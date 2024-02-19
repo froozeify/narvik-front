@@ -1,0 +1,144 @@
+<script setup lang="ts">
+  import type {Member} from "~/types/member";
+  import MemberQuery from "~/composables/api/query/MemberQuery";
+  import {formatDateReadable} from "~/utils/date";
+  import ImageQuery from "~/composables/api/query/ImageQuery";
+
+  definePageMeta({
+    layout: "admin"
+  });
+
+  useHead({
+    title: 'Trombinoscope'
+  })
+
+  const isLoading = ref(true);
+
+  const page = ref(1);
+  const itemsPerPage = ref(30);
+  const sort = ref({
+    column: 'lastname',
+    direction: 'asc'
+  });
+  const totalMembers: Ref<number> = ref(0);
+
+  const members: Ref<Member[]> = ref([]);
+
+  const memberQuery = new MemberQuery();
+  const imageQuery = new ImageQuery();
+
+  getMembers();
+
+  function getMembers() {
+    isLoading.value = true;
+
+    const urlParams = new URLSearchParams({
+      page: page.value.toString(),
+      itemsPerPage: itemsPerPage.value.toString(),
+      'exists[licence]': 'true',
+    });
+
+    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+    urlParams.append(`order[firstname]`, 'asc');
+    urlParams.append('currentSeason[memberSeasons.season]', 'true');
+
+    memberQuery.getAll(urlParams).then(value => {
+      isLoading.value = false;
+
+      if (value.items) {
+        value.items.value.forEach(member => {
+          loadMemberProfileImage(member).then(img => {
+            if (img) {
+              member.profileImageBase64 = img;
+            }
+          })
+        })
+
+        members.value = members.value.concat(value.items.value)
+
+
+        if (value.totalItems.value && totalMembers.value == 0) {
+          totalMembers.value = value.totalItems.value
+        }
+
+        if (value.view.value && value.view.value?.["hydra:next"]) {
+          page.value = page.value + 1;
+          getMembers();
+          return;
+        }
+      }
+    });
+  }
+
+  async function loadMemberProfileImage(member: Member) {
+    if (!member.profileImage) return null;
+
+    const {retrieved} = await imageQuery.get(member.profileImage);
+    if (!retrieved || !retrieved.value || !retrieved.value.base64) return null
+
+    return retrieved.value.base64
+  }
+</script>
+
+<template>
+  <div>
+    <UCard class="print:ring-0 print:shadow-none">
+      <div class="text-xl font-bold mb-4">Trombinoscope pour la saison actuelle ({{totalMembers}} membres)</div>
+
+      <div class="grid grid-flow-row gap-4 grid-cols-1 sm:grid-cols-3 xl:grid-cols-5">
+        <NuxtLink
+          v-for="member in (members)"
+          :to="`/admin/members/${member.id}`"
+          target="_blank"
+          class="transition ease-in-out hover:scale-105 duration-300 "
+        >
+          <UCard
+            :ui="{
+              background: 'bg-white dark:bg-slate-950'
+            }"
+          >
+            <div class="h-24 w-24 aspect-square mx-auto">
+              <img class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800" v-if="member.profileImageBase64" :src="member.profileImageBase64" />
+              <USkeleton v-else class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+            </div>
+
+            <div class="mt-4 mx-auto text-center">
+              <p>{{ member.lastname }}</p>
+              <p>{{ member.firstname }}</p>
+            </div>
+
+            <div class="mx-auto text-center mt-1">
+              {{ member.licence }}
+            </div>
+
+          </UCard>
+
+        </NuxtLink>
+
+        <template v-if="isLoading">
+          <UCard
+            v-for="i in (totalMembers - members.length + 7)"
+            :ui="{
+              background: 'bg-white dark:bg-slate-950'
+            }"
+          >
+            <div class="mx-auto my-0 h-24 w-24 aspect-square">
+              <USkeleton class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+            </div>
+
+            <div class="space-y-4 w-full mt-4">
+              <div v-for="w in ['w-52 h-8', 'w-36 h-4']" class="flex justify-center">
+                <USkeleton :class="w" />
+              </div>
+            </div>
+          </UCard>
+        </template>
+      </div>
+
+    </UCard>
+  </div>
+</template>
+
+<style scoped lang="scss">
+
+</style>

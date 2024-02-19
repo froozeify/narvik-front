@@ -29,6 +29,7 @@ export function getAvailableMemberRoles() {
 
 export interface Member extends Item {
   profileImage?: string;
+  profileImageBase64?: string;
   lastControlShooting?: Date;
   accountActivated?: boolean;
   plainPassword?: string;
