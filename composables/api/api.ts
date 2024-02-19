@@ -8,12 +8,15 @@ import mergician from "mergician";
 import {JwtToken} from "~/types/jwtTokens";
 import {jwtDecode} from "jwt-decode";
 import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/useApiData";
+import {useSelfMemberStore} from "~/stores/useSelfMember";
 
 const MIME_TYPE = "application/ld+json";
 const MIME_TYPE_JSON = "application/json";
 const MIME_TYPE_JSON_PATCH = "application/merge-patch+json"
 
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data"
+
+const isRefreshingJwtToken = ref(false);
 
 export function getJwtCookies(): JwtToken|null {
   let jwtToken: JwtToken|null = null;
@@ -56,7 +59,11 @@ function setJwtCookies(payload: JwtToken) {
   }
 }
 
-async function enhanceJwtCookiesDefined() {
+function delay(time: number) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
+async function enhanceJwtCookiesDefined(delayedCalled: number = 0) {
   let jwtCookies = getJwtCookies()
 
   if (!jwtCookies) {
@@ -64,13 +71,32 @@ async function enhanceJwtCookiesDefined() {
   }
 
   if (!jwtCookies.access || !jwtCookies.access.token) {
-    if (jwtCookies.refresh) {
-      jwtCookies = await useRefreshAccessToken(jwtCookies.refresh.token)
-      if (!jwtCookies) {
-        useLogout()
-        throw new Error("An error occurred when refreshing the token.");
+    if (jwtCookies.refresh && jwtCookies.refresh.token) {
+
+      // First request is refreshing
+      if (!isRefreshingJwtToken.value) {
+        isRefreshingJwtToken.value = true
+        jwtCookies = await useRefreshAccessToken(jwtCookies.refresh.token)
+        if (!jwtCookies) {
+          useLogout()
+          throw new Error("An error occurred when refreshing the token.");
+        }
+        isRefreshingJwtToken.value = false
+      } else {
+        // We are already refreshing we wait
+        await delay(100)
+
+        // Taking to long to refresh we are in timeout
+        if (delayedCalled > 100) { // 10 secondes
+          useLogout()
+          throw new Error("Taking too long to refresh the token.");
+        }
+
+        return enhanceJwtCookiesDefined(++delayedCalled);
       }
+
     } else {
+      useLogout()
       throw new Error("No refresh access token.");
     }
   }
@@ -164,6 +190,7 @@ async function useRefreshAccessToken(refresh_token: string) {
   });
 
   if (error.value) {
+    console.error(error.value)
     return null;
   }
 

@@ -2,6 +2,9 @@
 import type { FormSubmitEvent } from '#ui/types'
 import {useLoginUser} from "~/composables/api/api";
 
+const toast = useToast()
+const isLoading = ref(false)
+
 const state = reactive({
   email: undefined,
   password: undefined
@@ -9,12 +12,19 @@ const state = reactive({
 
 async function onSubmit(event: FormSubmitEvent<{email: string, password: string}>) {
   try {
+    isLoading.value = true
     await useLoginUser(event.data.email, event.data.password);
   } catch (e) {
-    console.log("Login failed");
+    toast.add({
+      color: "red",
+      title: "Erreur de connexion"
+    })
+    console.error(e)
+    isLoading.value = false
     return;
   }
 
+  isLoading.value = false
   await navigateTo('/');
 }
 </script>
@@ -31,7 +41,7 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
           <UInput v-model="state.password" type="password" />
         </UFormGroup>
 
-        <UButton type="submit">
+        <UButton type="submit" :loading="isLoading">
           Connexion
         </UButton>
       </UForm>
