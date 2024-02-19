@@ -25,6 +25,11 @@
       label: 'Membres',
       icon: 'i-heroicons-user-group',
       to: '/admin/members'
+    },
+    {
+      label: 'Trombinoscope',
+      icon: 'i-heroicons-face-smile',
+      to: '/admin/thrombinoscope'
     }
   ]
 
@@ -75,7 +80,7 @@
     <main class="min-h-full">
       <div class="container mx-auto p-4">
         <div class="flex flex-col lg:grid lg:grid-cols-10 lg:gap-8">
-          <div class="lg:col-span-2">
+          <div class="lg:col-span-2 print:hidden">
             <UVerticalNavigation
                 :links="links"
                 :ui="{
