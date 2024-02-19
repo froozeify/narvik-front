@@ -7,6 +7,7 @@ import type {MemberPresence} from "~/types/memberpresence";
 import type {Member} from "~/types/member";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence";
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
+import {formatTimeReadable} from "~/utils/date";
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
@@ -51,16 +52,26 @@ const addExternalPresenceModal = ref(false);
 const selectedMemberPresence: Ref<MemberPresence | null> = ref(null)
 const selectedMember: Ref<Member | null> = ref(null)
 
-const columns = [{
-  key: 'member.licence',
-  label: 'Licence'
-}, {
-  key: 'member.fullName',
-  label: 'Nom'
-}, {
-  key: 'activities',
-  label: 'Activités'
-}]
+const columns = [
+  {
+    key: 'createdAt',
+    label: 'Heure',
+    class: 'w-20',
+    sortable: true
+  },
+  {
+    key: 'member.licence',
+    label: 'Licence',
+    class: 'w-24'
+  }, {
+    key: 'member.fullName',
+    label: 'Nom',
+    class: 'w-1/3'
+  }, {
+    key: 'activities',
+    label: 'Activités'
+  }
+]
 
 function rowClicked(row: MemberPresence) {
   selectedMemberPresence.value = row;
@@ -143,12 +154,21 @@ function memberPresenceUpdated(memberPresence: MemberPresence) {
           class="w-full"
           :columns="columns"
           :rows="presenceList.presentMembers"
+          :ui="{
+            td: {
+              padding: 'py-2'
+            }
+          }"
           @select="rowClicked">
         <template #empty-state>
           <div class="flex flex-col items-center justify-center py-6 gap-3">
             <span class="italic text-sm">Aucune présence enregistrée</span>
             <UButton class="mt-4" label="S'enregistrer" @click="openAddPresenceModal()"/>
           </div>
+        </template>
+
+        <template #createdAt-data="{row}">
+          {{ formatTimeReadable(row.createdAt) }}
         </template>
 
         <template #activities-data="{row}">

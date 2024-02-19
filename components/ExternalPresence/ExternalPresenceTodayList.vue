@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type {ExternalPresence} from "~/types/externalpresence";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
+import {formatTimeReadable} from "~/utils/date";
 
 const externalPresenceModalOpen = ref(false);
 const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)
@@ -10,16 +11,25 @@ if (externalPresenceStore.list === undefined) {
   externalPresenceStore.refresh()
 }
 
-const columns = [{
-  key: 'licence',
-  label: 'Licence'
-}, {
-  key: 'fullName',
-  label: 'Nom'
-}, {
-  key: 'activities',
-  label: 'Activités'
-}]
+const columns = [
+  {
+    key: 'createdAt',
+    label: 'Heure',
+    class: 'w-20',
+    sortable: true
+  },
+  {
+    key: 'licence',
+    label: 'Licence',
+    class: 'w-24'
+  }, {
+    key: 'fullName',
+    label: 'Nom'
+  }, {
+    key: 'activities',
+    label: 'Activités'
+  }
+]
 
 function rowClicked(row: ExternalPresence) {
   selectedExternalPresence.value = row;
@@ -39,7 +49,16 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
         class="w-full"
         :columns="columns"
         :rows="externalPresenceStore.list"
+        :ui="{
+          td: {
+            padding: 'py-2'
+          }
+        }"
         @select="rowClicked">
+
+      <template #createdAt-data="{row}">
+        {{ formatTimeReadable(row.createdAt) }}
+      </template>
 
       <template #licence-data="{row}">
         <div v-if="!row.licence">
