@@ -197,7 +197,12 @@ function memberPresenceUpdated(memberPresence: MemberPresence) {
     </UModal>
 
     <UModal
-        v-model="memberPresenceModalOpen">
+        v-model="memberPresenceModalOpen"
+        :ui="{
+           background: 'bg-transparent',
+           shadow: 'shadow-none'
+        }"
+    >
       <PresentMemberDetails
           :item="selectedMemberPresence"
           @updated="memberPresenceUpdated"

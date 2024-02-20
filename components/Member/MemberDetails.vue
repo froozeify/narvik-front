@@ -7,10 +7,10 @@
   import type {MemberPresence} from "~/types/memberpresence";
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
   import { formatDateTime, formatDateReadable } from "~/utils/date"
+  import {useSelfMemberStore} from "~/stores/useSelfMember";
 
   import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
   import { Doughnut } from 'vue-chartjs'
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
@@ -44,6 +44,7 @@
   const member: Ref<Member | undefined> = ref(undefined)
   const memberProfileImage: Ref<Image | undefined> = ref(undefined)
   const memberPresences: Ref<MemberPresence[]> = ref([])
+  const totalMemberPresences = computed(() => memberPresences.value.length)
 
   const chartData: Ref<object|undefined> = ref(undefined)
   const chartOptions = ref({
@@ -220,7 +221,7 @@
 
     const { totalItems, items } = await memberQuery.presences(member.value.id, presenceUrlParams)
     if (totalItems.value && totalItems.value > 0) {
-      memberPresences.value = items
+      memberPresences.value = items.value
 
       // We update the chart
       let data: any = []
@@ -412,9 +413,9 @@
     </UCard>
 
     <div class="mt-4">
-      <UCard v-if="memberPresences && memberPresences.value">
+      <UCard v-if="totalMemberPresences > 0">
 
-        <div class="text-lg">{{ memberPresences.value.length }} présences ces 12 derniers mois</div>
+        <div class="text-lg">{{ totalMemberPresences }} présences ces 12 derniers mois</div>
 
         <div class="h-96 mt-4">
           <Doughnut
@@ -439,7 +440,7 @@
               key: 'actions'
             }
           ]"
-            :rows="memberPresences.value"
+            :rows="memberPresences"
         >
 
           <template #empty-state>
