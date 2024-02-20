@@ -67,37 +67,45 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 		return new Promise(resolve => setTimeout(resolve, time));
 	}
 
+	function displayJwtError(description: string, redirect: boolean = true) {
+		const toast = useToast()
+		toast.add({
+			color: "red",
+			title: "Erreur d'authentification",
+			description: description
+		})
+		logout(redirect)
+		return ref(null)
+	}
+
 	async function enhanceJwtTokenDefined(delayedCalled: number = 0) {
 		const jwtToken = getSelfJwtToken()
 
 		if (!jwtToken || !jwtToken.value) {
-			throw new Error("No auth token.");
+			return displayJwtError("No auth token.")
 		}
 
 		// Access token is expired
 		if (!jwtToken.value.access || !jwtToken.value.access.token || (jwtToken.value.access && jwtToken.value.access.date < new Date() )) {
 			if (!(jwtToken.value.refresh && jwtToken.value.refresh.token)) {
-				logout(false)
-				throw new Error("No refresh access token.");
+				return displayJwtError("No refresh access token.")
 			}
 
-			// First request is refreshing
+			// Already refreshing
 			if (isRefreshingJwtToken.value) {
 				// We are already refreshing we wait
 				await delay(100)
 				// Taking to long to refresh we are in timeout
 				if (delayedCalled > 100) { // 10 secondes
-					logout(false)
-					throw new Error("Taking too long to refresh the token.");
+					return displayJwtError("Taking too long to refresh the token.", false);
 				}
 				return enhanceJwtTokenDefined(++delayedCalled);
 			}
 
 			isRefreshingJwtToken.value = true
-			await useRefreshAccessToken(jwtToken)
-			if (!jwtToken.value) {
-				logout(false)
-				throw new Error("An error occurred when refreshing the token.");
+			const newJwtToken = await useRefreshAccessToken(jwtToken)
+			if (!newJwtToken || !jwtToken.value) {
+				return displayJwtError("An error occurred when refreshing the token.")
 			}
 			isRefreshingJwtToken.value = false
 		}
@@ -234,5 +242,6 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 		selfJwtToken,
 		setJwtSelfJwtTokenFromApiResponse,
 		enhanceJwtTokenDefined,
+		displayJwtError
 	}
 })
