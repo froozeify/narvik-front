@@ -5,141 +5,29 @@ import type {View} from "~/types/view";
 import type {SubmissionErrors} from "~/types/error";
 import type {Item} from "~/types/item";
 import mergician from "mergician";
-import {JwtToken} from "~/types/jwtTokens";
-import {jwtDecode} from "jwt-decode";
 import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/useApiData";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 
-const MIME_TYPE = "application/ld+json";
-const MIME_TYPE_JSON = "application/json";
-const MIME_TYPE_JSON_PATCH = "application/merge-patch+json"
+export const MIME_TYPE = "application/ld+json";
+export const MIME_TYPE_JSON = "application/json";
+export const MIME_TYPE_JSON_PATCH = "application/merge-patch+json"
 
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data"
-
-const isRefreshingJwtToken = ref(false);
-
-export function getJwtCookies(): JwtToken|null {
-  let jwtToken: JwtToken|null = null;
-
-  const authCookie = useCookie('auth');
-  if (authCookie && authCookie.value != undefined) {
-    jwtToken = new JwtToken();
-    jwtToken.access = JSON.parse(atob(authCookie.value));
-  }
-
-  const refreshTokenCookie = useCookie('auth_refresh');
-  if (refreshTokenCookie && refreshTokenCookie.value != undefined) {
-    if (!jwtToken) {
-      jwtToken = new JwtToken()
-    }
-    jwtToken.refresh = JSON.parse(atob(refreshTokenCookie.value));
-  }
-
-  return jwtToken;
-}
-
-function setJwtCookies(payload: JwtToken) {
-  if (payload.access) {
-    const authCookie = useCookie('auth', {
-      expires: payload.access.date,
-      httpOnly: false,
-      sameSite: true,
-    });
-    authCookie.value = btoa(JSON.stringify(payload.access))
-  }
-
-  if (payload.refresh && payload.refresh.date) {
-    // Expire at the date returned by the refresh token
-    const refreshTokenCookie = useCookie('auth_refresh', {
-      expires: payload.refresh.date,
-      httpOnly: false,
-      sameSite: true,
-    });
-    refreshTokenCookie.value = btoa(JSON.stringify(payload.refresh));
-  }
-}
-
-function delay(time: number) {
-  return new Promise(resolve => setTimeout(resolve, time));
-}
-
-async function enhanceJwtCookiesDefined(delayedCalled: number = 0) {
-  let jwtCookies = getJwtCookies()
-
-  if (!jwtCookies) {
-    throw new Error("No auth token.");
-  }
-
-  if (!jwtCookies.access || !jwtCookies.access.token) {
-    if (jwtCookies.refresh && jwtCookies.refresh.token) {
-
-      // First request is refreshing
-      if (!isRefreshingJwtToken.value) {
-        isRefreshingJwtToken.value = true
-        jwtCookies = await useRefreshAccessToken(jwtCookies.refresh.token)
-        if (!jwtCookies) {
-          useLogout()
-          throw new Error("An error occurred when refreshing the token.");
-        }
-        isRefreshingJwtToken.value = false
-      } else {
-        // We are already refreshing we wait
-        await delay(100)
-
-        // Taking to long to refresh we are in timeout
-        if (delayedCalled > 100) { // 10 secondes
-          useLogout()
-          throw new Error("Taking too long to refresh the token.");
-        }
-
-        return enhanceJwtCookiesDefined(++delayedCalled);
-      }
-
-    } else {
-      useLogout()
-      throw new Error("No refresh access token.");
-    }
-  }
-
-  return jwtCookies;
-}
-
-function setJwtCookiesFromApiResponse(data: Ref<any>): JwtToken {
-  const jwtToken = new JwtToken();
-  jwtToken.access = {
-    date: new Date(Date.now() + (3480 * 1000)), // Expires in 1h - 2mn (to get some room on the token expiration),
-    token: data.value.token
-  }
-
-  jwtToken.refresh = {
-    date: new Date((data.value.refresh_token_expiration - 120) * 1000),
-    token: data.value.refresh_token
-  }
-
-  setJwtCookies(jwtToken);
-
-  return jwtToken;
-}
-
-
-
-
-
-
 
 async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLogin: boolean = true) {
   let overloadedOptions = undefined
 
   if (requireLogin) {
     try {
-      const jwtCookies = await enhanceJwtCookiesDefined();
+      const selfStore = useSelfMemberStore()
+      const jwtToken = await selfStore.enhanceJwtTokenDefined();
       // We throw an error if at this point we still don't have an access token
-      if (!jwtCookies || !jwtCookies.access) {
+      if (!jwtToken.value || !jwtToken.value.access) {
         throw new Error("No access token.");
       }
       overloadedOptions = mergician({
         headers: {
-          Authorization: 'Bearer ' + jwtCookies.access.token
+          Authorization: 'Bearer ' + jwtToken.value.access.token
         }
       }, options);
     } catch (e: any) {
@@ -179,24 +67,6 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
   return response;
 }
 
-async function useRefreshAccessToken(refresh_token: string) {
-  const { data, error } = await useLocalApiData("auth/token/refresh", {
-    method: "POST",
-    headers: {
-      Accept: MIME_TYPE_JSON,
-      'content-type': 'application/x-www-form-urlencoded',
-    },
-    body: `refresh_token=${refresh_token}`
-  });
-
-  if (error.value) {
-    console.error(error.value)
-    return null;
-  }
-
-  return setJwtCookiesFromApiResponse(data);
-}
-
 export async function useLoginUser(email: string, password: string) {
   const { data, error } = await useLocalApiData("auth", {
     method: "POST",
@@ -213,7 +83,8 @@ export async function useLoginUser(email: string, password: string) {
     throw error;
   }
 
-  setJwtCookiesFromApiResponse(data);
+  const selfStore = useSelfMemberStore()
+  selfStore.setJwtSelfJwtTokenFromApiResponse(data)
 
   return true;
 }
@@ -230,17 +101,10 @@ export async function useLoginBadger(loginToken: string) {
     throw error;
   }
 
-  setJwtCookiesFromApiResponse(data);
+  const selfStore = useSelfMemberStore()
+  selfStore.setJwtSelfJwtTokenFromApiResponse(data)
 
   return true;
-}
-
-export function useLogout() {
-  const authCookie = useCookie('auth');
-  authCookie.value = null
-
-  const refreshTokenCookie = useCookie('auth_refresh');
-  refreshTokenCookie.value = null;
 }
 
 

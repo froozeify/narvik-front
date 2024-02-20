@@ -13,7 +13,9 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
     }
   });
 
+  // const, to avoid it being reactive and login back user
   const isAdmin = selfStore.isAdmin()
+  const isBadger = selfStore.isBadger()
   const isSupervisor = selfStore.hasSupervisorRole()
 
 </script>
@@ -35,7 +37,7 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
               @click="isDark = !isDark"
           />
         </li>
-        <li v-if="!selfStore.isBadger()">
+        <li v-if="!isBadger">
           <UButton
               icon="i-heroicons-user-circle-solid"
               color="gray"
