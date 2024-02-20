@@ -11,8 +11,9 @@ const state = reactive({
 })
 
 async function onSubmit(event: FormSubmitEvent<{email: string, password: string}>) {
+  isLoading.value = true
+
   try {
-    isLoading.value = true
     await useLoginUser(event.data.email, event.data.password);
   } catch (e) {
     toast.add({
@@ -25,7 +26,7 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
   }
 
   isLoading.value = false
-  await navigateTo('/');
+  navigateTo('/');
 }
 </script>
 

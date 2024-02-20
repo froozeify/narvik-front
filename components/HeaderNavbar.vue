@@ -23,7 +23,7 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
     <nav class="container mx-auto p-4 flex justify-between h-full">
       <ul class="flex gap-4">
         <li><NuxtLink to="/">Accueil</NuxtLink></li>
-        <li v-if="isSupervisor"><NuxtLink to="/admin">Admin</NuxtLink></li>
+        <li v-if="isSupervisor"><NuxtLink to="/admin">Administration</NuxtLink></li>
       </ul>
       <ul class="flex gap-4">
         <li>
