@@ -199,7 +199,7 @@ function memberPresenceUpdated(memberPresence: MemberPresence) {
     <UModal
         v-model="memberPresenceModalOpen"
         :ui="{
-           background: 'bg-transparent',
+           background: 'bg-transparent dark:bg-transparent',
            shadow: 'shadow-none'
         }"
     >
