@@ -14,6 +14,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'updated',
+  'canceled'
 ])
 
 
@@ -25,6 +26,11 @@ function presenceUpdated(newExternalPresence: ExternalPresence) {
   updateExternalPresenceModalOpen.value = false;
   externalPresence.value = newExternalPresence
   emit('updated', newExternalPresence)
+}
+
+function presenceCanceled(newExternalPresence: ExternalPresence) {
+  updateExternalPresenceModalOpen.value = false;
+  emit('canceled', newExternalPresence)
 }
 
 </script>
@@ -47,7 +53,8 @@ function presenceUpdated(newExternalPresence: ExternalPresence) {
       <div class="text-center text-2xl font-bold">
         {{ externalPresence.fullName }}
       </div>
-      <div class="text-center text-xl">
+      <div class="flex items-center justify-center text-xl">
+        <UIcon class="mr-2" name="i-heroicons-identification" />
         {{ externalPresence.licence }}
       </div>
       <div class="flex gap-4 justify-center flex-wrap">
@@ -68,6 +75,7 @@ function presenceUpdated(newExternalPresence: ExternalPresence) {
     <RegisterExternalPresence
       :external-presence="externalPresence"
       @registered="presenceUpdated"
+      @canceled="presenceCanceled"
     />
   </UModal>
 </template>

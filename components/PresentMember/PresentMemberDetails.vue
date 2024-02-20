@@ -90,7 +90,8 @@ async function copyLicence() {
       <div class="text-center text-2xl font-bold">
         {{ member.fullName }}
       </div>
-      <div class="text-center text-xl cursor-pointer select-none" @click="copyLicence">
+      <div class="flex items-center justify-center text-xl cursor-pointer select-none" @click="copyLicence">
+        <UIcon class="mr-2" name="i-heroicons-identification" />
         {{ member.licence }}
       </div>
       <div v-if="member.lastControlShooting" class="text-center text-xl">

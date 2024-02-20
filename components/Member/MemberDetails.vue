@@ -377,7 +377,7 @@
         </div>
 
         <div class="grid grid-cols-2">
-          <div>
+          <div class="flex items-center">
             {{ member.lastname }} {{ member.firstname }}
           </div>
 
@@ -391,8 +391,9 @@
             </template>
           </div>
 
-          <div>
-            {{ member.licence }}
+          <div class="flex items-center">
+            <UIcon class="mr-2" name="i-heroicons-identification" />
+            <p>{{ member.licence }}</p>
           </div>
 
           <div class="flex items-center">
