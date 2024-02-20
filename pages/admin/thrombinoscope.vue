@@ -85,6 +85,20 @@
     <UCard class="print:ring-0 print:shadow-none">
       <div class="text-xl font-bold mb-4">Trombinoscope pour la saison actuelle ({{totalMembers}} membres)</div>
 
+      <UProgress
+        v-if="isLoading"
+        class="mb-4"
+        :value="members.length"
+        :max="totalMembers"
+        indicator
+      >
+        <template #indicator="{percent}">
+          <div class="text-right" :style="{ width: `${percent}%` }">
+            <span class="text-xs">Liste chargée à {{ Math.round(percent) || 0 }} %</span>
+          </div>
+        </template>
+      </UProgress>
+
       <div class="grid grid-flow-row gap-4 grid-cols-1 sm:grid-cols-3 xl:grid-cols-5">
         <NuxtLink
           v-for="member in (members)"
