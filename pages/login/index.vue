@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from '#ui/types'
 import {useLoginUser} from "~/composables/api/api";
+import {useImageLogo, useLoadImageLogo} from "~/composables/image";
 
 const toast = useToast()
 const isLoading = ref(false)
@@ -9,6 +10,8 @@ const state = reactive({
   email: undefined,
   password: undefined
 })
+
+useLoadImageLogo(false)
 
 async function onSubmit(event: FormSubmitEvent<{email: string, password: string}>) {
   isLoading.value = true
@@ -32,6 +35,10 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
 
 <template>
   <div>
+    <div v-if="useImageLogo" class="h-24 flex justify-center mb-4">
+      <img :src="useImageLogo.base64" class="h-full" />
+    </div>
+
     <UCard>
       <UForm :state="state" class="space-y-4" @submit="onSubmit">
         <UFormGroup label="Email" name="email">

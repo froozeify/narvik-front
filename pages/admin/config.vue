@@ -5,6 +5,9 @@ import type {GlobalSetting} from "~/types/globalsetting";
 import clipboard from "clipboardy";
 import ActivityQuery from "~/composables/api/query/ActivityQuery";
 import type {Activity} from "~/types/activity";
+import type {Image} from "~/types/image";
+import ImageQuery from "~/composables/api/query/ImageQuery";
+import {useImageLogo, useLoadImageLogo} from "~/composables/image";
 
 definePageMeta({
   layout: "admin"
@@ -42,6 +45,13 @@ const activities: Ref<Activity[] | undefined> = ref(undefined);
 activityQuery.getAll().then(value => {
   activities.value = value.items.value
 })
+
+const logoUploading = ref(false)
+const state = reactive({
+  file: undefined
+})
+
+useLoadImageLogo()
 
 function copyBadgerLink() {
   if (!badgerSetting.value) return;
@@ -87,11 +97,65 @@ async function getActivity(id: string) {
   return response.retrieved;
 }
 
+async function uploadLogo(event) {
+  const files = event.target.files || event.dataTransfer.files;
+
+  if (files.length > 0) {
+    logoUploading.value = true
+
+    const formData = new FormData()
+    formData.append('file', files.item(0), files.item(0).name)
+
+    const { created, violations, error } = await globalSettingQuery.importLogo(formData)
+
+    if (created.value) {
+      useLoadImageLogo(false)
+      toast.add({
+        title: "Logo envoyé",
+        color: "green"
+      })
+    } else {
+      toast.add({
+        title: "Erreur lors de l'envoie du logo",
+        description: error.value?.message,
+        color: "red"
+      })
+    }
+
+    logoUploading.value = false
+  }
+}
+
+async function deleteLogo() {
+  logoUploading.value = true
+
+  const formData = new FormData()
+
+  const { created, error } = await globalSettingQuery.importLogo(formData)
+
+  if (created.value) {
+    useLoadImageLogo(false)
+    toast.add({
+      title: "Logo supprimé",
+      color: "green"
+    })
+  } else {
+    toast.add({
+      title: "Erreur lors de la suppression du logo",
+      description: error.value?.message,
+      color: "red"
+    })
+  }
+
+  logoUploading.value = false
+}
+
+
 </script>
 
 <template>
-  <div>
-    <UCard>
+  <div class="grid gap-4 md:grid-cols-3">
+    <UCard class="md:col-span-3">
       <div class="text-xl font-bold mb-4">Lien de connexion badger</div>
       <div>A mettre en favoris sur l'ordinateur accessible publiquement.</div>
       <div>Ce lien permet d'être automatiquement connecté en tant que badgeuse (accès seulement à la liste de présence).</div>
@@ -126,7 +190,7 @@ async function getActivity(id: string) {
       </div>
     </UCard>
 
-    <UCard class="mt-4">
+    <UCard class="h-fit">
       <div class="text-xl font-bold mb-4">Activité correspondant au tir de contrôle</div>
       <div v-if="!controlShootingSetting" class="mt-4">
         <USkeleton class="h-4 w-full" />
@@ -140,6 +204,41 @@ async function getActivity(id: string) {
             value-attribute="id"
             placeholder="Tir de contrôle non défini" />
       </div>
+    </UCard>
+
+    <UCard>
+      <div class="text-xl font-bold mb-4">Logo</div>
+      <div v-if="useImageLogo" class="mt-4 flex justify-center">
+        <img :src="useImageLogo.base64" class="w-48" />
+      </div>
+
+      <UInput
+          :loading="logoUploading"
+          class="my-4"
+          type="file"
+          accept="image/png"
+          icon="i-heroicons-paint-brush"
+          v-model="state.file"
+          @change="uploadLogo"
+      />
+
+      <UPopover overlay v-if="useImageLogo">
+        <UButton color="red">
+          Supprimer le logo
+        </UButton>
+
+        <template #panel="{ close }">
+          <div class="p-4 w-56 flex flex-col gap-4">
+            <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+
+            <UButton color="red" @click="deleteLogo" class="mx-auto">
+              Supprimer le logo
+            </UButton>
+          </div>
+        </template>
+
+      </UPopover>
+
     </UCard>
   </div>
 </template>

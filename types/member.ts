@@ -17,7 +17,7 @@ export function getAvailableMemberRoles() {
       value: MemberRole.Admin
     },
     {
-      text:  'Superviseur',
+      text:  'Superviseur/Permanent',
       value: MemberRole.Supervisor
     },
     {

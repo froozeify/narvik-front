@@ -1,3 +1,23 @@
+<script setup lang="ts">
+  import {useImageLogo, useLoadImageLogo} from "~/composables/image";
+
+  useLoadImageLogo()
+
+  watch(useImageLogo, (newValue, oldValue) => {
+    if (newValue && newValue.mimeType && newValue.base64) {
+      useHead({
+        link: [
+          {
+            rel: 'icon',
+            type: newValue.mimeType,
+            href: newValue.base64
+          }
+        ]
+      })
+    }
+  })
+</script>
+
 <template>
   <div>
     <main class="min-h-full h-screen flex justify-center items-center">
@@ -12,6 +32,3 @@
 <style lang="scss" scoped>
 
 </style>
-
-<script setup lang="ts">
-</script>

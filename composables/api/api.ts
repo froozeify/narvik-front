@@ -15,7 +15,7 @@ export const MIME_TYPE_JSON_PATCH = "application/merge-patch+json"
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data"
 
 async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLogin: boolean = true) {
-  let overloadedOptions = undefined
+  let overloadedOptions = {}
 
   if (requireLogin) {
     const selfStore = useSelfMemberStore()
@@ -130,7 +130,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
   };
 }
 
-export async function useFetchItem<T>(path: string, useCache: boolean = false): Promise<FetchItemData<T>> {
+export async function useFetchItem<T>(path: string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<T>> {
   const retrieved: Ref<T | undefined> = ref(undefined);
   const hubUrl: Ref<URL | undefined> = ref(undefined);
 
@@ -140,7 +140,7 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false): 
       retrieved.value = response._data;
       hubUrl.value = extractHubURL(response);
     },
-  });
+  }, requireLogin);
 
   retrieved.value = data.value as T;
 
@@ -189,7 +189,7 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
   };
 }
 
-export async function useUploadFile(resource: string, payload: FormData) {
+export async function useUploadFile(resource: string, payload: FormData, requireLogin: boolean = true) {
   const created: Ref<Object | undefined> = ref(undefined);
   const violations: Ref<SubmissionErrors | undefined> = ref(undefined);
 
@@ -217,7 +217,7 @@ export async function useUploadFile(resource: string, payload: FormData) {
 
       throw new SubmissionError(errors);
     },
-  });
+  }, requireLogin);
 
   created.value = data.value as Object;
 
