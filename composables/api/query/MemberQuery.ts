@@ -1,7 +1,7 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {Member} from "~/types/member";
 import type {FetchAllData} from "~/types/api";
-import {useFetchItem, useFetchList, usePut, useUpdateItem, useUploadFile} from "~/composables/api/api";
+import {useFetchItem, useFetchList, usePost, usePut, useUpdateItem, useUploadFile} from "~/composables/api/api";
 import type {MemberPresence} from "~/types/memberpresence";
 
 export default class MemberQuery extends AbstractQuery<Member> {
@@ -15,8 +15,8 @@ export default class MemberQuery extends AbstractQuery<Member> {
         return usePut('/self/update-password', {current: currentPassword, new: newPassword});
     }
 
-    async search(query: string): Promise<FetchAllData<Member>> {
-        return useFetchList<Member>(this.rootPath + "/-/search/" + encodeURI(query));
+    async search(query: string) {
+        return usePost<Member[]>(`${this.rootPath}/-/search`, {query});
     }
 
     async importFromItac(formData: FormData) {

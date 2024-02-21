@@ -38,10 +38,16 @@ async function search(query: any) {
     searching.value = true;
 
     const memberQuery = new MemberQuery();
-    const members = await memberQuery.search(query);
-    foundMembers.value = members.items;
-    if (members.totalItems.value === 1) {
-      rowClicked(members.items.value.at(0) as Member)
+    const searchResult = await memberQuery.search(query);
+
+    if (!searchResult.item.value) return;
+
+    const members: Ref<Member[]> = ref([])
+    members.value = searchResult.item.value
+
+    foundMembers.value = members.value;
+    if (members.value.length === 1) {
+      rowClicked(members.value.at(0) as Member)
     }
 
     searching.value = false;
@@ -78,7 +84,7 @@ function rowClicked(row: Member) {
         :loading="searching"
         class="w-full"
         :columns="columns"
-        :rows="foundMembers.value"
+        :rows="foundMembers"
         @select="rowClicked">
       <template #empty-state>
         <div class="flex flex-col items-center justify-center py-6 gap-3">

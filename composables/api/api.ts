@@ -270,6 +270,47 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
   };
 }
 
+export async function usePost<T>(path: string, payload: object) {
+  const item: Ref<T | undefined> = ref(undefined);
+  const violations: Ref<SubmissionErrors | undefined> = ref(undefined);
+
+  const { data, pending, error } = await useApi(path, {
+    method: "POST",
+    body: payload,
+    headers: {
+      Accept: MIME_TYPE,
+      "Content-Type": MIME_TYPE,
+    },
+
+    onResponseError({ response }) {
+      const data = response._data;
+      const error = data["hydra:description"] || response.statusText;
+
+      if (!data.violations) throw new Error(error);
+
+      const errors: SubmissionErrors = { _error: error };
+      data.violations.forEach(
+          (violation: { propertyPath: string; message: string }) => {
+            errors[violation.propertyPath] = violation.message;
+          }
+      );
+
+      violations.value = errors;
+
+      throw new SubmissionError(errors);
+    },
+  });
+
+  item.value = data.value as T;
+
+  return {
+    item,
+    isLoading: pending,
+    error,
+    violations,
+  };
+}
+
 export async function usePut(path: string, payload: object) {
   const updated: Ref<object | undefined> = ref(undefined);
   const violations: Ref<SubmissionErrors | undefined> = ref(undefined);
