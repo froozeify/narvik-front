@@ -49,6 +49,8 @@ const memberPresenceModalOpen = ref(false);
 const searchMemberModalOpen = ref(false);
 const addExternalPresenceModal = ref(false);
 
+const searchQuery = ref('')
+
 const selectedMemberPresence: Ref<MemberPresence | null> = ref(null)
 const selectedMember: Ref<Member | null> = ref(null)
 
@@ -89,6 +91,7 @@ function openAddExternalPresenceModal() {
 watch(searchMemberModalOpen, (value, oldValue) => {
   if (!value) {
     selectedMember.value = null;
+    searchQuery.value = '';
   }
 })
 
@@ -121,6 +124,29 @@ function memberPresenceUpdated(memberPresence: MemberPresence) {
     presentMembers.value = value.items.value
   });
 }
+
+function keyPressHandler(ev: KeyboardEvent) {
+  if (
+      externalPresenceStore.modalOpen === true ||
+      addExternalPresenceModal.value === true ||
+      memberPresenceModalOpen.value === true ||
+      searchMemberModalOpen.value === true) {
+    return;
+  }
+
+  openAddPresenceModal()
+  searchQuery.value = searchQuery.value + ev.key
+}
+
+onMounted(() => {
+  window.addEventListener('keypress', keyPressHandler)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keypress', keyPressHandler)
+  externalPresenceStore.modalOpen = false
+})
+
 </script>
 
 <template>
@@ -212,7 +238,7 @@ function memberPresenceUpdated(memberPresence: MemberPresence) {
     <UModal
         v-model="searchMemberModalOpen">
       <template v-if="!selectedMember">
-        <SearchMember @selected-member="memberSelectedFromSearch" />
+        <SearchMember :query="searchQuery" @selected-member="memberSelectedFromSearch" />
       </template>
       <template v-else>
         <RegisterMemberPresence :member="selectedMember" @registered="presenceRegistered" @canceled="searchMemberModalOpen = false;" />
