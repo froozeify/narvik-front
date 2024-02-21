@@ -139,6 +139,7 @@ function keyPressHandler(ev: KeyboardEvent) {
 }
 
 onMounted(() => {
+  externalPresenceStore.modalOpen = false
   window.addEventListener('keypress', keyPressHandler)
 })
 
