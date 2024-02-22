@@ -5,8 +5,8 @@ import type {Item} from "~/types/item";
 export abstract class AbstractQuery<T> {
 	protected abstract rootPath: string;
 
-	async get(id: number|string, useCache: boolean = false): Promise<FetchItemData<T>> {
-		return useFetchItem<T>(this.rootPath + "/" + id, useCache);
+	async get(id: number|string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<T>> {
+		return useFetchItem<T>(this.rootPath + "/" + id, useCache, requireLogin);
 	}
 
 	async getAll(urlParams?: URLSearchParams): Promise<FetchAllData<T>> {

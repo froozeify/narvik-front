@@ -1,3 +1,9 @@
+<script setup lang="ts">
+  import {useSetSiteFavicon} from "~/composables/image";
+
+  useSetSiteFavicon()
+</script>
+
 <template>
   <div>
     <main class="min-h-full h-screen flex justify-center items-center">
@@ -12,6 +18,3 @@
 <style lang="scss" scoped>
 
 </style>
-
-<script setup lang="ts">
-</script>

@@ -16,8 +16,7 @@ export default defineNuxtConfig({
 	],
 	app: {
 		head: {
-			// title: 'Narvik default',
-			titleTemplate: 'Narvik'
+			titleTemplate: 'Narvik',
 		}
 	},
 	runtimeConfig: {

@@ -3,9 +3,39 @@ import MemberQuery from "~/composables/api/query/MemberQuery";
 import {MIME_TYPE_JSON} from "~/composables/api/api";
 import {JwtToken} from "~/types/jwtTokens";
 import type {Ref} from "vue";
+import type {Image} from "~/types/image";
+import ImageQuery from "~/composables/api/query/ImageQuery";
+import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
 
 export const useSelfMemberStore = defineStore('selfMember', () => {
 	const member: Ref<Member | undefined> = ref(undefined)
+	const siteLogo: Ref<Image | null> = ref(null)
+
+	function getSiteLogo(useCache: boolean = true): Ref<Image|null> {
+		if (useCache && siteLogo.value) {
+			return siteLogo
+		}
+
+		const globalSettingQuery = new GlobalSettingQuery()
+		globalSettingQuery.getPublic("LOGO", useCache).then(value => {
+			if (value.retrieved && value.retrieved.value) {
+				// No logo
+				if (!value.retrieved.value.value) {
+					siteLogo.value = null
+					return;
+				}
+
+				const imageQuery = new ImageQuery()
+				imageQuery.getPublic(value.retrieved.value.value, useCache).then(imageQueryResponse => {
+					if (imageQueryResponse.retrieved && imageQueryResponse.retrieved.value) {
+						siteLogo.value = imageQueryResponse.retrieved.value
+					}
+				})
+			}
+		})
+
+		return siteLogo
+	}
 
 	// Session Management
 	const selfJwtToken: Ref<JwtToken | null> = ref(null)
@@ -238,6 +268,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 
 		hasSupervisorRole,
 
+		getSiteLogo,
 		// Session management
 		selfJwtToken,
 		setJwtSelfJwtTokenFromApiResponse,

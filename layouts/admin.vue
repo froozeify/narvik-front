@@ -1,4 +1,5 @@
-<script setup>
+<script setup lang="ts">
+  import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
 
   useHead({
@@ -7,14 +8,15 @@
     }
   });
 
-  const selfStore = useSelfMemberStore();
+  useSetSiteFavicon()
 
+  const selfStore = useSelfMemberStore()
   const isAdmin = selfStore.isAdmin()
   const isSupervisor = selfStore.hasSupervisorRole()
 
   const globalSection = [
     {
-      label: 'Accueil admin',
+      label: 'Accueil',
       icon: 'i-heroicons-home',
       to: '/admin'
     }
@@ -80,7 +82,7 @@
     <main class="min-h-full">
       <div class="container mx-auto p-4">
         <div class="flex flex-col lg:grid lg:grid-cols-10 lg:gap-8">
-          <div class="lg:col-span-2 print:hidden">
+          <div class="mb-4 lg:col-span-3 xl:col-span-2 print:hidden">
             <UVerticalNavigation
                 :links="links"
                 :ui="{
@@ -101,7 +103,7 @@
             />
 
           </div>
-          <div class="lg:col-span-8">
+          <div class="lg:col-span-7 xl:col-span-8">
             <slot/>
           </div>
         </div>

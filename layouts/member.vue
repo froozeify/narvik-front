@@ -1,9 +1,15 @@
 <script lang="ts" setup>
+import {useSetSiteFavicon} from "~/composables/image";
+
+
 useHead({
   titleTemplate: (title) => {
     return title ? `${title} - Narvik` : 'Narvik'
   }
 })
+
+useSetSiteFavicon()
+
 </script>
 
 <template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import type {Image} from "~/types/image";
 
   const colorMode = useColorMode()
   const selfStore = useSelfMemberStore();
@@ -18,24 +19,36 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
   const isBadger = selfStore.isBadger()
   const isSupervisor = selfStore.hasSupervisorRole()
 
+  const siteLogo: Ref<Image|null> = selfStore.getSiteLogo()
 </script>
 
 <template>
   <header class="bg-background/75 backdrop-blur border-b -mb-px sticky top-0 z-50 border-gray-200 dark:border-gray-800 h-16 print:hidden">
     <nav class="container mx-auto p-4 flex justify-between h-full">
       <ul class="flex gap-4">
-        <li><NuxtLink to="/">Accueil</NuxtLink></li>
+        <li>
+          <NuxtLink to="/" class="flex align-middle">
+            <span v-if="!siteLogo">Accueil</span>
+            <UTooltip v-else
+              text="Accueil"
+            >
+              <img :src="siteLogo.base64" class="w-7" />
+            </UTooltip>
+          </NuxtLink>
+        </li>
         <li v-if="isSupervisor"><NuxtLink to="/admin">Administration</NuxtLink></li>
       </ul>
       <ul class="flex gap-4">
         <li>
-          <UButton
-              :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
-              color="gray"
-              variant="ghost"
-              aria-label="Theme"
-              @click="isDark = !isDark"
-          />
+          <UTooltip text="Mode clair/sombre">
+            <UButton
+                :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
+                color="gray"
+                variant="ghost"
+                aria-label="Theme"
+                @click="isDark = !isDark"
+            />
+          </UTooltip>
         </li>
         <li v-if="!isBadger">
           <UButton
