@@ -1,24 +1,21 @@
-import ImageQuery from "~/composables/api/query/ImageQuery";
-import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
 import type {Image} from "~/types/image";
+import {useSelfMemberStore} from "~/stores/useSelfMember";
 
-const globalSettingQuery = new GlobalSettingQuery()
-export const useImageLogo: Ref<Image | null> = ref(null)
+export function useSetSiteFavicon() {
+	const selfStore = useSelfMemberStore()
+	const siteLogo: Ref<Image|null> = selfStore.getSiteLogo()
 
-export function useLoadImageLogo(useCache: boolean = true) {
-	globalSettingQuery.getPublic("LOGO", useCache).then(value => {
-		if (value.retrieved && value.retrieved.value) {
-			// No logo
-			if (!value.retrieved.value.value) {
-				useImageLogo.value = null
-				return;
-			}
-
-			const imageQuery = new ImageQuery()
-			imageQuery.getPublic(value.retrieved.value.value, useCache).then(imageQueryResponse => {
-				if (imageQueryResponse.retrieved && imageQueryResponse.retrieved.value) {
-					useImageLogo.value = imageQueryResponse.retrieved.value
-				}
+	watch(siteLogo, (newValue, oldValue) => {
+		if (newValue && newValue.mimeType && newValue.base64) {
+			useHead({
+				link: [
+					{
+						key: 'logo',
+						rel: 'icon',
+						type: newValue.mimeType,
+						href: newValue.base64
+					}
+				]
 			})
 		}
 	})

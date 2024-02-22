@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import {useImageLogo, useLoadImageLogo} from "~/composables/image";
+  import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
 
   useHead({
@@ -8,24 +8,9 @@
     }
   });
 
-  useLoadImageLogo()
+  useSetSiteFavicon()
 
-  watch(useImageLogo, (newValue, oldValue) => {
-    if (newValue && newValue.mimeType && newValue.base64) {
-      useHead({
-        link: [
-          {
-            rel: 'icon',
-            type: newValue.mimeType,
-            href: newValue.base64
-          }
-        ]
-      })
-    }
-  })
-
-  const selfStore = useSelfMemberStore();
-
+  const selfStore = useSelfMemberStore()
   const isAdmin = selfStore.isAdmin()
   const isSupervisor = selfStore.hasSupervisorRole()
 

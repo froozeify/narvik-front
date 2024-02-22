@@ -6,8 +6,7 @@ import clipboard from "clipboardy";
 import ActivityQuery from "~/composables/api/query/ActivityQuery";
 import type {Activity} from "~/types/activity";
 import type {Image} from "~/types/image";
-import ImageQuery from "~/composables/api/query/ImageQuery";
-import {useImageLogo, useLoadImageLogo} from "~/composables/image";
+import {useSelfMemberStore} from "~/stores/useSelfMember";
 
 definePageMeta({
   layout: "admin"
@@ -51,7 +50,9 @@ const state = reactive({
   file: undefined
 })
 
-useLoadImageLogo()
+const selfStore = useSelfMemberStore();
+const siteLogo: Ref<Image|null> = selfStore.getSiteLogo()
+
 
 function copyBadgerLink() {
   if (!badgerSetting.value) return;
@@ -109,7 +110,7 @@ async function uploadLogo(event) {
     const { created, violations, error } = await globalSettingQuery.importLogo(formData)
 
     if (created.value) {
-      useLoadImageLogo(false)
+      selfStore.getSiteLogo(false)
       toast.add({
         title: "Logo envoyé",
         color: "green"
@@ -134,7 +135,7 @@ async function deleteLogo() {
   const { created, error } = await globalSettingQuery.importLogo(formData)
 
   if (created.value) {
-    useLoadImageLogo(false)
+    selfStore.getSiteLogo(false)
     toast.add({
       title: "Logo supprimé",
       color: "green"
@@ -208,8 +209,8 @@ async function deleteLogo() {
 
     <UCard>
       <div class="text-xl font-bold mb-4">Logo</div>
-      <div v-if="useImageLogo" class="mt-4 flex justify-center">
-        <img :src="useImageLogo.base64" class="w-48" />
+      <div v-if="siteLogo" class="mt-4 flex justify-center">
+        <img :src="siteLogo.base64" class="w-48" />
       </div>
 
       <UInput
@@ -222,7 +223,7 @@ async function deleteLogo() {
           @change="uploadLogo"
       />
 
-      <UPopover overlay v-if="useImageLogo">
+      <UPopover overlay v-if="siteLogo">
         <UButton color="red">
           Supprimer le logo
         </UButton>

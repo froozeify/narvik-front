@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {useImageLogo, useLoadImageLogo} from "~/composables/image";
+import {useSetSiteFavicon} from "~/composables/image";
 
 
 useHead({
@@ -8,21 +8,7 @@ useHead({
   }
 })
 
-useLoadImageLogo()
-
-watch(useImageLogo, (newValue, oldValue) => {
-  if (newValue && newValue.mimeType && newValue.base64) {
-    useHead({
-      link: [
-        {
-          rel: 'icon',
-          type: newValue.mimeType,
-          href: newValue.base64
-        }
-      ]
-    })
-  }
-})
+useSetSiteFavicon()
 
 </script>
 

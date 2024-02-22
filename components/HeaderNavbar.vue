@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import {useSelfMemberStore} from "~/stores/useSelfMember";
-  import {useImageLogo, useLoadImageLogo} from "~/composables/image";
+  import type {Image} from "~/types/image";
 
   const colorMode = useColorMode()
   const selfStore = useSelfMemberStore();
@@ -19,7 +19,7 @@
   const isBadger = selfStore.isBadger()
   const isSupervisor = selfStore.hasSupervisorRole()
 
-  useLoadImageLogo()
+  const siteLogo: Ref<Image|null> = selfStore.getSiteLogo()
 </script>
 
 <template>
@@ -28,11 +28,11 @@
       <ul class="flex gap-4">
         <li>
           <NuxtLink to="/" class="flex align-middle">
-            <span v-if="!useImageLogo">Accueil</span>
+            <span v-if="!siteLogo">Accueil</span>
             <UTooltip v-else
               text="Accueil"
             >
-              <img :src="useImageLogo.base64" class="w-7" />
+              <img :src="siteLogo.base64" class="w-7" />
             </UTooltip>
           </NuxtLink>
         </li>
