@@ -3,7 +3,6 @@ import type {ExternalPresence} from "~/types/externalpresence";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
 import {formatTimeReadable} from "~/utils/date";
 
-const externalPresenceModalOpen = ref(false);
 const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)
 
 const externalPresenceStore = useExternalPresenceStore()
@@ -34,7 +33,7 @@ const columns = [
 
 function rowClicked(row: ExternalPresence) {
   selectedExternalPresence.value = row;
-  externalPresenceModalOpen.value = true;
+  externalPresenceStore.modalOpen = true;
 }
 
 function externalPresenceUpdated(externalPresence: ExternalPresence) {
@@ -89,7 +88,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
   </UCard>
 
   <UModal
-      v-model="externalPresenceModalOpen">
+      v-model="externalPresenceStore.modalOpen">
     <ExternalPresenceDetails
         :item="selectedExternalPresence"
         @updated="externalPresenceUpdated"

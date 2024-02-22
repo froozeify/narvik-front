@@ -80,13 +80,16 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   })
 
   let item: ExternalPresence | undefined = undefined;
+  let isUpdating = false
   let queryViolations: Ref<SubmissionErrors | undefined> = ref(undefined);
+
   if (!props.externalPresence) {
     let { created, violations, error } = await externalPresenceQuery.post(externalPresence);
     item = created.value
     queryViolations = violations;
   } else {
     let { updated, violations, error } = await externalPresenceQuery.patch(props.externalPresence, externalPresence);
+    isUpdating = true
     item = updated.value
     queryViolations = violations;
   }
@@ -102,10 +105,14 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   }
 
   if (item) {
-    useExternalPresenceStore().addItem(item);
+    if (isUpdating) {
+      useExternalPresenceStore().updateItem(item);
+    } else {
+      useExternalPresenceStore().addItem(item);
+    }
 
     toast.add({
-      title: "Présence enregistrée"
+      title: !isUpdating ? "Présence enregistrée" : "Présence modifiée"
     });
     emit('registered', item)
   }

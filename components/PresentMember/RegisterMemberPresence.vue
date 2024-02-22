@@ -7,6 +7,8 @@ import type {FormSubmitEvent} from "#ui/types";
 import type {MemberPresence} from "~/types/memberpresence";
 import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
 import type {SubmissionErrors} from "~/types/error";
+import MemberQuery from "~/composables/api/query/MemberQuery";
+import type {NuxtError} from "#app";
 
 const props = defineProps({
   member: {
@@ -61,12 +63,12 @@ activityQuery.getAll().then(value => {
 async function onSubmit(event: FormSubmitEvent<any>) {
   isSubmitting.value = true;
 
-  let memberPresence: MemberPresence = {
+  let memberPresence: { member: string|number|undefined, activities: string[] } = {
     member: undefined,
     activities: []
   }
   if (props.member) {
-    memberPresence.member = props.member?.["@id"]
+    memberPresence.member = `/members/${props.member.id}`
   } else if (props.memberPresence) {
     delete memberPresence.member // We remove the member key since we only update the activities (PATCH request)
   }
@@ -78,15 +80,15 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   })
 
   let item: MemberPresence | undefined = undefined;
-  let queryViolations: Ref<SubmissionErrors | undefined> = ref(undefined);
+  let queryViolations: Ref<NuxtError | null> = ref(null);
   if (!props.memberPresence) {
-    let { created, violations, error } = await memberPresenceQuery.post(memberPresence);
+    let { created, error } = await memberPresenceQuery.post(memberPresence);
     item = created.value
-    queryViolations = violations;
+    queryViolations.value = error.value;
   } else {
-    let { updated, violations, error } = await memberPresenceQuery.patch(props.memberPresence, memberPresence);
+    let { updated, error } = await memberPresenceQuery.patch(props.memberPresence, memberPresence);
     item = updated.value
-    queryViolations = violations;
+    queryViolations.value = error.value;
   }
 
   isSubmitting.value = false;
@@ -94,7 +96,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     toast.add({
       color: "red",
       title: "L'enregistrement a échoué",
-      description: queryViolations.value._error
+      description: queryViolations.value?.message
     });
     return;
   }

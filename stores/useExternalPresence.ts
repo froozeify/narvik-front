@@ -3,6 +3,7 @@ import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery
 
 export const useExternalPresenceStore = defineStore('externalPresence', () => {
 	const list: Ref<ExternalPresence[] | undefined> = ref(undefined)
+	const modalOpen: Ref<boolean> = ref(false);
 
 	async function refresh() {
 		const externalPresenceQuery = new ExternalPresenceQuery();
@@ -35,6 +36,7 @@ export const useExternalPresenceStore = defineStore('externalPresence', () => {
 
 	return {
 		list,
+		modalOpen,
 		addItem,
 		refresh,
 		updateItem,
