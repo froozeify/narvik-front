@@ -71,18 +71,18 @@ function getMembers() {
   memberQuery.getAll(urlParams).then(value => {
     isLoading.value = false;
 
-    if (value.error.value) {
+    if (value.error) {
       toast.add({
         color: "red",
         title: "Une erreur s'est produite",
-        description: value.error.value?.message || value.error.value.toString()
+        description: value.error.message || value.error.toString()
       })
     }
 
     if (value.items) {
-      members.value = value.items.value
-      if (value.totalItems.value) {
-        totalMembers.value = value.totalItems.value
+      members.value = value.items
+      if (value.totalItems) {
+        totalMembers.value = value.totalItems
       }
     }
   });

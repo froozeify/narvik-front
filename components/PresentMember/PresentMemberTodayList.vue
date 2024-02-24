@@ -18,7 +18,7 @@ if (externalPresenceStore.list === undefined) {
 
 const presentMembers: Ref<MemberPresence[] | undefined> = ref(undefined);
 memberPresenceQuery.getPresentToday().then(value => {
-  presentMembers.value = value.items.value
+  presentMembers.value = value.items
 });
 
 
@@ -115,13 +115,13 @@ function presenceRegistered(memberPresence: MemberPresence) {
   searchMemberModalOpen.value = false;
   presentMembers.value = undefined; // We unset the list since we are refreshing it
   memberPresenceQuery.getPresentToday().then(value => {
-    presentMembers.value = value.items.value
+    presentMembers.value = value.items
   });
 }
 
 function memberPresenceUpdated(memberPresence: MemberPresence) {
   memberPresenceQuery.getPresentToday().then(value => {
-    presentMembers.value = value.items.value
+    presentMembers.value = value.items
   });
 }
 

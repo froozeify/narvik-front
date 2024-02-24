@@ -4,7 +4,7 @@ import type {Ref} from "vue";
 import type {View} from "~/types/view";
 import type {SubmissionErrors} from "~/types/error";
 import type {Item} from "~/types/item";
-import mergician from "mergician";
+import {mergician} from 'mergician';
 import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/useApiData";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 
@@ -52,13 +52,11 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
     overloadedOptions.body = options.body
   }
 
-  const response = await useLocalApiData(path, overloadedOptions);
-
-  return response;
+  return await $localApi<T>(path, overloadedOptions);
 }
 
 export async function useLoginUser(email: string, password: string) {
-  const { data, error } = await useLocalApiData("auth", {
+  const data = await $localApi("auth", {
     method: "POST",
     headers: {
       Accept: MIME_TYPE_JSON,
@@ -69,10 +67,6 @@ export async function useLoginUser(email: string, password: string) {
     }
   });
 
-  if (error.value) {
-    throw error;
-  }
-
   const selfStore = useSelfMemberStore()
   selfStore.setJwtSelfJwtTokenFromApiResponse(data)
 
@@ -80,16 +74,12 @@ export async function useLoginUser(email: string, password: string) {
 }
 
 export async function useLoginBadger(loginToken: string) {
-  const { data, error } = await useLocalApiData("auth/bdg/" + loginToken, {
+  const data = await $localApi("auth/bdg/" + loginToken, {
     method: "POST",
     headers: {
       Accept: MIME_TYPE_JSON,
     }
   });
-
-  if (error.value) {
-    throw error;
-  }
 
   const selfStore = useSelfMemberStore()
   selfStore.setJwtSelfJwtTokenFromApiResponse(data)
@@ -101,252 +91,278 @@ export async function useLoginBadger(loginToken: string) {
 
 
 export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>> {
-  const items: Ref<T[]> = ref([]);
-  const totalItems: Ref<number | undefined> = ref(undefined);
-  const view: Ref<View | undefined> = ref(undefined);
-  const hubUrl: Ref<URL | undefined> = ref(undefined);
+  let items: T[] = [];
+  let totalItems: number | undefined = undefined;
+  let view: View | undefined = undefined;
+  let hubUrl: URL | undefined = undefined;
+  let error: Error | null = null;
 
-  const { data, pending, error } = await useApi<T>(resource, {
+  try {
+    const data = await useApi<PagedCollection<T>>(resource, {
 
-    onResponse({ response }) {
-      hubUrl.value = extractHubURL(response);
-    },
-  });
+      onResponse({ response }) {
+        hubUrl = extractHubURL(response);
+      },
+    });
 
-  const value = data.value as PagedCollection<T>;
-  if (value) {
-    items.value = value["hydra:member"];
-    view.value = value["hydra:view"];
-    totalItems.value = value["hydra:totalItems"];
+    items = data["hydra:member"];
+    view = data["hydra:view"];
+    totalItems = data["hydra:totalItems"];
+  } catch (e) {
+    error = e as Error;
   }
 
   return {
     items,
     totalItems,
     view,
-    isLoading: pending,
     error,
     hubUrl,
   };
 }
 
 export async function useFetchItem<T>(path: string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<T>> {
-  const retrieved: Ref<T | undefined> = ref(undefined);
-  const hubUrl: Ref<URL | undefined> = ref(undefined);
+  let retrieved: T | undefined = undefined;
+  let hubUrl: URL | undefined = undefined;
+  let error: Error | null = null;
 
-  const { data, pending, error } = await useApi<T>(path, {
-    cache: useCache,
-    onResponse({ response }) {
-      retrieved.value = response._data;
-      hubUrl.value = extractHubURL(response);
-    },
-  }, requireLogin);
+  try {
+    const data = await useApi<T>(path, {
+      cache: useCache,
+      onResponse({ response }) {
+        retrieved = response._data;
+        hubUrl = extractHubURL(response);
+      },
+    }, requireLogin);
 
-  retrieved.value = data.value as T;
+    retrieved = data as T;
+  } catch (e) {
+    error = e as Error;
+  }
+
 
   return {
     retrieved,
-    isLoading: pending,
     error,
     hubUrl,
   };
 }
 
 export async function useCreateItem<T>(resource: string, payload: Item) {
-  const created: Ref<T | undefined> = ref(undefined);
-  const violations: Ref<SubmissionErrors | undefined> = ref(undefined);
+  let created: T | undefined = undefined;
+  let violations: SubmissionErrors | undefined = undefined;
+  let error: Error | null = null;
 
-  const { data, pending, error } = await useApi(resource, {
-    method: "POST",
-    body: payload,
+  try {
+    const data = await useApi<T>(resource, {
+      method: "POST",
+      body: payload,
 
-    onResponseError({ response }) {
-      const data = response._data;
-      const error = data["hydra:description"] || response.statusText;
+      onResponseError({ response }) {
+        const data = response._data;
+        const error = data["hydra:description"] || response.statusText;
 
-      if (!data.violations) throw new Error(error);
+        if (!data.violations) throw new Error(error);
 
-      const errors: SubmissionErrors = { _error: error };
-      data.violations.forEach(
-        (violation: { propertyPath: string; message: string }) => {
-          errors[violation.propertyPath] = violation.message;
-        }
-      );
+        const errors: SubmissionErrors = { _error: error };
+        data.violations.forEach(
+            (violation: { propertyPath: string; message: string }) => {
+              errors[violation.propertyPath] = violation.message;
+            }
+        );
 
-      violations.value = errors;
+        violations = errors;
 
-      throw new SubmissionError(errors);
-    },
-  });
+        throw new SubmissionError(errors);
+      },
+    });
 
-  created.value = data.value as T;
+    created = data as T;
+  } catch (e) {
+    error = e as Error
+  }
 
   return {
     created,
-    isLoading: pending,
     error,
     violations,
   };
 }
 
 export async function useUploadFile(resource: string, payload: FormData, requireLogin: boolean = true) {
-  const created: Ref<Object | undefined> = ref(undefined);
-  const violations: Ref<SubmissionErrors | undefined> = ref(undefined);
+  let created: Object | undefined = undefined;
+  let violations: SubmissionErrors | undefined = undefined;
+  let error: Error | null = null;
 
-  const { data, pending, error } = await useApi(resource, {
-    method: "POST",
-    headers: {
-      Accept: MIME_TYPE_JSON,
-    },
-    body: payload,
+  try {
+    const data = await useApi(resource, {
+      method: "POST",
+      headers: {
+        Accept: MIME_TYPE_JSON,
+      },
+      body: payload,
 
-    onResponseError({ response }) {
-      const data = response._data;
-      const error = data["hydra:description"] || data['detail'] || response.statusText;
+      onResponseError({ response }) {
+        const data = response._data;
+        const error = data["hydra:description"] || data['detail'] || response.statusText;
 
-      if (!data.violations) throw new Error(error);
+        if (!data.violations) throw new Error(error);
 
-      const errors: SubmissionErrors = { _error: error };
-      data.violations.forEach(
-          (violation: { propertyPath: string; message: string }) => {
-            errors[violation.propertyPath] = violation.message;
-          }
-      );
+        const errors: SubmissionErrors = { _error: error };
+        data.violations.forEach(
+            (violation: { propertyPath: string; message: string }) => {
+              errors[violation.propertyPath] = violation.message;
+            }
+        );
 
-      violations.value = errors;
+        violations = errors;
 
-      throw new SubmissionError(errors);
-    },
-  }, requireLogin);
+        throw new SubmissionError(errors);
+      },
+    }, requireLogin);
 
-  created.value = data.value as Object;
+    created = data as Object;
+  } catch (e) {
+    error = e as Error
+  }
 
   return {
     created,
-    isLoading: pending,
     error,
     violations,
   };
 }
 
 export async function useUpdateItem<T>(item: Item, payload: Item) {
-  const updated: Ref<T | undefined> = ref(undefined);
-  const violations: Ref<SubmissionErrors | undefined> = ref(undefined);
+  let updated: T | undefined = undefined;
+  let violations: SubmissionErrors | undefined = undefined;
+  let error: Error | null = null;
 
-  const { data, pending, error } = await useApi(item["@id"] ?? "", {
-    method: "PUT",
-    body: payload,
-    headers: {
-      Accept: MIME_TYPE,
-      "Content-Type": MIME_TYPE,
-    },
+  try {
+    const data = await useApi<T>(item["@id"] ?? "", {
+      method: "PUT",
+      body: payload,
+      headers: {
+        Accept: MIME_TYPE,
+        "Content-Type": MIME_TYPE,
+      },
 
-    onResponseError({ response }) {
-      const data = response._data;
-      const error = data["hydra:description"] || response.statusText;
+      onResponseError({ response }) {
+        const data = response._data;
+        const error = data["hydra:description"] || response.statusText;
 
-      if (!data.violations) throw new Error(error);
+        if (!data.violations) throw new Error(error);
 
-      const errors: SubmissionErrors = { _error: error };
-      data.violations.forEach(
-        (violation: { propertyPath: string; message: string }) => {
-          errors[violation.propertyPath] = violation.message;
-        }
-      );
+        const errors: SubmissionErrors = { _error: error };
+        data.violations.forEach(
+            (violation: { propertyPath: string; message: string }) => {
+              errors[violation.propertyPath] = violation.message;
+            }
+        );
 
-      violations.value = errors;
+        violations = errors;
 
-      throw new SubmissionError(errors);
-    },
-  });
+        throw new SubmissionError(errors);
+      },
+    });
 
-  updated.value = data.value as T;
+    updated = data as T;
+  } catch (e) {
+    error = e as Error
+  }
 
   return {
     updated,
-    isLoading: pending,
     error,
     violations,
   };
 }
 
 export async function usePost<T>(path: string, payload: object) {
-  const item: Ref<T | undefined> = ref(undefined);
-  const violations: Ref<SubmissionErrors | undefined> = ref(undefined);
+  let item: T | undefined = undefined;
+  let violations: SubmissionErrors | undefined = undefined;
+  let error: Error | null = null;
 
-  const { data, pending, error } = await useApi(path, {
-    method: "POST",
-    body: payload,
-    headers: {
-      Accept: MIME_TYPE,
-      "Content-Type": MIME_TYPE,
-    },
+  try {
+    const data = await useApi<T>(path, {
+      method: "POST",
+      body: payload,
+      headers: {
+        Accept: MIME_TYPE,
+        "Content-Type": MIME_TYPE,
+      },
 
-    onResponseError({ response }) {
-      const data = response._data;
-      const error = data["hydra:description"] || response.statusText;
+      onResponseError({ response }) {
+        const data = response._data;
+        const error = data["hydra:description"] || response.statusText;
 
-      if (!data.violations) throw new Error(error);
+        if (!data.violations) throw new Error(error);
 
-      const errors: SubmissionErrors = { _error: error };
-      data.violations.forEach(
-          (violation: { propertyPath: string; message: string }) => {
-            errors[violation.propertyPath] = violation.message;
-          }
-      );
+        const errors: SubmissionErrors = { _error: error };
+        data.violations.forEach(
+            (violation: { propertyPath: string; message: string }) => {
+              errors[violation.propertyPath] = violation.message;
+            }
+        );
 
-      violations.value = errors;
+        violations = errors;
 
-      throw new SubmissionError(errors);
-    },
-  });
+        throw new SubmissionError(errors);
+      },
+    });
 
-  item.value = data.value as T;
+    item = data as T;
+  } catch (e) {
+    error = e as Error
+  }
 
   return {
     item,
-    isLoading: pending,
     error,
     violations,
   };
 }
 
 export async function usePut(path: string, payload: object) {
-  const updated: Ref<object | undefined> = ref(undefined);
-  const violations: Ref<SubmissionErrors | undefined> = ref(undefined);
+  let updated: object | undefined = undefined;
+  let violations: SubmissionErrors | undefined = undefined;
+  let error: Error | null = null;
 
-  const { data, pending, error } = await useApi(path, {
-    method: "PUT",
-    body: payload,
-    headers: {
-      Accept: MIME_TYPE,
-      "Content-Type": MIME_TYPE,
-    },
+  try {
+    const data = await useApi<object>(path, {
+      method: "PUT",
+      body: payload,
+      headers: {
+        Accept: MIME_TYPE,
+        "Content-Type": MIME_TYPE,
+      },
 
-    onResponseError({ response }) {
-      const data = response._data;
-      const error = data["hydra:description"] || response.statusText;
+      onResponseError({ response }) {
+        const data = response._data;
+        const error = data["hydra:description"] || response.statusText;
 
-      if (!data.violations) throw new Error(error);
+        if (!data.violations) throw new Error(error);
 
-      const errors: SubmissionErrors = { _error: error };
-      data.violations.forEach(
-          (violation: { propertyPath: string; message: string }) => {
-            errors[violation.propertyPath] = violation.message;
-          }
-      );
+        const errors: SubmissionErrors = { _error: error };
+        data.violations.forEach(
+            (violation: { propertyPath: string; message: string }) => {
+              errors[violation.propertyPath] = violation.message;
+            }
+        );
 
-      violations.value = errors;
+        violations = errors;
 
-      throw new SubmissionError(errors);
-    },
-  });
+        throw new SubmissionError(errors);
+      },
+    });
 
-  updated.value = data.value;
+    updated = data;
+  } catch (e) {
+    error = e as Error
+  }
 
   return {
     updated,
-    isLoading: pending,
     error,
     violations,
   };
@@ -354,67 +370,70 @@ export async function usePut(path: string, payload: object) {
 
 
 export async function usePatchItem<T>(item: Item, payload: Item) {
-  const updated: Ref<T | undefined> = ref(undefined);
-  const violations: Ref<SubmissionErrors | undefined> = ref(undefined);
+  let updated: T | undefined = undefined;
+  let violations: SubmissionErrors | undefined = undefined;
+  let error: Error | null = null;
 
-  const { data, pending, error } = await useApi(item["@id"] ?? "", {
-    method: "PATCH",
-    body: payload,
-    headers: {
-      Accept: MIME_TYPE,
-      "Content-Type": MIME_TYPE_JSON_PATCH,
-    },
+  try {
+    const data = await useApi(item["@id"] ?? "", {
+      method: "PATCH",
+      body: payload,
+      headers: {
+        Accept: MIME_TYPE,
+        "Content-Type": MIME_TYPE_JSON_PATCH,
+      },
 
-    onResponseError({ response }) {
-      const data = response._data;
-      const error = data["hydra:description"] || response.statusText;
+      onResponseError({ response }) {
+        const data = response._data;
+        const error = data["hydra:description"] || response.statusText;
 
-      if (!data.violations) throw new Error(error);
+        if (!data.violations) throw new Error(error);
 
-      const errors: SubmissionErrors = { _error: error };
-      data.violations.forEach(
-          (violation: { propertyPath: string; message: string }) => {
-            errors[violation.propertyPath] = violation.message;
-          }
-      );
+        const errors: SubmissionErrors = { _error: error };
+        data.violations.forEach(
+            (violation: { propertyPath: string; message: string }) => {
+              errors[violation.propertyPath] = violation.message;
+            }
+        );
 
-      violations.value = errors;
+        violations = errors;
 
-      throw new SubmissionError(errors);
-    },
-  });
+        throw new SubmissionError(errors);
+      },
+    });
 
-  updated.value = data.value as T;
+    updated = data as T;
+  } catch (e) {
+    error = e as Error
+  }
 
   return {
     updated,
-    isLoading: pending,
     error,
     violations,
   };
 }
 
 export async function useDeleteItem(item: Item) {
-  const error: Ref<string | undefined> = ref(undefined);
+  let error: string | undefined = undefined;
 
   if (!item?.["@id"]) {
-    error.value = "No item found. Please reload";
+    error = "No item found. Please reload";
     return {
       error,
     };
   }
 
-  const { pending } = await useApi(item["@id"] ?? "", {
+  const data = await useApi(item["@id"] ?? "", {
     method: "DELETE",
 
     onResponseError({ response }) {
       const data = response._data;
-      error.value = data["hydra:description"] || response.statusText;
+      error = data["hydra:description"] || response.statusText;
     },
   });
 
   return {
-    isLoading: pending,
     error,
   };
 }

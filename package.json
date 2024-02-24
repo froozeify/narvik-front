@@ -13,17 +13,17 @@
   "devDependencies": {
     "chart.js": "^4.4.1",
     "jwt-decode": "^4.0.0",
-    "mergician": "^1.1.0",
-    "nuxt": "^3.9.0",
-    "nuxt-api-party": "^1.0.0",
-    "sass": "^1.69.7",
-    "vue": "^3.4.5",
+    "mergician": "^2.0.0",
+    "nuxt": "^3.10.3",
+    "nuxt-api-party": "^1.0.1",
+    "sass": "^1.71.1",
+    "vue": "^3.4.19",
     "vue-chartjs": "^5.3.0",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.3.0"
   },
   "dependencies": {
-    "@iconify/json": "^2.2.165",
-    "@nuxt/ui": "^2.12.3",
+    "@iconify/json": "^2.2.186",
+    "@nuxt/ui": "2.13.0",
     "@pinia/nuxt": "^0.5.1",
     "@types/qs": "^6.9.11",
     "dayjs": "^1.11.10",

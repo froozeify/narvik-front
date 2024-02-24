@@ -20,15 +20,15 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 		globalSettingQuery.getPublic("LOGO", useCache).then(value => {
 			if (value.retrieved && value.retrieved.value) {
 				// No logo
-				if (!value.retrieved.value.value) {
+				if (!value.retrieved.value) {
 					siteLogo.value = null
 					return;
 				}
 
 				const imageQuery = new ImageQuery()
-				imageQuery.getPublic(value.retrieved.value.value, useCache).then(imageQueryResponse => {
-					if (imageQueryResponse.retrieved && imageQueryResponse.retrieved.value) {
-						siteLogo.value = imageQueryResponse.retrieved.value
+				imageQuery.getPublic(value.retrieved.value, useCache).then(imageQueryResponse => {
+					if (imageQueryResponse.retrieved && imageQueryResponse.retrieved) {
+						siteLogo.value = imageQueryResponse.retrieved
 					}
 				})
 			}
@@ -166,16 +166,16 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 		return setJwtSelfJwtTokenFromApiResponse(data);
 	}
 
-	function setJwtSelfJwtTokenFromApiResponse(data: Ref<any>): JwtToken {
+	function setJwtSelfJwtTokenFromApiResponse(data: any): JwtToken {
 		const jwtToken = new JwtToken();
 		jwtToken.access = {
 			date: new Date(Date.now() + (3480 * 1000)), // Expires in 1h - 2mn (to get some room on the token expiration),
-			token: data.value.token
+			token: data.token
 		}
 
 		jwtToken.refresh = {
-			date: new Date((data.value.refresh_token_expiration - 120) * 1000),
-			token: data.value.refresh_token
+			date: new Date((data.refresh_token_expiration - 120) * 1000),
+			token: data.refresh_token
 		}
 
 		setSelfJwtToken(jwtToken);
@@ -193,7 +193,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 		const memberQuery = new MemberQuery();
 		const { retrieved } = await memberQuery.self()
 		if (retrieved) {
-			member.value = retrieved.value
+			member.value = retrieved
 		}
 	}
 

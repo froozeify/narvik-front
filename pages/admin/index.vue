@@ -22,7 +22,7 @@
   const memberMetrics: Ref<Metric | undefined> = ref(undefined);
   // Will be updated once value return
   metricsQuery.get("members").then(value => {
-    memberMetrics.value = value.retrieved.value
+    memberMetrics.value = value.retrieved
   });
   const memberStats = computed(() => {
     let response = {
@@ -44,7 +44,7 @@
 
   const presenceMetrics: Ref<Metric | undefined> = ref(undefined);
   metricsQuery.get("presences").then(value => {
-    presenceMetrics.value = value.retrieved.value
+    presenceMetrics.value = value.retrieved
   });
 
   const presenceStats = computed(() => {
@@ -80,7 +80,7 @@
 
   const externalPresenceMetrics: Ref<Metric | undefined> = ref(undefined);
   metricsQuery.get("external-presences").then(value => {
-    externalPresenceMetrics.value = value.retrieved.value
+    externalPresenceMetrics.value = value.retrieved
   });
 
   const externalPresenceStats = computed(() => {
@@ -119,7 +119,7 @@
       datasets: [{ }],
     }
 
-    value.retrieved.value?.childMetrics.forEach(cm => {
+    value.retrieved.childMetrics.forEach(cm => {
       let data: object[] = [];
       cm.childMetrics.forEach(ccm => {
         data.push({

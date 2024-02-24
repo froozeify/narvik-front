@@ -1,33 +1,28 @@
-import { Ref } from "vue";
-import { SubmissionErrors } from "./error";
-import { View } from "./view";
+import type {SubmissionErrors} from "./error";
+import type {View} from "./view";
 
 export interface FetchAllData<T> {
-  items: Ref<T[]>;
-  totalItems: Ref<number | undefined>
-  view: Ref<View | undefined>;
-  isLoading: Ref<boolean>;
-  error: Ref<Error | null>;
-  hubUrl: Ref<URL | undefined>;
+  items: T[];
+  totalItems: number | undefined
+  view: View | undefined;
+  error: Error | null;
+  hubUrl: URL | undefined;
 }
 
 export interface FetchItemData<T> {
-  retrieved: Ref<T | undefined>;
-  isLoading: Ref<boolean>;
-  error: Ref<Error | null>;
-  hubUrl: Ref<URL | undefined>;
+  retrieved: T | undefined;
+  error: Error | null;
+  hubUrl: URL | undefined;
 }
 
 export interface CreateItemData<T> {
-  created: Ref<T | undefined>;
-  isLoading: Ref<boolean>;
-  error: Ref<Error | null>;
-  violations: Ref<SubmissionErrors | undefined>;
+  created: T | undefined;
+  error: Error | null;
+  violations: SubmissionErrors | undefined;
 }
 
 export interface UpdateItemData<T> {
-  updated: Ref<T | undefined>;
-  isLoading: Ref<boolean>;
-  error: Ref<Error | null>;
-  violations: Ref<SubmissionErrors | undefined>;
+  updated: T | undefined;
+  error: Error | null;
+  violations: SubmissionErrors | undefined;
 }

@@ -55,7 +55,7 @@ if (props.memberPresence) {
 const activityQuery = new ActivityQuery();
 activityQuery.getAll().then(value => {
   isLoading.value = false;
-  activities.value = value.items.value
+  activities.value = value.items
       .filter((actvt) => actvt.isEnabled) // We don't display the disabled activities
       .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
 });
@@ -80,23 +80,23 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   })
 
   let item: MemberPresence | undefined = undefined;
-  let queryViolations: Ref<NuxtError | null> = ref(null);
+  let queryViolations: NuxtError | null = null;
   if (!props.memberPresence) {
     let { created, error } = await memberPresenceQuery.post(memberPresence);
-    item = created.value
-    queryViolations.value = error.value;
+    item = created
+    queryViolations = error;
   } else {
     let { updated, error } = await memberPresenceQuery.patch(props.memberPresence, memberPresence);
-    item = updated.value
-    queryViolations.value = error.value;
+    item = updated
+    queryViolations = error;
   }
 
   isSubmitting.value = false;
-  if (queryViolations.value) {
+  if (queryViolations) {
     toast.add({
       color: "red",
       title: "L'enregistrement a échoué",
-      description: queryViolations.value?.message
+      description: queryViolations?.message
     });
     return;
   }

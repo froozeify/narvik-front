@@ -19,8 +19,8 @@
 
   // We force a refresh for the display
   memberQuery.self().then(value => {
-    if (value.retrieved && value.retrieved.value) {
-      self.value = value.retrieved.value;
+    if (value.retrieved && value.retrieved) {
+      self.value = value.retrieved;
     } else {
       // No information on self, we force logout
       selfStore.logout();

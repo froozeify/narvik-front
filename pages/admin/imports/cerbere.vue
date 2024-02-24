@@ -18,7 +18,7 @@
   const importBatchesMetric: Ref<Metric | undefined> = ref(undefined)
   metricQuery.get("import-batches").then(value => {
     if (value.retrieved) {
-      importBatchesMetric.value = value.retrieved.value
+      importBatchesMetric.value = value.retrieved
     }
   })
 
@@ -38,7 +38,7 @@
 
       const { created, violations, error } = await memberPresenceQuery.importFromCerbere(formData)
 
-      if (created.value) {
+      if (created) {
         toast.add({
           title: "Fichier envoyé",
           color: "green"
@@ -46,7 +46,7 @@
       } else {
         toast.add({
           title: "Erreur lors de l'envoie du fichier",
-          description: error.value,
+          description: error,
           color: "red"
         })
       }

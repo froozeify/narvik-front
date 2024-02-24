@@ -51,14 +51,14 @@ const updateMemberPresenceModalOpen = ref(false);
 if (memberPresence.value && memberPresence.value.member?.id) {
   // We request the real member datas
   memberQuery.get(memberPresence.value.member.id).then(memberResponse => {
-    if (memberResponse.retrieved.value) {
-      member.value = memberResponse.retrieved.value
+    if (memberResponse.retrieved) {
+      member.value = memberResponse.retrieved
 
       // We load the profile image
-      if (memberResponse.retrieved.value.profileImage) {
-        imageQuery.get(memberResponse.retrieved.value.profileImage).then(profileImage => {
+      if (memberResponse.retrieved.profileImage) {
+        imageQuery.get(memberResponse.retrieved.profileImage).then(profileImage => {
           if (profileImage.retrieved) {
-            memberProfileImage.value = profileImage.retrieved.value
+            memberProfileImage.value = profileImage.retrieved
           }
         })
       }
@@ -78,8 +78,8 @@ function loadPresenceHistory() {
   isLoadingPresences.value = true
   memberQuery.presences(member.value.id, presenceUrlParams).then(presencesResponse => {
     isLoadingPresences.value = false
-    if (presencesResponse.items.value.length > 0) {
-      memberPresences.value = presencesResponse.items.value
+    if (presencesResponse.items.length > 0) {
+      memberPresences.value = presencesResponse.items
 
       // We update the chart
       let data: any = []
@@ -93,7 +93,7 @@ function loadPresenceHistory() {
         ],
       }
 
-      presencesResponse.items.value.forEach(pr => {
+      presencesResponse.items.forEach(pr => {
         pr.activities?.forEach(actvt => {
           if (data[actvt.name]) {
             data[actvt.name] = data[actvt.name] + 1;

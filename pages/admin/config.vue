@@ -23,7 +23,7 @@ const activityQuery = new ActivityQuery();
 
 const badgerSetting: Ref<GlobalSetting | undefined> = ref(undefined);
 globalSettingQuery.get("BADGER_TOKEN").then(value =>  {
-  badgerSetting.value = value.retrieved.value
+  badgerSetting.value = value.retrieved
 })
 
 const controlShootingSetting: Ref<GlobalSetting | undefined> = ref(undefined);
@@ -31,18 +31,18 @@ const selectedControlShootingActivityValue: Ref<string | undefined> = ref(undefi
 const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
 
 globalSettingQuery.get("CONTROL_SHOOTING_ACTIVITY_ID").then(value => {
-  controlShootingSetting.value = value.retrieved.value
+  controlShootingSetting.value = value.retrieved
   if (controlShootingSetting.value && controlShootingSetting.value.value) {
     getActivity(controlShootingSetting.value.value).then(actvt => {
-      selectedControlShootingActivity.value = actvt.value
-      selectedControlShootingActivityValue.value = actvt.value?.id?.toString()
+      selectedControlShootingActivity.value = actvt
+      selectedControlShootingActivityValue.value = actvt?.id?.toString()
     })
   }
 })
 
 const activities: Ref<Activity[] | undefined> = ref(undefined);
 activityQuery.getAll().then(value => {
-  activities.value = value.items.value
+  activities.value = value.items
 })
 
 const logoUploading = ref(false)
@@ -67,7 +67,7 @@ function copyBadgerLink() {
 async function controlShootingUpdated() {
   if (selectedControlShootingActivityValue.value) {
     const activity = await getActivity(selectedControlShootingActivityValue.value);
-    selectedControlShootingActivity.value = activity.value
+    selectedControlShootingActivity.value = activity
   }
 
   if (!controlShootingSetting.value || !selectedControlShootingActivity.value) return;
@@ -78,11 +78,11 @@ async function controlShootingUpdated() {
 
   let { updated, violations } = await globalSettingQuery.patch(controlShootingSetting.value, payload);
 
-  if (violations.value) {
+  if (violations) {
     toast.add({
       color: "red",
       title: "L'enregistrement a échoué",
-      description: violations.value._error
+      description: violations._error
     });
     return;
   }
@@ -109,7 +109,7 @@ async function uploadLogo(event) {
 
     const { created, violations, error } = await globalSettingQuery.importLogo(formData)
 
-    if (created.value) {
+    if (created) {
       selfStore.getSiteLogo(false)
       toast.add({
         title: "Logo envoyé",
@@ -118,7 +118,7 @@ async function uploadLogo(event) {
     } else {
       toast.add({
         title: "Erreur lors de l'envoie du logo",
-        description: error.value?.message,
+        description: error.message,
         color: "red"
       })
     }
@@ -134,7 +134,7 @@ async function deleteLogo() {
 
   const { created, error } = await globalSettingQuery.importLogo(formData)
 
-  if (created.value) {
+  if (created) {
     selfStore.getSiteLogo(false)
     toast.add({
       title: "Logo supprimé",
@@ -143,7 +143,7 @@ async function deleteLogo() {
   } else {
     toast.add({
       title: "Erreur lors de la suppression du logo",
-      description: error.value?.message,
+      description: error.message,
       color: "red"
     })
   }

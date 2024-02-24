@@ -46,7 +46,7 @@
       isLoading.value = false;
 
       if (value.items) {
-        value.items.value.forEach(member => {
+        value.items.forEach(member => {
           loadMemberProfileImage(member).then(img => {
             if (img) {
               member.profileImageBase64 = img;
@@ -54,14 +54,14 @@
           })
         })
 
-        members.value = members.value.concat(value.items.value)
+        members.value = members.value.concat(value.items)
 
 
-        if (value.totalItems.value && totalMembers.value == 0) {
-          totalMembers.value = value.totalItems.value
+        if (value.totalItems && totalMembers.value == 0) {
+          totalMembers.value = value.totalItems
         }
 
-        if (value.view.value && value.view.value?.["hydra:next"]) {
+        if (value.view && value.view["hydra:next"]) {
           page.value = page.value + 1;
           getMembers();
           return;
@@ -74,9 +74,9 @@
     if (!member.profileImage) return null;
 
     const {retrieved} = await imageQuery.get(member.profileImage);
-    if (!retrieved || !retrieved.value || !retrieved.value.base64) return null
+    if (!retrieved || !retrieved.base64) return null
 
-    return retrieved.value.base64
+    return retrieved.base64
   }
 </script>
 

@@ -66,7 +66,7 @@
       if (member.value) {
         if (member.value.profileImage) {
           imageQuery.get(member.value.profileImage).then(imageResponse => {
-            memberProfileImage.value = imageResponse.retrieved.value
+            memberProfileImage.value = imageResponse.retrieved
           })
         }
 
@@ -87,19 +87,19 @@
     }
 
     memberQuery.get(props.memberId).then(value => {
-      if (value.error.value) {
+      if (value.error) {
         toast.add({
           color: "red",
           title: "Une erreur s'est produite",
-          description: value.error.value?.message || value.error.value.toString()
+          description: value.error.message || value.error.toString()
         })
 
         navigateTo('/admin/members')
         return;
       }
 
-      if (value.retrieved.value) {
-        member.value = value.retrieved.value
+      if (value.retrieved) {
+        member.value = value.retrieved
       }
     });
   }
@@ -120,18 +120,18 @@
       }
 
       const { updated, error } = await memberQuery.patch(member.value, payload)
-      if (updated && updated.value) {
+      if (updated) {
         toast.add({
           color: "green",
           title: "Mot de passe modifié"
         })
-        member.value = updated.value
+        member.value = updated
         updatePasswordModalOpen.value = false
       } else {
         toast.add({
           color: "red",
           title: "Une erreur est arrivé lors de la mise à jour du mot de passe",
-          description: error.value?.message
+          description: error.message
         })
       }
 
@@ -142,8 +142,8 @@
     }
 
     const { error } = await memberQuery.selfUpdatePassword(passwordState.current, passwordState.new)
-    if (error.value) {
-      return failedPasswordUpdate(error.value?.message)
+    if (error) {
+      return failedPasswordUpdate(error.message)
     }
 
     updatePasswordModalOpen.value = false
@@ -168,18 +168,18 @@
       accountActivated: activated
     }
     memberQuery.patch(member.value, payload).then(({updated, error}) => {
-      if (updated && updated.value) {
+      if (updated) {
         toast.add({
           color: "green",
           title: activated ? "Compte activé" : "Compté désactivé"
         })
-        member.value = updated.value
+        member.value = updated
         close();
       } else {
         toast.add({
           color: "red",
           title: activated ? "L'activation a échoué" : "La désactivation a échoué",
-          description: error.value?.message
+          description: error.message
         })
       }
     });
@@ -193,18 +193,18 @@
       role: selectedNewRole.value
     }
     memberQuery.patch(member.value, payload).then(({updated, error}) => {
-      if (updated && updated.value) {
+      if (updated) {
         toast.add({
           color: "green",
           title: "Rôle modifié"
         })
-        member.value = updated.value
+        member.value = updated
         close();
       } else {
         toast.add({
           color: "red",
           title: "Une erreur est survenue",
-          description: error.value?.message
+          description: error.message
         })
       }
     });
@@ -220,8 +220,8 @@
     });
 
     const { totalItems, items } = await memberQuery.presences(member.value.id, presenceUrlParams)
-    if (totalItems.value && totalItems.value > 0) {
-      memberPresences.value = items.value
+    if (totalItems && totalItems > 0) {
+      memberPresences.value = items
 
       // We update the chart
       let data: any = []
@@ -235,7 +235,7 @@
         ],
       }
 
-      items.value.forEach(pr => {
+      items.forEach(pr => {
         pr.activities?.forEach(actvt => {
           if (data[actvt.name]) {
             data[actvt.name] = data[actvt.name] + 1;
@@ -257,11 +257,11 @@
     isUpdating.value = true
 
     memberPresenceQuery.delete(memberPresence).then(async ({error}) => {
-      if (error.value) {
+      if (error) {
         toast.add({
           color: "red",
           title: "La suppression a échouée",
-          description: error.value
+          description: error
         })
         isUpdating.value = false
         return;

@@ -40,10 +40,10 @@ async function search(query: any) {
     const memberQuery = new MemberQuery();
     const searchResult = await memberQuery.search(query);
 
-    if (!searchResult.item.value) return;
+    if (!searchResult.item) return;
 
     const members: Ref<Member[]> = ref([])
-    members.value = searchResult.item.value
+    members.value = searchResult.item
 
     foundMembers.value = members.value;
     if (members.value.length === 1) {

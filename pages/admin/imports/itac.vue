@@ -29,13 +29,13 @@
 
   metricQuery.get("import-batches").then(value => {
     if (value.retrieved) {
-      importBatchesMetric.value = value.retrieved.value
+      importBatchesMetric.value = value.retrieved
     }
   })
 
   globalSettingQuery.get('LAST_ITAC_IMPORT').then(value => {
     if (value.retrieved) {
-      lastImportDate.value = value.retrieved.value?.value
+      lastImportDate.value = value.retrieved.value
     }
   });
 
@@ -50,7 +50,7 @@
 
       const { created, violations, error } = await memberQuery.importFromItac(formData)
 
-      if (created.value) {
+      if (created) {
         toast.add({
           title: "Fichier envoyé",
           color: "green"

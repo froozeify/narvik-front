@@ -28,7 +28,7 @@
 
       const { created, violations, error } = await memberQuery.importPhotosFromItac(formData)
 
-      if (created.value) {
+      if (created) {
         toast.add({
           title: "Fichier envoyé",
           color: "green"

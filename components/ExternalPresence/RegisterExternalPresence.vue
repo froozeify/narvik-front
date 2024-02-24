@@ -57,7 +57,7 @@ if (props.externalPresence) {
 const activityQuery = new ActivityQuery();
 activityQuery.getAll().then(value => {
   isLoading.value = false;
-  activities.value = value.items.value
+  activities.value = value.items
       .filter((actvt) => actvt.isEnabled) // We don't display the disabled activities
       .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
 });
@@ -81,25 +81,25 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
   let item: ExternalPresence | undefined = undefined;
   let isUpdating = false
-  let queryViolations: Ref<SubmissionErrors | undefined> = ref(undefined);
+  let queryViolations: SubmissionErrors | undefined = undefined;
 
   if (!props.externalPresence) {
     let { created, violations, error } = await externalPresenceQuery.post(externalPresence);
-    item = created.value
+    item = created
     queryViolations = violations;
   } else {
     let { updated, violations, error } = await externalPresenceQuery.patch(props.externalPresence, externalPresence);
     isUpdating = true
-    item = updated.value
+    item = updated
     queryViolations = violations;
   }
 
   isSubmitting.value = false;
-  if (queryViolations.value) {
+  if (queryViolations) {
     toast.add({
       color: "red",
       title: "L'enregistrement a échoué",
-      description: queryViolations.value._error
+      description: queryViolations._error
     });
     return;
   }

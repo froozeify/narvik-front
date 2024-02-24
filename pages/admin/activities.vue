@@ -26,7 +26,7 @@ const activityQuery = new ActivityQuery();
 activityQuery.getAll().then(value => {
   isLoading.value = false
 
-  value.items.value.forEach(actvt => {
+  value.items.forEach(actvt => {
     activities.value.push({
       activity: actvt,
       unsaved: false,
@@ -62,9 +62,9 @@ function addActivity() {
   isLoading.value = true;
   activityQuery.post(activity).then(({created, violations}) => {
     isLoading.value = false;
-    if (created.value) {
+    if (created) {
       activities.value.push({
-        activity: created.value,
+        activity: created,
         unsaved: false,
         isUpdating: false,
       })
@@ -73,7 +73,7 @@ function addActivity() {
       toast.add({
         color: "red",
         title: "L'enregistrement a échoué",
-        description: violations.value?._error
+        description: violations._error
       })
     }
   })
@@ -96,7 +96,7 @@ function saveRow(dataItem: DataItem) {
   }
 
   activityQuery.patch(dataItem.activity, payload).then(({updated, violations}) => {
-    if (updated && updated.value) {
+    if (updated) {
       dataItem.unsaved = false;
       toast.add({
         color: "green",
@@ -107,7 +107,7 @@ function saveRow(dataItem: DataItem) {
       toast.add({
         color: "red",
         title: "L'enregistrement a échoué",
-        description: violations.value?._error
+        description: violations._error
       })
     }
   });
@@ -118,7 +118,7 @@ async function deleteRow(dataItem: DataItem) {
   activityQuery.delete(dataItem.activity).then(({error}) => {
     dataItem.isUpdating = false
 
-    if (!error.value) {
+    if (!error) {
       // We remove the activity from the array
       activities.value = activities.value.filter(actvt => actvt.activity.id !== dataItem.activity.id);
       refreshActivityListOrder()
@@ -131,7 +131,7 @@ async function deleteRow(dataItem: DataItem) {
       toast.add({
         color: "red",
         title: "La suppression a échouée",
-        description: error.value
+        description: error
       })
     }
   });
@@ -144,9 +144,9 @@ async function cancelRow(dataItem: DataItem) {
   dataItem.isUpdating = true;
   const { retrieved } = await activityQuery.get(dataItem.activity.id);
   dataItem.isUpdating = false;
-  if (retrieved && retrieved.value) {
+  if (retrieved) {
     dataItem.unsaved = false;
-    dataItem.activity = retrieved.value;
+    dataItem.activity = retrieved;
   }
 }
 
@@ -156,7 +156,7 @@ async function migrateRow(dataItem: DataItem) {
   dataItem.isUpdating = true;
   activityQuery.mergeTo(dataItem.activity.id, migrationTarget.value).then(({error}) => {
     dataItem.isUpdating = false
-    if (!error.value) {
+    if (!error) {
       // We remove the activity from the array
       activities.value = activities.value.filter(actvt => actvt.activity.id !== dataItem.activity.id);
       refreshActivityListOrder()
@@ -169,7 +169,7 @@ async function migrateRow(dataItem: DataItem) {
       toast.add({
         color: "red",
         title: "La migration a échouée",
-        description: error.value?.message
+        description: error.message
       })
     }
   })
