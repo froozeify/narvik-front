@@ -78,8 +78,6 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 				sameSite: true,
 			});
 			authCookie.value = btoa(JSON.stringify(payload.access))
-		} else {
-			console.warn("No access token in the payload.")
 		}
 
 		if (payload.refresh && payload.refresh.date) {
@@ -149,21 +147,19 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 			return null;
 		}
 
-		const { data, error } = await useLocalApiData("auth/token/refresh", {
-			method: "POST",
-			headers: {
-				Accept: MIME_TYPE_JSON,
-				'content-type': 'application/x-www-form-urlencoded',
-			},
-			body: `refresh_token=${jwtToken.value.refresh.token}`
-		});
-
-		if (error.value) {
-			console.error(error.value)
+		try {
+			const data = await $localApi("auth/token/refresh", {
+				method: "POST",
+				headers: {
+					Accept: MIME_TYPE_JSON,
+					'content-type': 'application/x-www-form-urlencoded',
+				},
+				body: `refresh_token=${jwtToken.value.refresh.token}`
+			});
+			return setJwtSelfJwtTokenFromApiResponse(data);
+		} catch (e) {
 			return null;
 		}
-
-		return setJwtSelfJwtTokenFromApiResponse(data);
 	}
 
 	function setJwtSelfJwtTokenFromApiResponse(data: any): JwtToken {

@@ -1,6 +1,5 @@
 import type {PagedCollection} from "~/types/collection";
 import type {FetchAllData, FetchItemData} from "~/types/api";
-import type {Ref} from "vue";
 import type {View} from "~/types/view";
 import type {SubmissionErrors} from "~/types/error";
 import type {Item} from "~/types/item";
