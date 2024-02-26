@@ -38,20 +38,21 @@
 
       const { created, violations, error } = await memberPresenceQuery.importFromCerbere(formData)
 
-      if (created) {
-        toast.add({
-          title: "Fichier envoyé",
-          color: "green"
-        })
-      } else {
+      fileUploading.value = false
+
+      if (error) {
         toast.add({
           title: "Erreur lors de l'envoie du fichier",
-          description: error,
+          description: error.message,
           color: "red"
         })
+        return;
       }
 
-      fileUploading.value = false
+      toast.add({
+        title: "Fichier envoyé",
+        color: "green"
+      })
     }
   }
 

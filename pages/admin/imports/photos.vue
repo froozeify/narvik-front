@@ -27,21 +27,21 @@
       formData.append('file', files.item(0), files.item(0).name)
 
       const { created, violations, error } = await memberQuery.importPhotosFromItac(formData)
+      fileUploading.value = false
 
-      if (created) {
-        toast.add({
-          title: "Fichier envoyé",
-          color: "green"
-        })
-      } else {
+      if (error) {
         toast.add({
           title: "Erreur lors de l'envoie du fichier",
-          description: error.value,
+          description: error.message,
           color: "red"
         })
+        return
       }
 
-      fileUploading.value = false
+      toast.add({
+        title: "Fichier envoyé",
+        color: "green"
+      })
     }
   }
 

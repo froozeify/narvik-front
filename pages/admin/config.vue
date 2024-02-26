@@ -57,7 +57,7 @@ const siteLogo: Ref<Image|null> = selfStore.getSiteLogo()
 function copyBadgerLink() {
   if (!badgerSetting.value) return;
 
-  clipboard.write(window.location.origin + '/login/bdg/' + badgerSetting.value.token)
+  clipboard.write(window.location.origin + '/login/bdg/' + badgerSetting.value.value)
   toast.add({
     title: 'URL Copiée',
     color: "green"
@@ -76,13 +76,13 @@ async function controlShootingUpdated() {
     value: selectedControlShootingActivity.value.id?.toString()
   }
 
-  let { updated, violations } = await globalSettingQuery.patch(controlShootingSetting.value, payload);
+  let { updated, error } = await globalSettingQuery.patch(controlShootingSetting.value, payload);
 
-  if (violations) {
+  if (error) {
     toast.add({
       color: "red",
       title: "L'enregistrement a échoué",
-      description: violations._error
+      description: error.message
     });
     return;
   }
@@ -108,22 +108,23 @@ async function uploadLogo(event) {
     formData.append('file', files.item(0), files.item(0).name)
 
     const { created, violations, error } = await globalSettingQuery.importLogo(formData)
+    logoUploading.value = false
 
-    if (created) {
-      selfStore.getSiteLogo(false)
-      toast.add({
-        title: "Logo envoyé",
-        color: "green"
-      })
-    } else {
+    if (error) {
       toast.add({
         title: "Erreur lors de l'envoie du logo",
         description: error.message,
         color: "red"
       })
+      return;
     }
 
-    logoUploading.value = false
+    selfStore.getSiteLogo(false)
+    toast.add({
+      title: "Logo envoyé",
+      color: "green"
+    })
+
   }
 }
 
@@ -133,22 +134,23 @@ async function deleteLogo() {
   const formData = new FormData()
 
   const { created, error } = await globalSettingQuery.importLogo(formData)
+  logoUploading.value = false
 
-  if (created) {
-    selfStore.getSiteLogo(false)
-    toast.add({
-      title: "Logo supprimé",
-      color: "green"
-    })
-  } else {
+  if (error) {
     toast.add({
       title: "Erreur lors de la suppression du logo",
       description: error.message,
       color: "red"
     })
+    return
   }
 
-  logoUploading.value = false
+  selfStore.getSiteLogo(false)
+  toast.add({
+    title: "Logo supprimé",
+    color: "green"
+  })
+
 }
 
 
