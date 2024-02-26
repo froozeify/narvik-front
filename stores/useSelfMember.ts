@@ -18,9 +18,9 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 
 		const globalSettingQuery = new GlobalSettingQuery()
 		globalSettingQuery.getPublic("LOGO", useCache).then(value => {
-			if (value.retrieved && value.retrieved.value) {
+			if (value.retrieved) {
 				// No logo
-				if (!value.retrieved.value) {
+				if (!value.retrieved.value || value.retrieved.value.trim() === '') {
 					siteLogo.value = null
 					return;
 				}
