@@ -3,7 +3,7 @@
   import type {Metric} from "~/types/metric";
 
   import { Chart as ChartJS, Title, Tooltip, Legend, BarController, BarElement, CategoryScale, LinearScale, Colors } from 'chart.js'
-  import {Bar} from 'vue-chartjs'
+  import { Bar } from 'vue-chartjs'
   ChartJS.register(Title, Tooltip, Legend, BarController, BarElement, CategoryScale, LinearScale, Colors)
 
 
@@ -37,7 +37,7 @@
         if (childMetric.name == "current-season") response.currentSeason = childMetric.value;
         if (childMetric.name == "previous-season") response.previousSeason = childMetric.value;
       })
-      response.isIncreasing = response.currentSeason > response.previousSeason
+      response.isIncreasing = response.currentSeason >= response.previousSeason
     }
     return response
   });
@@ -111,7 +111,7 @@
   });
 
   metricsQuery.get('activities').then(value => {
-    if (!value.retrieved || !value.retrieved.value) return;
+    if (!value.retrieved || isNaN(value.retrieved.value)) return;
 
     let datasets: any[] = [];
 
@@ -151,7 +151,7 @@
             title="Membres"
             tooltip="Cette saison"
             :value="memberStats.currentSeason"
-            :is-increasing="memberStats.currentSeason > memberStats.previousSeason"
+            :is-increasing="memberStats.currentSeason >= memberStats.previousSeason"
             :top-right="{
               tooltip: 'Saison précédente',
               value: memberStats.previousSeason,
@@ -163,7 +163,7 @@
             title="Jours ouverts"
             tooltip="Cette année"
             :value="presenceStats.currentYearOpenedDays"
-            :is-increasing="presenceStats.currentYearOpenedDays > presenceStats.previousYearOpenedDays"
+            :is-increasing="presenceStats.currentYearOpenedDays >= presenceStats.previousYearOpenedDays"
             :top-right="{
               value: presenceStats.previousYearOpenedDays,
               tooltip: 'Année précédente (même date)'
@@ -175,7 +175,7 @@
             title="Présences (membres + externes)"
             tooltip="Cette année"
             :value="presenceStats.currentYear + externalPresenceStats.currentYear"
-            :is-increasing="(presenceStats.currentYear + externalPresenceStats.currentYear) > (presenceStats.previousYear + externalPresenceStats.previousYear)"
+            :is-increasing="(presenceStats.currentYear + externalPresenceStats.currentYear) >= (presenceStats.previousYear + externalPresenceStats.previousYear)"
             :top-right="{
               value: (presenceStats.previousYear + externalPresenceStats.previousYear),
               tooltip: 'Année précédente (même date)'
@@ -187,7 +187,7 @@
             title="Présences/ouvertures (membres + externes)"
             tooltip="Cette année"
             :value="'≃ ' + (presenceStats.ratioPresenceOpenCurrentYear + externalPresenceStats.ratioPresenceOpenCurrentYear)"
-            :is-increasing="(presenceStats.ratioPresenceOpenCurrentYear + externalPresenceStats.ratioPresenceOpenCurrentYear) > (presenceStats.ratioPresenceOpenPreviousYear + externalPresenceStats.ratioPresenceOpenPreviousYear)"
+            :is-increasing="(presenceStats.ratioPresenceOpenCurrentYear + externalPresenceStats.ratioPresenceOpenCurrentYear) >= (presenceStats.ratioPresenceOpenPreviousYear + externalPresenceStats.ratioPresenceOpenPreviousYear)"
             :top-right="{
               value: (presenceStats.ratioPresenceOpenPreviousYear + externalPresenceStats.ratioPresenceOpenPreviousYear),
               tooltip: 'Année précédente (même date)'
@@ -199,7 +199,7 @@
             title="Présences"
             tooltip="Cette année"
             :value="presenceStats.currentYear"
-            :is-increasing="presenceStats.currentYear > presenceStats.previousYear"
+            :is-increasing="presenceStats.currentYear >= presenceStats.previousYear"
             :top-right="{
               value: presenceStats.previousYear,
               tooltip: 'Année précédente (même date)'
@@ -211,7 +211,7 @@
             title="Présences/ouvertures"
             tooltip="Cette année"
             :value="'≃ ' + presenceStats.ratioPresenceOpenCurrentYear"
-            :is-increasing="presenceStats.ratioPresenceOpenCurrentYear > presenceStats.ratioPresenceOpenPreviousYear"
+            :is-increasing="presenceStats.ratioPresenceOpenCurrentYear >= presenceStats.ratioPresenceOpenPreviousYear"
             :top-right="{
               value: presenceStats.ratioPresenceOpenPreviousYear,
               tooltip: 'Année précédente (même date)'
@@ -223,7 +223,7 @@
             title="Présences externes"
             tooltip="Cette année"
             :value="externalPresenceStats.currentYear"
-            :is-increasing="externalPresenceStats.currentYear > externalPresenceStats.previousYear"
+            :is-increasing="externalPresenceStats.currentYear >= externalPresenceStats.previousYear"
             :top-right="{
               value: externalPresenceStats.previousYear,
               tooltip: 'Année précédente (même date)'
@@ -235,7 +235,7 @@
             title="Présences externes/ouvertures"
             tooltip="Cette année"
             :value="'≃ ' + externalPresenceStats.ratioPresenceOpenCurrentYear"
-            :is-increasing="externalPresenceStats.ratioPresenceOpenCurrentYear > externalPresenceStats.ratioPresenceOpenPreviousYear"
+            :is-increasing="externalPresenceStats.ratioPresenceOpenCurrentYear >= externalPresenceStats.ratioPresenceOpenPreviousYear"
             :top-right="{
               value: externalPresenceStats.ratioPresenceOpenPreviousYear,
               tooltip: 'Année précédente (même date)'
@@ -246,7 +246,7 @@
 
       <UCard v-if="chartData" class="mt-4">
         <div class="text-xl font-bold">Statistiques d'activités réalisées (membres)</div>
-        <div class="my-4 text-sm">Les données sont basées sur la même période</div>
+        <div class="my-4 text-sm">Les données sont basées sur la même période (en partant du 1er janvier au jour actuel)</div>
         <Bar
             :data="chartData"
             :options="chartOptions"
