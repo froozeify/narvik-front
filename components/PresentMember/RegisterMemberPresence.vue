@@ -80,23 +80,24 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   })
 
   let item: MemberPresence | undefined = undefined;
-  let queryViolations: NuxtError | null = null;
+  let error: Error | null = null;
+
   if (!props.memberPresence) {
-    let { created, error } = await memberPresenceQuery.post(memberPresence);
+    let { created, error: errorMessage } = await memberPresenceQuery.post(memberPresence);
     item = created
-    queryViolations = error;
+    error = errorMessage;
   } else {
-    let { updated, error } = await memberPresenceQuery.patch(props.memberPresence, memberPresence);
+    let { updated, error: errorMessage } = await memberPresenceQuery.patch(props.memberPresence, memberPresence);
     item = updated
-    queryViolations = error;
+    error = errorMessage;
   }
 
   isSubmitting.value = false;
-  if (queryViolations) {
+  if (error) {
     toast.add({
       color: "red",
       title: "L'enregistrement a échoué",
-      description: queryViolations?.message
+      description: error.message
     });
     return;
   }

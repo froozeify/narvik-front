@@ -81,25 +81,25 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
   let item: ExternalPresence | undefined = undefined;
   let isUpdating = false
-  let queryViolations: SubmissionErrors | undefined = undefined;
+  let error: Error | null = null;
 
   if (!props.externalPresence) {
-    let { created, violations, error } = await externalPresenceQuery.post(externalPresence);
+    let { created, error: errorMessage } = await externalPresenceQuery.post(externalPresence);
     item = created
-    queryViolations = violations;
+    error = errorMessage
   } else {
-    let { updated, violations, error } = await externalPresenceQuery.patch(props.externalPresence, externalPresence);
+    let { updated, error: errorMessage } = await externalPresenceQuery.patch(props.externalPresence, externalPresence);
     isUpdating = true
     item = updated
-    queryViolations = violations;
+    error = errorMessage
   }
 
   isSubmitting.value = false;
-  if (queryViolations) {
+  if (error) {
     toast.add({
       color: "red",
       title: "L'enregistrement a échoué",
-      description: queryViolations._error
+      description: error.message
     });
     return;
   }

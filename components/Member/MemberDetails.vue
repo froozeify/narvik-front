@@ -120,21 +120,21 @@
       }
 
       const { updated, error } = await memberQuery.patch(member.value, payload)
-      if (updated) {
-        toast.add({
-          color: "green",
-          title: "Mot de passe modifié"
-        })
-        member.value = updated
-        updatePasswordModalOpen.value = false
-      } else {
+      if (error) {
         toast.add({
           color: "red",
           title: "Une erreur est arrivé lors de la mise à jour du mot de passe",
           description: error.message
         })
+        return;
       }
 
+      toast.add({
+        color: "green",
+        title: "Mot de passe modifié"
+      })
+      member.value = updated
+      updatePasswordModalOpen.value = false
     }
 
     if (!passwordState.current) {
@@ -168,20 +168,21 @@
       accountActivated: activated
     }
     memberQuery.patch(member.value, payload).then(({updated, error}) => {
-      if (updated) {
-        toast.add({
-          color: "green",
-          title: activated ? "Compte activé" : "Compté désactivé"
-        })
-        member.value = updated
-        close();
-      } else {
+      if (error) {
         toast.add({
           color: "red",
           title: activated ? "L'activation a échoué" : "La désactivation a échoué",
           description: error.message
         })
+        return;
       }
+
+      toast.add({
+        color: "green",
+        title: activated ? "Compte activé" : "Compté désactivé"
+      })
+      member.value = updated
+      close();
     });
 
   }
@@ -193,22 +194,22 @@
       role: selectedNewRole.value
     }
     memberQuery.patch(member.value, payload).then(({updated, error}) => {
-      if (updated) {
-        toast.add({
-          color: "green",
-          title: "Rôle modifié"
-        })
-        member.value = updated
-        close();
-      } else {
+      if (error) {
         toast.add({
           color: "red",
           title: "Une erreur est survenue",
           description: error.message
         })
+        return;
       }
-    });
 
+      toast.add({
+        color: "green",
+        title: "Rôle modifié"
+      })
+      member.value = updated
+      close();
+    });
   }
 
   async function getMemberPresences() {
