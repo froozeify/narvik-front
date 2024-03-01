@@ -149,12 +149,14 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
         <UInput class="my-4"
           v-model="state.lastname"
+          required
           :disabled="props.externalPresence !== undefined"
           placeholder="Nom"
         />
 
         <UInput
             v-model="state.firstname"
+            required
             :disabled="props.externalPresence !== undefined"
             placeholder="Prénom"
         />

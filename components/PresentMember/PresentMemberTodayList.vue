@@ -12,15 +12,10 @@ import {formatTimeReadable} from "~/utils/date";
 const memberPresenceQuery = new MemberPresenceQuery();
 
 const externalPresenceStore = useExternalPresenceStore()
-if (externalPresenceStore.list === undefined) {
-  externalPresenceStore.refresh()
-}
-
 const presentMembers: Ref<MemberPresence[] | undefined> = ref(undefined);
-memberPresenceQuery.getPresentToday().then(value => {
-  presentMembers.value = value.items
-});
+const isRefreshing: Ref<boolean> = ref(false)
 
+getPresences()
 
 const presenceList = computed(() => {
   let response = {
@@ -74,6 +69,36 @@ const columns = [
     label: 'Activités'
   }
 ]
+
+refreshNight()
+function refreshNight() {
+  var now = new Date();
+  var night = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+      3, 0, 0
+  );
+  var msToMidnight = night.getTime() - now.getTime();
+  if (msToMidnight > 0) {
+    setTimeout(function() {
+      getPresences();
+      refreshNight(); // Then, reset again next night.
+    }, msToMidnight);
+  }
+}
+
+function getPresences(force: boolean = false) {
+  isRefreshing.value = true
+  if (externalPresenceStore.list === undefined || force) {
+    externalPresenceStore.refresh()
+  }
+
+  memberPresenceQuery.getPresentToday().then(value => {
+    presentMembers.value = value.items
+    isRefreshing.value = false
+  });
+}
 
 function rowClicked(row: MemberPresence) {
   selectedMemberPresence.value = row;
@@ -152,7 +177,8 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <div class="flex justify-end gap-4 mb-4">
+    <div class="flex gap-4 mb-4">
+      <span class="flex-1"></span>
       <UButton variant="soft" color="orange" label="Enregistrement tireur externe" @click="openAddExternalPresenceModal()"/>
       <UButton label="S'enregistrer" @click="openAddPresenceModal()"/>
     </div>
@@ -163,7 +189,7 @@ onUnmounted(() => {
         color="orange"
         :items="[
           {
-            'label': 'Tireurs externes / non licenciés',
+            'label': `Tireurs externes / non licenciés (${externalPresenceStore.list.length})`,
             'slot': 'external-presences'
           }
         ]"
@@ -176,6 +202,25 @@ onUnmounted(() => {
     </UAccordion>
 
     <UCard>
+      <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700 items-center">
+        <p>Membres enregistrés aujourd'hui : {{presenceList.presentMembers.length}}</p>
+
+
+        <div class="flex-1"></div>
+
+        <div class="inline-flex">
+          <UTooltip text="Rafraichir">
+            <UButton
+                icon="i-heroicons-arrow-path"
+                color="gray"
+                variant="solid"
+                aria-label="Rafraichir"
+                :loading="isRefreshing"
+                @click="getPresences(true)"
+            />
+          </UTooltip>
+        </div>
+      </div>
       <UTable
           :loading="presenceList.loading"
           class="w-full"
