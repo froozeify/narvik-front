@@ -49,11 +49,6 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
         class="w-full"
         :columns="columns"
         :rows="externalPresenceStore.list"
-        :ui="{
-          td: {
-            padding: 'py-2'
-          }
-        }"
         @select="rowClicked">
 
       <template #createdAt-data="{row}">

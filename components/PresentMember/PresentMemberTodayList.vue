@@ -226,11 +226,6 @@ onUnmounted(() => {
           class="w-full"
           :columns="columns"
           :rows="presenceList.presentMembers"
-          :ui="{
-            td: {
-              padding: 'py-2'
-            }
-          }"
           @select="rowClicked">
         <template #empty-state>
           <div class="flex flex-col items-center justify-center py-6 gap-3">
