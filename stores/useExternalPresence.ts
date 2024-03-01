@@ -9,7 +9,7 @@ export const useExternalPresenceStore = defineStore('externalPresence', () => {
 		const externalPresenceQuery = new ExternalPresenceQuery();
 		const { items } = await externalPresenceQuery.getPresentToday()
 		if (items) {
-			list.value = items.value
+			list.value = items
 		}
 	}
 
