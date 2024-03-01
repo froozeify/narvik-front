@@ -24,6 +24,11 @@
 
   const entitiesSection = [
     {
+      label: 'Présences',
+      icon: 'i-heroicons-calendar-days',
+      to: '/admin/presences'
+    },
+    {
       label: 'Membres',
       icon: 'i-heroicons-user-group',
       to: '/admin/members'
