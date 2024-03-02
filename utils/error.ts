@@ -4,7 +4,7 @@ export class SubmissionError extends Error {
   private readonly _errors: SubmissionErrors;
 
   constructor(errors: SubmissionErrors) {
-    super("Submit Validation Failed. " + errors.toString());
+    super(errors['_error']);
     this._errors = errors;
   }
 

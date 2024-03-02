@@ -17,9 +17,9 @@ export function formatTimeReadable(date?: string): string | null {
   return new Date(date).toLocaleString('fr-FR', {hour: '2-digit', minute: '2-digit'});
 }
 
-export function formatDateInput(value?: string): string | undefined {
+export function formatDateInput(value?: string): string | null {
   if (!value) {
-    return undefined;
+    return null;
   }
 
   return dayjs(value).format("YYYY-MM-DD");

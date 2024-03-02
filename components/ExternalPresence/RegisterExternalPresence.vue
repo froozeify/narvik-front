@@ -2,11 +2,7 @@
 import ActivityQuery from "~/composables/api/query/ActivityQuery";
 import type {Activity} from "~/types/activity";
 import type {PropType, Ref} from "vue";
-import type {Member} from "~/types/member";
 import type {FormSubmitEvent} from "#ui/types";
-import type {MemberPresence} from "~/types/memberpresence";
-import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
-import type {SubmissionErrors} from "~/types/error";
 import type {ExternalPresence} from "~/types/externalpresence";
 import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
@@ -26,7 +22,9 @@ const emit = defineEmits([
 const toast = useToast()
 
 const externalPresenceQuery = new ExternalPresenceQuery();
+const selfStore = useSelfMemberStore()
 
+const isBadger = selfStore.isBadger()
 
 const isLoading: Ref<boolean> = ref(true)
 const isSubmitting: Ref<boolean> = ref(false)
@@ -143,19 +141,21 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       <UForm :state="state" @submit="onSubmit" class="mt-4">
         <UInput
             v-model="state.licence"
-            :disabled="props.externalPresence !== undefined"
+            :disabled="props.externalPresence !== undefined && isBadger"
             placeholder="Licence"
         />
 
         <UInput class="my-4"
           v-model="state.lastname"
-          :disabled="props.externalPresence !== undefined"
+          required
+          :disabled="props.externalPresence !== undefined && isBadger"
           placeholder="Nom"
         />
 
         <UInput
             v-model="state.firstname"
-            :disabled="props.externalPresence !== undefined"
+            required
+            :disabled="props.externalPresence !== undefined && isBadger"
             placeholder="Prénom"
         />
 

@@ -22,6 +22,11 @@ const props = defineProps({
     type: Object as PropType<MemberPresence>,
     required: true
   },
+  viewOnly: {
+    type: Boolean,
+    required: false,
+    default: false
+  }
 });
 
 const emit = defineEmits([
@@ -118,12 +123,18 @@ function presenceUpdated(newMemberPresence: MemberPresence) {
 }
 
 async function copyLicence() {
-  if (selfStore.isAdmin() && props.item.member?.licence) {
+  if (selfStore.hasSupervisorRole() && props.item.member?.licence) {
     clipboard.write(props.item.member.licence)
     toast.add({
       title: 'Licence copiée',
       color: "green"
     })
+  }
+}
+
+function fullNameClicked() {
+  if (selfStore.hasSupervisorRole() && member.value) {
+    navigateTo(`/admin/members/${member.value.id}`)
   }
 }
 
@@ -134,7 +145,7 @@ async function copyLicence() {
     <template v-if="member">
       <UCard>
         <div class="flex justify-end">
-          <UTooltip text="Editer" class="">
+          <UTooltip v-if="!viewOnly" text="Editer" class="">
             <UButton
                 @click="updateMemberPresenceModalOpen = true"
                 icon="i-heroicons-pencil-square"
@@ -150,7 +161,7 @@ async function copyLicence() {
         </div>
 
         <div class="space-y-4 w-full my-4">
-          <div class="text-center text-2xl font-bold">
+          <div class="text-center text-2xl font-bold" @click="fullNameClicked">
             {{ member.fullName }}
           </div>
           <div class="flex items-center justify-center text-xl cursor-pointer select-none" @click="copyLicence">

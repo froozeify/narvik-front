@@ -49,11 +49,6 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
         class="w-full"
         :columns="columns"
         :rows="externalPresenceStore.list"
-        :ui="{
-          td: {
-            padding: 'py-2'
-          }
-        }"
         @select="rowClicked">
 
       <template #createdAt-data="{row}">
@@ -62,7 +57,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
 
       <template #licence-data="{row}">
         <div v-if="!row.licence">
-          <i>Non communiqué</i>
+          <i>Non communiquée</i>
         </div>
         <div v-else>
           {{ row.licence }}

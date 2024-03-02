@@ -7,6 +7,11 @@ export default defineAppConfig({
 		},
 		card: {
 			background: 'bg-neutral-50 dark:bg-gray-900'
+		},
+		table: {
+			td: {
+				padding: 'py-2'
+			}
 		}
 	}
 })
