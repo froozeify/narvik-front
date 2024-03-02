@@ -118,12 +118,18 @@ function presenceUpdated(newMemberPresence: MemberPresence) {
 }
 
 async function copyLicence() {
-  if (selfStore.isAdmin() && props.item.member?.licence) {
+  if (selfStore.hasSupervisorRole() && props.item.member?.licence) {
     clipboard.write(props.item.member.licence)
     toast.add({
       title: 'Licence copiée',
       color: "green"
     })
+  }
+}
+
+function fullNameClicked() {
+  if (selfStore.hasSupervisorRole() && member.value) {
+    navigateTo(`/admin/members/${member.value.id}`)
   }
 }
 
@@ -150,7 +156,7 @@ async function copyLicence() {
         </div>
 
         <div class="space-y-4 w-full my-4">
-          <div class="text-center text-2xl font-bold">
+          <div class="text-center text-2xl font-bold" @click="fullNameClicked">
             {{ member.fullName }}
           </div>
           <div class="flex items-center justify-center text-xl cursor-pointer select-none" @click="copyLicence">
