@@ -6,6 +6,14 @@
   import type {MemberPresence} from "~/types/memberpresence";
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
 
+  const props = defineProps({
+    listOnly: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+  });
+
   const toast = useToast();
   const isLoading = ref(true);
 
@@ -99,6 +107,8 @@
   }
 
   function rowClicked(row: ExternalPresence) {
+    if (props.listOnly) return;
+
     selectedPresence.value = row
     modalOpen.value = true
   }

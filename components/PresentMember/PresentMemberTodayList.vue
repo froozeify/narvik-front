@@ -43,6 +43,7 @@ const presenceList = computed(() => {
 const memberPresenceModalOpen = ref(false);
 const searchMemberModalOpen = ref(false);
 const addExternalPresenceModal = ref(false);
+const historyModal = ref(false);
 
 const searchQuery = ref('')
 
@@ -155,7 +156,8 @@ function keyPressHandler(ev: KeyboardEvent) {
       externalPresenceStore.modalOpen === true ||
       addExternalPresenceModal.value === true ||
       memberPresenceModalOpen.value === true ||
-      searchMemberModalOpen.value === true) {
+      searchMemberModalOpen.value === true ||
+      historyModal.value === true) {
     return;
   }
 
@@ -177,8 +179,15 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <div class="flex gap-4 mb-4">
+    <div class="flex flex-col sm:flex-row gap-4 mb-4">
+      <UButton
+        icon="i-heroicons-calendar-days"
+        variant="ghost"
+        @click="historyModal = true"
+      />
+
       <span class="flex-1"></span>
+
       <UButton variant="soft" color="orange" label="Enregistrement tireur externe" @click="openAddExternalPresenceModal()"/>
       <UButton label="S'enregistrer" @click="openAddPresenceModal()"/>
     </div>
@@ -284,6 +293,15 @@ onUnmounted(() => {
       <template v-else>
         <RegisterMemberPresence :member="selectedMember" @registered="presenceRegistered" @canceled="searchMemberModalOpen = false;" />
       </template>
+    </UModal>
+
+    <UModal
+      v-model="historyModal"
+      :ui="{
+        width: 'lg:max-w-5xl p-4 mx-4'
+      }"
+    >
+      <PresenceList />
     </UModal>
 
   </div>

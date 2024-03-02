@@ -12,7 +12,7 @@ useHead({
 
 <template>
   <div>
-    <PresenceList />
+    <PresenceList :list-only="false" />
   </div>
 </template>
 

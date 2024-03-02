@@ -1,6 +1,16 @@
 <script setup lang="ts">
   import {usePresenceStore} from "~/stores/usePresenceStore";
   import {formatDateReadable} from "~/utils/date";
+  import type {PropType} from "vue";
+  import type {MemberPresence} from "~/types/memberpresence";
+
+  const props = defineProps({
+    listOnly: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+  });
 
   const presenceStore = usePresenceStore()
 
@@ -48,7 +58,7 @@
       <template #external-presences>
         <UCard class="bg-orange-50 dark:bg-orange-950">
           <div class="text-xl font-bold mb-4">Présences externe</div>
-          <ExternalPresenceList />
+          <ExternalPresenceList :list-only="props.listOnly"/>
         </UCard>
       </template>
 
@@ -56,7 +66,7 @@
 
     <UCard class="mt-4">
       <div class="text-xl font-bold mb-4">Présences membres ({{presenceStore.totalMembers}})</div>
-      <PresentMemberList />
+      <PresentMemberList :list-only="props.listOnly"/>
     </UCard>
   </div>
 </template>

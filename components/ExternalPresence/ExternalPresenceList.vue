@@ -5,6 +5,14 @@
   import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
   import {formatDateInput, formatDateReadable} from "~/utils/date";
 
+  const props = defineProps({
+    listOnly: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+  });
+
   const toast = useToast();
   const isLoading = ref(true);
 
@@ -99,6 +107,8 @@
   }
 
   function rowClicked(row: ExternalPresence) {
+    if (props.listOnly) return;
+
     selectedExternalPresence.value = row
     modalOpen.value = true
   }
