@@ -22,6 +22,11 @@ const props = defineProps({
     type: Object as PropType<MemberPresence>,
     required: true
   },
+  viewOnly: {
+    type: Boolean,
+    required: false,
+    default: false
+  }
 });
 
 const emit = defineEmits([
@@ -140,7 +145,7 @@ function fullNameClicked() {
     <template v-if="member">
       <UCard>
         <div class="flex justify-end">
-          <UTooltip text="Editer" class="">
+          <UTooltip v-if="!viewOnly" text="Editer" class="">
             <UButton
                 @click="updateMemberPresenceModalOpen = true"
                 icon="i-heroicons-pencil-square"

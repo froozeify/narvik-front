@@ -107,8 +107,6 @@
   }
 
   function rowClicked(row: ExternalPresence) {
-    if (props.listOnly) return;
-
     selectedPresence.value = row
     modalOpen.value = true
   }
@@ -166,6 +164,7 @@
     <UModal
         v-model="modalOpen">
       <PresentMemberDetails
+          :view-only="listOnly"
           :item="selectedPresence"
           @updated="presenceUpdated"
       />
