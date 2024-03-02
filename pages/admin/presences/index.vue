@@ -5,7 +5,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'Historique de présences'
+  title: 'Gestion des présences'
 })
 
 </script>

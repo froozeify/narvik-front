@@ -22,7 +22,9 @@ const emit = defineEmits([
 const toast = useToast()
 
 const externalPresenceQuery = new ExternalPresenceQuery();
+const selfStore = useSelfMemberStore()
 
+const isBadger = selfStore.isBadger()
 
 const isLoading: Ref<boolean> = ref(true)
 const isSubmitting: Ref<boolean> = ref(false)
@@ -139,21 +141,21 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       <UForm :state="state" @submit="onSubmit" class="mt-4">
         <UInput
             v-model="state.licence"
-            :disabled="props.externalPresence !== undefined"
+            :disabled="props.externalPresence !== undefined && isBadger"
             placeholder="Licence"
         />
 
         <UInput class="my-4"
           v-model="state.lastname"
           required
-          :disabled="props.externalPresence !== undefined"
+          :disabled="props.externalPresence !== undefined && isBadger"
           placeholder="Nom"
         />
 
         <UInput
             v-model="state.firstname"
             required
-            :disabled="props.externalPresence !== undefined"
+            :disabled="props.externalPresence !== undefined && isBadger"
             placeholder="Prénom"
         />
 

@@ -9,7 +9,7 @@
 <template>
   <div>
     <UCard class="mb-4">
-      <div class="flex px-3 items-center">
+      <div class="flex px-3 items-center gap-4">
         <UPopover :popper="{ placement: 'bottom-start' }">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(presenceStore.selectedDate) || 'Choisir une date'" />
 
@@ -17,6 +17,14 @@
             <DatePicker v-model="presenceStore.selectedDate" @close="close" />
           </template>
         </UPopover>
+
+        <UButton
+          v-if="presenceStore.selectedDate"
+          color="red"
+          @click="presenceStore.selectedDate = null"
+        >
+          Supprimer la date
+        </UButton>
       </div>
     </UCard>
 
@@ -47,8 +55,8 @@
     </UAccordion>
 
     <UCard class="mt-4">
-      <div class="text-xl font-bold mb-4">Présences membres</div>
-      TODO
+      <div class="text-xl font-bold mb-4">Présences membres ({{presenceStore.totalMembers}})</div>
+      <PresentMemberList />
     </UCard>
   </div>
 </template>

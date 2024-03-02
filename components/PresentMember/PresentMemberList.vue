@@ -2,8 +2,9 @@
   import type {Member} from "~/types/member";
   import {usePresenceStore} from "~/stores/usePresenceStore";
   import type {ExternalPresence} from "~/types/externalpresence";
-  import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
   import {formatDateInput, formatDateReadable} from "~/utils/date";
+  import type {MemberPresence} from "~/types/memberpresence";
+  import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
 
   const toast = useToast();
   const isLoading = ref(true);
@@ -11,7 +12,7 @@
   const presenceStore = usePresenceStore()
   const { selectedDate } = storeToRefs(presenceStore)
 
-  const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)
+  const selectedPresence: Ref<MemberPresence | undefined> = ref(undefined)
   const modalOpen: Ref<boolean> = ref(false);
 
   const page = ref(1);
@@ -22,7 +23,7 @@
   });
 
   const members: Ref<Member[]> = ref([])
-  const presenceQuery = new ExternalPresenceQuery()
+  const presenceQuery = new MemberPresenceQuery()
 
   getPresences();
 
@@ -46,12 +47,11 @@
       sortable: true
     },
     {
-      key: 'licence',
+      key: 'member.licence',
       label: 'Licence',
       class: 'w-24'
-    },
-    {
-      key: 'fullName',
+    }, {
+      key: 'member.fullName',
       label: 'Nom',
       class: 'w-1/3'
     }, {
@@ -93,17 +93,17 @@
 
       if (value.items) {
         members.value = value.items
-        presenceStore.totalExternal = value.totalItems || 0
+        presenceStore.totalMembers = value.totalItems || 0
       }
     });
   }
 
   function rowClicked(row: ExternalPresence) {
-    selectedExternalPresence.value = row
+    selectedPresence.value = row
     modalOpen.value = true
   }
 
-  function externalPresenceUpdated(externalPresence: ExternalPresence) {
+  function presenceUpdated(presence: MemberPresence) {
     getPresences()
   }
 
@@ -131,15 +131,6 @@
         {{ formatDateReadable(row.date) }}
       </template>
 
-      <template #licence-data="{row}">
-        <div v-if="!row.licence">
-          <i>Non communiquée</i>
-        </div>
-        <div v-else>
-          {{ row.licence }}
-        </div>
-      </template>
-
       <template #activities-data="{row}">
         <div v-if="row.activities.length == 0">
           <i>Aucune activités déclarées</i>
@@ -159,14 +150,14 @@
 
     <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
       <USelect v-model="itemsPerPage" :options="itemsPerPagesValues" @update:model-value="getPresences()" />
-      <UPagination v-model="page" @update:model-value="getPresences()" :page-count="parseInt(itemsPerPage.toString())" :total="presenceStore.totalExternal" />
+      <UPagination v-model="page" @update:model-value="getPresences()" :page-count="parseInt(itemsPerPage.toString())" :total="presenceStore.totalMembers" />
     </div>
 
     <UModal
         v-model="modalOpen">
-      <ExternalPresenceDetails
-          :item="selectedExternalPresence"
-          @updated="externalPresenceUpdated"
+      <PresentMemberDetails
+          :item="selectedPresence"
+          @updated="presenceUpdated"
       />
     </UModal>
   </div>

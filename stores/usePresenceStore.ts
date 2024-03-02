@@ -5,6 +5,7 @@ export const usePresenceStore = defineStore('presence', () => {
 	const selectedDate: Ref<Date|null> = ref(null)
 
 	const totalExternal: Ref<number> = ref(0)
+	const totalMembers: Ref<number> = ref(0)
 
 	const list: Ref<ExternalPresence[] | undefined> = ref(undefined)
 
@@ -40,6 +41,7 @@ export const usePresenceStore = defineStore('presence', () => {
 	return {
 		selectedDate,
 		totalExternal,
+		totalMembers,
 
 		addItem,
 		refresh,
