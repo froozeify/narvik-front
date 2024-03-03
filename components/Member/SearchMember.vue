@@ -13,6 +13,8 @@ const emit = defineEmits([
   'selected-member',
 ])
 
+const toast = useToast()
+
 let inputTimer: NodeJS.Timeout;
 
 const searching = ref(false);
@@ -20,13 +22,15 @@ const memberSelected = ref();
 const foundMembers: Ref<Member[]> = ref([])
 const query: Ref<string|undefined> = ref(undefined)
 
-watch(query, search)
+watch(query, (value) => {
+  search(value)
+})
 
 if (props.query) {
   query.value = props.query
 }
 
-async function search(query: any) {
+async function search(query: any, replayCount: number = 0) {
   clearTimeout(inputTimer);
   inputTimer = setTimeout(async () => {
     if (query === null || query.trim() === "") {
@@ -39,6 +43,36 @@ async function search(query: any) {
 
     const memberQuery = new MemberQuery();
     const searchResult = await memberQuery.search(query);
+    searching.value = false;
+
+    if (searchResult.error) {
+      if (searchResult.error.message.includes('The operation was aborted')) {
+        // We replay the query
+        if (replayCount < 5) {
+          toast.add({
+            color: "orange",
+            title: "Problème réseau",
+            description: `Il semblerait que la requête ne peut aboutir. Nouvelle tentative. (${replayCount + 1}/5)`
+          })
+          return await search(query, ++replayCount);
+        } else {
+          toast.add({
+            color: "red",
+            title: "Une erreur est survenue",
+            description: "Il semblerait que la requête ne peut aboutir. Veuillez rafraichir la page."
+          })
+          return;
+        }
+      }
+
+      toast.add({
+        color: "red",
+        title: "Une erreur est survenue",
+        description: searchResult.error.message
+      })
+
+      return;
+    }
 
     if (!searchResult.item) return;
 
@@ -50,7 +84,6 @@ async function search(query: any) {
       rowClicked(members.value.at(0) as Member)
     }
 
-    searching.value = false;
   }, 800);
 }
 
@@ -72,13 +105,15 @@ function rowClicked(row: Member) {
 <template>
   <div class="flex flex-col justify-start px-4 py-4 rounded-lg divide-y divide-gray-200 dark:divide-gray-800 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 min-h-96">
 
-    <UInput
-        class="mb-4"
-        v-model="query"
-        :loading="searching"
-        placeholder="Nom / Licence"
-        trailing
-    />
+    <UFormGroup label="Nom / Licence">
+      <UInput
+          class="mb-4"
+          v-model="query"
+          :loading="searching"
+          placeholder="Nom / Licence"
+          trailing
+      />
+    </UFormGroup>
 
     <UTable
         :loading="searching"
