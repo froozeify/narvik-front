@@ -155,8 +155,8 @@ function fullNameClicked() {
   <div>
     <template v-if="member">
       <UCard>
-        <div class="flex justify-end">
-          <UTooltip v-if="!viewOnly" text="Editer" class="">
+        <div v-if="!viewOnly" class="flex justify-end">
+          <UTooltip text="Editer">
             <UButton
                 @click="updateMemberPresenceModalOpen = true"
                 icon="i-heroicons-pencil-square"

@@ -11,6 +11,8 @@
 
   import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
   import { Doughnut } from 'vue-chartjs'
+  import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
+  import type {ExternalPresence} from "~/types/externalpresence";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
@@ -34,7 +36,11 @@
   const isAdmin = selfStore.isAdmin();
   const isSupervisor = selfStore.hasSupervisorRole();
 
+  const addMemberPresenceModal = ref(false)
+  const selectedPresence: Ref<MemberPresence | undefined> = ref(undefined)
+  const memberPresenceModal: Ref<boolean> = ref(false);
   const updatePasswordModalOpen = ref(false)
+
   const passwordState = reactive({
     current: undefined as string|undefined,
     new: undefined as string|undefined,
@@ -281,6 +287,11 @@
     })
   }
 
+  function presenceUpdated(presence?: MemberPresence) {
+    memberPresenceModal.value = false
+    getMemberPresences()
+  }
+
 </script>
 
 <template>
@@ -425,6 +436,13 @@
           />
         </div>
 
+        <div v-if="isSupervisor" class="flex gap-4">
+          <div class="flex-1"></div>
+          <UButton @click="addMemberPresenceModal = true" >
+            Ajouter une activité
+          </UButton>
+        </div>
+
         <UTable
             class="mt-4"
             :columns="[
@@ -470,8 +488,10 @@
           </template>
 
           <template #actions-data="{row}" >
-            <div class="w-96 flex gap-4">
-              <UPopover v-if="isAdmin" overlay>
+            <div v-if="isSupervisor" class="w-96 flex gap-4">
+              <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
+
+              <UPopover overlay>
                 <UButton color="red" label="Supprimer" />
 
                 <template #panel="{ close }">
@@ -519,6 +539,25 @@
           </UButton>
         </UForm>
       </UCard>
+    </UModal>
+
+    <UModal v-model="addMemberPresenceModal">
+      <RegisterMemberPresence
+        :member="member"
+        :date-editable="true"
+        @canceled="addMemberPresenceModal = false"
+        @registered="addMemberPresenceModal = false; getMemberPresences()"
+      />
+    </UModal>
+
+    <UModal
+        v-model="memberPresenceModal">
+      <RegisterMemberPresence
+          :member-presence="selectedPresence"
+          :date-editable="true"
+          @canceled="memberPresenceModal = false"
+          @registered="presenceUpdated"
+      />
     </UModal>
 
   </div>
