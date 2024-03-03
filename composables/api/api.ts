@@ -33,6 +33,7 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
   overloadedOptions = mergician({
     mode: "cors",
     cache: false,
+    timeout: 10000, // Default timeout after 10s
 
     headers: {
       Accept: MIME_TYPE,
@@ -196,6 +197,7 @@ export async function useUploadFile(resource: string, payload: FormData, require
   try {
     const data = await useApi(resource, {
       method: "POST",
+      timeout: null, // No timeout for file upload
       headers: {
         Accept: MIME_TYPE_JSON,
       },
