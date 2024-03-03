@@ -19,7 +19,14 @@
 <template>
   <div>
     <UCard class="mb-4">
-      <div class="flex px-3 items-center gap-4">
+      <div class="flex items-center gap-4">
+
+        <UInput
+            v-model="presenceStore.searchQuery"
+            placeholder="Rechercher..."  />
+
+        <div class="flex-1"></div>
+
         <UPopover :popper="{ placement: 'bottom-start' }">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(presenceStore.selectedDate) || 'Choisir une date'" />
 

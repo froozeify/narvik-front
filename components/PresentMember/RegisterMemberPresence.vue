@@ -6,9 +6,7 @@ import type {Member} from "~/types/member";
 import type {FormSubmitEvent} from "#ui/types";
 import type {MemberPresence} from "~/types/memberpresence";
 import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
-import type {SubmissionErrors} from "~/types/error";
-import MemberQuery from "~/composables/api/query/MemberQuery";
-import type {NuxtError} from "#app";
+import {formatDateInput, formatDateReadable} from "~/utils/date";
 
 const props = defineProps({
   member: {
@@ -18,6 +16,11 @@ const props = defineProps({
   memberPresence: {
     type: Object as PropType<MemberPresence>,
     required: false
+  },
+  dateEditable: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 });
 
@@ -34,6 +37,7 @@ const memberPresenceQuery = new MemberPresenceQuery();
 const isLoading: Ref<boolean> = ref(true)
 const isSubmitting: Ref<boolean> = ref(false)
 const activities: Ref<Activity[]> = ref([])
+const selectedDate: Ref<Date|null> = ref(null);
 
 const state = reactive({
   member: props.member,
@@ -43,6 +47,9 @@ const state = reactive({
 if (props.memberPresence) {
   state.member = props.memberPresence.member
   state.activities = []
+  if (props.memberPresence.date) {
+    selectedDate.value = new Date(props.memberPresence.date)
+  }
   props.memberPresence.activities?.forEach(actvt => {
     if (!actvt.isEnabled) {
       state.activities[actvt.id] = false
@@ -63,7 +70,8 @@ activityQuery.getAll().then(value => {
 async function onSubmit(event: FormSubmitEvent<any>) {
   isSubmitting.value = true;
 
-  let memberPresence: { member: string|number|undefined, activities: string[] } = {
+  let memberPresence: { member: string|number|undefined, activities: string[], date: string|undefined } = {
+    date: undefined,
     member: undefined,
     activities: []
   }
@@ -78,6 +86,13 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       memberPresence.activities.push(activityQuery.rootPath + "/" + actvt)
     }
   })
+
+  if (props.dateEditable && selectedDate.value) {
+    const date = formatDateInput(selectedDate.value.toString())
+    if (date) {
+      memberPresence.date = date
+    }
+  }
 
   let item: MemberPresence | undefined = undefined;
   let error: Error | null = null;
@@ -131,6 +146,14 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       <div class="text-2xl">Enregistrement pour <b>{{ state.member.fullName }}</b></div>
 
       <UForm :state="state" @submit="onSubmit">
+        <UPopover v-if="props.dateEditable" :popper="{ placement: 'bottom-start' }" class="mt-4">
+          <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(selectedDate) || 'Choisir une date'" />
+
+          <template #panel="{ close }">
+            <DatePicker v-model="selectedDate" @close="close" />
+          </template>
+        </UPopover>
+
         <div class="mt-4">Activités</div>
         <UFormGroup name="activities" class="my-4">
           <div class="grid grid-cols-2 gap-2 gap-y-2 ">

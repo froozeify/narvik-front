@@ -2,6 +2,7 @@
 import type {PropType} from "vue";
 import type {ExternalPresence} from "~/types/externalpresence";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence.vue";
+import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
 
 const toast = useToast()
 
@@ -17,8 +18,11 @@ const emit = defineEmits([
   'canceled'
 ])
 
+const selfStore = useSelfMemberStore()
+const isSupervisor = selfStore.hasSupervisorRole()
 
 const externalPresence: Ref<ExternalPresence> = ref(props.item)
+const externalPresenceQuery = new ExternalPresenceQuery()
 
 const updateExternalPresenceModalOpen = ref(false);
 
@@ -33,12 +37,20 @@ function presenceCanceled(newExternalPresence: ExternalPresence) {
   emit('canceled', newExternalPresence)
 }
 
+async function deletePresence(close: Function) {
+  if (isSupervisor) {
+    await externalPresenceQuery.delete(externalPresence.value)
+    close()
+    emit('updated', null)
+  }
+}
+
 </script>
 
 <template>
   <UCard class="bg-orange-50 dark:bg-orange-950">
     <div class="flex justify-end">
-      <UTooltip text="Editer" class="">
+      <UTooltip text="Editer">
         <UButton
             @click="updateExternalPresenceModalOpen = true"
             icon="i-heroicons-pencil-square"
@@ -46,6 +58,31 @@ function presenceCanceled(newExternalPresence: ExternalPresence) {
             color="orange"
             variant="ghost"
         />
+      </UTooltip>
+
+      <UTooltip text="Supprimer" v-if="isSupervisor">
+        <UPopover>
+          <UButton
+              icon="i-heroicons-trash"
+              size="xs"
+              color="red"
+              variant="ghost"
+          />
+
+          <template #panel="{ close }">
+            <div class="p-4 w-56 flex flex-col gap-4">
+              <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+
+              <UButton
+                  @click="deletePresence(close);"
+                  color="red"
+                  class="mx-auto"
+              >
+                Supprimer
+              </UButton>
+            </div>
+          </template>
+        </UPopover>
       </UTooltip>
     </div>
 

@@ -145,7 +145,9 @@ function presenceRegistered(memberPresence: MemberPresence) {
   });
 }
 
-function memberPresenceUpdated(memberPresence: MemberPresence) {
+function memberPresenceUpdated(memberPresence?: MemberPresence) {
+  if (!memberPresence) memberPresenceModalOpen.value = false
+
   memberPresenceQuery.getPresentToday().then(value => {
     presentMembers.value = value.items
   });

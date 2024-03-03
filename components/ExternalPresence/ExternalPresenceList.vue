@@ -17,7 +17,7 @@
   const isLoading = ref(true);
 
   const presenceStore = usePresenceStore()
-  const { selectedDate } = storeToRefs(presenceStore)
+  const { selectedDate, searchQuery } = storeToRefs(presenceStore)
 
   const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)
   const modalOpen: Ref<boolean> = ref(false);
@@ -34,7 +34,7 @@
 
   getPresences();
 
-  watch(selectedDate, (value) => {
+  watch([searchQuery, selectedDate], (value) => {
     page.value = 1
     getPresences()
   })
@@ -85,6 +85,10 @@
         urlParams.append(`date[before]`, formattedDate);
         urlParams.append(`date[after]`, formattedDate);
       }
+    }
+
+    if (searchQuery.value) {
+      urlParams.append(`multiple[firstname, lastname, licence]`, searchQuery.value);
     }
 
     presenceQuery.getAll(urlParams).then(value => {

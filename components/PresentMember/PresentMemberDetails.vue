@@ -12,10 +12,12 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
 
 import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
 import { Doughnut } from 'vue-chartjs'
+import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 const toast = useToast()
-const selfStore = useSelfMemberStore();
+const selfStore = useSelfMemberStore()
+const isAdmin = selfStore.isAdmin()
 
 const props = defineProps({
   item: {
@@ -35,6 +37,7 @@ const emit = defineEmits([
 
 const imageQuery = new ImageQuery()
 const memberQuery = new MemberQuery()
+const memberPresenceQuery = new MemberPresenceQuery()
 
 const memberPresence: Ref<MemberPresence> = ref(props.item)
 const member: Ref<Member | undefined> = ref(undefined)
@@ -122,6 +125,14 @@ function presenceUpdated(newMemberPresence: MemberPresence) {
   emit('updated', newMemberPresence)
 }
 
+async function deletePresence(close: Function) {
+  if (isAdmin) {
+    await memberPresenceQuery.delete(memberPresence.value)
+    close()
+    emit('updated', null)
+  }
+}
+
 async function copyLicence() {
   if (selfStore.hasSupervisorRole() && props.item.member?.licence) {
     clipboard.write(props.item.member.licence)
@@ -144,14 +155,38 @@ function fullNameClicked() {
   <div>
     <template v-if="member">
       <UCard>
-        <div class="flex justify-end">
-          <UTooltip v-if="!viewOnly" text="Editer" class="">
+        <div v-if="!viewOnly" class="flex justify-end">
+          <UTooltip text="Editer">
             <UButton
                 @click="updateMemberPresenceModalOpen = true"
                 icon="i-heroicons-pencil-square"
                 size="xs"
                 variant="ghost"
             />
+          </UTooltip>
+          <UTooltip text="Supprimer" v-if="isAdmin">
+            <UPopover>
+              <UButton
+                  icon="i-heroicons-trash"
+                  size="xs"
+                  color="red"
+                  variant="ghost"
+              />
+
+              <template #panel="{ close }">
+                <div class="p-4 w-56 flex flex-col gap-4">
+                  <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+
+                  <UButton
+                      @click="deletePresence(close);"
+                      color="red"
+                      class="mx-auto"
+                  >
+                    Supprimer
+                  </UButton>
+                </div>
+              </template>
+            </UPopover>
           </UTooltip>
         </div>
 
