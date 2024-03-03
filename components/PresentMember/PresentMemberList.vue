@@ -115,7 +115,8 @@
     modalOpen.value = true
   }
 
-  function presenceUpdated(presence: MemberPresence) {
+  function presenceUpdated(presence?: MemberPresence) {
+    if (!presence) modalOpen.value = false
     getPresences()
   }
 
