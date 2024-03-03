@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {useSetSiteFavicon} from "~/composables/image";
+import FooterCopyright from "~/components/FooterCopyright.vue";
 
 
 useHead({
@@ -13,15 +14,18 @@ useSetSiteFavicon()
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col">
     <HeaderNavbar />
-    <main class="min-h-full">
+    <main class="min-h-full flex-1">
       <div>
         <div class="container mx-auto p-4">
           <slot/>
         </div>
       </div>
     </main>
+    <footer class="mb-4">
+      <FooterCopyright />
+    </footer>
     <UNotifications />
   </div>
 </template>

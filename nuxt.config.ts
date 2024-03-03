@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import pkg from './package.json'
+
 export default defineNuxtConfig({
 	devtools: { enabled: true },
 	ssr: false,
@@ -21,7 +23,8 @@ export default defineNuxtConfig({
 	},
 	runtimeConfig: {
 		public: {
-			apiUrl: process.env.API_URL || 'https://localhost'
+			apiUrl: process.env.API_URL || 'https://localhost',
+			clientVersion: pkg.version
 		}
 	},
 	apiParty: {

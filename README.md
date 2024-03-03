@@ -1,39 +1,16 @@
-# Nuxt 3 Minimal Starter
+# Narvik - Front
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Page du projet : https://narvik.pages.dev/frontend/
 
-## Setup
+## Documentations
 
-Make sure to install the dependencies:
+0. [Développement](docs/0.README.md)
+1. [Documentation utilisateur](https://narvik.pages.dev/frontend/)
 
-```bash
-# yarn
-yarn install
-```
 
-## Development Server
+## License
 
-Start the development server on `http://localhost:3000`:
+GNU AGPLv3 Licence.
 
-```bash
-# yarn
-yarn dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# yarn
-yarn build
-```
-
-Locally preview production build:
-
-```bash
-# yarn
-yarn preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Crédits
+Crée par Benoît VIGNAL
