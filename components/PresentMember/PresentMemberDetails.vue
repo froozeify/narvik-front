@@ -156,7 +156,7 @@ function fullNameClicked() {
     <template v-if="member">
       <UCard>
         <div v-if="!viewOnly" class="flex justify-end">
-          <UTooltip text="Editer">
+          <UTooltip text="Editer la présence">
             <UButton
                 @click="updateMemberPresenceModalOpen = true"
                 icon="i-heroicons-pencil-square"
@@ -164,7 +164,7 @@ function fullNameClicked() {
                 variant="ghost"
             />
           </UTooltip>
-          <UTooltip text="Supprimer" v-if="isAdmin">
+          <UTooltip text="Supprimer la présence" v-if="isAdmin">
             <UPopover>
               <UButton
                   icon="i-heroicons-trash"

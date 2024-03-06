@@ -13,6 +13,7 @@
   import { Doughnut } from 'vue-chartjs'
   import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
   import type {ExternalPresence} from "~/types/externalpresence";
+  import {usePaginationValues} from "~/composables/api/list";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
@@ -52,11 +53,23 @@
   const memberPresences: Ref<MemberPresence[]> = ref([])
   const totalMemberPresences = computed(() => memberPresences.value.length)
 
+  const isLoadingMemberPresencesPaginated = ref(false)
+  const memberPresencesPaginated: Ref<MemberPresence[]> = ref([])
+  const totalMemberPresencesPaginated = ref(0)
+
+
   const chartData: Ref<object|undefined> = ref(undefined)
   const chartOptions = ref({
     responsive: true,
     maintainAspectRatio: false,
   })
+
+  const page = ref(1);
+  const itemsPerPage = ref(10);
+  const sort = ref({
+    column: 'date',
+    direction: 'desc'
+  });
 
   const isUpdating = ref(false);
 
@@ -258,6 +271,28 @@
       chartData.value = newChartData
     }
 
+    await getMemberPresencesPaginated()
+  }
+
+  async function getMemberPresencesPaginated() {
+    if (!member.value || !member.value.id) return;
+    isLoadingMemberPresencesPaginated.value = true
+
+    const urlParams = new URLSearchParams({
+      pagination: '1',
+      page: page.value.toString(),
+      itemsPerPage: itemsPerPage.value.toString(),
+    });
+
+    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+
+    const { totalItems, items } = await memberQuery.presences(member.value.id, urlParams)
+    memberPresencesPaginated.value = items
+    if (totalItems) {
+      totalMemberPresencesPaginated.value = totalItems
+    }
+
+    isLoadingMemberPresencesPaginated.value = false
   }
 
   async function deleteRow(memberPresence: MemberPresence, close: Function) {
@@ -424,7 +459,7 @@
 
     </UCard>
 
-    <div class="mt-4">
+    <div class="my-4">
       <UCard v-if="totalMemberPresences > 0">
 
         <div class="text-lg">{{ totalMemberPresences }} présences ces 12 derniers mois</div>
@@ -435,7 +470,14 @@
               :options="chartOptions"
           />
         </div>
+      </UCard>
+      <UCard v-else>
+        <i class="text-lg">Aucune présences ces 12 derniers mois</i>
+      </UCard>
+    </div>
 
+    <div>
+      <UCard>
         <div v-if="isSupervisor" class="flex gap-4">
           <div class="flex-1"></div>
           <UButton @click="addMemberPresenceModal = true" >
@@ -444,22 +486,25 @@
         </div>
 
         <UTable
-            class="mt-4"
+            :loading="isLoadingMemberPresencesPaginated"
             :columns="[
-            {
-              key: 'date',
-              label: 'Date',
-              sortable: true,
-            },
-            {
-              key: 'activities',
-              label: 'Activités'
-            },
-            {
-              key: 'actions'
-            }
-          ]"
-            :rows="memberPresences"
+              {
+                key: 'date',
+                label: 'Date',
+                sortable: true,
+              },
+              {
+                key: 'activities',
+                label: 'Activités'
+              },
+              {
+                key: 'actions'
+              }
+            ]"
+            v-model:sort="sort"
+            sort-mode="manual"
+            @update:sort="getMemberPresencesPaginated()"
+            :rows="memberPresencesPaginated"
         >
 
           <template #empty-state>
@@ -511,9 +556,11 @@
           </template>
 
         </UTable>
-      </UCard>
-      <UCard v-else>
-        <i class="text-lg">Aucune présences ces 12 derniers mois</i>
+
+        <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+          <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMemberPresencesPaginated()" />
+          <UPagination v-model="page" @update:model-value="getMemberPresencesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMemberPresencesPaginated" />
+        </div>
       </UCard>
     </div>
 
