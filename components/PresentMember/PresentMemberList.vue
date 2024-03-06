@@ -5,6 +5,7 @@
   import {formatDateInput, formatDateReadable} from "~/utils/date";
   import type {MemberPresence} from "~/types/memberpresence";
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+  import {usePaginationValues} from "~/composables/api/list";
 
   const props = defineProps({
     listOnly: {
@@ -39,14 +40,6 @@
     page.value = 1
     getPresences()
   })
-
-
-  const itemsPerPagesValues = [
-      5,
-      10,
-      30,
-      100
-  ]
 
   const columns = [
     {
@@ -162,7 +155,7 @@
     </UTable>
 
     <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <USelect v-model="itemsPerPage" :options="itemsPerPagesValues" @update:model-value="getPresences()" />
+      <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getPresences()" />
       <UPagination v-model="page" @update:model-value="getPresences()" :page-count="parseInt(itemsPerPage.toString())" :total="presenceStore.totalMembers" />
     </div>
 

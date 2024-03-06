@@ -3,6 +3,7 @@
 import type {Member} from "~/types/member";
 import MemberQuery from "~/composables/api/query/MemberQuery";
 import type {MemberPresence} from "~/types/memberpresence";
+import {usePaginationValues} from "~/composables/api/list";
 
 const toast = useToast();
 const isLoading = ref(true);
@@ -23,14 +24,6 @@ const members: Ref<Member[]> = ref([]);
 const memberQuery = new MemberQuery();
 
 getMembers();
-
-
-const itemsPerPagesValues = [
-    5,
-    10,
-    30,
-    100
-]
 
 const columns = [
   {
@@ -137,7 +130,7 @@ function rowClicked(row: Member) {
     </UTable>
 
     <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <USelect v-model="itemsPerPage" :options="itemsPerPagesValues" @update:model-value="getMembers()" />
+      <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMembers()" />
       <UPagination v-model="page" @update:model-value="getMembers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMembers" />
     </div>
   </div>
