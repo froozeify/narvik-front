@@ -59,7 +59,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
 
   <UCard class="bg-orange-50 dark:bg-orange-950">
     <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700 items-center">
-      <p class="font-bold text-white">Tireurs externes / non licenciés : {{ externalPresenceStore.list.length}}</p>
+      <p class="font-bold dark:text-white">Tireurs externes / non licenciés : {{ externalPresenceStore.list.length}}</p>
 
       <div class="flex-1"></div>
 
