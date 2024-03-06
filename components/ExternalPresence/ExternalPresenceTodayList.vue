@@ -6,8 +6,10 @@ import {formatTimeReadable} from "~/utils/date";
 const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)
 
 const externalPresenceStore = useExternalPresenceStore()
+const { isRefreshing } = storeToRefs(externalPresenceStore)
+
 if (externalPresenceStore.list === undefined) {
-  externalPresenceStore.refresh()
+  getExternalPresences()
 }
 
 const columns = [
@@ -31,13 +33,24 @@ const columns = [
   }
 ]
 
+async function getExternalPresences() {
+  await externalPresenceStore.refresh()
+}
+
 function rowClicked(row: ExternalPresence) {
   selectedExternalPresence.value = row;
   externalPresenceStore.modalOpen = true;
 }
 
 function externalPresenceUpdated(externalPresence: ExternalPresence) {
-  externalPresenceStore.updateItem(externalPresence)
+  if (!externalPresence) {
+    if (selectedExternalPresence.value) {
+      externalPresenceStore.deleteItem(selectedExternalPresence.value)
+      externalPresenceStore.modalOpen = false
+    }
+  } else {
+    externalPresenceStore.updateItem(externalPresence)
+  }
 }
 
 </script>
@@ -45,6 +58,25 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
 <template>
 
   <UCard class="bg-orange-50 dark:bg-orange-950">
+    <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700 items-center">
+      <p class="font-bold text-white">Tireurs externes / non licenciés : {{ externalPresenceStore.list.length}}</p>
+
+      <div class="flex-1"></div>
+
+      <div class="inline-flex">
+        <UTooltip text="Rafraichir">
+          <UButton
+              icon="i-heroicons-arrow-path"
+              color="gray"
+              variant="solid"
+              aria-label="Rafraichir"
+              :loading="isRefreshing"
+              @click="getExternalPresences()"
+          />
+        </UTooltip>
+      </div>
+    </div>
+
     <UTable
         class="w-full"
         :columns="columns"

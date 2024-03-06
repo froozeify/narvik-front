@@ -18,6 +18,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 const toast = useToast()
 const selfStore = useSelfMemberStore()
 const isAdmin = selfStore.isAdmin()
+const isSupervisor = selfStore.hasSupervisorRole()
+const isBadger = selfStore.isBadger()
 
 const props = defineProps({
   item: {
@@ -155,7 +157,7 @@ function fullNameClicked() {
   <div>
     <template v-if="member">
       <UCard>
-        <div v-if="!viewOnly" class="flex justify-end">
+        <div v-if="!viewOnly && (isSupervisor || isBadger)" class="flex justify-end">
           <UTooltip text="Editer la présence">
             <UButton
                 @click="updateMemberPresenceModalOpen = true"
@@ -164,7 +166,7 @@ function fullNameClicked() {
                 variant="ghost"
             />
           </UTooltip>
-          <UTooltip text="Supprimer la présence" v-if="isAdmin">
+          <UTooltip text="Supprimer la présence">
             <UPopover>
               <UButton
                   icon="i-heroicons-trash"

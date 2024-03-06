@@ -41,7 +41,20 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 	const selfJwtToken: Ref<JwtToken | null> = ref(null)
 	const isRefreshingJwtToken = ref(false);
 	function getSelfJwtToken(): Ref<JwtToken|null> {
-		if (selfJwtToken.value) return selfJwtToken
+		if (selfJwtToken.value) {
+			// We remove the authCookie if he is not in the cookie
+			const authCookie = useCookie('auth');
+			if (!authCookie || authCookie.value == undefined) {
+				selfJwtToken.value.access = undefined
+			}
+
+			const refreshTokenCookie = useCookie('auth_refresh');
+			if (!refreshTokenCookie || refreshTokenCookie.value == undefined) {
+				selfJwtToken.value.refresh = undefined
+			}
+
+			return selfJwtToken
+		}
 
 		// Settings from cookies storage
 		let jwtToken: JwtToken|null = null;
