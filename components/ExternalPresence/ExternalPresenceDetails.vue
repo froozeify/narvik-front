@@ -20,6 +20,7 @@ const emit = defineEmits([
 
 const selfStore = useSelfMemberStore()
 const isSupervisor = selfStore.hasSupervisorRole()
+const isBadger = selfStore.isBadger()
 
 const externalPresence: Ref<ExternalPresence> = ref(props.item)
 const externalPresenceQuery = new ExternalPresenceQuery()
@@ -38,7 +39,7 @@ function presenceCanceled(newExternalPresence: ExternalPresence) {
 }
 
 async function deletePresence(close: Function) {
-  if (isSupervisor) {
+  if (isSupervisor || isBadger) {
     await externalPresenceQuery.delete(externalPresence.value)
     close()
     emit('updated', null)
@@ -60,7 +61,7 @@ async function deletePresence(close: Function) {
         />
       </UTooltip>
 
-      <UTooltip text="Supprimer" v-if="isSupervisor">
+      <UTooltip text="Supprimer" v-if="isSupervisor || isBadger">
         <UPopover>
           <UButton
               icon="i-heroicons-trash"

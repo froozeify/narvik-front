@@ -2,15 +2,19 @@ import type {ExternalPresence} from "~/types/externalpresence";
 import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
 
 export const useExternalPresenceStore = defineStore('externalPresence', () => {
+	const isRefreshing = ref(false)
 	const list: Ref<ExternalPresence[] | undefined> = ref(undefined)
+
 	const modalOpen: Ref<boolean> = ref(false);
 
 	async function refresh() {
+		isRefreshing.value = true
 		const externalPresenceQuery = new ExternalPresenceQuery();
 		const { items } = await externalPresenceQuery.getPresentToday()
 		if (items) {
 			list.value = items
 		}
+		isRefreshing.value = false
 	}
 
 	function addItem(newItem: ExternalPresence) {
@@ -35,6 +39,7 @@ export const useExternalPresenceStore = defineStore('externalPresence', () => {
 	}
 
 	return {
+		isRefreshing,
 		list,
 		modalOpen,
 		addItem,

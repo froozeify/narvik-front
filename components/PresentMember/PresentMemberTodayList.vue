@@ -194,27 +194,13 @@ onUnmounted(() => {
       <UButton label="S'enregistrer" @click="openAddPresenceModal()"/>
     </div>
 
-    <UAccordion v-if="externalPresenceStore.list"
-        class="mb-4"
-        variant="soft"
-        color="orange"
-        :items="[
-          {
-            'label': `Tireurs externes / non licenciés (${externalPresenceStore.list.length})`,
-            'slot': 'external-presences'
-          }
-        ]"
-      >
-
-      <template #external-presences>
-        <ExternalPresenceTodayList />
-      </template>
-
-    </UAccordion>
+    <div v-if="externalPresenceStore.list && externalPresenceStore.list.length > 0" class="mb-4">
+      <ExternalPresenceTodayList />
+    </div>
 
     <UCard>
       <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700 items-center">
-        <p>Membres enregistrés aujourd'hui : {{presenceList.presentMembers.length}}</p>
+        <p class="font-bold">Membres enregistrés aujourd'hui : {{ presenceList.presentMembers.length }}</p>
 
 
         <div class="flex-1"></div>
