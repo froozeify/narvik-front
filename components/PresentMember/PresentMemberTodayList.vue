@@ -83,7 +83,7 @@ function refreshNight() {
   var msToMidnight = night.getTime() - now.getTime();
   if (msToMidnight > 0) {
     setTimeout(function() {
-      getPresences();
+      getPresences(true);
       refreshNight(); // Then, reset again next night.
     }, msToMidnight);
   }
