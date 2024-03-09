@@ -4,6 +4,7 @@
   import type {Metric} from "~/types/metric";
   import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
   import { formatDateReadable } from "~/utils/date";
+  import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
 
   definePageMeta({
     layout: "admin"
@@ -21,23 +22,28 @@
   })
 
   const memberQuery = new MemberQuery()
+  const memberPresenceQuery = new MemberPresenceQuery()
   const metricQuery = new MetricQuery()
   const globalSettingQuery = new GlobalSettingQuery();
 
   const importBatchesMetric: Ref<Metric | undefined> = ref(undefined)
   const lastImportDate: Ref<string | undefined> = ref(undefined)
 
-  metricQuery.get("import-batches").then(value => {
-    if (value.retrieved) {
-      importBatchesMetric.value = value.retrieved
-    }
-  })
+  getMetrics();
 
-  globalSettingQuery.get('LAST_SECONDARY_CLUB_ITAC_IMPORT').then(value => {
-    if (value.retrieved) {
-      lastImportDate.value = value.retrieved.value
-    }
-  });
+  function getMetrics() {
+    metricQuery.get("import-batches").then(value => {
+      if (value.retrieved) {
+        importBatchesMetric.value = value.retrieved
+      }
+    })
+
+    globalSettingQuery.get('LAST_SECONDARY_CLUB_ITAC_IMPORT').then(value => {
+      if (value.retrieved) {
+        lastImportDate.value = value.retrieved.value
+      }
+    });
+  }
 
   async function getFileObject(event) {
     const files = event.target.files || event.dataTransfer.files;
@@ -60,11 +66,33 @@
         return
       }
 
+      getMetrics()
+
       toast.add({
         title: "Fichier envoyé",
         color: "green"
       })
     }
+  }
+
+  async function migrateExternal() {
+    const { error } = await memberPresenceQuery.importFromExternalPresences()
+
+    if (error) {
+      toast.add({
+        title: "Erreur lors de la migration",
+        description: error.message,
+        color: "red"
+      })
+      return
+    }
+
+    getMetrics()
+
+    toast.add({
+      title: "Présences migrées",
+      color: "green"
+    })
   }
 
 </script>
@@ -106,6 +134,8 @@
       />
 
       <UButton target="_blank" to="https://narvik.pages.dev/frontend/docs/import/itac.html#import-des-membres-club-secondaire">Documentation</UButton>
+
+      <UButton @click="migrateExternal()" color="green" class="mx-4" :disabled="(importBatchesMetric && importBatchesMetric.value > 0)">Migration présence externe vers présence membres</UButton>
 
     </UCard>
 
