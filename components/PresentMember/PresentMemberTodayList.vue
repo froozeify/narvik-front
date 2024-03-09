@@ -7,7 +7,7 @@ import type {MemberPresence} from "~/types/memberpresence";
 import type {Member} from "~/types/member";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence";
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
-import {formatTimeReadable} from "~/utils/date";
+import {formatDateReadable, formatTimeReadable} from "~/utils/date";
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
@@ -31,7 +31,9 @@ const presenceList = computed(() => {
       const isExpired = new Date((new Date()).setFullYear((new Date().getFullYear() - 1))) > new Date(pm.member.lastControlShooting);
       if (isExpired) {
         // @ts-ignore We add some specific class to warn the user
-        pm['class'] = 'bg-red-500/50 dark:bg-red-400/50 animate-pulse';
+        // pm['class'] = 'bg-red-500/50 dark:bg-red-400/50 animate-pulse';
+        // @ts-ignore We add some specific class to warn the user
+        pm['expired_shooting'] = new Date(pm.member.lastControlShooting);
       }
     })
 
@@ -64,7 +66,7 @@ const columns = [
   }, {
     key: 'member.fullName',
     label: 'Nom',
-    class: 'w-1/3'
+    class: 'w-1/4'
   }, {
     key: 'activities',
     label: 'Activités'
@@ -236,11 +238,20 @@ onUnmounted(() => {
         </template>
 
         <template #activities-data="{row}">
-          <div v-if="row.activities.length == 0">
-            <i>Aucune activités déclarées</i>
-          </div>
-
           <div class="flex flex-1 flex-wrap gap-4">
+
+            <div v-if="row['expired_shooting']" class="basis-full">
+              <UButton
+                  color="red"
+                  :ui="{ rounded: 'rounded-full' }">
+                Dernier tir de contrôle : {{ formatDateReadable(row['expired_shooting']) }}
+              </UButton>
+            </div>
+
+            <div v-if="row.activities.length == 0">
+              <i>Aucune activités déclarées</i>
+            </div>
+
             <UButton
                 v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
                 variant="soft"
