@@ -128,7 +128,7 @@ function presenceUpdated(newMemberPresence: MemberPresence) {
 }
 
 async function deletePresence(close: Function) {
-  if (isAdmin) {
+  if (isSupervisor || isBadger) {
     await memberPresenceQuery.delete(memberPresence.value)
     close()
     emit('updated', null)
