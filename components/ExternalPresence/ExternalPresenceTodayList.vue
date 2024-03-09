@@ -26,7 +26,7 @@ const columns = [
   }, {
     key: 'fullName',
     label: 'Nom',
-    class: 'w-1/3'
+    class: 'w-1/4'
   }, {
     key: 'activities',
     label: 'Activités'
