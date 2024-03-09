@@ -201,7 +201,7 @@ async function migrateRow(dataItem: DataItem) {
           <UInput
               :model-value="row.activity.name"
               variant="none"
-              class="hover:bg-gray-50 hover:dark:bg-gray-900"
+              class="hover:bg-gray-50 hover:dark:bg-gray-900 min-w-44"
               :disabled="row.isUpdating"
               @input="event => updateText(event, row)" />
         </template>
