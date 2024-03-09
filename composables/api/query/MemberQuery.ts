@@ -23,6 +23,10 @@ export default class MemberQuery extends AbstractQuery<Member> {
         return useUploadFile(this.rootPath + "/-/from-itac", formData)
     }
 
+    async importFromItacSecondary(formData: FormData) {
+        return useUploadFile(this.rootPath + "/-/secondary-from-itac", formData)
+    }
+
     async importPhotosFromItac(formData: FormData) {
         return useUploadFile(this.rootPath + "/-/photos-from-itac", formData)
     }
