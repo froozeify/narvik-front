@@ -268,7 +268,7 @@ onUnmounted(() => {
 
     <UModal
         v-model="addExternalPresenceModal">
-      <RegisterExternalPresence @registered="addExternalPresenceModal = false" @canceled="addExternalPresenceModal = false" />
+      <RegisterExternalPresence @registered="addExternalPresenceModal = false; getPresences()" @canceled="addExternalPresenceModal = false" />
     </UModal>
 
     <UModal
