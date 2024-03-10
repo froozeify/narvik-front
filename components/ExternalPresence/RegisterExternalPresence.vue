@@ -6,6 +6,10 @@ import type {FormSubmitEvent} from "#ui/types";
 import type {ExternalPresence} from "~/types/externalpresence";
 import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
+import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
+import SearchMember from "~/components/Member/SearchMember.vue";
+import type {Member} from "~/types/member";
+import MemberQuery from "~/composables/api/query/MemberQuery";
 
 const props = defineProps({
   externalPresence: {
@@ -31,11 +35,27 @@ const isLoading: Ref<boolean> = ref(true)
 const isSubmitting: Ref<boolean> = ref(false)
 const activities: Ref<Activity[]> = ref([])
 
+const registerMemberPresenceModal = ref(false)
+const matchedMember: Ref<Member|null> = ref(null)
+
 const state = reactive({
   licence: undefined as string|undefined,
   firstname: undefined as string|undefined,
   lastname: undefined as string|undefined,
   activities: []
+})
+
+watch(state, async (value) => {
+  if (!value.licence || value.licence.length < 8) return;
+  // We search if by any chance we already have the member registered
+  const memberQuery = new MemberQuery();
+  const searchResult = await memberQuery.search(value.licence);
+  if (searchResult.error || !searchResult.item) return;
+
+  if (searchResult.item.length !== 1) return;
+
+  matchedMember.value = searchResult.item[0];
+  registerMemberPresenceModal.value = true
 })
 
 if (props.externalPresence) {
@@ -117,6 +137,15 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   }
 }
 
+function presenceRegistered() {
+  registerMemberPresenceModal.value = false
+  emit('registered')
+}
+
+function presenceCanceled() {
+  registerMemberPresenceModal.value = false
+}
+
 </script>
 
 <template>
@@ -181,6 +210,11 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       </UForm>
     </div>
   </UCard>
+
+  <UModal
+      v-model="registerMemberPresenceModal">
+      <RegisterMemberPresence :member="matchedMember" @registered="presenceRegistered" @canceled="presenceCanceled" />
+  </UModal>
 </template>
 
 <style scoped lang="scss">
