@@ -1,4 +1,5 @@
 import type { Item } from "./item";
+import type {MemberSeason} from "~/types/memberseason";
 
 export enum MemberRole {
   User = 'ROLE_USER',
@@ -31,6 +32,7 @@ export interface Member extends Item {
   profileImage?: string;
   profileImageBase64?: string;
   lastControlShooting?: Date;
+  currentSeason?: MemberSeason;
   accountActivated?: boolean;
   plainPassword?: string;
   role?: string;
