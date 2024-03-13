@@ -201,6 +201,22 @@ function fullNameClicked() {
           <div class="text-center text-2xl font-bold" @click="fullNameClicked">
             {{ member.fullName }}
           </div>
+          <div class="flex justify-center gap-2">
+            <UBadge
+                v-if="member.currentSeason && member.currentSeason.ageCategory.code"
+                variant="subtle"
+                color="amber"
+                :ui="{ rounded: 'rounded-full' }">
+              {{ member.currentSeason.ageCategory.name }}
+            </UBadge>
+
+            <UBadge v-if="member.currentSeason && member.currentSeason.isSecondaryClub"
+                    variant="subtle"
+                    color="green"
+                    :ui="{ rounded: 'rounded-full' }">
+              Club secondaire
+            </UBadge>
+          </div>
           <div class="flex items-center justify-center text-xl cursor-pointer select-none" @click="copyLicence">
             <UIcon class="mr-2" name="i-heroicons-identification" />
             {{ member.licence }}

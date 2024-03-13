@@ -225,6 +225,11 @@ onUnmounted(() => {
           class="w-full"
           :columns="columns"
           :rows="presenceList.presentMembers"
+          :ui="{
+            td: {
+              base: 'md:whitespace-normal'
+            }
+          }"
           @select="rowClicked">
         <template #empty-state>
           <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -237,8 +242,29 @@ onUnmounted(() => {
           {{ formatTimeReadable(row.createdAt) }}
         </template>
 
+        <template #member.fullName-data="{row}">
+          <div class="flex flex-wrap gap-2">
+            <p class="inline-flex items-center">{{ row.member.fullName }}</p>
+
+            <UBadge v-if="row.member.currentSeason && row.member.currentSeason.isSecondaryClub"
+                    variant="subtle"
+                    color="green"
+                    :ui="{ rounded: 'rounded-full' }">
+              Club secondaire
+            </UBadge>
+          </div>
+        </template>
+
         <template #activities-data="{row}">
-          <div class="flex flex-1 flex-wrap gap-4">
+          <div class="flex flex-1 flex-wrap gap-2">
+
+            <div v-if="!row.member.currentSeason" class="basis-full">
+              <UButton
+                  color="red"
+                  :ui="{ rounded: 'rounded-full' }">
+                Saison non renouvelée
+              </UButton>
+            </div>
 
             <div v-if="row['expired_shooting']" class="basis-full">
               <UButton
@@ -251,8 +277,7 @@ onUnmounted(() => {
             <div v-if="row.activities.length == 0">
               <i>Aucune activités déclarées</i>
             </div>
-
-            <UButton
+            <UButton v-else
                 v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
                 variant="soft"
                 :ui="{ rounded: 'rounded-full' }">
