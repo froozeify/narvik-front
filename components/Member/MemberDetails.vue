@@ -14,6 +14,8 @@
   import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
   import type {ExternalPresence} from "~/types/externalpresence";
   import {usePaginationValues} from "~/composables/api/list";
+  import ActivityQuery from "~/composables/api/query/ActivityQuery";
+  import type {Activity} from "~/types/activity";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
@@ -76,6 +78,17 @@
   const memberQuery = new MemberQuery();
   const memberPresenceQuery = new MemberPresenceQuery();
   const imageQuery = new ImageQuery();
+
+  const activityQuery = new ActivityQuery()
+  const filteredActivities: Ref<Activity[]> = ref([])
+  const activities: Ref<Activity[]> = ref([])
+  activityQuery.getAll().then(value => {
+    activities.value = value.items.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
+  });
+
+  watch(filteredActivities, (newValue) => {
+    getMemberPresencesPaginated()
+  })
 
   const selectedNewRole: Ref<string | undefined> = ref(undefined);
   const availableRoles = getAvailableMemberRoles()
@@ -286,6 +299,14 @@
 
     urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
 
+    if (filteredActivities.value.length > 0) {
+      filteredActivities.value.forEach(filteredActivity => {
+        if (!filteredActivity.id) return;
+        urlParams.append('activities.id[]', filteredActivity.id.toString())
+      })
+    }
+
+    // We make the search
     const { totalItems, items } = await memberQuery.presences(member.value.id, urlParams)
     memberPresencesPaginated.value = items
     if (totalItems) {
@@ -479,6 +500,21 @@
     <div>
       <UCard>
         <div v-if="isSupervisor" class="flex gap-4">
+          <USelectMenu
+            class="w-44"
+            v-model="filteredActivities"
+            :options="activities"
+            option-attribute="name"
+            multiple
+          >
+            <template #label>
+              <span v-if="filteredActivities.length" class="truncate">
+                {{ filteredActivities.map(fa => fa.name).join(', ') }}
+              </span>
+              <span v-else>Activités</span>
+            </template>
+          </USelectMenu>
+
           <div class="flex-1"></div>
           <UButton @click="addMemberPresenceModal = true" >
             Ajouter une activité
