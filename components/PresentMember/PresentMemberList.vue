@@ -19,7 +19,7 @@
   const isLoading = ref(true);
 
   const presenceStore = usePresenceStore()
-  const { selectedDate, searchQuery } = storeToRefs(presenceStore)
+  const { selectedRange, searchQuery } = storeToRefs(presenceStore)
 
   const selectedPresence: Ref<MemberPresence | undefined> = ref(undefined)
   const modalOpen: Ref<boolean> = ref(false);
@@ -36,7 +36,7 @@
 
   getPresences();
 
-  watch([selectedDate, searchQuery], (value) => {
+  watch([selectedRange, searchQuery], (value) => {
     page.value = 1
     getPresences()
   })
@@ -72,11 +72,17 @@
 
     urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
 
-    if (selectedDate.value) {
-      const formattedDate = formatDateInput(selectedDate.value.toString())
-      if (formattedDate) {
-        urlParams.append(`date[before]`, formattedDate);
-        urlParams.append(`date[after]`, formattedDate);
+    if (selectedRange.value) {
+      const formattedStartDate = formatDateInput(selectedRange.value.start.toString())
+      const formattedEndDate = formatDateInput(selectedRange.value.end.toString())
+      if (formattedStartDate) {
+        urlParams.append(`date[after]`, formattedStartDate);
+
+        if (formattedEndDate) {
+          urlParams.append(`date[before]`, formattedEndDate);
+        } else {
+          urlParams.append(`date[before]`, formattedStartDate);
+        }
       }
     }
 

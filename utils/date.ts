@@ -12,6 +12,24 @@ export function formatDateReadable(date?: string): string | null {
   return new Date(date).toLocaleString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
 }
 
+export function formatDateRangeReadable(dateRange: {start: Date, end: Date}): string | null {
+  if (!dateRange) return null;
+  let response = '';
+
+  if (dateRange.start) {
+    response += formatDateReadable(dateRange.start.toString())
+  }
+
+  if (dateRange.end) {
+    if (dayjs(dateRange.start).isSame(dateRange.end)) return response;
+
+    if (response != '') response += ' - '
+    response += formatDateReadable(dateRange.end.toString())
+  }
+
+  return response
+}
+
 export function formatTimeReadable(date?: string): string | null {
   if (!date) return null;
   return new Date(date).toLocaleString('fr-FR', {hour: '2-digit', minute: '2-digit'});
