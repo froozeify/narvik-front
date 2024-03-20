@@ -10,6 +10,7 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
 export const MIME_TYPE = "application/ld+json";
 export const MIME_TYPE_JSON = "application/json";
 export const MIME_TYPE_JSON_PATCH = "application/merge-patch+json"
+export const MIME_TYPE_CSV = "text/csv"
 
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data"
 
@@ -276,6 +277,27 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
     updated,
     error,
     violations,
+  };
+}
+
+export async function useGetCsv(path: string) {
+  let data = null;
+  let error: Error | null = null;
+
+  try {
+    data = await useApi(path, {
+      method: "GET",
+      headers: {
+        Accept: MIME_TYPE_CSV,
+      },
+    });
+  } catch (e) {
+    error = e as Error
+  }
+
+  return {
+    data,
+    error,
   };
 }
 

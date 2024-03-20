@@ -59,6 +59,7 @@
   const memberPresencesPaginated: Ref<MemberPresence[]> = ref([])
   const totalMemberPresencesPaginated = ref(0)
 
+  const isDownloadingCsv = ref(false)
 
   const chartData: Ref<object|undefined> = ref(undefined)
   const chartOptions = ref({
@@ -348,6 +349,41 @@
     getMemberPresences()
   }
 
+  async function downloadCsv() {
+    if (!member.value || !member.value.id) return;
+    isDownloadingCsv.value = true
+
+    const urlParams = new URLSearchParams({
+      pagination: 'false',
+    });
+
+    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+
+    if (filteredActivities.value.length > 0) {
+      filteredActivities.value.forEach(filteredActivity => {
+        if (!filteredActivity.id) return;
+        urlParams.append('activities.id[]', filteredActivity.id.toString())
+      })
+    }
+
+    // We make the search
+    const { data } = await memberQuery.presencesCsv(member.value.id, urlParams)
+    isDownloadingCsv.value = false
+    // We download in the browser
+    const filename = `${member.value.licence}-presences.csv`
+    const blob = new Blob([data], {type: 'text/csv'})
+    if(window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(blob, filename)
+    } else {
+      const elem = window.document.createElement('a')
+      elem.href = window.URL.createObjectURL(blob)
+      elem.download = filename
+      document.body.appendChild(elem)
+      elem.click()
+      document.body.removeChild(elem)
+    }
+  }
+
 </script>
 
 <template>
@@ -518,6 +554,10 @@
           <div class="flex-1"></div>
           <UButton @click="addMemberPresenceModal = true" >
             Ajouter une activité
+          </UButton>
+
+          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
+            CSV
           </UButton>
         </div>
 
