@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import {usePresenceStore} from "~/stores/usePresenceStore";
-  import {formatDateReadable} from "~/utils/date";
+  import {formatDateRangeReadable, formatDateReadable} from "~/utils/date";
   import type {PropType} from "vue";
   import type {MemberPresence} from "~/types/memberpresence";
 
@@ -19,7 +19,7 @@
 <template>
   <div>
     <UCard class="mb-4">
-      <div class="flex items-center gap-4">
+      <div class="flex flex-wrap items-center gap-4">
 
         <UInput
             v-model="presenceStore.searchQuery"
@@ -28,17 +28,17 @@
         <div class="flex-1"></div>
 
         <UPopover :popper="{ placement: 'bottom-start' }">
-          <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(presenceStore.selectedDate) || 'Choisir une date'" />
+          <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateRangeReadable(presenceStore.selectedRange) || 'Choisir une date'" />
 
           <template #panel="{ close }">
-            <DatePicker v-model="presenceStore.selectedDate" @close="close" />
+            <DateRangePicker v-model="presenceStore.selectedRange" @close="close" />
           </template>
         </UPopover>
 
         <UButton
-          v-if="presenceStore.selectedDate"
+          v-if="presenceStore.selectedRange"
           color="red"
-          @click="presenceStore.selectedDate = null"
+          @click="presenceStore.selectedRange = null"
         >
           Supprimer la date
         </UButton>
