@@ -56,7 +56,7 @@
       }"
       :items="[
           {
-            'label': `Tireurs externes / non licenciés (${presenceStore.totalExternal})`,
+            'label': `Licenciés autre club / non licenciés (${presenceStore.totalExternal})`,
             'slot': 'external-presences'
           }
         ]"
