@@ -18,4 +18,8 @@ export default class MemberPresenceQuery extends AbstractQuery<MemberPresence> {
     async importFromExternalPresences() {
         return usePost(`${this.rootPath}/-/import-from-external-presences`, {});
     }
+
+    async importFromCsv(formData: FormData) {
+        return useUploadFile(this.rootPath + "/-/from-csv", formData)
+    }
 }
