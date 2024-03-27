@@ -1,9 +1,10 @@
 import type {ExternalPresence} from "~/types/externalpresence";
 import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
+import dayjs from "dayjs";
 
 export const usePresenceStore = defineStore('presence', () => {
 	const selectedDate: Ref<Date|null> = ref(null)
-	const selectedRange: Ref<{start: Date, end: Date}|null> = ref(null)
+	const selectedRange: Ref<{start: Date, end: Date}|null> = ref({ start: dayjs().subtract(30, 'day').toDate(), end: new Date() })
 	const searchQuery: Ref<string> = ref('')
 
 	const totalExternal: Ref<number> = ref(0)

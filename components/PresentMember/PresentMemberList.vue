@@ -6,6 +6,7 @@
   import type {MemberPresence} from "~/types/memberpresence";
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
   import {usePaginationValues} from "~/composables/api/list";
+  import {useSelfMemberStore} from "~/stores/useSelfMember";
 
   const props = defineProps({
     listOnly: {
@@ -18,11 +19,16 @@
   const toast = useToast();
   const isLoading = ref(true);
 
+  const selfStore = useSelfMemberStore()
   const presenceStore = usePresenceStore()
   const { selectedRange, searchQuery } = storeToRefs(presenceStore)
 
+  const isAdmin = selfStore.isAdmin()
+
   const selectedPresence: Ref<MemberPresence | undefined> = ref(undefined)
   const modalOpen: Ref<boolean> = ref(false);
+
+  const isDownloadingCsv = ref(false)
 
   const page = ref(1);
   const itemsPerPage = ref(10);
@@ -119,10 +125,75 @@
     getPresences()
   }
 
+  async function downloadCsv() {
+    isDownloadingCsv.value = true
+
+    const urlParams = new URLSearchParams({
+      pagination: 'false',
+    });
+
+    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+
+    if (selectedRange.value) {
+      const formattedStartDate = formatDateInput(selectedRange.value.start.toString())
+      const formattedEndDate = formatDateInput(selectedRange.value.end.toString())
+      if (formattedStartDate) {
+        urlParams.append(`date[after]`, formattedStartDate);
+
+        if (formattedEndDate) {
+          urlParams.append(`date[before]`, formattedEndDate);
+        } else {
+          urlParams.append(`date[before]`, formattedStartDate);
+        }
+      }
+    } else {
+      isDownloadingCsv.value = false
+      toast.add({
+        color: "red",
+        title: "Date non définie.",
+        description: "Veuillez sélectionner une date afin de pouvoir télécharger le csv."
+      })
+      return;
+    }
+
+    if (searchQuery.value) {
+      urlParams.append(`multiple[member.firstname, member.lastname, member.licence]`, searchQuery.value);
+    }
+
+    // We make the search
+    const { data } = await presenceQuery.getAllCsv(urlParams)
+    isDownloadingCsv.value = false
+    // We download in the browser
+    const filename = `presences.csv`
+    const blob = new Blob([data], {type: 'text/csv'})
+    if(window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(blob, filename)
+    } else {
+      const elem = window.document.createElement('a')
+      elem.href = window.URL.createObjectURL(blob)
+      elem.download = filename
+      document.body.appendChild(elem)
+      elem.click()
+      document.body.removeChild(elem)
+    }
+  }
+
 </script>
 
 <template>
   <div>
+
+    <div class="flex flex-wrap items-center gap-4">
+      <div class="text-xl font-bold mb-4">Présences membres ({{presenceStore.totalMembers}})</div>
+
+      <div class="flex-1"></div>
+
+      <template v-if="isAdmin">
+        <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv" :disabled="!selectedRange">
+          CSV
+        </UButton>
+      </template>
+    </div>
 
     <UTable
         :loading="isLoading"
