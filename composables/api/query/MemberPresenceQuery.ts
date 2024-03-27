@@ -1,11 +1,26 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {MemberPresence} from "~/types/memberpresence";
 import type {FetchAllData} from "~/types/api";
-import {useFetchList, usePost, useUploadFile} from "~/composables/api/api";
+import {useFetchList, useGetCsv, usePost, useUploadFile} from "~/composables/api/api";
 import type {Member} from "~/types/member";
 
 export default class MemberPresenceQuery extends AbstractQuery<MemberPresence> {
     rootPath = "member-presences";
+
+    async getAllCsv(urlParams?: URLSearchParams) {
+        let url = `${this.rootPath}.csv`;
+
+        if (!urlParams) {
+            urlParams = new URLSearchParams()
+        }
+        if (!urlParams.has('pagination')) {
+            urlParams.append('pagination', 'false')
+        }
+
+        url += '?' + urlParams.toString()
+
+        return useGetCsv(url)
+    }
 
     async getPresentToday(): Promise<FetchAllData<MemberPresence>> {
         return useFetchList<MemberPresence>(this.rootPath + "/-/today");
@@ -17,5 +32,9 @@ export default class MemberPresenceQuery extends AbstractQuery<MemberPresence> {
 
     async importFromExternalPresences() {
         return usePost(`${this.rootPath}/-/import-from-external-presences`, {});
+    }
+
+    async importFromCsv(formData: FormData) {
+        return useUploadFile(this.rootPath + "/-/from-csv", formData)
     }
 }

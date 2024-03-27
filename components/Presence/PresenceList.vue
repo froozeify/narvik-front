@@ -1,8 +1,6 @@
 <script setup lang="ts">
   import {usePresenceStore} from "~/stores/usePresenceStore";
-  import {formatDateRangeReadable, formatDateReadable} from "~/utils/date";
-  import type {PropType} from "vue";
-  import type {MemberPresence} from "~/types/memberpresence";
+  import {formatDateRangeReadable} from "~/utils/date";
 
   const props = defineProps({
     listOnly: {
@@ -13,7 +11,6 @@
   });
 
   const presenceStore = usePresenceStore()
-
 </script>
 
 <template>
@@ -56,7 +53,7 @@
       }"
       :items="[
           {
-            'label': `Tireurs externes / non licenciés (${presenceStore.totalExternal})`,
+            'label': `Licenciés autre club / non licenciés (${presenceStore.totalExternal})`,
             'slot': 'external-presences'
           }
         ]"
@@ -72,7 +69,6 @@
     </UAccordion>
 
     <UCard class="mt-4">
-      <div class="text-xl font-bold mb-4">Présences membres ({{presenceStore.totalMembers}})</div>
       <PresentMemberList :list-only="props.listOnly"/>
     </UCard>
   </div>

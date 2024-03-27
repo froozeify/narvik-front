@@ -56,7 +56,12 @@
       label: 'Import photos',
       icon: 'i-heroicons-photo',
       to: '/admin/imports/photos'
-    }
+    },
+    {
+      label: 'Import présences',
+      icon: 'i-heroicons-calendar-days',
+      to: '/admin/imports/presences'
+    },
   ]
 
   if (isAdmin) {

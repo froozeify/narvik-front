@@ -10,6 +10,7 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
 export const MIME_TYPE = "application/ld+json";
 export const MIME_TYPE_JSON = "application/json";
 export const MIME_TYPE_JSON_PATCH = "application/merge-patch+json"
+export const MIME_TYPE_CSV = "text/csv"
 
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data"
 
@@ -33,7 +34,7 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
   overloadedOptions = mergician({
     mode: "cors",
     cache: false,
-    timeout: 10000, // Default timeout after 10s
+    timeout: 30000, // Default timeout after 30s
 
     headers: {
       Accept: MIME_TYPE,
@@ -279,6 +280,27 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
   };
 }
 
+export async function useGetCsv(path: string) {
+  let data = null;
+  let error: Error | null = null;
+
+  try {
+    data = await useApi(path, {
+      method: "GET",
+      headers: {
+        Accept: MIME_TYPE_CSV,
+      },
+    });
+  } catch (e) {
+    error = e as Error
+  }
+
+  return {
+    data,
+    error,
+  };
+}
+
 export async function usePost<T>(path: string, payload: object) {
   let item: T | undefined = undefined;
   let violations: SubmissionErrors | undefined = undefined;
@@ -287,6 +309,7 @@ export async function usePost<T>(path: string, payload: object) {
   try {
     const data = await useApi<T>(path, {
       method: "POST",
+      timeout: 10000, // Timeout after 10s
       body: payload,
       headers: {
         Accept: MIME_TYPE,

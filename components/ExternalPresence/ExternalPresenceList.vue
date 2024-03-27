@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import type {Member} from "~/types/member";
   import {usePresenceStore} from "~/stores/usePresenceStore";
   import type {ExternalPresence} from "~/types/externalpresence";
   import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
@@ -30,7 +29,7 @@
     direction: 'desc'
   });
 
-  const members: Ref<Member[]> = ref([])
+  const members: Ref<ExternalPresence[]> = ref([])
   const presenceQuery = new ExternalPresenceQuery()
 
   getPresences();
