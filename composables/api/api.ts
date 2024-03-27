@@ -34,7 +34,7 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
   overloadedOptions = mergician({
     mode: "cors",
     cache: false,
-    timeout: 10000, // Default timeout after 10s
+    timeout: 30000, // Default timeout after 30s
 
     headers: {
       Accept: MIME_TYPE,
@@ -309,6 +309,7 @@ export async function usePost<T>(path: string, payload: object) {
   try {
     const data = await useApi<T>(path, {
       method: "POST",
+      timeout: 10000, // Timeout after 10s
       body: payload,
       headers: {
         Accept: MIME_TYPE,
