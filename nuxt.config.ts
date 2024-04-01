@@ -23,15 +23,15 @@ export default defineNuxtConfig({
 	},
 	runtimeConfig: {
 		public: {
-			apiUrl: process.env.API_URL || 'https://localhost',
 			clientVersion: pkg.version
-		}
-	},
-	apiParty: {
-		endpoints: {
-			localApi: {
-				url: process.env.API_URL || 'https://localhost'
+		},
+
+		apiParty: {
+			endpoints: {
+				localApi: {
+					url: 'http://php'
+				}
 			}
 		}
-	}
+	},
 })
