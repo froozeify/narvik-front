@@ -42,7 +42,6 @@ export interface Member extends Item {
   firstname?: string;
   lastname?: string;
   fullName?: string;
-  memberPresences?: any;
   gender?: string;
   birthday?: string;
   handisport?: boolean;
@@ -55,5 +54,4 @@ export interface Member extends Item {
   country?: string;
   phone?: string;
   mobilePhone?: string;
-  memberSeasons?: any;
 }

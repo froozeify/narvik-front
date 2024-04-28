@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import type {Image} from "~/types/image";
+  import {useAppConfigStore} from "~/stores/useAppConfig";
 
   const colorMode = useColorMode()
   const selfStore = useSelfMemberStore();
+  const appConfigStore = useAppConfigStore();
 
   const isDark = computed({
     get () {
@@ -19,7 +21,7 @@
   const isBadger = selfStore.isBadger()
   const isSupervisor = selfStore.hasSupervisorRole()
 
-  const siteLogo: Ref<Image|null> = selfStore.getSiteLogo()
+  const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
 </script>
 
 <template>

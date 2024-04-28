@@ -7,6 +7,7 @@ import ActivityQuery from "~/composables/api/query/ActivityQuery";
 import type {Activity} from "~/types/activity";
 import type {Image} from "~/types/image";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useAppConfigStore} from "~/stores/useAppConfig";
 
 definePageMeta({
   layout: "admin"
@@ -51,8 +52,12 @@ const state = reactive({
 })
 
 const selfStore = useSelfMemberStore();
-const siteLogo: Ref<Image|null> = selfStore.getSiteLogo()
+const appConfigStore = useAppConfigStore();
 
+const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
+
+appConfigStore.getLogo();
+console.log(appConfigStore.getLogo().value)
 
 function copyBadgerLink() {
   if (!badgerSetting.value) return;
@@ -119,7 +124,7 @@ async function uploadLogo(event) {
       return;
     }
 
-    selfStore.getSiteLogo(false)
+    appConfigStore.getLogo(false)
     toast.add({
       title: "Logo envoyé",
       color: "green"
@@ -145,7 +150,7 @@ async function deleteLogo() {
     return
   }
 
-  selfStore.getSiteLogo(false)
+  appConfigStore.getLogo(false)
   toast.add({
     title: "Logo supprimé",
     color: "green"
