@@ -56,9 +56,6 @@ const appConfigStore = useAppConfigStore();
 
 const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
 
-appConfigStore.getLogo();
-console.log(appConfigStore.getLogo().value)
-
 function copyBadgerLink() {
   if (!badgerSetting.value) return;
 
@@ -124,7 +121,8 @@ async function uploadLogo(event) {
       return;
     }
 
-    appConfigStore.getLogo(false)
+    await appConfigStore.refresh()
+    siteLogo.value = appConfigStore.getLogo(false).value
     toast.add({
       title: "Logo envoyé",
       color: "green"
@@ -150,7 +148,8 @@ async function deleteLogo() {
     return
   }
 
-  appConfigStore.getLogo(false)
+  await appConfigStore.refresh()
+  siteLogo.value = appConfigStore.getLogo(false).value
   toast.add({
     title: "Logo supprimé",
     color: "green"
