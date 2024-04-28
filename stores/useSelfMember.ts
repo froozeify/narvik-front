@@ -9,33 +9,8 @@ import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
 
 export const useSelfMemberStore = defineStore('selfMember', () => {
 	const member: Ref<Member | undefined> = ref(undefined)
-	const siteLogo: Ref<Image | null> = ref(null)
 
-	function getSiteLogo(useCache: boolean = true): Ref<Image|null> {
-		if (useCache && siteLogo.value) {
-			return siteLogo
-		}
-
-		const globalSettingQuery = new GlobalSettingQuery()
-		globalSettingQuery.getPublic("LOGO", useCache).then(value => {
-			if (value.retrieved) {
-				// No logo
-				if (!value.retrieved.value || value.retrieved.value.trim() === '') {
-					siteLogo.value = null
-					return;
-				}
-
-				const imageQuery = new ImageQuery()
-				imageQuery.getPublic(value.retrieved.value, useCache).then(imageQueryResponse => {
-					if (imageQueryResponse.retrieved && imageQueryResponse.retrieved) {
-						siteLogo.value = imageQueryResponse.retrieved
-					}
-				})
-			}
-		})
-
-		return siteLogo
-	}
+	const appConfigStore = useAppConfigStore()
 
 	// Session Management
 	const selfJwtToken: Ref<JwtToken | null> = ref(null)
@@ -204,6 +179,9 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 		if (retrieved) {
 			member.value = retrieved
 		}
+
+		// We refresh the config we got from the api
+		appConfigStore.refresh()
 	}
 
 	function logout(redirect: boolean = true) {
@@ -215,6 +193,9 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 
 		const refreshTokenCookie = useCookie('auth_refresh');
 		refreshTokenCookie.value = null;
+
+		// We refresh the config we got from the api
+		appConfigStore.refresh(false)
 
 		// We stay on same page
 		if (!redirect) return;
@@ -277,7 +258,6 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 
 		hasSupervisorRole,
 
-		getSiteLogo,
 		// Session management
 		selfJwtToken,
 		setJwtSelfJwtTokenFromApiResponse,

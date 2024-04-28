@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from '#ui/types'
 import {useLoginUser} from "~/composables/api/api";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
 import type {Image} from "~/types/image";
+import {useAppConfigStore} from "~/stores/useAppConfig";
 
 const toast = useToast()
 const isLoading = ref(false)
@@ -12,8 +12,8 @@ const state = reactive({
   password: undefined
 })
 
-const selfStore = useSelfMemberStore();
-const siteLogo: Ref<Image|null> = selfStore.getSiteLogo()
+const appConfigStore = useAppConfigStore();
+const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
 
 async function onSubmit(event: FormSubmitEvent<{email: string, password: string}>) {
   isLoading.value = true

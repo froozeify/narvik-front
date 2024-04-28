@@ -1,5 +1,6 @@
 import {pathsMatch} from "~/utils/resource";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useAppConfigStore} from "~/stores/useAppConfig";
 
 const publicPaths = [
 	"^/login$",
@@ -8,9 +9,14 @@ const publicPaths = [
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
 	const selfStore = useSelfMemberStore();
+	const appConfigStore = useAppConfigStore();
 
 	if (!selfStore.member && selfStore.isLogged()) {
 		await selfStore.refresh();
+	}
+
+	if (!appConfigStore.config) {
+		await appConfigStore.refresh();
 	}
 
 	if (pathsMatch(publicPaths, to.fullPath)) {

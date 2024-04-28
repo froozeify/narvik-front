@@ -1,9 +1,10 @@
 import type {Image} from "~/types/image";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useAppConfigStore} from "~/stores/useAppConfig";
 
 export function useSetSiteFavicon() {
-	const selfStore = useSelfMemberStore()
-	const siteLogo: Ref<Image|null> = selfStore.getSiteLogo()
+	const appConfigStore = useAppConfigStore()
+	const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
 
 	injectFavicon(siteLogo.value)
 
