@@ -14,7 +14,7 @@
     "chart.js": "^4.4.2",
     "jwt-decode": "^4.0.0",
     "mergician": "^2.0.1",
-    "nuxt": "^3.11.1",
+    "nuxt": "^3.11.2",
     "nuxt-api-party": "^1.1.1",
     "sass": "^1.72.0",
     "vue": "^3.4.21",
