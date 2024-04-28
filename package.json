@@ -13,8 +13,8 @@
   "devDependencies": {
     "chart.js": "^4.4.2",
     "jwt-decode": "^4.0.0",
-    "mergician": "^2.0.1",
-    "nuxt": "^3.11.1",
+    "mergician": "^2.0.2",
+    "nuxt": "^3.11.2",
     "nuxt-api-party": "^1.1.1",
     "sass": "^1.72.0",
     "vue": "^3.4.21",
@@ -26,8 +26,8 @@
     "@nuxt/ui": "2.13.0",
     "@pinia/nuxt": "^0.5.1",
     "@types/qs": "^6.9.14",
-    "dayjs": "^1.11.10",
-    "qs": "^6.12.0",
+    "dayjs": "^1.11.11",
+    "qs": "^6.12.1",
     "v-calendar": "^3.1.2"
   }
 }
