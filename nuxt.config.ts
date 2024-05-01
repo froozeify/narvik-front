@@ -11,7 +11,7 @@ export default defineNuxtConfig({
 	],
 	ui: {
 		global: true,
-		icons: ['mdi', 'simple-icons'],
+		icons: [],
 	},
 	css: [
 		'~/assets/css/main.scss'

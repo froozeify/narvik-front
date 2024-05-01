@@ -38,9 +38,10 @@
             </UTooltip>
           </NuxtLink>
         </li>
-        <li v-if="isSupervisor"><NuxtLink to="/admin">Administration</NuxtLink></li>
+        <li v-if="isSupervisor"><UButton to="/admin/sales" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton></li>
       </ul>
       <ul class="flex gap-4">
+        <li v-if="isSupervisor"><UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton></li>
         <li>
           <UTooltip text="Mode clair/sombre">
             <UButton
