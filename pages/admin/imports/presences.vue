@@ -1,10 +1,6 @@
 <script lang="ts" setup>
-  import MemberQuery from "~/composables/api/query/MemberQuery";
-  import MetricQuery from "~/composables/api/query/MetricQuery";
-  import type {Metric} from "~/types/metric";
-  import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
-  import { formatDateReadable } from "~/utils/date";
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+  import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
 
   definePageMeta({
     layout: "admin"
@@ -25,34 +21,23 @@
   const memberPresenceQuery = new MemberPresenceQuery()
 
 
-  async function getFileObject(event) {
-    const files = event.target.files || event.dataTransfer.files;
+  async function getFileObject(event: any) {
+    const formData = getFileFormDataFromUInputChangeEvent(event);
 
-    if (files.length > 0) {
-      fileUploading.value = true
-
-      const formData = new FormData()
-      formData.append('file', files.item(0), files.item(0).name)
-
-      const { created, violations, error } = await memberPresenceQuery.importFromCsv(formData)
-      fileUploading.value = false
-
-      if (error) {
-        toast.add({
-          title: "Erreur lors de l'envoie du fichier",
-          description: error.message,
-          color: "red"
-        })
-        return
-      }
-
-      apiUploadResponse.value = created
-
-      toast.add({
-        title: "Fichier envoyé",
-        color: "green"
-      })
+    if (!formData) {
+      return;
     }
+
+    fileUploading.value = true
+    const {created, violations, error} = await memberPresenceQuery.importFromCsv(formData)
+    fileUploading.value = false
+
+    if (error) {
+      return displayFileErrorToast(error.message)
+    }
+
+    apiUploadResponse.value = created
+    displayFileSuccessToast()
   }
 
 </script>
