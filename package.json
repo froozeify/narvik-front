@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@iconify/json": "^2.2.196",
-    "@nuxt/ui": "2.13.0",
+    "@nuxt/ui": "^2.16.0",
     "@pinia/nuxt": "^0.5.1",
     "@types/qs": "^6.9.14",
     "dayjs": "^1.11.11",
