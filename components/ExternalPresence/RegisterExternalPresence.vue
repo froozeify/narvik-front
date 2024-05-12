@@ -190,7 +190,7 @@ function presenceCanceled() {
         />
 
         <div class="mt-4">Activités</div>
-        <UFormGroup name="activities" class="my-4">
+        <div class="my-4">
           <div class="grid grid-cols-2 gap-2 gap-y-2 ">
             <UCheckbox
                 class="w-full"
@@ -199,7 +199,7 @@ function presenceCanceled() {
                 :name="'actvt-' + activity.id"
                 :label="activity.name" />
           </div>
-        </UFormGroup>
+        </div>
 
         <UButton :loading="isSubmitting" block type="submit">
           Enregistrer
