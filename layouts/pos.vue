@@ -38,6 +38,11 @@
       label: 'Inventaire',
       icon: 'i-heroicons-calculator',
       to: '/admin/inventories'
+    },
+    {
+      label: 'Catégorie',
+      icon: 'i-heroicons-tag',
+      to: '/admin/inventories/categories'
     }
   ]
 
