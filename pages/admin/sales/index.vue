@@ -9,7 +9,7 @@
 </script>
 
 <template>
-  Page Vente
+  Page Vente - Afficher historique du jour avec possibilité de modifier/supprimer une vente
 </template>
 
 <style scoped lang="scss">

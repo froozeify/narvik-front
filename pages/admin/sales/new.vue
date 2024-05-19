@@ -17,7 +17,7 @@
       </ul>
     </UCard>
 
-    <div class="h-fit lg:sticky lg:top-20 max-h-[calc(100vh-6rem)] flex flex-col gap-4">
+    <div class="w-full h-fit lg:sticky lg:top-20 max-h-[calc(100vh-6rem)] flex flex-col gap-4">
       <UCard class="overflow-y-auto">
         <div class="text-4xl text-center">xx.xx €</div>
         <ul class="mt-4">
