@@ -147,7 +147,7 @@
     <div id="wrapper" class=" mx-auto">
       <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-4">
 
-        <StatCard
+        <GenericStatCard
             title="Membres"
             tooltip="Cette saison"
             :value="memberStats.currentSeason"
@@ -157,9 +157,9 @@
               value: memberStats.previousSeason,
             }"
             :loading="memberStats.loading">
-        </StatCard>
+        </GenericStatCard>
 
-        <StatCard
+        <GenericStatCard
             title="Jours ouverts"
             tooltip="Cette année"
             :value="presenceStats.currentYearOpenedDays"
@@ -169,9 +169,9 @@
               tooltip: 'Année précédente (même date)'
             }"
             :loading="presenceStats.loading">
-        </StatCard>
+        </GenericStatCard>
 
-        <StatCard
+        <GenericStatCard
             title="Présences (membres + externes)"
             tooltip="Cette année"
             :value="presenceStats.currentYear + externalPresenceStats.currentYear"
@@ -181,9 +181,9 @@
               tooltip: 'Année précédente (même date)'
             }"
             :loading="presenceStats.loading && externalPresenceStats.loading">
-        </StatCard>
+        </GenericStatCard>
 
-        <StatCard
+        <GenericStatCard
             title="Présences/ouvertures (membres + externes)"
             tooltip="Cette année"
             :value="'≃ ' + (presenceStats.ratioPresenceOpenCurrentYear + externalPresenceStats.ratioPresenceOpenCurrentYear)"
@@ -193,9 +193,9 @@
               tooltip: 'Année précédente (même date)'
             }"
             :loading="presenceStats.loading">
-        </StatCard>
+        </GenericStatCard>
 
-        <StatCard
+        <GenericStatCard
             title="Présences"
             tooltip="Cette année"
             :value="presenceStats.currentYear"
@@ -205,9 +205,9 @@
               tooltip: 'Année précédente (même date)'
             }"
             :loading="presenceStats.loading">
-        </StatCard>
+        </GenericStatCard>
 
-        <StatCard
+        <GenericStatCard
             title="Présences/ouvertures"
             tooltip="Cette année"
             :value="'≃ ' + presenceStats.ratioPresenceOpenCurrentYear"
@@ -217,9 +217,9 @@
               tooltip: 'Année précédente (même date)'
             }"
             :loading="presenceStats.loading">
-        </StatCard>
+        </GenericStatCard>
 
-        <StatCard
+        <GenericStatCard
             title="Présences externes"
             tooltip="Cette année"
             :value="externalPresenceStats.currentYear"
@@ -229,9 +229,9 @@
               tooltip: 'Année précédente (même date)'
             }"
             :loading="externalPresenceStats.loading">
-        </StatCard>
+        </GenericStatCard>
 
-        <StatCard
+        <GenericStatCard
             title="Présences externes/ouvertures"
             tooltip="Cette année"
             :value="'≃ ' + externalPresenceStats.ratioPresenceOpenCurrentYear"
@@ -241,7 +241,7 @@
               tooltip: 'Année précédente (même date)'
             }"
             :loading="externalPresenceStats.loading">
-        </StatCard>
+        </GenericStatCard>
       </div>
 
       <UCard v-if="chartData" class="mt-4">
