@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import {formatDateReadable} from "~/utils/date";
-  import type {ExternalPresence} from "~/types/externalpresence";
 
   definePageMeta({
     layout: "pos"
@@ -73,52 +71,46 @@
 </script>
 
 <template>
-  <div class="flex flex-col-reverse lg:flex-row gap-4">
-    <UCard class="lg:w-2/3 shrink-0">
-      <UTable
-        class="w-full"
-        :sort="sort"
-        :columns="columns"
-        :rows="categories"
-        @select="rowClicked">
-        <template #empty-state>
-          <div class="flex flex-col items-center justify-center py-6 gap-3">
-            <span class="italic text-sm">Aucune catégories.</span>
-          </div>
-        </template>
-
-        <template #name-data="{ row }">
-          {{ row.name }}
-        </template>
-
-        <template #actions-data="{ row }">
-          <GenericStackedUpDown></GenericStackedUpDown>
-
-          <div class="text-xs flex flex-col gap-0.5">
-            <div class="p-0.5 rounded-md text-primary-500 dark:text-primary-400 bg-primary-50 hover:bg-primary-100 dark:bg-primary-950 dark:hover:bg-primary-900 flex justify-center items-center">
-              <UIcon name="i-heroicons-chevron-up" @click.stop="move(row, -1)"/>
+  <GenericLayoutContentWithStickySide>
+    <template #main>
+      <UCard>
+        <UTable
+          class="w-full"
+          :sort="sort"
+          :columns="columns"
+          :rows="categories"
+          @select="rowClicked">
+          <template #empty-state>
+            <div class="flex flex-col items-center justify-center py-6 gap-3">
+              <span class="italic text-sm">Aucune catégories.</span>
             </div>
-            <div class="p-0.5 rounded-md text-primary-500 dark:text-primary-400 bg-primary-50 hover:bg-primary-100 dark:bg-primary-950 dark:hover:bg-primary-900 flex justify-center items-center">
-              <UIcon name="i-heroicons-chevron-down" @click.stop="move(row, 1)"/>
-            </div>
-          </div>
-        </template>
+          </template>
 
-      </UTable>
-    </UCard>
+          <template #name-data="{ row }">
+            {{ row.name }}
+          </template>
 
-    <div v-if="selectedCategory" class="w-full h-fit lg:sticky lg:top-20 max-h-[calc(100vh-6rem)] flex flex-col gap-4">
-      <UCard class="overflow-y-auto">
-        Afficher info / edit au clic ici
-        <pre>{{ selectedCategory }}</pre>
+          <template #actions-data="{ row }">
+            <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+          </template>
 
+        </UTable>
       </UCard>
+    </template>
 
-      <UButton block>Enregistrer</UButton>
-      <UButton color="red" block>Supprimer</UButton>
-    </div>
+    <template #side>
+      <template v-if="selectedCategory">
+        <UCard class="overflow-y-auto">
+          Afficher info / edit au clic ici
+          <pre>{{ selectedCategory }}</pre>
 
-  </div>
+        </UCard>
+
+        <UButton block>Enregistrer</UButton>
+        <UButton color="red" block>Supprimer</UButton>
+      </template>
+    </template>
+  </GenericLayoutContentWithStickySide>
 </template>
 
 <style scoped lang="scss">

@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
-  import FooterCopyright from "~/components/FooterCopyright.vue";
 
   useHead({
     titleTemplate: (titleChunk) => {
