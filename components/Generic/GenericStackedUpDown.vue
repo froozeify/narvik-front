@@ -1,8 +1,5 @@
 <script setup lang="ts">
 
-
-import type {PropType} from "vue";
-
 const props = defineProps({
   step: {
     type: Number,

@@ -10,6 +10,8 @@
 
   const selectedCategory: Ref<{id: number, weight: number, name: string} | null> = ref(null)
 
+  const isVisible = ref(false);
+
   const page = ref(1);
   const itemsPerPage = ref(10);
   const sort = ref({
@@ -52,7 +54,8 @@
   ])
 
   function rowClicked(row: object) {
-    selectedCategory.value = row
+    selectedCategory.value = {...row} // We make a shallow clone
+    isVisible.value = true
   }
 
   function move(row: any, modifier: number) {
@@ -71,7 +74,7 @@
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide>
+  <GenericLayoutContentWithStickySide :display-side="isVisible" @keyup.esc="isVisible = false; selectedCategory = null;" tabindex="-1">
     <template #main>
       <UCard>
         <UTable
@@ -101,8 +104,12 @@
     <template #side>
       <template v-if="selectedCategory">
         <UCard class="overflow-y-auto">
-          Afficher info / edit au clic ici
-          <pre>{{ selectedCategory }}</pre>
+
+          <div class="flex gap-2 flex-col">
+            <UFormGroup label="Nom" :error="!selectedCategory.name && 'Champ requis'">
+              <UInput v-model="selectedCategory.name" />
+            </UFormGroup>
+          </div>
 
         </UCard>
 
