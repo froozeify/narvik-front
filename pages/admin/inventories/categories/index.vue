@@ -1,4 +1,7 @@
 <script setup lang="ts">
+  import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
+  import type {InventoryCategory} from "~/types/inventorycategory";
+  import {usePaginationValues} from "~/composables/api/list";
 
   definePageMeta({
     layout: "pos"
@@ -8,10 +11,17 @@
     title: 'Catégorie d\'inventaire'
   })
 
-  const selectedCategory: Ref<{id: number, weight: number, name: string} | null> = ref(null)
+  const apiQuery = new InventoryCategoryQuery();
 
+  const categories: Ref<InventoryCategory> = ref([])
+  const isLoading = ref(true);
+  const totalCategories = ref(0)
+  const selectedCategory: Ref<InventoryCategory | null> = ref(null)
+
+  // Side menu visible
   const isVisible = ref(false);
 
+  // Table settings
   const page = ref(1);
   const itemsPerPage = ref(10);
   const sort = ref({
@@ -19,12 +29,6 @@
     direction: 'asc'
   });
   const columns = [
-    // {
-    //   key: 'weight',
-    //   label: 'Ordre',
-    //   // sortable: true,
-    //   class: 'w-12'
-    // },
     {
       key: 'name',
       label: 'Nom',
@@ -35,23 +39,28 @@
     }
   ]
 
-  const categories = ref([
-    {
-      id: 1,
-      weight: 1,
-      name: 'Categorie 1'
-    },
-    {
-      id: 2,
-      weight: 3,
-      name: 'Categorie w3',
-    },
-    {
-      id: 3,
-      weight: 2,
-      name: 'Categorie w2',
+  // We get the data from the api on first page load
+  getCategoriesPaginated()
+
+  async function getCategoriesPaginated() {
+    isLoading.value = true
+
+    const urlParams = new URLSearchParams({
+      pagination: '1',
+      page: page.value.toString(),
+      itemsPerPage: itemsPerPage.value.toString(),
+    });
+
+    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+
+    const { totalItems, items } = await apiQuery.getAll(urlParams)
+    categories.value = items
+    if (totalItems) {
+      totalCategories.value = totalItems
     }
-  ])
+
+    isLoading.value = false
+  }
 
   function rowClicked(row: object) {
     selectedCategory.value = {...row} // We make a shallow clone
@@ -79,6 +88,7 @@
       <UCard>
         <UTable
           class="w-full"
+          :loading="isLoading"
           :sort="sort"
           :columns="columns"
           :rows="categories"
@@ -98,6 +108,12 @@
           </template>
 
         </UTable>
+
+        <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+          <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getCategoriesPaginated()" />
+          <UPagination v-model="page" @update:model-value="getCategoriesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalCategories" />
+        </div>
+
       </UCard>
     </template>
 
@@ -113,7 +129,7 @@
 
         </UCard>
 
-        <UButton block>Enregistrer</UButton>
+        <UButton block @click="console.log(selectedCategory)">Enregistrer</UButton>
         <UButton color="red" block>Supprimer</UButton>
       </template>
     </template>

@@ -87,7 +87,7 @@
     activities.value = value.items.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
   });
 
-  watch(filteredActivities, (newValue) => {
+  watch(filteredActivities, (newValue) => {console.log('hello')
     getMemberPresencesPaginated()
   })
 
