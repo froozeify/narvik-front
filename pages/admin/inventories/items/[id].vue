@@ -6,10 +6,6 @@
     layout: "pos"
   });
 
-  useHead({
-    title: 'Inventaire - Article'
-  })
-
   const isLoading = ref(true)
 
   const toast = useToast()
@@ -43,14 +39,19 @@
 
     inventoryItem.value = retrieved
 
+    // We update the page title
+    useHead({
+      title: retrieved.name
+    })
+
     return true
   }
 </script>
 
 <template>
   <div id="wrapper" class="flex flex-col gap-4">
-    <div>
-      <UTooltip text="Inventaire">
+    <div class="flex relative">
+      <UTooltip text="Inventaire" class="absolute left-0">
         <UButton
           @click="navigateTo('/admin/inventories')"
           icon="i-heroicons-arrow-left"
@@ -58,6 +59,8 @@
           variant="ghost"
         />
       </UTooltip>
+
+      <div class="flex-1 text-center font-bold text-2xl">{{ inventoryItem?.name }}</div>
     </div>
 
     <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-4">

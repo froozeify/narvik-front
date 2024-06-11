@@ -61,7 +61,6 @@ definePageMeta({
 
   function rowClicked(row: object) {
     selectedItem.value = {...row} // We make a shallow clone
-    isVisible.value = true
   }
 </script>
 
