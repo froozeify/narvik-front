@@ -10,5 +10,4 @@ export interface Inventoryitem extends Item {
   sellingPrice?: string;
   canBeSold?: boolean;
   quantity?: number
-  weight?: number;
 }
