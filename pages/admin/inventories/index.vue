@@ -1,11 +1,9 @@
 <script setup lang="ts">
-  import {usePaginationValues} from "~/composables/api/list";
-  import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
-  import type {InventoryCategory} from "~/types/inventorycategory";
-  import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-  import type {Inventoryitem} from "~/types/inventoryitem";
+import {usePaginationValues} from "~/composables/api/list";
+import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
+import type {Inventoryitem} from "~/types/inventoryitem";
 
-  definePageMeta({
+definePageMeta({
     layout: "pos"
   });
 
@@ -20,9 +18,6 @@
   const totalApiItems = ref(0)
   const selectedItem: Ref<Inventoryitem | null> = ref(null)
 
-  // Side menu visible
-  const isVisible = ref(false);
-
   // Table settings
   const page = ref(1);
   const itemsPerPage = ref(10);
@@ -34,10 +29,10 @@
     {
       key: 'name',
       label: 'Nom',
-      class: 'w-full'
     },
     {
-      key: 'actions',
+      key: 'category',
+      label: 'Catégorie'
     }
   ]
 
@@ -71,12 +66,11 @@
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide :display-side="isVisible" @keyup.esc="isVisible = false; selectedItem = null;" tabindex="-1">
+  <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = null;" tabindex="-1">
     <template #main>
       <UCard>
         Add category filter (+ filter from url param so we can redirect from category page).
         Tri par nom et catégorie.
-        Supprimer weight pour InventoryItem
         <UTable
           class="w-full"
           :loading="isLoading"
@@ -94,8 +88,12 @@
             {{ row.name }}
           </template>
 
-          <template #actions-data="{ row }">
-            <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+          <template #category-data="{ row }">
+            <UButton
+              variant="soft"
+              :ui="{ rounded: 'rounded-full' }">
+              {{ row.category.name }}
+            </UButton>
           </template>
 
         </UTable>
@@ -132,7 +130,7 @@
 
         </UCard>
 
-        <UButton block @click="console.log(selectedItem)">Voir en détail</UButton>
+        <UButton block :to="'/admin/inventories/items/' + selectedItem.id">Voir en détail</UButton>
       </template>
     </template>
   </GenericLayoutContentWithStickySide>
