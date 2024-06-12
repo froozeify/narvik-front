@@ -2,6 +2,7 @@
   import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
   import type {InventoryCategory} from "~/types/inventorycategory";
   import {usePaginationValues} from "~/composables/api/list";
+  import type {Member} from "~/types/member";
 
   definePageMeta({
     layout: "pos"
@@ -11,6 +12,7 @@
     title: 'Catégorie d\'inventaire'
   })
 
+  const toast = useToast()
   const apiQuery = new InventoryCategoryQuery();
 
   const categories: Ref<InventoryCategory> = ref([])
@@ -67,17 +69,44 @@
     isVisible.value = true
   }
 
-  function move(row: any, modifier: number) {
-    // TODO: Change this for api call (so they are all moved cleanly in bo)
-    // row.weight += modifier
+  async function move(row: InventoryCategory, modifier: number) {
+    isLoading.value = true
+    const { error } = await apiQuery.move(row, modifier === 1 ? 'down' : 'up');
+    isLoading.value = false
 
-    const sortedCategories = categories.value.sort((a, b) => (a.weight > b.weight ? 1 : -1))
-    const matchToExchange = sortedCategories.find( value => value.weight == row.weight + modifier )
+    if (error) {
+      toast.add({
+        color: "red",
+        title: "La modification a échouée",
+        description: error.message
+      });
+      return;
+    }
 
-    if (!matchToExchange) return;
+    // We refresh the list
+    await getCategoriesPaginated();
+  }
 
-    matchToExchange.weight = row.weight
-    row.weight += modifier
+  async function updateCategory(category: InventoryCategory) {
+    isLoading.value = true
+    let payload: InventoryCategory = {
+      name: category.name
+    }
+
+    const { error } = await apiQuery.patch(category, payload);
+    isLoading.value = false
+
+    if (error) {
+      toast.add({
+        color: "red",
+        title: "La modification a échouée",
+        description: error.message
+      });
+      return;
+    }
+
+    // We refresh the list
+    await getCategoriesPaginated();
   }
 
 </script>
@@ -129,8 +158,8 @@
 
         </UCard>
 
-        <UButton block @click="console.log(selectedCategory)">Enregistrer</UButton>
-        <UButton color="red" block>Supprimer</UButton>
+        <UButton block :loading="isLoading" @click="updateCategory(selectedCategory)">Enregistrer</UButton>
+        <UButton color="red" block :loading="isLoading">Supprimer</UButton>
       </template>
     </template>
   </GenericLayoutContentWithStickySide>
