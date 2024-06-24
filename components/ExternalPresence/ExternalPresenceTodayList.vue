@@ -81,6 +81,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
         class="w-full"
         :columns="columns"
         :rows="externalPresenceStore.list"
+        :loading="isRefreshing"
         @select="rowClicked">
 
       <template #createdAt-data="{row}">

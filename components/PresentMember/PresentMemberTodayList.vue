@@ -8,6 +8,7 @@ import type {Member} from "~/types/member";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence";
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
 import {formatDateReadable, formatTimeReadable} from "~/utils/date";
+import type {ExternalPresence} from "~/types/externalpresence";
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
@@ -140,19 +141,20 @@ function memberSelectedFromSearch(member: Member) {
 }
 
 function presenceRegistered(memberPresence: MemberPresence) {
+  getPresences(true)
   searchMemberModalOpen.value = false;
   presentMembers.value = undefined; // We unset the list since we are refreshing it
-  memberPresenceQuery.getPresentToday().then(value => {
-    presentMembers.value = value.items
-  });
 }
+
+function externalPresenceRegistered(memberPresence: ExternalPresence) {
+  getPresences(true)
+  addExternalPresenceModal.value = false;
+}
+
 
 function memberPresenceUpdated(memberPresence?: MemberPresence) {
   if (!memberPresence) memberPresenceModalOpen.value = false
-
-  memberPresenceQuery.getPresentToday().then(value => {
-    presentMembers.value = value.items
-  });
+  getPresences(true)
 }
 
 function keyPressHandler(ev: KeyboardEvent) {
@@ -182,8 +184,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
-    <div class="flex flex-col sm:flex-row gap-4 mb-4">
+  <div class="-mt-4 -mb-2">
+    <div class="flex flex-col sm:flex-row gap-4 pt-4 pb-2 mb-4 sm:sticky sm:top-16 z-50 backdrop-blur-sm">
       <UButton
         icon="i-heroicons-calendar-days"
         variant="ghost"
@@ -221,7 +223,7 @@ onUnmounted(() => {
         </div>
       </div>
       <UTable
-          :loading="presenceList.loading"
+          :loading="presenceList.loading || isRefreshing"
           class="w-full"
           :columns="columns"
           :rows="presenceList.presentMembers"
@@ -293,7 +295,7 @@ onUnmounted(() => {
 
     <UModal
         v-model="addExternalPresenceModal">
-      <RegisterExternalPresence @registered="addExternalPresenceModal = false; getPresences()" @canceled="addExternalPresenceModal = false" />
+      <RegisterExternalPresence @registered="externalPresenceRegistered" @canceled="addExternalPresenceModal = false" />
     </UModal>
 
     <UModal
