@@ -25,7 +25,7 @@
 </script>
 
 <template>
-  <header class="bg-background/75 backdrop-blur border-b -mb-px sticky top-0 z-50 border-gray-200 dark:border-gray-800 h-16 print:hidden">
+  <header class="backdrop-blur -mb-px sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-16 print:hidden">
     <nav class="container mx-auto p-4 flex justify-between h-full">
       <ul class="flex gap-4">
         <li>

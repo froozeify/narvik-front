@@ -8,6 +8,7 @@ import type {Activity} from "~/types/activity";
 import type {Image} from "~/types/image";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import {useAppConfigStore} from "~/stores/useAppConfig";
+import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
 
 definePageMeta({
   layout: "admin"
@@ -101,34 +102,23 @@ async function getActivity(id: string) {
 }
 
 async function uploadLogo(event) {
-  const files = event.target.files || event.dataTransfer.files;
+  const formData = getFileFormDataFromUInputChangeEvent(event);
 
-  if (files.length > 0) {
-    logoUploading.value = true
-
-    const formData = new FormData()
-    formData.append('file', files.item(0), files.item(0).name)
-
-    const { created, violations, error } = await globalSettingQuery.importLogo(formData)
-    logoUploading.value = false
-
-    if (error) {
-      toast.add({
-        title: "Erreur lors de l'envoie du logo",
-        description: error.message,
-        color: "red"
-      })
-      return;
-    }
-
-    await appConfigStore.refresh()
-    siteLogo.value = appConfigStore.getLogo(false).value
-    toast.add({
-      title: "Logo envoyé",
-      color: "green"
-    })
-
+  if (!formData) {
+    return;
   }
+
+  logoUploading.value = true
+  const { created, violations, error } = await globalSettingQuery.importLogo(formData)
+  logoUploading.value = false
+
+  if (error) {
+    return displayFileErrorToast(error.message)
+  }
+
+  displayFileSuccessToast('Logo envoyé')
+  await appConfigStore.refresh()
+  siteLogo.value = appConfigStore.getLogo(false).value
 }
 
 async function deleteLogo() {
