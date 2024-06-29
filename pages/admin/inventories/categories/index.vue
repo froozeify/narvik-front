@@ -15,13 +15,17 @@
   const toast = useToast()
   const apiQuery = new InventoryCategoryQuery();
 
-  const categories: Ref<InventoryCategory> = ref([])
+  const categories: Ref<InventoryCategory[]> = ref([])
   const isLoading = ref(true);
   const totalCategories = ref(0)
   const selectedCategory: Ref<InventoryCategory | null> = ref(null)
 
   // Side menu visible
   const isVisible = ref(false);
+  // We watch the selected item so we close the side menu if unselected
+  watch(selectedCategory, (value, oldValue) => {
+    isVisible.value = value !== null
+  })
 
   // Table settings
   const page = ref(1);
@@ -93,20 +97,44 @@
       name: category.name
     }
 
-    const { error } = await apiQuery.patch(category, payload);
+    // We verify if it's a creation or an update
+    let error: null | Error = null
+    if (!category.id) {
+      await apiQuery.post(payload).then(value => {
+        error = value.error
+        selectedCategory.value = null
+      });
+    } else { // Update
+      await apiQuery.patch(category, payload).then(value => {
+        error = value.error
+      });
+    }
+
     isLoading.value = false
 
     if (error) {
       toast.add({
         color: "red",
-        title: "La modification a échouée",
+        title: !category.id ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
       return;
     }
 
+    toast.add({
+      color: "green",
+      title: !category.id ? "Catégorie créée" : "Catégorie modifiée",
+    });
+
     // We refresh the list
     await getCategoriesPaginated();
+  }
+
+  async function createCategory() {
+    let category: InventoryCategory = {
+      name: ''
+    }
+    selectedCategory.value = category
   }
 
 </script>
@@ -115,6 +143,15 @@
   <GenericLayoutContentWithStickySide :display-side="isVisible" @keyup.esc="isVisible = false; selectedCategory = null;" tabindex="-1">
     <template #main>
       <UCard>
+
+        <div class="flex gap-4">
+
+          <div class="flex-1"></div>
+          <UButton @click="createCategory" >
+            Créer une catégorie
+          </UButton>
+        </div>
+
         <UTable
           class="w-full"
           :loading="isLoading"
@@ -159,7 +196,7 @@
         </UCard>
 
         <UButton block :loading="isLoading" @click="updateCategory(selectedCategory)">Enregistrer</UButton>
-        <UButton color="red" block :loading="isLoading">Supprimer</UButton>
+        <UButton v-if="selectedCategory.id" color="red" block :loading="isLoading">Supprimer</UButton>
       </template>
     </template>
   </GenericLayoutContentWithStickySide>
