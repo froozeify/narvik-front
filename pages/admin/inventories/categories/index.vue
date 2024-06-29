@@ -91,6 +91,13 @@
     await getCategoriesPaginated();
   }
 
+  async function createCategory() {
+    let category: InventoryCategory = {
+      name: ''
+    }
+    selectedCategory.value = category
+  }
+
   async function updateCategory(category: InventoryCategory) {
     isLoading.value = true
     let payload: InventoryCategory = {
@@ -130,11 +137,25 @@
     await getCategoriesPaginated();
   }
 
-  async function createCategory() {
-    let category: InventoryCategory = {
-      name: ''
+  async function deleteCategory(close: Function) {
+    console.log(selectedCategory.value)
+    isLoading.value = true
+    const { error } = await apiQuery.delete(selectedCategory.value)
+    isLoading.value = false
+    close()
+
+    if (error) {
+      toast.add({
+        color: "red",
+        title: "La suppression a échouée",
+        description: error.message
+      });
+      return;
     }
-    selectedCategory.value = category
+
+    selectedCategory.value = null
+    // We refresh the list
+    await getCategoriesPaginated();
   }
 
 </script>
@@ -196,7 +217,33 @@
         </UCard>
 
         <UButton block :loading="isLoading" @click="updateCategory(selectedCategory)">Enregistrer</UButton>
-        <UButton v-if="selectedCategory.id" color="red" block :loading="isLoading">Supprimer</UButton>
+
+        <UPopover>
+          <UButton
+            v-if="selectedCategory.id"
+            color="red" block
+            :loading="isLoading"
+            :disabled="selectedCategory.items?.length > 0"
+          >
+            Supprimer
+          </UButton>
+
+
+          <template #panel="{ close }">
+            <div class="p-4 w-56 flex flex-col gap-4">
+              <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+
+              <UButton
+                @click="deleteCategory(close)"
+                color="red"
+                class="mx-auto"
+              >
+                Supprimer
+              </UButton>
+            </div>
+          </template>
+        </UPopover>
+
       </template>
     </template>
   </GenericLayoutContentWithStickySide>
