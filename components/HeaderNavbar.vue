@@ -79,7 +79,7 @@
           @click="rightMenuOpen = true"
         />
         <UDropdown v-model:open="rightMenuOpen" :items="rightMenu">
-          <div></div><!-- Button iis not here so we can use open logic on mobile. Nuxt bug otherwise -->
+          <div></div><!-- Button is not here so we can use open logic on mobile. Nuxt bug otherwise. -->
           <template #darkMode>
               <UIcon
                 :name="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"

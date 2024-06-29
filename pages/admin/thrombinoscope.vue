@@ -73,7 +73,7 @@
   async function loadMemberProfileImage(member: Member) {
     if (!member.profileImage) return null;
 
-    const {retrieved} = await imageQuery.get(member.profileImage);
+    const { retrieved } = await imageQuery.get(member.profileImage);
     if (!retrieved || !retrieved.base64) return null
 
     return retrieved.base64
