@@ -23,6 +23,7 @@
 
   const siteLogo: Ref<Image | null> = appConfigStore.getLogo()
 
+  const rightMenuOpen = ref(false)
   const rightMenu = [
     [{
       label: !isBadger ? selfStore.member?.fullName : 'Pointeuse',
@@ -71,13 +72,14 @@
         <div v-if="isSupervisor">
           <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton>
         </div>
-        <UDropdown :items="rightMenu">
-          <UButton
-            variant="ghost"
-            color="gray"
-            trailing-icon="i-heroicons-cog-6-tooth"
-          />
-
+        <UButton
+          variant="ghost"
+          color="gray"
+          trailing-icon="i-heroicons-cog-6-tooth"
+          @click="rightMenuOpen = true"
+        />
+        <UDropdown v-model:open="rightMenuOpen" :items="rightMenu">
+          <div></div><!-- Button iis not here so we can use open logic on mobile. Nuxt bug otherwise -->
           <template #darkMode>
               <UIcon
                 :name="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
@@ -87,7 +89,6 @@
                 {{ isDark ? 'Thème sombre' : 'Thème clair' }}
               </span>
           </template>
-
         </UDropdown>
       </div>
     </nav>
