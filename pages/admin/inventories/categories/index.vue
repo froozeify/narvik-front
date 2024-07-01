@@ -29,7 +29,7 @@
 
   // Table settings
   const page = ref(1);
-  const itemsPerPage = ref(10);
+  const itemsPerPage = ref(30);
   const sort = ref({
     column: 'weight',
     direction: 'asc'
