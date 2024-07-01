@@ -218,9 +218,8 @@
 
         <UButton block :loading="isLoading" @click="updateCategory(selectedCategory)">Enregistrer</UButton>
 
-        <UPopover>
+        <UPopover v-if="selectedCategory.id">
           <UButton
-            v-if="selectedCategory.id"
             color="red" block
             :loading="isLoading"
             :disabled="selectedCategory.items?.length > 0"
