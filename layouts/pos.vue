@@ -1,10 +1,11 @@
 <script setup lang="ts">
   import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import FooterCopyright from "~/components/FooterCopyright.vue";
 
   useHead({
     titleTemplate: (titleChunk) => {
-      return titleChunk ? `${titleChunk} - Adminstration - Narvik` : 'Adminstration - Narvik';
+      return titleChunk ? `${titleChunk} - POS - Narvik` : 'POS - Narvik';
     }
   });
 
@@ -14,81 +15,45 @@
   const isAdmin = selfStore.isAdmin()
   const isSupervisor = selfStore.hasSupervisorRole()
 
-  const globalSection = [
+  const salesSection = [
     {
-      label: 'Accueil',
-      icon: 'i-heroicons-home',
-      to: '/admin'
+      label: 'Ventes',
+      icon: 'i-heroicons-shopping-cart',
+      to: '/admin/sales'
+    },
+    {
+      label: 'Faire une vente',
+      icon: 'i-heroicons-banknotes',
+      to: '/admin/sales/new'
+    },
+    {
+      label: 'Historique',
+      icon: 'i-heroicons-receipt-refund',
+      to: '/admin/sales/history'
     }
   ]
 
-  const entitiesSection = [
+  const inventorySection = [
     {
-      label: 'Présences',
-      icon: 'i-heroicons-calendar-days',
-      to: '/admin/presences'
+      label: 'Inventaire',
+      icon: 'i-heroicons-calculator',
+      to: '/admin/inventories'
     },
     {
-      label: 'Membres',
-      icon: 'i-heroicons-user-group',
-      to: '/admin/members'
-    },
-    {
-      label: 'Trombinoscope',
-      icon: 'i-heroicons-face-smile',
-      to: '/admin/thrombinoscope'
+      label: 'Catégorie',
+      icon: 'i-heroicons-tag',
+      to: '/admin/inventories/categories'
     }
   ]
-
-  const importSection = [
-    {
-      label: 'Import membres',
-      icon: 'i-heroicons-users',
-      to: '/admin/imports/itac'
-    },
-    {
-      label: 'Import membres club secondaire',
-      icon: 'i-heroicons-user-plus',
-      to: '/admin/imports/itac-secondary-club'
-    },
-    {
-      label: 'Import photos',
-      icon: 'i-heroicons-photo',
-      to: '/admin/imports/photos'
-    },
-    {
-      label: 'Import présences',
-      icon: 'i-heroicons-calendar-days',
-      to: '/admin/imports/presences'
-    },
-  ]
-
-  if (isAdmin) {
-    globalSection.push(
-      {
-        label: 'Configuration globale',
-        icon: 'i-heroicons-wrench-screwdriver',
-        to: '/admin/config'
-      }
-    )
-
-    entitiesSection.unshift(
-{
-        label: 'Activités',
-        icon: 'i-heroicons-rocket-launch',
-        to: '/admin/activities'
-      }
-    )
-  }
 
   let links = [
-    globalSection,
-    entitiesSection
+    salesSection
   ]
 
   if (isAdmin) {
-    links.push(importSection)
+    links.push(inventorySection)
   }
+
 </script>
 
 <template>

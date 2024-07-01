@@ -8,260 +8,276 @@ import ImageQuery from "~/composables/api/query/ImageQuery";
 import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
 
 export const useSelfMemberStore = defineStore('selfMember', () => {
-	const member: Ref<Member | undefined> = ref(undefined)
+  const member: Ref<Member | undefined> = ref(undefined)
 
-	const appConfigStore = useAppConfigStore()
+  const appConfigStore = useAppConfigStore()
 
-	// Session Management
-	const selfJwtToken: Ref<JwtToken | null> = ref(null)
-	const isRefreshingJwtToken = ref(false);
-	function getSelfJwtToken(): Ref<JwtToken|null> {
-		if (selfJwtToken.value) {
-			// We remove the authCookie if he is not in the cookie
-			const authCookie = useCookie('auth');
-			if (!authCookie || authCookie.value == undefined) {
-				selfJwtToken.value.access = undefined
-			}
+  // Session Management
+  const selfJwtToken: Ref<JwtToken | null> = ref(null)
+  const isRefreshingJwtToken = ref(false);
+  function getSelfJwtToken(): Ref<JwtToken|null> {
+    if (selfJwtToken.value) {
+      // We remove the authCookie if he is not in the cookie
+      const authCookie = useCookie('auth');
+      if (!authCookie || authCookie.value == undefined) {
+        selfJwtToken.value.access = undefined
+      }
 
-			const refreshTokenCookie = useCookie('auth_refresh');
-			if (!refreshTokenCookie || refreshTokenCookie.value == undefined) {
-				selfJwtToken.value.refresh = undefined
-			}
+      const refreshTokenCookie = useCookie('auth_refresh');
+      if (!refreshTokenCookie || refreshTokenCookie.value == undefined) {
+        selfJwtToken.value.refresh = undefined
+      }
 
-			return selfJwtToken
-		}
+      return selfJwtToken
+    }
 
-		// Settings from cookies storage
-		let jwtToken: JwtToken|null = null;
+    // Settings from cookies storage
+    let jwtToken: JwtToken|null = null;
 
-		const authCookie = useCookie('auth');
-		if (authCookie && authCookie.value != undefined) {
-			jwtToken = new JwtToken();
-			jwtToken.access = JSON.parse(atob(authCookie.value));
-		}
+    const authCookie = useCookie('auth');
+    if (authCookie && authCookie.value != undefined) {
+      jwtToken = new JwtToken();
+      jwtToken.access = JSON.parse(atob(authCookie.value));
+    }
 
-		const refreshTokenCookie = useCookie('auth_refresh');
-		if (refreshTokenCookie && refreshTokenCookie.value != undefined) {
-			if (!jwtToken) {
-				jwtToken = new JwtToken()
-			}
-			jwtToken.refresh = JSON.parse(atob(refreshTokenCookie.value));
-		}
+    const refreshTokenCookie = useCookie('auth_refresh');
+    if (refreshTokenCookie && refreshTokenCookie.value != undefined) {
+      if (!jwtToken) {
+        jwtToken = new JwtToken()
+      }
+      jwtToken.refresh = JSON.parse(atob(refreshTokenCookie.value));
+    }
 
-		if (jwtToken) {
-			setSelfJwtToken(jwtToken)
-		}
+    if (jwtToken) {
+      setSelfJwtToken(jwtToken)
+    }
 
-		return selfJwtToken;
-	}
+    return selfJwtToken;
+  }
 
-	function setSelfJwtToken(payload: JwtToken) {
-		// We update the selfJwtToken ref
-		selfJwtToken.value = payload
+  function setSelfJwtToken(payload: JwtToken) {
+    // We update the selfJwtToken ref
+    selfJwtToken.value = payload
 
-		if (payload.access) {
-			const authCookie = useCookie('auth', {
-				expires: new Date(payload.access.date),
-				httpOnly: false,
-				sameSite: true,
-			});
-			authCookie.value = btoa(JSON.stringify(payload.access))
-		}
+    if (payload.access) {
+      const authCookie = useCookie('auth', {
+        expires: new Date(payload.access.date),
+        httpOnly: false,
+        sameSite: true,
+      });
+      authCookie.value = btoa(JSON.stringify(payload.access))
+    }
 
-		if (payload.refresh && payload.refresh.date) {
-			// Expire at the date returned by the refresh token
-			const refreshTokenCookie = useCookie('auth_refresh', {
-				expires: new Date(payload.refresh.date),
-				httpOnly: false,
-				sameSite: true,
-			});
-			refreshTokenCookie.value = btoa(JSON.stringify(payload.refresh));
-		}
-	}
+    if (payload.refresh && payload.refresh.date) {
+      // Expire at the date returned by the refresh token
+      const refreshTokenCookie = useCookie('auth_refresh', {
+        expires: new Date(payload.refresh.date),
+        httpOnly: false,
+        sameSite: true,
+      });
+      refreshTokenCookie.value = btoa(JSON.stringify(payload.refresh));
+    }
+  }
 
-	function delay(time: number) {
-		return new Promise(resolve => setTimeout(resolve, time));
-	}
+  function delay(time: number) {
+    return new Promise(resolve => setTimeout(resolve, time));
+  }
 
-	function displayJwtError(description: string, redirect: boolean = true) {
-		const toast = useToast()
-		toast.add({
-			color: "red",
-			title: "Erreur d'authentification",
-			description: description
-		})
-		logout(redirect)
-		return ref(null)
-	}
+  function displayJwtError(description: string, redirect: boolean = true) {
+    const toast = useToast()
+    toast.add({
+      color: "red",
+      title: "Erreur d'authentification",
+      description: description
+    })
+    logout(redirect)
+    return ref(null)
+  }
 
-	async function enhanceJwtTokenDefined(delayedCalled: number = 0) {
-		const jwtToken = getSelfJwtToken()
+  async function enhanceJwtTokenDefined(delayedCalled: number = 0) {
+    const jwtToken = getSelfJwtToken()
 
-		if (!jwtToken || !jwtToken.value) {
-			return displayJwtError("No auth token.")
-		}
+    if (!jwtToken || !jwtToken.value) {
+      return displayJwtError("No auth token.")
+    }
 
-		// Access token is expired
-		if (!jwtToken.value.access || !jwtToken.value.access.token || (jwtToken.value.access && jwtToken.value.access.date < new Date() )) {
-			if (!(jwtToken.value.refresh && jwtToken.value.refresh.token)) {
-				return displayJwtError("No refresh access token.")
-			}
+    // Access token is expired
+    if (!jwtToken.value.access || !jwtToken.value.access.token || (jwtToken.value.access && jwtToken.value.access.date < new Date() )) {
+      if (!(jwtToken.value.refresh && jwtToken.value.refresh.token)) {
+        return displayJwtError("No refresh access token.")
+      }
 
-			// Already refreshing
-			if (isRefreshingJwtToken.value) {
-				// We are already refreshing we wait
-				await delay(100)
-				// Taking to long to refresh we are in timeout
-				if (delayedCalled > 100) { // 10 secondes
-					return displayJwtError("Taking too long to refresh the token.", false);
-				}
-				return enhanceJwtTokenDefined(++delayedCalled);
-			}
+      // Already refreshing
+      if (isRefreshingJwtToken.value) {
+        // We are already refreshing we wait
+        await delay(100)
+        // Taking to long to refresh we are in timeout
+        if (delayedCalled > 100) { // 10 secondes
+          return displayJwtError("Taking too long to refresh the token.", false);
+        }
+        return enhanceJwtTokenDefined(++delayedCalled);
+      }
 
-			isRefreshingJwtToken.value = true
-			const newJwtToken = await useRefreshAccessToken(jwtToken)
-			if (!newJwtToken || !jwtToken.value) {
-				return displayJwtError("An error occurred when refreshing the token.")
-			}
-			isRefreshingJwtToken.value = false
-		}
+      isRefreshingJwtToken.value = true
+      const newJwtToken = await useRefreshAccessToken(jwtToken)
+      if (!newJwtToken || !jwtToken.value) {
+        return displayJwtError("An error occurred when refreshing the token.")
+      }
+      isRefreshingJwtToken.value = false
+    }
 
-		return jwtToken;
-	}
+    return jwtToken;
+  }
 
-	async function useRefreshAccessToken(jwtToken: Ref<JwtToken|null>) {
-		if (!jwtToken.value || !jwtToken.value.refresh || !jwtToken.value.refresh.token) {
-			console.error("No refresh token defined in the JwtToken")
-			return null;
-		}
+  async function useRefreshAccessToken(jwtToken: Ref<JwtToken|null>) {
+    if (!jwtToken.value || !jwtToken.value.refresh || !jwtToken.value.refresh.token) {
+      console.error("No refresh token defined in the JwtToken")
+      return null;
+    }
 
-		try {
-			const data = await $localApi("auth/token/refresh", {
-				method: "POST",
-				headers: {
-					Accept: MIME_TYPE_JSON,
-					'content-type': 'application/x-www-form-urlencoded',
-				},
-				body: `refresh_token=${jwtToken.value.refresh.token}`
-			});
-			return setJwtSelfJwtTokenFromApiResponse(data);
-		} catch (e) {
-			return null;
-		}
-	}
+    try {
+      const data = await $localApi("auth/token/refresh", {
+        method: "POST",
+        headers: {
+          Accept: MIME_TYPE_JSON,
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        body: `refresh_token=${jwtToken.value.refresh.token}`
+      });
+      return setJwtSelfJwtTokenFromApiResponse(data);
+    } catch (e) {
+      return null;
+    }
+  }
 
-	function setJwtSelfJwtTokenFromApiResponse(data: any): JwtToken {
-		const jwtToken = new JwtToken();
-		jwtToken.access = {
-			date: new Date(Date.now() + (3480 * 1000)), // Expires in 1h - 2mn (to get some room on the token expiration),
-			token: data.token
-		}
+  function setJwtSelfJwtTokenFromApiResponse(data: any): JwtToken {
+    const jwtToken = new JwtToken();
+    jwtToken.access = {
+      date: new Date(Date.now() + (3480 * 1000)), // Expires in 1h - 2mn (to get some room on the token expiration),
+      token: data.token
+    }
 
-		jwtToken.refresh = {
-			date: new Date((data.refresh_token_expiration - 120) * 1000),
-			token: data.refresh_token
-		}
+    jwtToken.refresh = {
+      date: new Date((data.refresh_token_expiration - 120) * 1000),
+      token: data.refresh_token
+    }
 
-		setSelfJwtToken(jwtToken);
+    setSelfJwtToken(jwtToken);
 
-		return jwtToken;
-	}
-
-
-
-	// End Session Management
+    return jwtToken;
+  }
 
 
 
-	async function refresh() {
-		const memberQuery = new MemberQuery();
-		const { retrieved } = await memberQuery.self()
-		if (retrieved) {
-			member.value = retrieved
-		}
+  // End Session Management
 
-		// We refresh the config we got from the api
-		appConfigStore.refresh()
-	}
 
-	function logout(redirect: boolean = true) {
-		selfJwtToken.value = null
-		member.value = undefined;
+  async function refresh() {
+    const memberQuery = new MemberQuery();
+    const {retrieved} = await memberQuery.self()
+    if (retrieved) {
+      member.value = retrieved
 
-		const authCookie = useCookie('auth');
-		authCookie.value = null
+      // We load the profile image
+      const image = await loadProfileImage()
+      if (image) {
+        member.value.profileImageBase64 = image
+      }
+    }
 
-		const refreshTokenCookie = useCookie('auth_refresh');
-		refreshTokenCookie.value = null;
+    // We refresh the config we got from the api
+    appConfigStore.refresh()
+  }
 
-		// We refresh the config we got from the api
-		appConfigStore.refresh(false)
+  async function loadProfileImage() {
+    if (!member.value || !member.value.profileImage) return null;
 
-		// We stay on same page
-		if (!redirect) return;
+    const imageQuery = new ImageQuery();
+    const { retrieved } = await imageQuery.get(member.value.profileImage);
 
-		const toast = useToast();
-		toast.add({
-			title: "Vous avez été déconnecté."
-		})
-		navigateTo('/login')
-	}
+    if (!retrieved || !retrieved.base64) return null
 
-	function isLogged(): boolean {
-		const selfToken = getSelfJwtToken();
+    return retrieved.base64
+  }
 
-		if (
-			!selfToken.value ||
-			!selfToken.value?.refresh
-		) return false
+  function logout(redirect: boolean = true) {
+    selfJwtToken.value = null
+    member.value = undefined;
 
-		return true
-	}
+    const authCookie = useCookie('auth');
+    authCookie.value = null
 
-	function isAdmin(): boolean {
-		if (!isLogged()) return false;
+    const refreshTokenCookie = useCookie('auth_refresh');
+    refreshTokenCookie.value = null;
 
-		if (member.value && member.value.role) {
-			return member.value.role === MemberRole.Admin
-		}
-		return false;
-	}
+    // We refresh the config we got from the api
+    appConfigStore.refresh(false)
 
-	function hasSupervisorRole(): boolean {
-		if (!isLogged()) return false;
+    // We stay on same page
+    if (!redirect) return;
 
-		if (member.value && member.value.role) {
-			return member.value.role === MemberRole.Supervisor || isAdmin()
-		}
+    const toast = useToast();
+    toast.add({
+      title: "Vous avez été déconnecté."
+    })
+    navigateTo('/login')
+  }
 
-		return false;
-	}
+  function isLogged(): boolean {
+    const selfToken = getSelfJwtToken();
 
-	function isBadger(): boolean {
-		if (!isLogged()) return false;
+    if (
+      !selfToken.value ||
+      !selfToken.value?.refresh
+    ) return false
 
-		if (member.value && member.value.role) {
-			return member.value.role === MemberRole.Badger
-		}
-		return false;
-	}
+    return true
+  }
 
-	return {
-		member,
+  function isAdmin(): boolean {
+    if (!isLogged()) return false;
 
-		refresh,
-		logout,
+    if (member.value && member.value.role) {
+      return member.value.role === MemberRole.Admin
+    }
+    return false;
+  }
 
-		isLogged,
-		isAdmin,
-		isBadger,
+  function hasSupervisorRole(): boolean {
+    if (!isLogged()) return false;
 
-		hasSupervisorRole,
+    if (member.value && member.value.role) {
+      return member.value.role === MemberRole.Supervisor || isAdmin()
+    }
 
-		// Session management
-		selfJwtToken,
-		setJwtSelfJwtTokenFromApiResponse,
-		enhanceJwtTokenDefined,
-		displayJwtError
-	}
+    return false;
+  }
+
+  function isBadger(): boolean {
+    if (!isLogged()) return false;
+
+    if (member.value && member.value.role) {
+      return member.value.role === MemberRole.Badger
+    }
+    return false;
+  }
+
+  return {
+    member,
+
+    refresh,
+    logout,
+
+    isLogged,
+    isAdmin,
+    isBadger,
+
+    hasSupervisorRole,
+
+    // Session management
+    selfJwtToken,
+    setJwtSelfJwtTokenFromApiResponse,
+    enhanceJwtTokenDefined,
+    displayJwtError
+  }
 })

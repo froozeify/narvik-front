@@ -438,24 +438,28 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
   };
 }
 
-export async function useDeleteItem(item: Item) {
-  let error: string | undefined = undefined;
+export async function useDeleteItem(item: Item | null) {
+  let error: Error | null = null;
 
-  if (!item?.["@id"]) {
-    error = "No item found. Please reload";
+  if (!item || !item["@id"]) {
+    error = new Error("No item found. Please reload");
     return {
       error,
     };
   }
 
-  const data = await useApi(item["@id"] ?? "", {
-    method: "DELETE",
+  try {
+    const data = await useApi(item["@id"] ?? "", {
+      method: "DELETE",
 
-    onResponseError({ response }) {
-      const data = response._data;
-      error = data["hydra:description"] || response.statusText;
-    },
-  });
+      onResponseError({ response }) {
+        const data = response._data;
+        error = new Error(data["hydra:description"] || response.statusText);
+      },
+    });
+  } catch (e) {
+    error = e as Error
+  }
 
   return {
     error,

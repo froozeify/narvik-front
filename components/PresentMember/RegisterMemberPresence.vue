@@ -150,7 +150,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(selectedDate) || 'Choisir une date'" />
 
           <template #panel="{ close }">
-            <DatePicker v-model="selectedDate" @close="close" />
+            <GenericDatePicker v-model="selectedDate" @close="close" />
           </template>
         </UPopover>
 
