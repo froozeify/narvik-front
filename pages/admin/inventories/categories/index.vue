@@ -216,6 +216,8 @@
 
         </UCard>
 
+        <UButton v-if="selectedCategory.id" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + selectedCategory.id">Voir les articles</UButton>
+
         <UButton block :loading="isLoading" @click="updateCategory(selectedCategory)">Enregistrer</UButton>
 
         <UPopover v-if="selectedCategory.id">
@@ -226,7 +228,6 @@
           >
             Supprimer
           </UButton>
-
 
           <template #panel="{ close }">
             <div class="p-4 w-56 flex flex-col gap-4">

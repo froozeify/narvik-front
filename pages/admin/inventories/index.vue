@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import {usePaginationValues} from "~/composables/api/list";
-import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-import type {Inventoryitem} from "~/types/inventoryitem";
+  import {usePaginationValues} from "~/composables/api/list";
+  import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
+  import type {Inventoryitem} from "~/types/inventoryitem";
+  import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
+  import type {InventoryCategory} from "~/types/inventorycategory";
 
-definePageMeta({
+  definePageMeta({
     layout: "pos"
   });
 
@@ -11,24 +13,58 @@ definePageMeta({
     title: 'Inventaire'
   })
 
-  const apiQuery = new InventoryItemQuery();
+  const queryParams = useRoute().query
 
-  const apiItems: Ref<Inventoryitem> = ref([])
+  const apiQuery = new InventoryItemQuery()
+  const itemCategoryQuery = new InventoryCategoryQuery()
+
+  const searchQuery: Ref<string> = ref('')
+  const categories: Ref<InventoryCategory[]> = ref([])
+  const filteredCategories: Ref<InventoryCategory[]> = ref([])
+  itemCategoryQuery.getAll().then(value => {
+    categories.value = value.items.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
+
+    // Filter is apply on a category
+    if (!isNaN(queryParams.category)) {
+      const matchedCategory = value.items.find( (category) => category.id == queryParams.category)
+      if (matchedCategory) {
+        filteredCategories.value.push(matchedCategory)
+        useRouter().replace(useRouter().currentRoute.value.path) // We remove the param from the url
+        getItemsPaginated()
+      }
+    }
+  });
+
+  const apiItems: Ref<Inventoryitem[]> = ref([])
   const isLoading = ref(true);
   const totalApiItems = ref(0)
   const selectedItem: Ref<Inventoryitem | null> = ref(null)
 
+  watch(filteredCategories, () => {
+    getItemsPaginated()
+  })
+
+  let inputTimer: NodeJS.Timeout;
+  async function searchQueryUpdated() {
+    clearTimeout(inputTimer);
+    inputTimer = setTimeout(async () => {
+      page.value = 1;
+      await getItemsPaginated()
+    }, 500);
+  }
+
   // Table settings
   const page = ref(1);
-  const itemsPerPage = ref(10);
+  const itemsPerPage = ref(30);
   const sort = ref({
-    column: 'weight',
+    column: 'name',
     direction: 'asc'
   });
   const columns = [
     {
       key: 'name',
       label: 'Nom',
+      sortable: true
     },
     {
       key: 'category',
@@ -43,12 +79,23 @@ definePageMeta({
     isLoading.value = true
 
     const urlParams = new URLSearchParams({
-      pagination: '1',
       page: page.value.toString(),
       itemsPerPage: itemsPerPage.value.toString(),
     });
 
     urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+    urlParams.append(`order[category.name]`, 'asc');
+
+    if (filteredCategories.value.length > 0) {
+      filteredCategories.value.forEach(filteredCategory => {
+        if (!filteredCategory.id) return;
+        urlParams.append('category.id[]', filteredCategory.id.toString())
+      })
+    }
+
+    if (searchQuery.value.trim().length > 0) {
+      urlParams.append('multiple[name]', searchQuery.value.trim())
+    }
 
     const { totalItems, items } = await apiQuery.getAll(urlParams)
     apiItems.value = items
@@ -68,12 +115,37 @@ definePageMeta({
   <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = null;" tabindex="-1">
     <template #main>
       <UCard>
-        Add category filter (+ filter from url param so we can redirect from category page).
-        Tri par nom et catégorie.
+        <div class="flex gap-4">
+          <UInput
+            v-model="searchQuery"
+            @update:model-value="searchQueryUpdated()"
+            placeholder="Rechercher..."  />
+
+          <div class="flex-1"></div>
+          <USelectMenu
+            class="w-44"
+            v-model="filteredCategories"
+            :options="categories"
+            option-attribute="name"
+            multiple
+          >
+            <template #label>
+              <span v-if="filteredCategories.length" class="truncate">
+                {{ filteredCategories.map(fa => fa.name).join(', ') }}
+              </span>
+              <span v-else>Catégories</span>
+            </template>
+          </USelectMenu>
+
+          <UButton @click="addItemModal = true" icon="i-heroicons-plus" />
+        </div>
+
         <UTable
           class="w-full"
           :loading="isLoading"
-          :sort="sort"
+          v-model:sort="sort"
+          sort-mode="manual"
+          @update:sort="getItemsPaginated()"
           :columns="columns"
           :rows="apiItems"
           @select="rowClicked">
