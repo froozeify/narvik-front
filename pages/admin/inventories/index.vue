@@ -94,7 +94,7 @@
     }
 
     if (searchQuery.value.trim().length > 0) {
-      urlParams.append('multiple[name]', searchQuery.value.trim())
+      urlParams.append('multiple[name, barcode]', searchQuery.value.trim())
     }
 
     const { totalItems, items } = await apiQuery.getAll(urlParams)
