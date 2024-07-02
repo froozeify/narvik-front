@@ -4,6 +4,8 @@
   import type {Inventoryitem} from "~/types/inventoryitem";
   import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
   import type {InventoryCategory} from "~/types/inventorycategory";
+  import { QrcodeStream } from 'vue-qrcode-reader'
+  import type {DetectedBarcode} from "barcode-detector";
 
   definePageMeta({
     layout: "pos"
@@ -109,13 +111,42 @@
   function rowClicked(row: object) {
     selectedItem.value = {...row} // We make a shallow clone
   }
+
+  const cameraPreview = ref(false)
+  const isCameraPresent = ref(false)
+  navigator.mediaDevices.enumerateDevices().then(devices => {
+    devices.forEach(device => {
+      if (device.kind === 'videoinput') {
+        isCameraPresent.value = true
+      }
+    })
+  })
+
+  function onDetect(firstDetectedCode: Array<DetectedBarcode>) {
+    searchQuery.value = firstDetectedCode[0].rawValue
+    cameraPreview.value = false
+    page.value = 1
+    getItemsPaginated()
+  }
 </script>
 
 <template>
   <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = null;" tabindex="-1">
     <template #main>
+      <QrcodeStream v-if="cameraPreview"
+        @detect="onDetect"
+        :formats="[
+          'linear_codes'
+        ]"
+      />
+
       <UCard>
         <div class="flex gap-4">
+          <UButton
+            v-if="isCameraPresent"
+            label="camera"
+            @click="cameraPreview = true"
+            />
           <UInput
             v-model="searchQuery"
             @update:model-value="searchQueryUpdated()"
@@ -180,25 +211,7 @@
     <template #side>
       <template v-if="selectedItem">
         <UCard class="overflow-y-auto">
-
-          <div class="flex gap-2 flex-col">
-            <UFormGroup label="Peut être vendu">
-              <UToggle :model-value="selectedItem.canBeSold" />
-            </UFormGroup>
-
-            <UFormGroup
-              v-for="(value, key) in {
-                'Nom': selectedItem.name,
-                'Description': selectedItem.description,
-                'Prix d\'achat': selectedItem.purchasePrice,
-                'Prix de vente': selectedItem.sellingPrice,
-              }"
-              :label="key"
-            >
-              <UInput :model-value="value" class="pointer-events-none" tabindex="-1" />
-            </UFormGroup>
-          </div>
-
+          <InventoryItemForm :item="selectedItem" :view-only="true" />
         </UCard>
 
         <UButton block :to="'/admin/inventories/items/' + selectedItem.id">Voir en détail</UButton>
