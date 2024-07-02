@@ -50,8 +50,8 @@
 
 <template>
   <div id="wrapper" class="flex flex-col gap-4">
-    <div class="flex relative">
-      <UTooltip text="Inventaire" class="absolute left-0">
+    <div class="flex gap-2">
+      <UTooltip text="Inventaire">
         <UButton
           @click="navigateTo('/admin/inventories')"
           icon="i-heroicons-arrow-left"
@@ -61,6 +61,20 @@
       </UTooltip>
 
       <div class="flex-1 text-center font-bold text-2xl">{{ inventoryItem?.name }}</div>
+
+      <UTooltip text="Modifier">
+        <UButton
+          icon="i-heroicons-pencil-square"
+          color="yellow"
+        />
+      </UTooltip>
+
+      <UTooltip text="Supprimer">
+        <UButton
+          icon="i-heroicons-trash"
+          color="red"
+        />
+      </UTooltip>
     </div>
 
     <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-4">
@@ -91,12 +105,8 @@
       </GenericStatCard>
     </div>
 
-    <UCard class="mt-4">
-      <div class="text-xl font-bold">Formulaire pour modifier le prix / nom</div>
-    </UCard>
-
-    <UCard class="mt-4">
-      <div class="text-xl font-bold">Historique des prix de vente/achat en graph</div>
+    <UCard>
+      <div class="text-xl font-bold">Historique des prix de ventes/achats</div>
     </UCard>
   </div>
 </template>

@@ -6,8 +6,10 @@ export interface Inventoryitem extends Item {
 
   name?: string;
   description?: string;
+  canBeSold?: boolean;
   purchasePrice?: string;
   sellingPrice?: string;
-  canBeSold?: boolean;
+  sellingQuantity?: number;
   quantity?: number
+  barcode?: string;
 }
