@@ -142,6 +142,7 @@
           >
             <template #trailing v-if="cameraIsPresent">
               <UIcon
+                class="cursor-pointer"
                 name="i-heroicons-qr-code"
                 @click="cameraPreview = true"
               />
