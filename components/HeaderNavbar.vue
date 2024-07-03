@@ -52,7 +52,7 @@
 <template>
   <header
     class="backdrop-blur -mb-px sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-16 print:hidden">
-    <nav class="container mx-auto p-4 flex justify-between h-full">
+    <nav class="container mx-auto p-4 flex justify-between h-full overflow-y-auto">
       <ul class="flex gap-4">
         <li>
           <NuxtLink to="/" class="flex align-middle">
