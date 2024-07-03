@@ -6,6 +6,7 @@
   import type {InventoryCategory} from "~/types/inventorycategory";
   import { QrcodeStream } from 'vue-qrcode-reader'
   import type {DetectedBarcode} from "barcode-detector";
+  import {verifyCameraIsPresent} from "~/utils/browser";
 
   definePageMeta({
     layout: "pos"
@@ -74,9 +75,12 @@
     }
   ]
 
+  function rowClicked(row: object) {
+    selectedItem.value = {...row} // We make a shallow clone
+  }
+
   // We get the data from the api on first page load
   getItemsPaginated()
-
   async function getItemsPaginated() {
     isLoading.value = true
 
@@ -108,23 +112,13 @@
     isLoading.value = false
   }
 
-  function rowClicked(row: object) {
-    selectedItem.value = {...row} // We make a shallow clone
-  }
+  // Camera detection setup
 
   const cameraPreview = ref(false)
-  const isCameraPresent = ref(false)
-  navigator.mediaDevices.enumerateDevices().then(devices => {
-    devices.forEach(device => {
-      if (device.kind === 'videoinput') {
-        isCameraPresent.value = true
-      }
-    })
-  })
+  const cameraIsPresent = verifyCameraIsPresent()
 
-  function onDetect(firstDetectedCode: Array<DetectedBarcode>) {
-    searchQuery.value = firstDetectedCode[0].rawValue
-    cameraPreview.value = false
+  function onDecoded(value: string) {
+    searchQuery.value = value
     page.value = 1
     getItemsPaginated()
   }
@@ -133,42 +127,49 @@
 <template>
   <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = null;" tabindex="-1">
     <template #main>
-      <QrcodeStream v-if="cameraPreview"
-        @detect="onDetect"
-        :formats="[
-          'linear_codes'
-        ]"
-      />
-
       <UCard>
-        <div class="flex gap-4">
-          <UButton
-            v-if="isCameraPresent"
-            label="camera"
-            @click="cameraPreview = true"
-            />
+        <div class="flex gap-2 flex-col flex-wrap sm:flex-row">
+          <GenericBarcodeReader
+            v-model="cameraPreview"
+            @decoded="onDecoded"
+          />
+
           <UInput
             v-model="searchQuery"
             @update:model-value="searchQueryUpdated()"
-            placeholder="Rechercher..."  />
+            placeholder="Rechercher..."
+            :ui="{ icon: { trailing: { pointer: '' } } }"
+          >
+            <template #trailing v-if="cameraIsPresent">
+              <UIcon
+                name="i-heroicons-qr-code"
+                @click="cameraPreview = true"
+              />
+            </template>
+          </UInput>
 
           <div class="flex-1"></div>
-          <USelectMenu
-            class="w-44"
-            v-model="filteredCategories"
-            :options="categories"
-            option-attribute="name"
-            multiple
-          >
-            <template #label>
+
+          <div class="flex gap-4 justify-between">
+            <USelectMenu
+              class="w-44"
+              v-model="filteredCategories"
+              :options="categories"
+              option-attribute="name"
+              multiple
+            >
+              <template #label>
               <span v-if="filteredCategories.length" class="truncate">
                 {{ filteredCategories.map(fa => fa.name).join(', ') }}
               </span>
-              <span v-else>Catégories</span>
-            </template>
-          </USelectMenu>
+                <span v-else>Catégories</span>
+              </template>
+            </USelectMenu>
 
-          <UButton @click="addItemModal = true" icon="i-heroicons-plus" />
+            <UButton @click="addItemModal = true" icon="i-heroicons-plus" />
+          </div>
+
+
         </div>
 
         <UTable
