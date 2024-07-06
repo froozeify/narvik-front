@@ -4,8 +4,6 @@
   import type {Inventoryitem} from "~/types/inventoryitem";
   import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
   import type {InventoryCategory} from "~/types/inventorycategory";
-  import { QrcodeStream } from 'vue-qrcode-reader'
-  import type {DetectedBarcode} from "barcode-detector";
   import {verifyCameraIsPresent} from "~/utils/browser";
 
   definePageMeta({
@@ -41,7 +39,7 @@
   const apiItems: Ref<Inventoryitem[]> = ref([])
   const isLoading = ref(true);
   const totalApiItems = ref(0)
-  const selectedItem: Ref<Inventoryitem | null> = ref(null)
+  const selectedItem: Ref<Inventoryitem | undefined> = ref(undefined)
 
   watch(filteredCategories, () => {
     getItemsPaginated()
@@ -112,6 +110,9 @@
     isLoading.value = false
   }
 
+  // InventoryItemModal
+  const inventoryItemModalOpen = ref(false)
+
   // Camera detection setup
 
   const cameraPreview = ref(false)
@@ -125,7 +126,7 @@
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = null;" tabindex="-1">
+  <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = undefined;" tabindex="-1">
     <template #main>
       <UCard>
         <div class="flex gap-2 flex-col flex-wrap sm:flex-row">
@@ -167,7 +168,7 @@
               </template>
             </USelectMenu>
 
-            <UButton @click="addItemModal = true" icon="i-heroicons-plus" />
+            <UButton @click="/*selectedItem = undefined;*/ inventoryItemModalOpen = true" icon="i-heroicons-plus" />
           </div>
 
 
@@ -219,7 +220,19 @@
         <UButton block :to="'/admin/inventories/items/' + selectedItem.id">Voir en détail</UButton>
       </template>
     </template>
+
   </GenericLayoutContentWithStickySide>
+
+  <UModal
+    v-model="inventoryItemModalOpen">
+    <UCard>
+      <InventoryItemForm
+        :item="selectedItem"
+        @updated="inventoryItemModalOpen = false; getItemsPaginated()"
+      />
+    </UCard>
+  </UModal>
+
 </template>
 
 <style scoped lang="scss">

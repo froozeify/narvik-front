@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type {PropType} from "vue";
+import type {PropType, Ref} from "vue";
 import type {Inventoryitem} from "~/types/inventoryitem";
 import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
 
 const props = defineProps({
   item: {
     type: Object as PropType<Inventoryitem>,
-    required: false
+    required: false,
   },
   viewOnly: {
     type: Boolean,
@@ -15,47 +15,94 @@ const props = defineProps({
   }
 })
 
-const item: Inventoryitem = props.item ?? {}
+const item: Ref<Inventoryitem> = toRef(props, 'item', {canBeSold: true, sellingQuantity: 1});
 
 const emit = defineEmits([
   'updated',
 ])
 
-const toast = useToast()
+const isUpdating = ref(false)
 
+const toast = useToast()
 const inventoryItemQuery = new InventoryItemQuery()
 
-const isUpdating = ref(false)
+async function updateItem() {
+  isUpdating.value = true
+  const isCreate = !item.value.id
+
+  // We unset some field we never want to send to the api
+  item.value.category = undefined //TODO: Add category selector
+
+  let errorMessage = null
+  if (isCreate) {
+    const { error } = await inventoryItemQuery.post(item.value)
+    if (error) {
+      errorMessage = error.message
+    }
+  } else {
+    const { error } = await inventoryItemQuery.patch(item.value, item.value)
+    if (error) {
+      errorMessage = error.message
+    }
+  }
+
+  isUpdating.value = false
+
+  if (errorMessage) {
+    toast.add({
+      title: "Une erreur est survenue",
+      description: errorMessage,
+      color: "red"
+    })
+  }
+
+  emit('updated')
+}
 
 </script>
 
 <template>
   <div class="flex gap-2 flex-col">
+    <pre>{{ item }}</pre>
+
     <UFormGroup label="Peut être vendu">
-      <UToggle :model-value="item.canBeSold" :disabled="props.viewOnly" />
+      <UToggle v-model="item.canBeSold" :disabled="props.viewOnly" />
     </UFormGroup>
+
 
     <UFormGroup v-if="item.barcode !== undefined" label="Code barre">
-      <UInput :model-value="item.barcode" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+      <UInput v-model="item.barcode" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
-    <UFormGroup
-      v-for="(value, key) in {
-                'Nom': item.name,
-                'Description': item.description,
-                'Prix d\'achat': item.purchasePrice,
-                'Prix de vente': item.sellingPrice,
-                'Vendue par': item.sellingQuantity,
-                'Quantité en stock': item.quantity
-              }"
-      :label="key"
-    >
-      <UInput :model-value="value" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    <UFormGroup label="Nom">
+      <UInput v-model="item.name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    </UFormGroup>
+
+    <UFormGroup label="Description">
+      <UInput v-model="item.description" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    </UFormGroup>
+
+    <UFormGroup label="Prix d'achat">
+      <UInput v-model="item.purchasePrice" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    </UFormGroup>
+
+    <UFormGroup label="Prix de vente">
+      <UInput v-model="item.sellingPrice" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    </UFormGroup>
+
+    <UFormGroup label="Vendue par (quantité)">
+      <UInput v-model="item.sellingQuantity" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    </UFormGroup>
+
+    <UFormGroup label="Quantité en stock">
+      <UInput v-model="item.quantity" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
     <UButton
-      class="mt-2"
       block
+      class="mt-2"
+      :loading="isUpdating"
+      @click="updateItem()"
     >
       <template v-if="item.id">
         Modifier
