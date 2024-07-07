@@ -7,6 +7,7 @@ const props = defineProps({
   item: {
     type: Object as PropType<Inventoryitem>,
     required: false,
+    default: { canBeSold: true, sellingQuantity: 1}
   },
   viewOnly: {
     type: Boolean,
@@ -15,7 +16,10 @@ const props = defineProps({
   }
 })
 
-const item: Ref<Inventoryitem> = toRef(props, 'item', {canBeSold: true, sellingQuantity: 1});
+const item: Ref<Inventoryitem> = ref(props.item)
+watch(props, value => {
+  item.value = props.item
+})
 
 const emit = defineEmits([
   'updated',
@@ -54,17 +58,16 @@ async function updateItem() {
       description: errorMessage,
       color: "red"
     })
+    return
   }
 
-  emit('updated')
+  emit('updated', item.value)
 }
 
 </script>
 
 <template>
   <div class="flex gap-2 flex-col">
-    <pre>{{ item }}</pre>
-
     <UFormGroup label="Peut être vendu">
       <UToggle v-model="item.canBeSold" :disabled="props.viewOnly" />
     </UFormGroup>
@@ -83,11 +86,11 @@ async function updateItem() {
     </UFormGroup>
 
     <UFormGroup label="Prix d'achat">
-      <UInput v-model="item.purchasePrice" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+      <UInput v-model="item.purchasePrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
     <UFormGroup label="Prix de vente">
-      <UInput v-model="item.sellingPrice" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+      <UInput v-model="item.sellingPrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
     <UFormGroup label="Vendue par (quantité)">
@@ -98,7 +101,7 @@ async function updateItem() {
       <UInput v-model="item.quantity" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
-    <UButton
+    <UButton v-if="!props.viewOnly"
       block
       class="mt-2"
       :loading="isUpdating"

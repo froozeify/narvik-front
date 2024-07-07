@@ -168,7 +168,7 @@
               </template>
             </USelectMenu>
 
-            <UButton @click="/*selectedItem = undefined;*/ inventoryItemModalOpen = true" icon="i-heroicons-plus" />
+            <UButton @click="selectedItem = undefined; inventoryItemModalOpen = true" icon="i-heroicons-plus" />
           </div>
 
 
@@ -194,11 +194,16 @@
           </template>
 
           <template #category-data="{ row }">
-            <UButton
+            <UButton v-if="row.category"
               variant="soft"
               :ui="{ rounded: 'rounded-full' }">
               {{ row.category.name }}
             </UButton>
+
+            <i v-else>
+              Pas de catégorie.
+            </i>
+
           </template>
 
         </UTable>
@@ -215,6 +220,13 @@
       <template v-if="selectedItem">
         <UCard class="overflow-y-auto">
           <InventoryItemForm :item="selectedItem" :view-only="true" />
+          <UButton
+            class="mt-4"
+            block
+            @click="inventoryItemModalOpen = true"
+          >
+            Modifier
+          </UButton>
         </UCard>
 
         <UButton block :to="'/admin/inventories/items/' + selectedItem.id">Voir en détail</UButton>
@@ -227,8 +239,8 @@
     v-model="inventoryItemModalOpen">
     <UCard>
       <InventoryItemForm
-        :item="selectedItem"
-        @updated="inventoryItemModalOpen = false; getItemsPaginated()"
+        :item="{...selectedItem}"
+        @updated="(value) => {selectedItem = value; inventoryItemModalOpen = false; getItemsPaginated() }"
       />
     </UCard>
   </UModal>
