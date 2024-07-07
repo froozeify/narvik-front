@@ -239,7 +239,7 @@
     v-model="inventoryItemModalOpen">
     <UCard>
       <InventoryItemForm
-        :item="{...selectedItem}"
+        :item="selectedItem ? {...selectedItem} : undefined"
         @updated="(value) => {selectedItem = value; inventoryItemModalOpen = false; getItemsPaginated() }"
       />
     </UCard>

@@ -30,6 +30,17 @@ const isUpdating = ref(false)
 const toast = useToast()
 const inventoryItemQuery = new InventoryItemQuery()
 
+// Camera detection setup
+
+const cameraPreview = ref(false)
+const cameraIsPresent = verifyCameraIsPresent()
+
+function onDecoded(value: string) {
+  item.value.barcode = value
+}
+
+// Api Query
+
 async function updateItem() {
   isUpdating.value = true
   const isCreate = !item.value.id
@@ -73,8 +84,26 @@ async function updateItem() {
     </UFormGroup>
 
 
-    <UFormGroup v-if="item.barcode !== undefined" label="Code barre">
-      <UInput v-model="item.barcode" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    <UFormGroup v-if="!props.viewOnly || item.barcode" label="Code barre">
+      <GenericBarcodeReader
+        class="mb-2"
+        v-model="cameraPreview"
+        @decoded="onDecoded"
+      />
+      <UInput
+        v-model="item.barcode"
+        :class="props.viewOnly ? 'pointer-events-none' : ''"
+        :tabindex="props.viewOnly ? '-1' : '0'"
+        :ui="{ icon: { trailing: { pointer: '' } } }"
+      >
+        <template #trailing v-if="cameraIsPresent">
+          <UIcon
+            class="cursor-pointer"
+            name="i-heroicons-qr-code"
+            @click="cameraPreview = true"
+          />
+        </template>
+      </UInput>
     </UFormGroup>
 
     <UFormGroup label="Nom">
