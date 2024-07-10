@@ -10,6 +10,6 @@ export interface Inventoryitem extends Item {
   purchasePrice?: string;
   sellingPrice?: string;
   sellingQuantity?: number;
-  quantity?: number
+  quantity?: number|null
   barcode?: string;
 }
