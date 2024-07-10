@@ -1,8 +1,8 @@
 import type {Item} from "./item";
-import type {Inventoryitem} from "~/types/inventoryitem";
+import type {InventoryItem} from "~/types/inventoryItem";
 
 export interface InventoryCategory extends Item {
   name?: string;
   weight?: number;
-  items?: Inventoryitem[];
+  items?: InventoryItem[];
 }

@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import type {PropType, Ref} from "vue";
-import type {Inventoryitem} from "~/types/inventoryitem";
+import type {InventoryItem} from "~/types/inventoryItem";
 import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
+import type {InventoryCategory} from "~/types/inventorycategory";
+import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
 
 const props = defineProps({
   item: {
-    type: Object as PropType<Inventoryitem>,
+    type: Object as PropType<InventoryItem>,
     required: false,
     default: { canBeSold: true, sellingQuantity: 1}
+  },
+  categories: {
+    type: Object as PropType<InventoryCategory[]>,
+    required: false,
   },
   viewOnly: {
     type: Boolean,
@@ -16,9 +22,15 @@ const props = defineProps({
   }
 })
 
-const item: Ref<Inventoryitem> = ref(props.item)
-watch(props, value => {
+const item: Ref<InventoryItem> = ref(props.item)
+// const selectedCategory: Ref<InventoryCategory | undefined> = ref(undefined)
+const categories: Ref<InventoryCategory[] | undefined> = ref(props.categories)
+
+watch(props, async value => {
   item.value = props.item
+  if (!props.categories) {
+    await getCategories()
+  }
 })
 
 const emit = defineEmits([
@@ -29,6 +41,7 @@ const isUpdating = ref(false)
 
 const toast = useToast()
 const inventoryItemQuery = new InventoryItemQuery()
+const inventoryCategoryQuery = new InventoryCategoryQuery()
 
 // Camera detection setup
 
@@ -45,8 +58,18 @@ async function updateItem() {
   isUpdating.value = true
   const isCreate = !item.value.id
 
-  // We unset some field we never want to send to the api
-  item.value.category = undefined //TODO: Add category selector
+  if (item.value.category) {
+    item.value.category = item.value.category["@id"]
+  } else {
+    item.value.category = null
+  }
+
+  if (!item.value.quantity) {
+    item.value.quantity = null
+  }
+  if (!item.value.sellingQuantity) {
+    item.value.sellingQuantity = 1
+  }
 
   let errorMessage = null
   if (isCreate) {
@@ -75,6 +98,14 @@ async function updateItem() {
   emit('updated', item.value)
 }
 
+if (!categories.value) {
+  getCategories()
+}
+async function getCategories() {
+  const { items } = await inventoryCategoryQuery.getAll();
+  categories.value = items.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
+}
+
 </script>
 
 <template>
@@ -83,6 +114,39 @@ async function updateItem() {
       <UToggle v-model="item.canBeSold" :disabled="props.viewOnly" />
     </UFormGroup>
 
+    <UFormGroup label="Catégorie">
+      <USelectMenu
+        v-model="item.category"
+        :options="categories"
+        option-attribute="name"
+        :class="props.viewOnly ? 'pointer-events-none' : ''"
+        :tabindex="props.viewOnly ? '-1' : '0'"
+        :ui="{ icon: { trailing: { pointer: '' } } }"
+      >
+        <template #label>
+          <span v-if="item.category">
+            {{ item.category.name }}
+          </span>
+          <span v-else><i>Aucune catégorie</i></span>
+        </template>
+
+        <template #trailing v-if="!props.viewOnly && item.category">
+          <UIcon
+            class="cursor-pointer"
+            name="i-heroicons-x-mark"
+            @click="item.category = null"
+          />
+        </template>
+      </USelectMenu>
+    </UFormGroup>
+
+    <UFormGroup label="Nom">
+      <UInput v-model="item.name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    </UFormGroup>
+
+    <UFormGroup label="Description">
+      <UInput v-model="item.description" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    </UFormGroup>
 
     <UFormGroup v-if="!props.viewOnly || item.barcode" label="Code barre">
       <GenericBarcodeReader
@@ -104,14 +168,6 @@ async function updateItem() {
           />
         </template>
       </UInput>
-    </UFormGroup>
-
-    <UFormGroup label="Nom">
-      <UInput v-model="item.name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
-
-    <UFormGroup label="Description">
-      <UInput v-model="item.description" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
     <UFormGroup label="Prix d'achat">

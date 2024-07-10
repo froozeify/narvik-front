@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {usePaginationValues} from "~/composables/api/list";
   import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-  import type {Inventoryitem} from "~/types/inventoryitem";
+  import type {InventoryItem} from "~/types/inventoryItem";
   import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
   import type {InventoryCategory} from "~/types/inventorycategory";
   import {verifyCameraIsPresent} from "~/utils/browser";
@@ -36,10 +36,10 @@
     }
   });
 
-  const apiItems: Ref<Inventoryitem[]> = ref([])
+  const apiItems: Ref<InventoryItem[]> = ref([])
   const isLoading = ref(true);
   const totalApiItems = ref(0)
-  const selectedItem: Ref<Inventoryitem | undefined> = ref(undefined)
+  const selectedItem: Ref<InventoryItem | undefined> = ref(undefined)
 
   watch(filteredCategories, () => {
     getItemsPaginated()
@@ -240,6 +240,7 @@
     <UCard>
       <InventoryItemForm
         :item="selectedItem ? {...selectedItem} : undefined"
+        :categories="categories"
         @updated="(value) => {selectedItem = value; inventoryItemModalOpen = false; getItemsPaginated() }"
       />
     </UCard>

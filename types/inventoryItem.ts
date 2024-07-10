@@ -1,8 +1,8 @@
 import type {Item} from "./item";
 import type {InventoryCategory} from "~/types/inventorycategory";
 
-export interface Inventoryitem extends Item {
-  category?: InventoryCategory;
+export interface InventoryItem extends Item {
+  category?: InventoryCategory|null;
 
   name?: string;
   description?: string;

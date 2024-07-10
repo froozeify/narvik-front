@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-  import type {Inventoryitem} from "~/types/inventoryitem";
+  import type {InventoryItem} from "~/types/inventoryItem";
 
   definePageMeta({
     layout: "pos"
@@ -12,8 +12,8 @@
   const route = useRoute()
   const itemId = route.params.id;
 
-  const inventoryItem: Ref<Inventoryitem | null> = ref(null)
-
+  const inventoryItemModalOpen = ref(false)
+  const inventoryItem: Ref<InventoryItem | undefined> = ref(undefined)
   const itemQuery = new InventoryItemQuery()
 
   // We load the item
@@ -30,10 +30,10 @@
 
   async function loadItem(): Promise<boolean> {
     isLoading.value = true
-    const { retrieved } = await itemQuery.get(itemId.toString())
+    const { retrieved, error } = await itemQuery.get(itemId.toString())
     isLoading.value = false
 
-    if (!retrieved) {
+    if (!retrieved || error) {
       return false
     }
 
@@ -45,6 +45,29 @@
     })
 
     return true
+  }
+
+  async function deleteItem(close: Function) {
+    if (!inventoryItem.value) return
+
+    const { error } = await itemQuery.delete(inventoryItem.value)
+
+    if (error) {
+      toast.add({
+        color: "red",
+        title: "La suppression a échouée",
+        description: error.message
+      })
+
+      return
+    }
+
+    toast.add({
+      color: "green",
+      title: "Produit supprimé",
+    })
+    close()
+    navigateTo('/admin/inventories')
   }
 </script>
 
@@ -66,14 +89,31 @@
         <UButton
           icon="i-heroicons-pencil-square"
           color="yellow"
+          @click="inventoryItemModalOpen = true"
         />
       </UTooltip>
 
       <UTooltip text="Supprimer">
-        <UButton
-          icon="i-heroicons-trash"
-          color="red"
-        />
+        <UPopover>
+          <UButton
+            icon="i-heroicons-trash"
+            color="red"
+          />
+
+          <template #panel="{ close }">
+            <div class="p-4 w-56 flex flex-col gap-4">
+              <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+
+              <UButton
+                @click="deleteItem(close);"
+                color="red"
+                class="mx-auto"
+              >
+                Supprimer
+              </UButton>
+            </div>
+          </template>
+        </UPopover>
       </UTooltip>
     </div>
 
@@ -109,6 +149,17 @@
       <div class="text-xl font-bold">Historique des prix de ventes/achats</div>
     </UCard>
   </div>
+
+  <UModal
+    v-model="inventoryItemModalOpen">
+    <UCard>
+      <InventoryItemForm
+        :item="inventoryItem ? {...inventoryItem} : undefined"
+        @updated="(value) => {inventoryItemModalOpen = false; loadItem() }"
+      />
+    </UCard>
+  </UModal>
+
 </template>
 
 <style scoped lang="scss">
