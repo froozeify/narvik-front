@@ -115,11 +115,19 @@ async function updateItem() {
     </UFormGroup>
 
     <UFormGroup label="Prix d'achat">
-      <UInput v-model="item.purchasePrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+      <UInput v-model="item.purchasePrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'">
+        <template #trailing>
+          <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
+        </template>
+      </UInput>
     </UFormGroup>
 
     <UFormGroup label="Prix de vente">
-      <UInput v-model="item.sellingPrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+      <UInput v-model="item.sellingPrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'">
+        <template #trailing>
+          <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
+        </template>
+      </UInput>
     </UFormGroup>
 
     <UFormGroup label="Vendue par (quantité)">
