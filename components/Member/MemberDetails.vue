@@ -410,7 +410,7 @@
         <div class="flex gap-4">
           <UTooltip v-if="isSupervisor" text="Liste des membres" class="">
             <UButton
-                @click="navigateTo('/admin/members')"
+                to="/admin/members"
                 icon="i-heroicons-arrow-left"
                 size="xs"
                 variant="ghost"

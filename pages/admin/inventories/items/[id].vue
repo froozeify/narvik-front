@@ -76,7 +76,7 @@
     <div class="flex gap-2">
       <UTooltip text="Inventaire">
         <UButton
-          @click="navigateTo('/admin/inventories')"
+          to="/admin/inventories"
           icon="i-heroicons-arrow-left"
           size="xs"
           variant="ghost"
