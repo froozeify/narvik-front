@@ -121,13 +121,13 @@
 
       <GenericStatCard
         title="Prix d'achat"
-        :value="inventoryItem?.purchasePrice ? inventoryItem.purchasePrice + ' €' : 'Non défini'"
+        :value="inventoryItem?.purchasePrice ? inventoryItem.purchasePrice.replace('.', ',') + ' €' : 'Non défini'"
         :loading="isLoading">
       </GenericStatCard>
 
       <GenericStatCard
         title="Prix de vente"
-        :value="inventoryItem?.sellingPrice ? inventoryItem.sellingPrice + ' €' : 'Non défini'"
+        :value="inventoryItem?.sellingPrice ? inventoryItem.sellingPrice.replace('.', ',') + ' €' : 'Non défini'"
         :loading="isLoading">
       </GenericStatCard>
 
