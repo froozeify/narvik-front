@@ -23,7 +23,7 @@
   const categories: Ref<InventoryCategory[]> = ref([])
   const filteredCategories: Ref<InventoryCategory[]> = ref([])
   itemCategoryQuery.getAll().then(value => {
-    categories.value = value.items.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
+    categories.value = value.items
 
     // Filter is apply on a category
     if (!isNaN(queryParams.category)) {
@@ -87,15 +87,16 @@
       itemsPerPage: itemsPerPage.value.toString(),
     });
 
-    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
-    urlParams.append(`order[category.name]`, 'asc');
-
     if (filteredCategories.value.length > 0) {
       filteredCategories.value.forEach(filteredCategory => {
         if (!filteredCategory.id) return;
         urlParams.append('category.id[]', filteredCategory.id.toString())
       })
+    } else {
+      urlParams.append(`order[category.weight]`, 'asc');
     }
+
+    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
 
     if (searchQuery.value.trim().length > 0) {
       urlParams.append('multiple[name, barcode]', searchQuery.value.trim())
