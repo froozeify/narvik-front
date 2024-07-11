@@ -3,6 +3,10 @@
   import type {InventoryItem} from "~/types/inventoryItem";
   import type {InventoryItemHistory} from "~/types/inventoryItemHistory";
 
+  import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors } from 'chart.js'
+  import { Line} from 'vue-chartjs'
+  ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors)
+
   definePageMeta({
     layout: "pos"
   });
@@ -17,6 +21,12 @@
 
   const inventoryItem: Ref<InventoryItem | undefined> = ref(undefined)
   const inventoryItemHistories: Ref<InventoryItemHistory[]> = ref([])
+
+  const chartData: Ref<object|undefined> = ref(undefined)
+  const chartOptions = ref({
+    responsive: true,
+    maintainAspectRatio: true,
+  })
 
   const itemQuery = new InventoryItemQuery()
 
@@ -63,6 +73,32 @@
     }
 
     inventoryItemHistories.value = items
+
+
+
+    let labels: string[] = [];
+    let dataPurchasePrice: string[] = [];
+    let dataSellingPrice: string[] = [];
+
+    items.reverse().forEach(value => {
+      labels.push(formatDateTime(value.date?.toString()) ?? '')
+      dataPurchasePrice.push(value.purchasePrice ?? '')
+      dataSellingPrice.push(value.sellingPrice ?? '')
+    })
+
+    chartData.value = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Prix d\'achat',
+          data: dataPurchasePrice
+        },
+        {
+          label: 'Prix de vente',
+          data: dataSellingPrice
+        }
+      ]
+    }
   }
 
   async function deleteItem(close: Function) {
@@ -172,9 +208,12 @@
       </GenericStatCard>
     </div>
 
-    <UCard>
+    <UCard v-if="chartData">
       <div class="text-xl font-bold">Historique des prix de ventes/achats</div>
-      <pre>{{ inventoryItemHistories }}</pre>
+      <Line
+        :data="chartData"
+        :options="chartOptions"
+      />
     </UCard>
   </div>
 
