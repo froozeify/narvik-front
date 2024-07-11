@@ -83,7 +83,16 @@
         />
       </UTooltip>
 
-      <div class="flex-1 text-center font-bold text-2xl">{{ inventoryItem?.name }}</div>
+      <div class="flex-1 text-center font-bold text-2xl flex justify-center gap-2 ">
+        {{ inventoryItem?.name }}
+
+        <UButton v-if="inventoryItem?.category"
+           :to="'/admin/inventories?category=' + inventoryItem.category.id"
+           variant="soft"
+           :ui="{ rounded: 'rounded-full' }">
+          {{ inventoryItem.category.name }}
+        </UButton>
+      </div>
 
       <UTooltip text="Modifier">
         <UButton
