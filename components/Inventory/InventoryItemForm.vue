@@ -64,10 +64,10 @@ async function updateItem() {
     item.value.category = null
   }
 
-  if (Number.isNaN(item.value.quantity)) {
+  if (Number.isNaN(item.value.quantity) || item.value.quantity?.toString() == '') {
     item.value.quantity = null
   }
-  if (Number.isNaN(item.value.sellingQuantity)) {
+  if (Number.isNaN(item.value.sellingQuantity) || item.value.sellingQuantity?.toString() == '') {
     item.value.sellingQuantity = 1
   }
 
