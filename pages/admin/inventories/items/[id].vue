@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
   import type {InventoryItem} from "~/types/inventoryItem";
+  import type {InventoryItemHistory} from "~/types/inventoryItemHistory";
 
   definePageMeta({
     layout: "pos"
@@ -13,7 +14,10 @@
   const itemId = route.params.id;
 
   const inventoryItemModalOpen = ref(false)
+
   const inventoryItem: Ref<InventoryItem | undefined> = ref(undefined)
+  const inventoryItemHistories: Ref<InventoryItemHistory[]> = ref([])
+
   const itemQuery = new InventoryItemQuery()
 
   // We load the item
@@ -44,7 +48,21 @@
       title: retrieved.name
     })
 
+    loadHistories(itemId.toString())
+
     return true
+  }
+
+  async function loadHistories(itemId: string) {
+    // We load the history
+    const { items, error } = await itemQuery.histories(itemId.toString())
+
+    if (error) {
+      inventoryItemHistories.value = []
+      return;
+    }
+
+    inventoryItemHistories.value = items
   }
 
   async function deleteItem(close: Function) {
@@ -156,6 +174,7 @@
 
     <UCard>
       <div class="text-xl font-bold">Historique des prix de ventes/achats</div>
+      <pre>{{ inventoryItemHistories }}</pre>
     </UCard>
   </div>
 
