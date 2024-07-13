@@ -105,7 +105,7 @@
     }
 
     // We verify if it's a creation or an update
-    let error: null | Error = null
+    let error: Error | null = null
     if (!category.id) {
       await apiQuery.post(payload).then(value => {
         error = value.error
@@ -161,7 +161,7 @@
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide :display-side="isVisible" @keyup.esc="isVisible = false; selectedCategory = null;" tabindex="-1">
+  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedCategory = null;" tabindex="-1">
     <template #main>
       <UCard>
 
