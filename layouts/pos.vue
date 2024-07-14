@@ -43,6 +43,11 @@
       label: 'Catégorie',
       icon: 'i-heroicons-tag',
       to: '/admin/inventories/categories'
+    },
+    {
+      label: 'Moyen de paiement',
+      icon: 'i-heroicons-credit-card',
+      to: '/admin/sales/payment-modes'
     }
   ]
 

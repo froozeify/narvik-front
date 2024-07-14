@@ -1,29 +1,29 @@
 <script setup lang="ts">
-  import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
-  import type {InventoryCategory} from "~/types/inventorycategory";
-  import {usePaginationValues} from "~/composables/api/list";
-  import type {Member} from "~/types/member";
+import type {InventoryCategory} from "~/types/inventorycategory";
+import {usePaginationValues} from "~/composables/api/list";
+import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
+import type {SalePaymentMode} from "~/types/salePaymentMode";
 
-  definePageMeta({
+definePageMeta({
     layout: "pos"
   });
 
   useHead({
-    title: 'Catégorie d\'inventaire'
+    title: 'Moyen de paiement'
   })
 
   const toast = useToast()
-  const apiQuery = new InventoryCategoryQuery();
+  const apiQuery = new SalePaymentModeQuery()
 
-  const categories: Ref<InventoryCategory[]> = ref([])
+  const paymentModes: Ref<SalePaymentMode[]> = ref([])
   const isLoading = ref(true);
-  const totalCategories = ref(0)
-  const selectedCategory: Ref<InventoryCategory | null> = ref(null)
+  const totalPaymentModes = ref(0)
+  const selectedPaymentMode: Ref<SalePaymentMode | null> = ref(null)
 
   // Side menu visible
   const isVisible = ref(false);
   // We watch the selected item so we close the side menu if unselected
-  watch(selectedCategory, (value, oldValue) => {
+  watch(selectedPaymentMode, (value, oldValue) => {
     isVisible.value = value !== null
   })
 
@@ -37,7 +37,11 @@
   const columns = [
     {
       key: 'name',
-      label: 'Nom',
+      label: 'Nom'
+    },
+    {
+      key: 'icon',
+      label: 'Icône',
       class: 'w-full'
     },
     {
@@ -46,9 +50,9 @@
   ]
 
   // We get the data from the api on first page load
-  getCategoriesPaginated()
+  getPaymentModesPaginated()
 
-  async function getCategoriesPaginated() {
+  async function getPaymentModesPaginated() {
     isLoading.value = true
 
     const urlParams = new URLSearchParams({
@@ -60,16 +64,16 @@
     urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
 
     const { totalItems, items } = await apiQuery.getAll(urlParams)
-    categories.value = items
+    paymentModes.value = items
     if (totalItems) {
-      totalCategories.value = totalItems
+      totalPaymentModes.value = totalItems
     }
 
     isLoading.value = false
   }
 
   function rowClicked(row: object) {
-    selectedCategory.value = {...row} // We make a shallow clone
+    selectedPaymentMode.value = {...row} // We make a shallow clone
     isVisible.value = true
   }
 
@@ -88,31 +92,32 @@
     }
 
     // We refresh the list
-    await getCategoriesPaginated();
+    await getPaymentModesPaginated();
   }
 
-  async function createCategory() {
-    let category: InventoryCategory = {
-      name: ''
+  async function createPaymentMode() {
+    selectedPaymentMode.value = {
+      name: '',
+      icon: ''
     }
-    selectedCategory.value = category
   }
 
-  async function updateCategory(category: InventoryCategory) {
+  async function updatePaymentMode(paymentMode: SalePaymentMode) {
     isLoading.value = true
-    let payload: InventoryCategory = {
-      name: category.name
+    let payload: SalePaymentMode = {
+      name: paymentMode.name,
+      icon: paymentMode.icon
     }
 
     // We verify if it's a creation or an update
     let error: Error | null = null
-    if (!category.id) {
+    if (!paymentMode.id) {
       await apiQuery.post(payload).then(value => {
         error = value.error
-        selectedCategory.value = null
+        selectedPaymentMode.value = null
       });
     } else { // Update
-      await apiQuery.patch(category, payload).then(value => {
+      await apiQuery.patch(paymentMode, payload).then(value => {
         error = value.error
       });
     }
@@ -122,7 +127,7 @@
     if (error) {
       toast.add({
         color: "red",
-        title: !category.id ? "La création a échouée" : "La modification a échouée",
+        title: !paymentMode.id ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
       return;
@@ -130,16 +135,16 @@
 
     toast.add({
       color: "green",
-      title: !category.id ? "Catégorie créée" : "Catégorie modifiée",
+      title: !paymentMode.id ? "Moyen de paiement crée" : "Moyen de paiement modifié",
     });
 
     // We refresh the list
-    await getCategoriesPaginated();
+    await getPaymentModesPaginated();
   }
 
-  async function deleteCategory(close: Function) {
+  async function deletePaymentMode(close: Function) {
     isLoading.value = true
-    const { error } = await apiQuery.delete(selectedCategory.value)
+    const { error } = await apiQuery.delete(selectedPaymentMode.value)
     isLoading.value = false
     close()
 
@@ -152,23 +157,23 @@
       return;
     }
 
-    selectedCategory.value = null
+    selectedPaymentMode.value = null
     // We refresh the list
-    await getCategoriesPaginated();
+    await getPaymentModesPaginated();
   }
 
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedCategory = null;" tabindex="-1">
+  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedPaymentMode = null;" tabindex="-1">
     <template #main>
       <UCard>
 
         <div class="flex gap-4">
 
           <div class="flex-1"></div>
-          <UButton @click="createCategory" >
-            Créer une catégorie
+          <UButton @click="createPaymentMode" >
+            Créer un mode de paiement
           </UButton>
         </div>
 
@@ -177,16 +182,21 @@
           :loading="isLoading"
           :sort="sort"
           :columns="columns"
-          :rows="categories"
+          :rows="paymentModes"
           @select="rowClicked">
           <template #empty-state>
             <div class="flex flex-col items-center justify-center py-6 gap-3">
-              <span class="italic text-sm">Aucune catégories.</span>
+              <span class="italic text-sm">Aucun moyen de paiement.</span>
             </div>
           </template>
 
           <template #name-data="{ row }">
             {{ row.name }}
+          </template>
+
+
+          <template #icon-data="{ row }">
+            <UIcon :name="'i-heroicons-' + row.icon" dynamic />
           </template>
 
           <template #actions-data="{ row }">
@@ -196,34 +206,52 @@
         </UTable>
 
         <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-          <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getCategoriesPaginated()" />
-          <UPagination v-model="page" @update:model-value="getCategoriesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalCategories" />
+          <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getPaymentModesPaginated()" />
+          <UPagination v-model="page" @update:model-value="getPaymentModesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalPaymentModes" />
         </div>
 
       </UCard>
     </template>
 
     <template #side>
-      <template v-if="selectedCategory">
+      <template v-if="selectedPaymentMode">
         <UCard class="overflow-y-auto">
 
           <div class="flex gap-2 flex-col">
-            <UFormGroup label="Nom" :error="!selectedCategory.name && 'Champ requis'">
-              <UInput v-model="selectedCategory.name" />
+            <UFormGroup label="Nom" :error="!selectedPaymentMode.name && 'Champ requis'">
+              <UInput v-model="selectedPaymentMode.name" />
+            </UFormGroup>
+
+            <UFormGroup
+              label="Icône"
+              :error="!selectedPaymentMode.icon && 'Champ requis'">
+
+              <template #description>
+                <UButton variant="link" to="https://heroicons.com/" target="_blank" :padded="false">Liste des icônes Heroicons</UButton>
+                <ul class="text-xs">
+                  <li>Espèces : <code>banknotes</code></li>
+                  <li>Chèque : <code>ticket</code></li>
+                  <li>Carte : <code>credit-card</code></li>
+                </ul>
+              </template>
+
+              <template #hint>
+                <UIcon :name="'i-heroicons-' + selectedPaymentMode.icon" dynamic />
+              </template>
+
+              <UInput v-model="selectedPaymentMode.icon" />
+
             </UFormGroup>
           </div>
 
         </UCard>
 
-        <UButton v-if="selectedCategory.id" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + selectedCategory.id">Voir les articles</UButton>
+        <UButton block :loading="isLoading" @click="updatePaymentMode(selectedPaymentMode)">Enregistrer</UButton>
 
-        <UButton block :loading="isLoading" @click="updateCategory(selectedCategory)">Enregistrer</UButton>
-
-        <UPopover v-if="selectedCategory.id">
+        <UPopover v-if="selectedPaymentMode.id">
           <UButton
             color="red" block
             :loading="isLoading"
-            :disabled="selectedCategory.items?.length > 0"
           >
             Supprimer
           </UButton>
@@ -233,7 +261,7 @@
               <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
               <UButton
-                @click="deleteCategory(close)"
+                @click="deletePaymentMode(close)"
                 color="red"
                 class="mx-auto"
               >
