@@ -1,8 +1,8 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {Member} from "~/types/member";
-import type {FetchAllData} from "~/types/api";
-import {useFetchItem, useFetchList, usePost, usePut, useGetCsv, useUploadFile} from "~/composables/api/api";
+import {useFetchItem, useFetchList, useGetCsv, usePost, usePut, useUploadFile} from "~/composables/api/api";
 import type {MemberPresence} from "~/types/memberpresence";
+import type {MemberSeason} from "~/types/memberseason";
 
 export default class MemberQuery extends AbstractQuery<Member> {
     rootPath = "members";
@@ -29,6 +29,18 @@ export default class MemberQuery extends AbstractQuery<Member> {
 
     async importPhotosFromItac(formData: FormData) {
         return useUploadFile(this.rootPath + "/-/photos-from-itac", formData)
+    }
+
+    async seasons(id: number | string, urlParams?: URLSearchParams) {
+      let url = `${this.rootPath}/${id}/seasons`;
+
+      if (!urlParams) {
+        urlParams = new URLSearchParams()
+      }
+
+      url += '?' + urlParams.toString()
+
+      return useFetchList<MemberSeason>(url)
     }
 
     async presences(id: number|string, urlParams?: URLSearchParams) {
