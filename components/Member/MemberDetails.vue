@@ -494,7 +494,7 @@
         </div>
 
         <div class="flex items-center justify-center flex-wrap gap-1">
-          <div v-if="member.currentSeason" class="basis-full text-center">
+          <div v-if="!member.currentSeason" class="basis-full text-center">
             <UButton
               color="red"
               :ui="{ rounded: 'rounded-full' }">

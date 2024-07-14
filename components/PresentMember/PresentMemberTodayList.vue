@@ -9,12 +9,21 @@ import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExte
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
 import {formatDateReadable, formatTimeReadable} from "~/utils/date";
 import type {ExternalPresence} from "~/types/externalpresence";
+import {useSelfMemberStore} from "~/stores/useSelfMember";
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
 const externalPresenceStore = useExternalPresenceStore()
 const presentMembers: Ref<MemberPresence[] | undefined> = ref(undefined);
 const isRefreshing: Ref<boolean> = ref(false)
+
+const selfStore = useSelfMemberStore();
+const isSupervisor = selfStore.hasSupervisorRole()
+if (isSupervisor) {
+  setInterval(() => {
+    getPresences(true)
+  }, 30000)
+}
 
 getPresences()
 
