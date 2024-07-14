@@ -17,14 +17,14 @@
 
   const salesSection = [
     {
-      label: 'Ventes',
-      icon: 'i-heroicons-shopping-cart',
-      to: '/admin/sales'
-    },
-    {
       label: 'Faire une vente',
       icon: 'i-heroicons-banknotes',
       to: '/admin/sales/new'
+    },
+    {
+      label: 'Ventes du jour',
+      icon: 'i-heroicons-shopping-cart',
+      to: '/admin/sales'
     },
     {
       label: 'Historique',

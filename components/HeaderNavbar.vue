@@ -65,7 +65,7 @@
           </NuxtLink>
         </li>
         <li v-if="isSupervisor">
-          <UButton to="/admin/sales" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
+          <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
         </li>
       </ul>
       <div class="flex gap-4">
