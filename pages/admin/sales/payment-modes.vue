@@ -235,7 +235,7 @@ definePageMeta({
                 </ul>
               </template>
 
-              <template #hint>
+              <template #hint v-if="selectedPaymentMode.icon">
                 <UIcon :name="'i-heroicons-' + selectedPaymentMode.icon" dynamic />
               </template>
 
