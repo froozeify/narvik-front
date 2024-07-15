@@ -81,7 +81,7 @@
     let dataSellingPrice: string[] = [];
 
     items.reverse().forEach(value => {
-      labels.push(formatDateTime(value.date?.toString()) ?? '')
+      labels.push(formatDateTime(value.createdAt) ?? '')
       dataPurchasePrice.push(value.purchasePrice ?? '')
       dataSellingPrice.push(value.sellingPrice ?? '')
     })
@@ -181,7 +181,6 @@
     </div>
 
     <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-4">
-
       <GenericStatCard
         title="Prix d'achat"
         :value="inventoryItem?.purchasePrice ? inventoryItem.purchasePrice.replace('.', ',') + ' €' : 'Non défini'"
