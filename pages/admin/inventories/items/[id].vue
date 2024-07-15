@@ -5,6 +5,7 @@
 
   import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors } from 'chart.js'
   import { Line} from 'vue-chartjs'
+  import {formatMonetary} from "~/utils/string";
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors)
 
   definePageMeta({
@@ -183,13 +184,13 @@
     <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-4">
       <GenericStatCard
         title="Prix d'achat"
-        :value="inventoryItem?.purchasePrice ? inventoryItem.purchasePrice.replace('.', ',') + ' €' : 'Non défini'"
+        :value="formatMonetary(inventoryItem?.purchasePrice)"
         :loading="isLoading">
       </GenericStatCard>
 
       <GenericStatCard
         title="Prix de vente"
-        :value="inventoryItem?.sellingPrice ? inventoryItem.sellingPrice.replace('.', ',') + ' €' : 'Non défini'"
+        :value="formatMonetary(inventoryItem?.sellingPrice)"
         :loading="isLoading">
       </GenericStatCard>
 
