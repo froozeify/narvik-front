@@ -45,7 +45,8 @@
 
     const urlParams = new URLSearchParams({
       page: page.toString(),
-      canBeSold: 'true'
+      canBeSold: 'true',
+      'exists[sellingPrice]': 'true'
     });
 
     const { items, view } = await inventoryItemQuery.getAll(urlParams)
