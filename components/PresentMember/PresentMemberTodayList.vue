@@ -19,11 +19,7 @@ const isRefreshing: Ref<boolean> = ref(false)
 
 const selfStore = useSelfMemberStore();
 const isSupervisor = selfStore.hasSupervisorRole()
-if (isSupervisor) {
-  setInterval(() => {
-    getPresences(true)
-  }, 30000)
-}
+let refreshInterval: NodeJS.Timeout
 
 getPresences()
 
@@ -183,11 +179,20 @@ function keyPressHandler(ev: KeyboardEvent) {
 onMounted(() => {
   externalPresenceStore.modalOpen = false
   window.addEventListener('keypress', keyPressHandler)
+  if (isSupervisor) {
+    refreshInterval = setInterval(() => {
+      getPresences(true)
+    }, 30000)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('keypress', keyPressHandler)
   externalPresenceStore.modalOpen = false
+  if (refreshInterval) {
+    console.log('tyse')
+    clearInterval(refreshInterval)
+  }
 })
 
 </script>
