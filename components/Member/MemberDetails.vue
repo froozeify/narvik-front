@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import type {PropType} from "vue";
-  import {getAvailableMemberRoles, type Member, MemberRole} from "~/types/member";
+  import {getAvailableMemberRoles, type Member} from "~/types/member";
   import MemberQuery from "~/composables/api/query/MemberQuery";
   import type {Image} from "~/types/image";
   import ImageQuery from "~/composables/api/query/ImageQuery";
@@ -12,10 +12,10 @@
   import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
   import { Doughnut } from 'vue-chartjs'
   import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
-  import type {ExternalPresence} from "~/types/externalpresence";
   import {usePaginationValues} from "~/composables/api/list";
   import ActivityQuery from "~/composables/api/query/ActivityQuery";
   import type {Activity} from "~/types/activity";
+  import type {MemberSeason} from "~/types/memberseason";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
@@ -54,6 +54,7 @@
   const memberProfileImage: Ref<Image | undefined> = ref(undefined)
   const memberPresences: Ref<MemberPresence[]> = ref([])
   const totalMemberPresences = computed(() => memberPresences.value.length)
+  const memberSeasons: Ref<MemberSeason[]> = ref([])
 
   const isLoadingMemberPresencesPaginated = ref(false)
   const memberPresencesPaginated: Ref<MemberPresence[]> = ref([])
@@ -245,8 +246,19 @@
     });
   }
 
+  async function getMemberSeasons() {
+    if (!member.value || !member.value.id) return;
+    const { error, items } = await memberQuery.seasons(member.value.id)
+    if (error) {
+      return
+    }
+    memberSeasons.value = items
+  }
+
   async function getMemberPresences() {
     if (!member.value || !member.value.id) return;
+
+    await getMemberSeasons()
 
     const presenceUrlParams = new URLSearchParams({
       'order[date]': 'desc',
@@ -479,6 +491,22 @@
         <div class="h-24 w-24 aspect-square self-center">
           <img class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800" v-if="memberProfileImage" :src="memberProfileImage.base64" />
           <USkeleton v-else class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+        </div>
+
+        <div class="flex items-center justify-center flex-wrap gap-1">
+          <div v-if="!member.currentSeason" class="basis-full text-center">
+            <UButton
+              color="red"
+              :ui="{ rounded: 'rounded-full' }">
+              Saison non renouvelée
+            </UButton>
+          </div>
+
+          <UButton
+            v-for="memberSeason in memberSeasons"
+            :ui="{ rounded: 'rounded-full' }">
+              {{ memberSeason.season.name}}
+          </UButton>
         </div>
 
         <div class="grid grid-cols-2">

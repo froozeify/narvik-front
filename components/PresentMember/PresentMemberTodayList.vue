@@ -9,12 +9,17 @@ import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExte
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
 import {formatDateReadable, formatTimeReadable} from "~/utils/date";
 import type {ExternalPresence} from "~/types/externalpresence";
+import {useSelfMemberStore} from "~/stores/useSelfMember";
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
 const externalPresenceStore = useExternalPresenceStore()
 const presentMembers: Ref<MemberPresence[] | undefined> = ref(undefined);
 const isRefreshing: Ref<boolean> = ref(false)
+
+const selfStore = useSelfMemberStore();
+const isSupervisor = selfStore.hasSupervisorRole()
+let refreshInterval: NodeJS.Timeout
 
 getPresences()
 
@@ -174,11 +179,20 @@ function keyPressHandler(ev: KeyboardEvent) {
 onMounted(() => {
   externalPresenceStore.modalOpen = false
   window.addEventListener('keypress', keyPressHandler)
+  if (isSupervisor) {
+    refreshInterval = setInterval(() => {
+      getPresences(true)
+    }, 30000)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('keypress', keyPressHandler)
   externalPresenceStore.modalOpen = false
+  if (refreshInterval) {
+    console.log('tyse')
+    clearInterval(refreshInterval)
+  }
 })
 
 </script>
