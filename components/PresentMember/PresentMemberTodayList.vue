@@ -190,7 +190,6 @@ onUnmounted(() => {
   window.removeEventListener('keypress', keyPressHandler)
   externalPresenceStore.modalOpen = false
   if (refreshInterval) {
-    console.log('tyse')
     clearInterval(refreshInterval)
   }
 })
