@@ -210,6 +210,13 @@ function fullNameClicked() {
               {{ member.currentSeason.ageCategory.name }}
             </UBadge>
 
+            <UButton
+              v-if="!member.currentSeason"
+              color="red"
+              :ui="{ rounded: 'rounded-full' }">
+              Saison non renouvelée
+            </UButton>
+
             <UBadge v-if="member.currentSeason && member.currentSeason.isSecondaryClub"
                     variant="subtle"
                     color="green"

@@ -311,6 +311,7 @@
     });
 
     urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+    urlParams.append(`order[createdAt]`, sort.value.direction);
 
     if (filteredActivities.value.length > 0) {
       filteredActivities.value.forEach(filteredActivity => {
@@ -370,6 +371,7 @@
     });
 
     urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+    urlParams.append(`order[createdAt]`, sort.value.direction);
 
     if (filteredActivities.value.length > 0) {
       filteredActivities.value.forEach(filteredActivity => {
@@ -618,7 +620,7 @@
           </template>
 
           <template #date-data="{row}">
-            {{ formatDateTime(row.date) }}
+            {{ formatDateTime(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
           </template>
 
           <template #activities-data="{row}">
