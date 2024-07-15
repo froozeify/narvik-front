@@ -70,6 +70,7 @@
 
 
     urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+    urlParams.append(`order[createdAt]`, sort.value.direction);
 
     if (selectedRange.value) {
       const formattedStartDate = formatDateInput(selectedRange.value.start.toString())
@@ -140,7 +141,7 @@
       </template>
 
       <template #date-data="{row}">
-        {{ formatDateReadable(row.date) }}
+        {{ formatDateReadable(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
       </template>
 
       <template #licence-data="{row}">
