@@ -139,6 +139,7 @@
           <UInput
             v-model="searchQuery"
             @update:model-value="searchQueryUpdated()"
+            autofocus
             placeholder="Rechercher..."
             :ui="{ icon: { trailing: { pointer: '' } } }"
           >

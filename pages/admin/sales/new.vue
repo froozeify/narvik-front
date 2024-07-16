@@ -110,6 +110,7 @@
           class="mb-4"
           v-model="searchQuery"
           @update:model-value="searchQueryUpdated()"
+          autofocus
           :loading="isLoading"
           placeholder="Rechercher..."
           :ui="{ icon: { trailing: { pointer: '' } } }"
