@@ -4,6 +4,7 @@ import type {InventoryItem} from "~/types/inventoryItem";
 import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
 import type {InventoryCategory} from "~/types/inventorycategory";
 import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
+import type {FormError, FormErrorEvent} from "#ui/types";
 
 const props = defineProps({
   item: {
@@ -42,6 +43,21 @@ const isUpdating = ref(false)
 const toast = useToast()
 const inventoryItemQuery = new InventoryItemQuery()
 const inventoryCategoryQuery = new InventoryCategoryQuery()
+
+// Form validation
+
+const validate = (state: any): FormError[] => {
+  const errors = []
+  if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
+  if (!state.sellingPrice) errors.push({ path: 'sellingPrice', message: 'Champ requis' })
+  return errors
+}
+
+async function onError(event: FormErrorEvent) {
+  const element = document.getElementById(event.errors[0].id)
+  element?.focus()
+  element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
 
 // Camera detection setup
 
@@ -109,7 +125,7 @@ async function getCategories() {
 </script>
 
 <template>
-  <div class="flex gap-2 flex-col">
+  <UForm class="flex gap-2 flex-col" :state="item" :validate="validate" @submit="updateItem" @error="onError">
     <UFormGroup label="Peut être vendu">
       <UToggle v-model="item.canBeSold" :disabled="props.viewOnly" />
     </UFormGroup>
@@ -140,7 +156,7 @@ async function getCategories() {
       </USelectMenu>
     </UFormGroup>
 
-    <UFormGroup label="Nom">
+    <UFormGroup label="Nom" name="name">
       <UInput v-model="item.name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
@@ -178,7 +194,7 @@ async function getCategories() {
       </UInput>
     </UFormGroup>
 
-    <UFormGroup label="Prix de vente">
+    <UFormGroup label="Prix de vente" name="sellingPrice">
       <UInput v-model="item.sellingPrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'">
         <template #trailing>
           <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
@@ -194,11 +210,10 @@ async function getCategories() {
       <UInput v-model="item.quantity" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
-    <UButton v-if="!props.viewOnly"
+    <UButton type="submit" v-if="!props.viewOnly"
       block
       class="mt-2"
       :loading="isUpdating"
-      @click="updateItem()"
     >
       <template v-if="item.id">
         Modifier
@@ -207,7 +222,7 @@ async function getCategories() {
         Créer
       </template>
     </UButton>
-  </div>
+  </UForm>
 </template>
 
 <style scoped lang="scss">
