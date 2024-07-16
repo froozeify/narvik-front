@@ -142,11 +142,19 @@
             placeholder="Rechercher..."
             :ui="{ icon: { trailing: { pointer: '' } } }"
           >
-            <template #trailing v-if="cameraIsPresent">
+            <template #trailing v-if="cameraIsPresent || searchQuery">
               <UIcon
+                v-if="cameraIsPresent"
                 class="cursor-pointer"
                 name="i-heroicons-qr-code"
                 @click="cameraPreview = true"
+              />
+
+              <UIcon
+                v-if="searchQuery"
+                class="cursor-pointer"
+                name="i-heroicons-x-mark"
+                @click="searchQuery = ''; getItemsPaginated()"
               />
             </template>
           </UInput>
