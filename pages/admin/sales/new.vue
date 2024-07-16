@@ -17,7 +17,10 @@
   const inventoryItemQuery = new InventoryItemQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
 
+  const searchQuery: Ref<string> = ref('')
+
   const inventoryItems: Ref<InventoryItem[]> = ref([])
+  const inventoryItemsLoading: Ref<InventoryItem[]> = ref([])
   const orderedItems = computed( () => {
     let categories = new Map<string, InventoryItem[]>()
     inventoryItems.value.forEach(item => {
@@ -43,21 +46,48 @@
   async function loadItems(page: number = 1) {
     isLoading.value = true
 
+    if (page === 1) {
+      inventoryItemsLoading.value = []
+    }
+
     const urlParams = new URLSearchParams({
       page: page.toString(),
       canBeSold: 'true',
       'exists[sellingPrice]': 'true'
     });
 
+    if (searchQuery.value.trim().length > 0) {
+      urlParams.append('multiple[name, barcode]', searchQuery.value.trim())
+    }
+
     const { items, view } = await inventoryItemQuery.getAll(urlParams)
-    inventoryItems.value = inventoryItems.value.concat(items)
+    inventoryItemsLoading.value = inventoryItemsLoading.value.concat(items)
 
     if (view &&view["hydra:next"]) {
       await loadItems(page + 1)
       return;
     }
 
+    inventoryItems.value = inventoryItemsLoading.value
     isLoading.value = false
+  }
+
+  let inputTimer: NodeJS.Timeout;
+  async function searchQueryUpdated() {
+    clearTimeout(inputTimer);
+    inputTimer = setTimeout(async () => {
+      await loadItems()
+    }, 250);
+  }
+
+  // Camera detection setup
+
+  const cameraPreview = ref(false)
+  const cameraIsPresent = verifyCameraIsPresent()
+
+  function onDecoded(value: string) {
+    searchQuery.value = value
+    loadItems()
   }
 
   // We load the page content
@@ -70,7 +100,39 @@
   <GenericLayoutContentWithStickySide>
     <template #main>
       <UCard>
-        <div v-for="[title, items] in orderedItems" class="test">
+        <GenericBarcodeReader
+          class="mb-4"
+          v-model="cameraPreview"
+          @decoded="onDecoded"
+        />
+
+        <UInput
+          class="mb-4"
+          v-model="searchQuery"
+          @update:model-value="searchQueryUpdated()"
+          :loading="isLoading"
+          placeholder="Rechercher..."
+          :ui="{ icon: { trailing: { pointer: '' } } }"
+        >
+          <template #trailing v-if="cameraIsPresent || searchQuery">
+            <UIcon
+              v-if="cameraIsPresent"
+              class="cursor-pointer"
+              name="i-heroicons-qr-code"
+              @click="cameraPreview = true"
+            />
+
+            <UIcon
+              v-if="searchQuery"
+              class="cursor-pointer"
+              name="i-heroicons-x-mark"
+              @click="searchQuery = ''; loadItems()"
+            />
+          </template>
+        </UInput>
+        <UProgress v-if="isLoading" animation="swing" class="mb-2" />
+
+        <div v-for="[title, items] in orderedItems">
           <div class="text-xl font-bold mb-2">{{ title }}</div>
           <div
             v-for="item in items"
@@ -83,6 +145,16 @@
             </div>
             <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
             <UButton icon="i-heroicons-shopping-cart" size="2xs" />
+          </div>
+        </div>
+
+        <div v-if="!isLoading && orderedItems.size < 1" class="text-center">
+          <i>Aucun résultats</i>
+        </div>
+        <div v-if="isLoading && orderedItems.size < 1" class="text-center">
+          <div v-for="i in (Math.floor(Math.random()*6) + 2)">
+            <USkeleton class="h-4 w-32" />
+            <USkeleton class="h-4 w-full my-4" />
           </div>
         </div>
       </UCard>
