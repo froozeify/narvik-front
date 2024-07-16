@@ -43,6 +43,15 @@
     return categories
   })
 
+  const cart: Ref<Map<string, {item: InventoryItem, quantity: number}>> = ref(new Map())
+  const cartTotalPrice = computed( () => {
+    let total: number = 0
+    cart.value.forEach( item => {
+      total += item.quantity * Number(item.item.sellingPrice)
+    } )
+    return !isNaN(total) ? total.toFixed(2) : '0.00'
+  } )
+
   async function loadItems(page: number = 1) {
     isLoading.value = true
 
@@ -88,6 +97,27 @@
   function onDecoded(value: string) {
     searchQuery.value = value
     loadItems()
+  }
+
+  // Cart management
+  function addToCart(item: InventoryItem, modifier: number = 1) {
+    if (!item.id) {
+      return
+    }
+
+    let cartItem = cart.value.get(item.id.toString())
+
+    if (!cartItem) {
+      cartItem = { quantity: modifier, item: item }
+    } else {
+      cartItem.quantity += modifier
+    }
+
+    if (cartItem.quantity <= 0) {
+      cart.value.delete(item.id.toString())
+    } else {
+      cart.value.set(item.id.toString(), cartItem)
+    }
   }
 
   // We load the page content
@@ -137,7 +167,7 @@
           <div class="text-xl font-bold mb-2">{{ title }}</div>
           <div
             v-for="item in items"
-            class="flex items-center gap-2 mb-1 cursor-pointer hover:bg-neutral-100 dark:hover:bg-gray-800/50 rounded-md"
+            class="flex items-center gap-2 mb-1 hover:bg-neutral-100 dark:hover:bg-gray-800/50 rounded-md"
           >
             <div class="flex-1 flex flex-col">
               <div class="flex-1">{{ item.name }}</div>
@@ -145,7 +175,7 @@
               <div v-if="item.description" class="text-xs">{{ item.description }}</div>
             </div>
             <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
-            <UButton icon="i-heroicons-shopping-cart" size="2xs" />
+            <UButton icon="i-heroicons-shopping-cart" size="2xs" @click="addToCart(item)" />
           </div>
         </div>
 
@@ -163,16 +193,28 @@
 
     <template #side>
       <UCard class="overflow-y-auto">
-        <div class="text-4xl text-center">xx.xx €</div>
-        <ul class="mt-4">
-          <li v-for="i in 4" class="flex items-center gap-2 mb-1">
-            <GenericStackedUpDown />
+        <div class="text-4xl text-center">{{ formatMonetary(cartTotalPrice) }}</div>
+        <div class="mt-4">
+          <div v-if="cart.size < 1" class="text-center">
+            <i>Aucun articles</i>
+          </div>
+          <div v-for="[id , cartItem] in cart" class="flex items-center gap-2 mb-1">
+            <GenericStackedUpDown @changed="modifier => { addToCart(cartItem.item, modifier) }" />
 
-            <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">1</div>
-            <div class="text-sm flex-1 leading-tight">Item long titre {{ i }}</div>
-            <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">xx,xx €</div>
-          </li>
-        </ul>
+            <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ cartItem.quantity }}</div>
+            <div class="text-sm flex-1 leading-tight">{{ cartItem.item.name }}</div>
+            <UTooltip :text="'Prix unitaire : ' + formatMonetary(cartItem.item.sellingPrice)">
+              <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">
+                <template v-if="cartItem.item.sellingPrice">
+                  {{ formatMonetary(Number(Number(cartItem.item.sellingPrice) * cartItem.quantity).toFixed(2)) }}
+                </template>
+                <template v-else>
+                  {{ formatMonetary(cartItem.item.sellingPrice) }}
+                </template>
+              </div>
+            </UTooltip>
+          </div>
+        </div>
       </UCard>
 
       <UCard>
