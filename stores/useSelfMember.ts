@@ -107,13 +107,13 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
     const jwtToken = getSelfJwtToken()
 
     if (!jwtToken || !jwtToken.value) {
-      return displayJwtError("No auth token.")
+      return logJwtError("No auth token.")
     }
 
     // Access token is expired
     if (!jwtToken.value.access || !jwtToken.value.access.token || (jwtToken.value.access && jwtToken.value.access.date < new Date() )) {
       if (!(jwtToken.value.refresh && jwtToken.value.refresh.token)) {
-        return displayJwtError("No refresh access token.")
+        return logJwtError("No refresh access token.")
       }
 
       // Already refreshing
@@ -122,7 +122,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
         await delay(100)
         // Taking to long to refresh we are in timeout
         if (delayedCalled > 100) { // 10 secondes
-          return displayJwtError("Taking too long to refresh the token.", false);
+          return displayJwtError("Taking too long to refresh the token.", true);
         }
         return enhanceJwtTokenDefined(++delayedCalled);
       }
@@ -140,7 +140,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 
   async function useRefreshAccessToken(jwtToken: Ref<JwtToken|null>) {
     if (!jwtToken.value || !jwtToken.value.refresh || !jwtToken.value.refresh.token) {
-      console.error("No refresh token defined in the JwtToken")
+      logJwtError("No refresh token defined in the JwtToken", false)
       return null;
     }
 
