@@ -97,14 +97,16 @@ definePageMeta({
 
   async function createPaymentMode() {
     selectedPaymentMode.value = {
+      available: true,
       name: '',
-      icon: ''
+      icon: '',
     }
   }
 
   async function updatePaymentMode(paymentMode: SalePaymentMode) {
     isLoading.value = true
     let payload: SalePaymentMode = {
+      available: paymentMode.available,
       name: paymentMode.name,
       icon: paymentMode.icon
     }
@@ -218,6 +220,10 @@ definePageMeta({
         <UCard class="overflow-y-auto">
 
           <div class="flex gap-2 flex-col">
+            <UFormGroup label="Disponible">
+              <UToggle v-model="selectedPaymentMode.available" />
+            </UFormGroup>
+
             <UFormGroup label="Nom" :error="!selectedPaymentMode.name && 'Champ requis'">
               <UInput v-model="selectedPaymentMode.name" />
             </UFormGroup>
