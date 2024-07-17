@@ -21,11 +21,13 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
       const authCookie = useCookie('auth');
       if (!authCookie || authCookie.value == undefined) {
         selfJwtToken.value.access = undefined
+        refreshCookie('auth')
       }
 
       const refreshTokenCookie = useCookie('auth_refresh');
       if (!refreshTokenCookie || refreshTokenCookie.value == undefined) {
         selfJwtToken.value.refresh = undefined
+        refreshCookie('auth_refresh')
       }
 
       return selfJwtToken
@@ -66,6 +68,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
         sameSite: true,
       });
       authCookie.value = btoa(JSON.stringify(payload.access))
+      refreshCookie('auth')
     }
 
     if (payload.refresh && payload.refresh.date) {
@@ -75,7 +78,8 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
         httpOnly: false,
         sameSite: true,
       });
-      refreshTokenCookie.value = btoa(JSON.stringify(payload.refresh));
+      refreshTokenCookie.value = btoa(JSON.stringify(payload.refresh))
+      refreshCookie('auth_refresh')
     }
   }
 
@@ -90,6 +94,11 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
       title: "Erreur d'authentification",
       description: description
     })
+    return logJwtError(description, redirect)
+  }
+
+  function logJwtError(description: string, redirect: boolean = true) {
+    console.error('JWT Error: ' + description)
     logout(redirect)
     return ref(null)
   }
@@ -121,7 +130,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
       isRefreshingJwtToken.value = true
       const newJwtToken = await useRefreshAccessToken(jwtToken)
       if (!newJwtToken || !jwtToken.value) {
-        return displayJwtError("An error occurred when refreshing the token.")
+        return logJwtError('An error occurred when refreshing the token.')
       }
       isRefreshingJwtToken.value = false
     }
@@ -201,14 +210,18 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
   }
 
   function logout(redirect: boolean = true) {
+    if (!selfJwtToken.value && member.value == undefined) return;
+
     selfJwtToken.value = null
-    member.value = undefined;
+    member.value = undefined
 
     const authCookie = useCookie('auth');
     authCookie.value = null
+    refreshCookie('auth')
 
     const refreshTokenCookie = useCookie('auth_refresh');
     refreshTokenCookie.value = null;
+    refreshCookie('auth_refresh')
 
     // We refresh the config we got from the api
     appConfigStore.refresh(false)
@@ -278,6 +291,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
     selfJwtToken,
     setJwtSelfJwtTokenFromApiResponse,
     enhanceJwtTokenDefined,
-    displayJwtError
+    displayJwtError,
+    logJwtError,
   }
 })
