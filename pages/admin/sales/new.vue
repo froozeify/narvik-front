@@ -136,6 +136,8 @@
       return
     }
 
+    searchQuery.value = '' // Since the item has been added to the cart, we revert to empty search
+
     let cartItem = cart.value.get(item.id.toString())
 
     if (!cartItem) {
