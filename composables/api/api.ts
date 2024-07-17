@@ -22,7 +22,7 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
     const jwtToken = await selfStore.enhanceJwtTokenDefined();
     // We throw an error if at this point we still don't have an access token
     if (!jwtToken.value || !jwtToken.value.access) {
-      selfStore.displayJwtError("No access token.")
+      selfStore.logJwtError("No access token.")
     }
     overloadedOptions = mergician({
       headers: {

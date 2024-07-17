@@ -3,6 +3,7 @@ import type { FormSubmitEvent } from '#ui/types'
 import {useLoginUser} from "~/composables/api/api";
 import type {Image} from "~/types/image";
 import {useAppConfigStore} from "~/stores/useAppConfig";
+import {useSelfMemberStore} from "~/stores/useSelfMember";
 
 const toast = useToast()
 const isLoading = ref(false)
@@ -20,6 +21,8 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
 
   try {
     await useLoginUser(event.data.email, event.data.password);
+    const selfStore = useSelfMemberStore();
+    await selfStore.refresh();
   } catch (e) {
     toast.add({
       color: "red",
