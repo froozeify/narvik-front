@@ -226,8 +226,8 @@
         </div>
         <UProgress v-if="isLoading" animation="swing" class="mb-2" />
 
-        <div v-for="[title, items] in orderedItems">
-          <div class="text-xl font-bold mb-2">{{ title }}</div>
+        <div v-for="[title, items] in orderedItems" class="mb-4">
+          <div class="text-xl font-bold mb-2 border-b">{{ title }}</div>
           <div
             v-for="item in items"
             class="flex items-center gap-2 mb-1 hover:bg-neutral-100 dark:hover:bg-gray-800/50 rounded-md"
