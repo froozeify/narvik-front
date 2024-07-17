@@ -4,6 +4,7 @@
   import type {InventoryItem} from "~/types/inventoryItem";
   import {formatMonetary} from "../../../utils/string";
   import type {FormError, FormErrorEvent} from "#ui/types";
+  import type {SalePaymentMode} from "~/types/salePaymentMode";
 
   definePageMeta({
     layout: "pos"
@@ -62,8 +63,11 @@
     name: undefined,
     sellingPrice: undefined
   })
-  const cartValidationModalOpen = ref(false)
   const cartCustomItemModalOpen = ref(false)
+
+  // Payment mode
+  const paymentModes: Ref<SalePaymentMode[]> = ref([])
+  const selectedPaymentMode: Ref<SalePaymentMode | undefined> = ref(undefined)
 
   async function loadItems(page: number = 1) {
     isLoading.value = true
@@ -92,6 +96,14 @@
 
     inventoryItems.value = inventoryItemsLoading.value
     isLoading.value = false
+  }
+
+  async function loadPaymentModes() {
+    const urlParams = new URLSearchParams({
+      available: 'true',
+    });
+    const { items } = await paymentModeQuery.getAll(urlParams)
+    paymentModes.value = items
   }
 
   let inputTimer: NodeJS.Timeout;
@@ -142,6 +154,7 @@
   function emptyCart() {
     cart.value.clear()
     searchQuery.value = ''
+    selectedPaymentMode.value = undefined
     cartComment.value = ''
   }
 
@@ -168,7 +181,7 @@
 
   // We load the page content
   loadItems()
-
+  loadPaymentModes()
 
 </script>
 
@@ -300,33 +313,27 @@
       </UCard>
 
       <UCard>
-        <UFormGroup label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'">
-          <UTextarea v-model="cartComment" :rows="2" autoresize :maxrows="5" placeholder="Commentaire liée à la vente"/>
+        <UFormGroup label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'" class="mb-2">
+          <UTextarea v-model="cartComment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente"/>
         </UFormGroup>
 
-        <UButton class="mt-4" block color="green">Finaliser la vente</UButton>
-      </UCard>
+        <UFormGroup label="Mode de paiement">
+          <div class="flex flex-wrap gap-2">
+            <UButton
+              v-for="paymentMode in paymentModes"
+              :variant="selectedPaymentMode?.id == paymentMode.id ? 'solid' : 'soft'"
+              class="basis-[calc(50%-0.25rem)]">
+              <div class="flex items-center w-full" @click="selectedPaymentMode = paymentMode">
+                <UIcon :name="'i-heroicons-' + paymentMode.icon" dynamic />
+                <div class="flex-1">
+                  {{ paymentMode.name }}
+                </div>
+              </div>
+            </UButton>
+          </div>
+        </UFormGroup>
 
-      <UModal v-model="cartValidationModalOpen">
-        <pre>
-          1. Requete pour creer le panier (avec le calcul auto du montant
-          2. Affichage du montant total
-          3. Selection du mode de paiement
-          4. 
-        </pre>
-      </UModal>
-
-      <UCard class="hidden">
-        <div class="flex flex-wrap justify-center gap-2">
-          <UButton v-for="i in ['banknotes', 'ticket', 'credit-card']" variant="soft" class="basis-[calc(50%-0.25rem)]">
-            <div class="flex items-center w-full">
-            <UIcon :name="'i-heroicons-' + i" dynamic />
-            <div class="flex-1">
-              {{ i }}
-            </div>
-            </div>
-          </UButton>
-        </div>
+        <UButton class="mt-4" block color="green" :disabled="cart.size < 1 || !selectedPaymentMode ">Finaliser la vente</UButton>
       </UCard>
     </template>
   </GenericLayoutContentWithStickySide>
