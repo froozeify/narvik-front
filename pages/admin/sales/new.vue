@@ -3,6 +3,7 @@
   import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
   import type {InventoryItem} from "~/types/inventoryItem";
   import {formatMonetary} from "../../../utils/string";
+  import type {FormError, FormErrorEvent} from "#ui/types";
 
   definePageMeta({
     layout: "pos"
@@ -18,6 +19,11 @@
   const paymentModeQuery = new SalePaymentModeQuery()
 
   const searchQuery: Ref<string> = ref('')
+  const searchQueryInput: Ref<string> = ref('')
+  watch(searchQuery, () => {
+    searchQueryInput.value = searchQuery.value
+    loadItems()
+  })
 
   const inventoryItems: Ref<InventoryItem[]> = ref([])
   const inventoryItemsLoading: Ref<InventoryItem[]> = ref([])
@@ -51,6 +57,13 @@
     } )
     return !isNaN(total) ? total.toFixed(2) : '0.00'
   } )
+  const cartComment = ref('')
+  const customItemForm = reactive<{name: string|undefined, sellingPrice: string|undefined}>({
+    name: undefined,
+    sellingPrice: undefined
+  })
+  const cartValidationModalOpen = ref(false)
+  const cartCustomItemModalOpen = ref(false)
 
   async function loadItems(page: number = 1) {
     isLoading.value = true
@@ -85,7 +98,7 @@
   async function searchQueryUpdated() {
     clearTimeout(inputTimer);
     inputTimer = setTimeout(async () => {
-      await loadItems()
+      searchQuery.value = searchQueryInput.value
     }, 250);
   }
 
@@ -94,12 +107,18 @@
   const cameraPreview = ref(false)
   const cameraIsPresent = verifyCameraIsPresent()
 
-  function onDecoded(value: string) {
-    searchQuery.value = value
-    loadItems()
+  // Cart management
+
+  // Form validation
+  const validate = (state: any): FormError[] => {
+    const errors = []
+    if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
+    if (!state.sellingPrice) errors.push({ path: 'sellingPrice', message: 'Champ requis' })
+    const sellingPrice = parseFloat(state.sellingPrice)
+    if (isNaN(sellingPrice)) errors.push({ path: 'sellingPrice', message: 'Le champ doit être un nombre' })
+    return errors
   }
 
-  // Cart management
   function addToCart(item: InventoryItem, modifier: number = 1) {
     if (!item.id) {
       return
@@ -120,6 +139,33 @@
     }
   }
 
+  function emptyCart() {
+    cart.value.clear()
+    searchQuery.value = ''
+    cartComment.value = ''
+  }
+
+  function addCustomItemToCart() {
+    if (!customItemForm.sellingPrice) {
+      closeCustomItemModal()
+      return
+    }
+
+    const item: InventoryItem = {
+      id: - Math.floor(Math.random() * 200000),
+      name: customItemForm.name,
+      sellingPrice: parseFloat(customItemForm.sellingPrice.replace(',', '.')).toFixed(2),
+    }
+    addToCart(item)
+    closeCustomItemModal()
+  }
+
+  function closeCustomItemModal() {
+    customItemForm.name = undefined
+    customItemForm.sellingPrice = undefined
+    cartCustomItemModalOpen.value = false
+  }
+
   // We load the page content
   loadItems()
 
@@ -133,34 +179,38 @@
         <GenericBarcodeReader
           class="mb-4"
           v-model="cameraPreview"
-          @decoded="onDecoded"
+          @decoded="(value) => {searchQuery = value}"
         />
 
-        <UInput
-          class="mb-4"
-          v-model="searchQuery"
-          @update:model-value="searchQueryUpdated()"
-          autofocus
-          :loading="isLoading"
-          placeholder="Rechercher..."
-          :ui="{ icon: { trailing: { pointer: '' } } }"
-        >
-          <template #trailing v-if="cameraIsPresent || searchQuery">
-            <UIcon
-              v-if="cameraIsPresent"
-              class="cursor-pointer"
-              name="i-heroicons-qr-code"
-              @click="cameraPreview = true"
-            />
+        <div class="flex flex-row items-center mb-4 gap-2">
+          <UInput
+            class="flex-1"
+            v-model="searchQueryInput"
+            @update:model-value="searchQueryUpdated()"
+            autofocus
+            :loading="isLoading"
+            placeholder="Rechercher..."
+            :ui="{ icon: { trailing: { pointer: '' } } }"
+          >
+            <template #trailing v-if="cameraIsPresent || searchQueryInput">
+              <UIcon
+                v-if="cameraIsPresent"
+                class="cursor-pointer"
+                name="i-heroicons-qr-code"
+                @click="cameraPreview = true"
+              />
 
-            <UIcon
-              v-if="searchQuery"
-              class="cursor-pointer"
-              name="i-heroicons-x-mark"
-              @click="searchQuery = ''; loadItems()"
-            />
-          </template>
-        </UInput>
+              <UIcon
+                v-if="searchQueryInput"
+                class="cursor-pointer"
+                name="i-heroicons-x-mark"
+                @click="searchQuery = '';"
+              />
+            </template>
+          </UInput>
+
+          <UButton @click="cartCustomItemModalOpen = true;" icon="i-heroicons-plus" />
+        </div>
         <UProgress v-if="isLoading" animation="swing" class="mb-2" />
 
         <div v-for="[title, items] in orderedItems">
@@ -189,12 +239,44 @@
           </div>
         </div>
       </UCard>
+
+      <UModal v-model="cartCustomItemModalOpen">
+        <UCard>
+          <UForm class="flex gap-2 flex-col" :state="customItemForm" :validate="validate" @submit="addCustomItemToCart">
+            <UFormGroup label="Nom" name="name">
+              <UInput v-model="customItemForm.name"/>
+            </UFormGroup>
+
+            <UFormGroup label="Prix de vente" name="sellingPrice">
+              <UInput v-model="customItemForm.sellingPrice">
+                <template #trailing>
+                  <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
+                </template>
+              </UInput>
+            </UFormGroup>
+
+            <div class="flex gap-2 mt-2 justify-end">
+              <UButton color="red" variant="ghost" @click="closeCustomItemModal()">
+                Annuler
+              </UButton>
+
+              <UButton type="submit">
+                Ajouter au panier
+              </UButton>
+            </div>
+          </UForm>
+        </UCard>
+      </UModal>
     </template>
 
     <template #side>
       <UCard class="overflow-y-auto">
         <div class="text-4xl text-center">{{ formatMonetary(cartTotalPrice) }}</div>
         <div class="mt-4">
+          <div class="flex text-xs align-center mt-1">
+            <div class="flex-1"></div>
+            <UButton v-if="cart.size > 0" size="xs" @click="emptyCart()">Vider le panier</UButton>
+          </div>
           <div v-if="cart.size < 1" class="text-center">
             <i>Aucun articles</i>
           </div>
@@ -218,6 +300,23 @@
       </UCard>
 
       <UCard>
+        <UFormGroup label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'">
+          <UTextarea v-model="cartComment" :rows="2" autoresize :maxrows="5" placeholder="Commentaire liée à la vente"/>
+        </UFormGroup>
+
+        <UButton class="mt-4" block color="green">Finaliser la vente</UButton>
+      </UCard>
+
+      <UModal v-model="cartValidationModalOpen">
+        <pre>
+          1. Requete pour creer le panier (avec le calcul auto du montant
+          2. Affichage du montant total
+          3. Selection du mode de paiement
+          4. 
+        </pre>
+      </UModal>
+
+      <UCard class="hidden">
         <div class="flex flex-wrap justify-center gap-2">
           <UButton v-for="i in ['banknotes', 'ticket', 'credit-card']" variant="soft" class="basis-[calc(50%-0.25rem)]">
             <div class="flex items-center w-full">
