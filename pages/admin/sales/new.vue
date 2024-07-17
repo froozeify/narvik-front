@@ -2,8 +2,8 @@
   import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
   import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
   import type {InventoryItem} from "~/types/inventoryItem";
-  import {formatMonetary} from "../../../utils/string";
-  import type {FormError, FormErrorEvent} from "#ui/types";
+  import {formatMonetary} from "~/utils/string";
+  import type {FormError} from "#ui/types";
   import type {SalePaymentMode} from "~/types/salePaymentMode";
 
   definePageMeta({
@@ -166,6 +166,7 @@
       return
     }
 
+    // Negative ID, Backend know it's not a real item
     const item: InventoryItem = {
       id: - Math.floor(Math.random() * 200000),
       name: customItemForm.name,
