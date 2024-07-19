@@ -5,6 +5,9 @@
   import {formatMonetary} from "~/utils/string";
   import type {FormError} from "#ui/types";
   import type {SalePaymentMode} from "~/types/salePaymentMode";
+  import SaleQuery from "~/composables/api/query/SaleQuery";
+  import type {Sale} from "~/types/sale";
+  import type {SalePurchasedItem} from "~/types/salePurchasedItem";
 
   definePageMeta({
     layout: "pos"
@@ -15,9 +18,13 @@
   })
 
   const isLoading = ref(false)
+  const isCreatingSale = ref(false)
+
+  const toast = useToast()
 
   const inventoryItemQuery = new InventoryItemQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
+  const saleQuery = new SaleQuery()
 
   const searchQuery: Ref<string> = ref('')
   const searchQueryInput: Ref<string> = ref('')
@@ -121,8 +128,7 @@
 
   // Cart management
 
-  // Form validation
-  const validate = (state: any): FormError[] => {
+  const validateCustomItemForm = (state: any): FormError[] => {
     const errors = []
     if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
     if (!state.sellingPrice) errors.push({ path: 'sellingPrice', message: 'Champ requis' })
@@ -180,6 +186,53 @@
     customItemForm.name = undefined
     customItemForm.sellingPrice = undefined
     cartCustomItemModalOpen.value = false
+  }
+
+  // Sale management
+  async function createSale() {
+    isCreatingSale.value = true
+
+    let salePurchasedItems: SalePurchasedItem[] = []
+    cart.value.forEach((item, key) => {
+      let payload: SalePurchasedItem = {
+        quantity: item.quantity
+      }
+
+      if (Number(key) > 0) {
+        payload.item = item.item['@id']
+      } else {
+        payload.itemName = item.item.name
+        payload.itemPrice = item.item.sellingPrice
+      }
+
+      salePurchasedItems.push(payload)
+    })
+
+    const payload: Sale = {
+      comment: cartComment.value.length ? cartComment.value : undefined,
+      salePurchasedItems: salePurchasedItems,
+      paymentMode: selectedPaymentMode.value?.["@id"]
+    }
+
+    const { created, error } = await saleQuery.post(payload)
+
+    isCreatingSale.value = false
+
+    if (!created || error) {
+      toast.add({
+        color: "red",
+        title: "La vente à échoué",
+        description: error.message
+      });
+      return;
+    }
+
+    toast.add({
+      color: "green",
+      title: "Vente enregistrée",
+    });
+
+    navigateTo('/admin/sales/' + created.id)
   }
 
   // We load the page content
@@ -258,7 +311,7 @@
 
       <UModal v-model="cartCustomItemModalOpen">
         <UCard>
-          <UForm class="flex gap-2 flex-col" :state="customItemForm" :validate="validate" @submit="addCustomItemToCart">
+          <UForm class="flex gap-2 flex-col" :state="customItemForm" :validate="validateCustomItemForm" @submit="addCustomItemToCart">
             <UFormGroup label="Nom" name="name">
               <UInput v-model="customItemForm.name"/>
             </UFormGroup>
@@ -336,7 +389,7 @@
           </div>
         </UFormGroup>
 
-        <UButton class="mt-4" block color="green" :disabled="cart.size < 1 || !selectedPaymentMode ">Finaliser la vente</UButton>
+        <UButton :loading="isCreatingSale" class="mt-4" block color="green" :disabled="cart.size < 1 || !selectedPaymentMode" @click="createSale()">Finaliser la vente</UButton>
       </UCard>
     </template>
   </GenericLayoutContentWithStickySide>

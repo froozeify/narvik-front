@@ -151,31 +151,12 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false, r
 
 export async function useCreateItem<T>(resource: string, payload: Item) {
   let created: T | undefined = undefined;
-  let violations: SubmissionErrors | undefined = undefined;
   let error: Error | null = null;
 
   try {
     const data = await useApi<T>(resource, {
       method: "POST",
       body: payload,
-
-      onResponseError({ response }) {
-        const data = response._data;
-        const error = data["hydra:description"] || response.statusText;
-
-        if (!data.violations) throw new Error(error);
-
-        const errors: SubmissionErrors = { _error: error };
-        data.violations.forEach(
-            (violation: { propertyPath: string; message: string }) => {
-              errors[violation.propertyPath] = violation.message;
-            }
-        );
-
-        violations = errors;
-
-        throw new SubmissionError(errors);
-      },
     });
 
     created = data as T;
@@ -186,7 +167,6 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
   return {
     created,
     error,
-    violations,
   };
 }
 
