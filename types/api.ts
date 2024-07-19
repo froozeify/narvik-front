@@ -18,11 +18,9 @@ export interface FetchItemData<T> {
 export interface CreateItemData<T> {
   created: T | undefined;
   error: Error | null;
-  violations: SubmissionErrors | undefined;
 }
 
 export interface UpdateItemData<T> {
   updated: T | undefined;
   error: Error | null;
-  violations: SubmissionErrors | undefined;
 }

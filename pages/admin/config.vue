@@ -109,7 +109,7 @@ async function uploadLogo(event) {
   }
 
   logoUploading.value = true
-  const { created, violations, error } = await globalSettingQuery.importLogo(formData)
+  const { created, error } = await globalSettingQuery.importLogo(formData)
   logoUploading.value = false
 
   if (error) {

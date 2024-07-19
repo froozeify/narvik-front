@@ -36,7 +36,7 @@
     }
 
     fileUploading.value = true
-    const {created, violations, error} = await memberPresenceQuery.importFromCerbere(formData)
+    const {created, error} = await memberPresenceQuery.importFromCerbere(formData)
     fileUploading.value = false
 
     if (error) {

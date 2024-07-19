@@ -60,7 +60,7 @@ function addActivity() {
   }
 
   isLoading.value = true;
-  activityQuery.post(activity).then(({created, violations}) => {
+  activityQuery.post(activity).then(({created, error}) => {
     isLoading.value = false;
     if (created) {
       activities.value.push({
@@ -73,7 +73,7 @@ function addActivity() {
       toast.add({
         color: "red",
         title: "L'enregistrement a échoué",
-        description: violations._error
+        description: error?.message
       })
     }
   })
@@ -95,7 +95,7 @@ function saveRow(dataItem: DataItem) {
     isEnabled: dataItem.activity.isEnabled
   }
 
-  activityQuery.patch(dataItem.activity, payload).then(({updated, violations}) => {
+  activityQuery.patch(dataItem.activity, payload).then(({updated, error}) => {
     if (updated) {
       dataItem.unsaved = false;
       toast.add({
@@ -107,7 +107,7 @@ function saveRow(dataItem: DataItem) {
       toast.add({
         color: "red",
         title: "L'enregistrement a échoué",
-        description: violations._error
+        description: error?.message
       })
     }
   });

@@ -48,7 +48,7 @@
     }
 
     fileUploading.value = true
-    const {created, violations, error} = await memberQuery.importFromItac(formData)
+    const {created, error} = await memberQuery.importFromItac(formData)
     fileUploading.value = false
 
     if (error) {

@@ -26,7 +26,7 @@
     }
 
     fileUploading.value = true
-    const {created, violations, error} = await memberQuery.importPhotosFromItac(formData)
+    const {created, error} = await memberQuery.importPhotosFromItac(formData)
     fileUploading.value = false
 
     if (error) {

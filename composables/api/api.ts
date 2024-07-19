@@ -39,13 +39,6 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
     headers: {
       Accept: MIME_TYPE,
     },
-
-    onResponseError({ response }) {
-      const data = response._data;
-      const error = data["hydra:description"] || response.statusText;
-
-      throw new Error(error);
-    },
   }, overloadedOptions)
 
   // We keep the original body for FormData values
@@ -172,7 +165,6 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
 
 export async function useUploadFile(resource: string, payload: FormData, requireLogin: boolean = true) {
   let created: Object | undefined = undefined;
-  let violations: SubmissionErrors | undefined = undefined;
   let error: Error | null = null;
 
   try {
@@ -183,24 +175,6 @@ export async function useUploadFile(resource: string, payload: FormData, require
         Accept: MIME_TYPE_JSON,
       },
       body: payload,
-
-      onResponseError({ response }) {
-        const data = response._data;
-        const error = data["hydra:description"] || data['detail'] || response.statusText;
-
-        if (!data.violations) throw new Error(error);
-
-        const errors: SubmissionErrors = { _error: error };
-        data.violations.forEach(
-            (violation: { propertyPath: string; message: string }) => {
-              errors[violation.propertyPath] = violation.message;
-            }
-        );
-
-        violations = errors;
-
-        throw new SubmissionError(errors);
-      },
     }, requireLogin);
 
     created = data as Object;
@@ -211,13 +185,11 @@ export async function useUploadFile(resource: string, payload: FormData, require
   return {
     created,
     error,
-    violations,
   };
 }
 
 export async function useUpdateItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let violations: SubmissionErrors | undefined = undefined;
   let error: Error | null = null;
 
   try {
@@ -227,24 +199,6 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
       headers: {
         Accept: MIME_TYPE,
         "Content-Type": MIME_TYPE,
-      },
-
-      onResponseError({ response }) {
-        const data = response._data;
-        const error = data["hydra:description"] || response.statusText;
-
-        if (!data.violations) throw new Error(error);
-
-        const errors: SubmissionErrors = { _error: error };
-        data.violations.forEach(
-            (violation: { propertyPath: string; message: string }) => {
-              errors[violation.propertyPath] = violation.message;
-            }
-        );
-
-        violations = errors;
-
-        throw new SubmissionError(errors);
       },
     });
 
@@ -256,7 +210,6 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
   return {
     updated,
     error,
-    violations,
   };
 }
 
@@ -283,7 +236,6 @@ export async function useGetCsv(path: string) {
 
 export async function usePost<T>(path: string, payload: object) {
   let item: T | undefined = undefined;
-  let violations: SubmissionErrors | undefined = undefined;
   let error: Error | null = null;
 
   try {
@@ -295,24 +247,6 @@ export async function usePost<T>(path: string, payload: object) {
         Accept: MIME_TYPE,
         "Content-Type": MIME_TYPE,
       },
-
-      onResponseError({ response }) {
-        const data = response._data;
-        const error = data["hydra:description"] || response.statusText;
-
-        if (!data.violations) throw new Error(error);
-
-        const errors: SubmissionErrors = { _error: error };
-        data.violations.forEach(
-            (violation: { propertyPath: string; message: string }) => {
-              errors[violation.propertyPath] = violation.message;
-            }
-        );
-
-        violations = errors;
-
-        throw new SubmissionError(errors);
-      },
     });
 
     item = data as T;
@@ -323,13 +257,11 @@ export async function usePost<T>(path: string, payload: object) {
   return {
     item,
     error,
-    violations,
   };
 }
 
 export async function usePut(path: string, payload: object) {
   let updated: object | undefined = undefined;
-  let violations: SubmissionErrors | undefined = undefined;
   let error: Error | null = null;
 
   try {
@@ -339,24 +271,6 @@ export async function usePut(path: string, payload: object) {
       headers: {
         Accept: MIME_TYPE,
         "Content-Type": MIME_TYPE,
-      },
-
-      onResponseError({ response }) {
-        const data = response._data;
-        const error = data["hydra:description"] || response.statusText;
-
-        if (!data.violations) throw new Error(error);
-
-        const errors: SubmissionErrors = { _error: error };
-        data.violations.forEach(
-            (violation: { propertyPath: string; message: string }) => {
-              errors[violation.propertyPath] = violation.message;
-            }
-        );
-
-        violations = errors;
-
-        throw new SubmissionError(errors);
       },
     });
 
@@ -368,14 +282,12 @@ export async function usePut(path: string, payload: object) {
   return {
     updated,
     error,
-    violations,
   };
 }
 
 
 export async function usePatchItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let violations: SubmissionErrors | undefined = undefined;
   let error: Error | null = null;
 
   try {
@@ -385,24 +297,6 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
       headers: {
         Accept: MIME_TYPE,
         "Content-Type": MIME_TYPE_JSON_PATCH,
-      },
-
-      onResponseError({ response }) {
-        const data = response._data;
-        const error = data["hydra:description"] || response.statusText;
-
-        if (!data.violations) throw new Error(error);
-
-        const errors: SubmissionErrors = { _error: error };
-        data.violations.forEach(
-            (violation: { propertyPath: string; message: string }) => {
-              errors[violation.propertyPath] = violation.message;
-            }
-        );
-
-        violations = errors;
-
-        throw new SubmissionError(errors);
       },
     });
 
@@ -414,7 +308,6 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
   return {
     updated,
     error,
-    violations,
   };
 }
 
@@ -431,11 +324,6 @@ export async function useDeleteItem(item: Item | null) {
   try {
     const data = await useApi(item["@id"] ?? "", {
       method: "DELETE",
-
-      onResponseError({ response }) {
-        const data = response._data;
-        error = new Error(data["hydra:description"] || response.statusText);
-      },
     });
   } catch (e) {
     error = e as Error
