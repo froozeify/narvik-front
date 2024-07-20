@@ -265,7 +265,7 @@
     </template>
 
     <template #side>
-      <UCard class="overflow-y-auto">
+      <UCard>
         <div class="text-4xl text-center">{{ formatMonetary(cartTotalPrice) }}</div>
         <div class="mt-4">
           <div class="flex text-xs align-center mt-1">
@@ -275,21 +275,23 @@
           <div v-if="cart.size < 1" class="text-center">
             <i>Aucun articles</i>
           </div>
-          <div v-for="[id , cartItem] in cart" class="flex items-center gap-2 mb-1">
-            <GenericStackedUpDown @changed="modifier => { cartStore.addToCart(cartItem.item, modifier) }" />
+          <div class="overflow-y-auto max-h-[25vh] mt-2">
+            <div v-for="[id , cartItem] in cart" class="flex items-center gap-2 mb-1">
+              <GenericStackedUpDown @changed="modifier => { cartStore.addToCart(cartItem.item, modifier) }" />
 
-            <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ cartItem.quantity }}</div>
-            <div class="text-sm flex-1 leading-tight">{{ cartItem.item.name }}</div>
-            <UTooltip :text="'Prix unitaire : ' + formatMonetary(cartItem.item.sellingPrice)">
-              <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">
-                <template v-if="cartItem.item.sellingPrice">
-                  {{ formatMonetary(Number(Number(cartItem.item.sellingPrice) * cartItem.quantity).toFixed(2)) }}
-                </template>
-                <template v-else>
-                  {{ formatMonetary(cartItem.item.sellingPrice) }}
-                </template>
-              </div>
-            </UTooltip>
+              <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ cartItem.quantity }}</div>
+              <div class="text-sm flex-1 leading-tight">{{ cartItem.item.name }}</div>
+              <UTooltip :text="'Prix unitaire : ' + formatMonetary(cartItem.item.sellingPrice)">
+                <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">
+                  <template v-if="cartItem.item.sellingPrice">
+                    {{ formatMonetary(Number(Number(cartItem.item.sellingPrice) * cartItem.quantity).toFixed(2)) }}
+                  </template>
+                  <template v-else>
+                    {{ formatMonetary(cartItem.item.sellingPrice) }}
+                  </template>
+                </div>
+              </UTooltip>
+            </div>
           </div>
         </div>
       </UCard>

@@ -17,7 +17,7 @@ const props = defineProps(
       <slot name="main"></slot>
     </div>
 
-    <div v-show="props.displaySide" class="lg:w-1/3 w-full h-fit lg:sticky lg:top-20 max-h-[calc(100vh-6rem)] flex flex-col gap-4">
+    <div v-show="props.displaySide" class="lg:w-1/3 w-full h-fit lg:sticky lg:top-20 max-h-[calc(100vh-6rem)] flex flex-col gap-4 overflow-y-auto">
       <slot name="side"></slot>
     </div>
 
