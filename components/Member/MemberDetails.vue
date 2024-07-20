@@ -6,7 +6,7 @@
   import ImageQuery from "~/composables/api/query/ImageQuery";
   import type {MemberPresence} from "~/types/memberpresence";
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
-  import { formatDateTime, formatDateReadable } from "~/utils/date"
+  import { formatDate, formatDateReadable } from "~/utils/date"
   import {useSelfMemberStore} from "~/stores/useSelfMember";
 
   import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
@@ -620,7 +620,7 @@
           </template>
 
           <template #date-data="{row}">
-            {{ formatDateTime(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
+            {{ formatDate(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
           </template>
 
           <template #activities-data="{row}">

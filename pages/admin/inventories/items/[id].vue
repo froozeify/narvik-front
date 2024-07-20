@@ -4,7 +4,7 @@
   import type {InventoryItemHistory} from "~/types/inventoryItemHistory";
 
   import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors } from 'chart.js'
-  import { Line} from 'vue-chartjs'
+  import { Line } from 'vue-chartjs'
   import {formatMonetary} from "~/utils/string";
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors)
 
@@ -82,7 +82,7 @@
     let dataSellingPrice: string[] = [];
 
     items.reverse().forEach(value => {
-      labels.push(formatDateTime(value.createdAt) ?? '')
+      labels.push(formatDate(value.createdAt) ?? '')
       dataPurchasePrice.push(value.purchasePrice ?? '')
       dataSellingPrice.push(value.sellingPrice ?? '')
     })
@@ -127,7 +127,7 @@
 </script>
 
 <template>
-  <div id="wrapper" class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4">
     <div class="flex gap-2">
       <UTooltip text="Inventaire">
         <UButton
