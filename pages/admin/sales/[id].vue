@@ -3,6 +3,8 @@ import {formatMonetary} from "~/utils/string";
 import type {Sale} from "~/types/sale";
 import SaleQuery from "~/composables/api/query/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
+import {useSelfMemberStore} from "~/stores/useSelfMember";
+import dayjs from "dayjs";
 
 definePageMeta({
     layout: "pos"
@@ -11,6 +13,9 @@ definePageMeta({
   useHead({
     title: "Détail vente"
   })
+
+  const selfStore = useSelfMemberStore()
+  const isAdmin = selfStore.isAdmin()
 
   const toast = useToast()
   const route = useRoute()
@@ -22,7 +27,27 @@ definePageMeta({
 
   const saleQuery = new SaleQuery()
 
-  loadSale()
+  const columns = [
+    {
+      key: 'itemCategory',
+      label: 'Catégorie',
+      sortable: true
+    },
+    {
+      key: 'itemName',
+      label: 'Nom',
+      class: 'w-full',
+      sortable: true
+    },
+    {
+      key: 'itemPrice',
+      label: 'Prix unitaire'
+    },
+    {
+      key: 'total',
+      label: 'Total'
+    }
+  ]
 
   async function loadSale() {
     isLoading.value = true
@@ -61,6 +86,15 @@ definePageMeta({
 
     navigateTo('/admin/sales')
   }
+
+  // Main code
+  loadSale()
+  if (isAdmin) {
+    columns.push({
+      key: 'item',
+      label: 'Article'
+    })
+  }
 </script>
 
 <template>
@@ -77,7 +111,7 @@ definePageMeta({
         {{ formatDateTimeReadable(sale?.createdAt) }}
       </div>
 
-      <UTooltip text="Supprimer">
+      <UTooltip v-if="isAdmin || dayjs(dayjs(sale?.createdAt)).isAfter(dayjs().startOf('day'))" text="Supprimer">
         <UPopover>
           <UButton
             icon="i-heroicons-trash"
@@ -129,37 +163,12 @@ definePageMeta({
         :loading="isLoading">
       </GenericStatCard>
     </div>
-
     <UCard>
       <div class="text-xl font-bold">Articles achetés</div>
       <UTable
         class="w-full"
         :loading="isLoading"
-        :columns="[
-          {
-            key: 'itemCategory',
-            label: 'Catégorie',
-            sortable: true
-          },
-          {
-            key: 'itemName',
-            label: 'Nom',
-            class: 'w-full',
-            sortable: true
-          },
-          {
-            key: 'itemPrice',
-            label: 'Prix unitaire'
-          },
-          {
-            key: 'total',
-            label: 'Total'
-          },
-          {
-            key: 'item',
-            label: 'Article'
-          }
-        ]"
+        :columns="columns"
         :sort="{
           column: 'itemCategory',
           direction: 'asc'
