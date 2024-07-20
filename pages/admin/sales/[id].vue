@@ -163,6 +163,14 @@ definePageMeta({
         :loading="isLoading">
       </GenericStatCard>
     </div>
+
+    <UCard v-if="sale?.comment">
+      <div class="text-xl font-bold mb-2">Commentaire</div>
+      <div class="whitespace-pre-line">
+        {{ sale.comment }}
+      </div>
+    </UCard>
+
     <UCard>
       <div class="text-xl font-bold">Articles achetés</div>
       <UTable
