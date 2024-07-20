@@ -35,17 +35,17 @@ const emit = defineEmits([
 ])
 
 interface topRight {
-  value: string,
-  tooltip: string|null,
-  icon: string|null,
-  useDefaultIcon: boolean|undefined
+  value?: string,
+  tooltip?: string|null,
+  icon?: string|null,
+  useDefaultIcon?: boolean
 }
 
 const iconUp = 'heroicons:arrow-trending-up-20-solid'
 const iconDown = 'heroicons:arrow-trending-down-20-solid'
 
 const valueClass = computed( () => {
-  let classes = 'text-3xl font-semibold flex-1 flex justify-center items-center'
+  let classes = 'text-3xl font-semibold flex-1 flex justify-center items-center text-center'
   if (props.valueClass) {
     classes += ' ' + props.valueClass
   }

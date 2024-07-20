@@ -101,7 +101,7 @@ definePageMeta({
       </UTooltip>
     </div>
 
-    <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-3">
+    <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-4">
       <GenericStatCard
         title="Total"
         :value="formatMonetary(sale?.price?.toString())"
@@ -117,6 +117,15 @@ definePageMeta({
       <GenericStatCard
         title="Moyen de paiement"
         :value="sale?.paymentMode?.name"
+        :top-right="{
+          icon: sale?.paymentMode?.icon ? 'i-heroicons-' + sale?.paymentMode?.icon : null
+        }"
+        :loading="isLoading">
+      </GenericStatCard>
+
+      <GenericStatCard
+        title="Vendeur"
+        :value="sale?.seller?.fullName"
         :loading="isLoading">
       </GenericStatCard>
     </div>

@@ -4,6 +4,8 @@
   import {formatDateInput, formatDateRangeReadable, formatDateTimeReadable} from "~/utils/date";
   import dayjs from "dayjs";
   import type {Sale} from "~/types/sale";
+  import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
+  import type {SalePaymentMode} from "~/types/salePaymentMode";
 
   const props = defineProps({
     today: {
@@ -17,6 +19,9 @@
   const selectedRange: Ref<{start: Date, end: Date}> = props.today ? ref({ start: new Date(), end: new Date() }) : ref({ start: dayjs().subtract(30, 'day').toDate(), end: new Date() })
 
   const saleQuery = new SaleQuery()
+  const paymentModeQuery = new SalePaymentModeQuery()
+  const paymentModes: Ref<SalePaymentMode[]> = ref([])
+
   const sales: Ref<Sale[]> = ref([])
   const salesLoading: Ref<Sale[]> = ref([])
   const totalAmountSales = computed(() => {
@@ -27,11 +32,28 @@
     return amount
   })
   const totalPerPaymentMode = computed(() => {
-    let amountPerPayment = {}
+    const amountPerPayment: Map<string, {count: number, amount: number, icon: string}> = new Map()
+    paymentModes.value.forEach(paymentMode => {
+      if (!paymentMode.name) return
+      amountPerPayment.set(paymentMode.name, {
+        count: 0,
+        amount: 0,
+        icon: paymentMode.icon ?? ''
+      })
+    })
+
     sales.value.forEach(sale => {
-      if (sale.paymentMode?.name) {
-        amountPerPayment[sale.paymentMode.name] = amountPerPayment[sale.paymentMode.name] ? amountPerPayment[sale.paymentMode.name] + Number(sale.price) : Number(sale.price)
+      const paymentModeObject: SalePaymentMode = sale.paymentMode as SalePaymentMode
+      if (!sale.paymentMode || !paymentModeObject.name) { return }
+
+      let paymentMode = amountPerPayment.get(paymentModeObject.name)
+      if (!paymentMode) {
+        return;
       }
+
+      paymentMode.count += 1
+      paymentMode.amount += Number(sale.price)
+      amountPerPayment.set(paymentModeObject.name, paymentMode)
     })
     return amountPerPayment
   })
@@ -74,6 +96,10 @@
 
     sales.value = salesLoading.value
 
+    // We load the payment modes
+    const { items: paymentModesResponse } = await paymentModeQuery.getAll()
+    paymentModes.value = paymentModesResponse
+
     isLoading.value = false
   }
 
@@ -101,11 +127,20 @@
         :value="formatMonetary(totalAmountSales.toFixed(2))"
         :loading="isLoading">
       </GenericStatCard>
+    </div>
 
+    <div class="sm:flex sm:gap-4 sm:justify-center sm:flex-wrap">
       <GenericStatCard
-        v-for="(value, name) in totalPerPaymentMode"
+        class="basis-[calc(25%-1rem)]"
+        v-for="[name, value] in totalPerPaymentMode"
         :title="name"
-        :value="formatMonetary(value.toFixed(2))"
+        :is-increasing="true"
+        :value="formatMonetary(value.amount.toFixed(2))"
+        :top-right="{
+          value: value.count.toString(),
+          tooltip: value.count + ' ventes en ' + name,
+          icon: value.icon ? 'i-heroicons-' + value.icon : null
+        }"
         :loading="isLoading">
       </GenericStatCard>
     </div>
