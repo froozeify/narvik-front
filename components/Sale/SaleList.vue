@@ -26,6 +26,15 @@
     })
     return amount
   })
+  const totalPerPaymentMode = computed(() => {
+    let amountPerPayment = {}
+    sales.value.forEach(sale => {
+      if (sale.paymentMode?.name) {
+        amountPerPayment[sale.paymentMode.name] = amountPerPayment[sale.paymentMode.name] ? amountPerPayment[sale.paymentMode.name] + Number(sale.price) : Number(sale.price)
+      }
+    })
+    return amountPerPayment
+  })
 
   getSales() // We load the default setting
   watch(selectedRange, () => {
@@ -90,6 +99,13 @@
       <GenericStatCard
         title="Total"
         :value="formatMonetary(totalAmountSales.toFixed(2))"
+        :loading="isLoading">
+      </GenericStatCard>
+
+      <GenericStatCard
+        v-for="(value, name) in totalPerPaymentMode"
+        :title="name"
+        :value="formatMonetary(value.toFixed(2))"
         :loading="isLoading">
       </GenericStatCard>
     </div>
