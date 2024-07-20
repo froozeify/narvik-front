@@ -9,7 +9,7 @@
 </script>
 
 <template>
-  Page Historique Vente
+  <SaleList />
 </template>
 
 <style scoped lang="scss">

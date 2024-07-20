@@ -9,7 +9,7 @@
 </script>
 
 <template>
-  Page Vente - Afficher historique du jour avec possibilité de modifier/supprimer une vente
+  <SaleList :today="true" />
 </template>
 
 <style scoped lang="scss">
