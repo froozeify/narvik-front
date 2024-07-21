@@ -307,7 +307,7 @@
               v-for="paymentMode in paymentModes"
               :variant="selectedPaymentMode?.id == paymentMode.id ? 'solid' : 'soft'"
               class="basis-[calc(50%-0.25rem)]">
-              <div class="flex items-center w-full" @click="selectedPaymentMode = paymentMode">
+              <div class="flex items-center w-full" @click="selectedPaymentMode = selectedPaymentMode === paymentMode ? null : paymentMode">
                 <UIcon :name="'i-heroicons-' + paymentMode.icon" dynamic />
                 <div class="flex-1">
                   {{ paymentMode.name }}
