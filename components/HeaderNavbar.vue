@@ -26,7 +26,7 @@
   const rightMenuOpen = ref(false)
   const rightMenu = [
     [{
-      label: !isBadger ? selfStore.member?.fullName : 'Pointeuse',
+      label: !isBadger ? 'Profil' : 'Pointeuse',
       avatar: {
         icon: 'i-heroicons-user',
         size: 'xs',
@@ -53,8 +53,8 @@
   <header
     class="backdrop-blur -mb-px sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-16 print:hidden">
     <nav class="container mx-auto p-4 flex justify-between h-full overflow-y-auto">
-      <ul class="flex gap-4">
-        <li>
+      <div class="flex gap-4 flex-shrink-0">
+        <div>
           <NuxtLink to="/" class="flex align-middle">
             <span v-if="!siteLogo">Accueil</span>
             <UTooltip v-else
@@ -63,11 +63,11 @@
               <img :src="siteLogo.base64" class="w-7"/>
             </UTooltip>
           </NuxtLink>
-        </li>
-        <li v-if="isSupervisor">
+        </div>
+        <div v-if="isSupervisor">
           <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
-        </li>
-      </ul>
+        </div>
+      </div>
       <div class="flex gap-4">
         <div v-if="isSupervisor">
           <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton>
@@ -75,9 +75,19 @@
         <UButton
           variant="ghost"
           color="gray"
-          trailing-icon="i-heroicons-cog-6-tooth"
-          @click="rightMenuOpen = true"
-        />
+          :label="!isBadger ? selfStore.member?.fullName : 'Pointeuse'"
+          @click="rightMenuOpen = true">
+          <template #trailing>
+            <UAvatar v-if="!isBadger"
+              size="xs"
+              :alt="selfStore.member?.fullName"
+              :src="selfStore.member?.profileImageBase64"
+            />
+            <UIcon v-else
+               name="i-heroicons-clock"
+            />
+          </template>
+        </UButton>
         <UDropdown v-model:open="rightMenuOpen" :items="rightMenu">
           <div></div><!-- Button is not here so we can use open logic on mobile. Nuxt bug otherwise. -->
           <template #darkMode>
