@@ -17,27 +17,19 @@ const emit = defineEmits(['delete'])
 </script>
 
 <template>
-  <UModal>
-    <UCard>
-      <div class="flex flex-col gap-4">
-        <div class="text-xl font-bold">{{ props.title }}</div>
-        {{ props.description }}
+  <ModalWithActions :title="props.title">
 
-        <div class="flex gap-2 justify-end">
-          <UButton color="gray" variant="ghost" @click="useModal().close()">
-            Annuler
-          </UButton>
+    <slot>{{ props.description }}</slot>
 
-          <UButton
-            @click="emit('delete')"
-            color="red"
-          >
-            Supprimer
-          </UButton>
-        </div>
-      </div>
-    </UCard>
-  </UModal>
+    <template #actions>
+      <UButton
+        @click="emit('delete')"
+        color="red"
+      >
+        Supprimer
+      </UButton>
+    </template>
+  </ModalWithActions>
 </template>
 
 <style scoped lang="scss">
