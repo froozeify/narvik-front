@@ -60,7 +60,7 @@ watchEffect(() => {
     </div>
 
     <div v-if="props.displaySide" :class="sideClasses">
-      <div v-if="hasSideContent" :class="`text-center lg:hidden ${asideButtonMargin}`">
+      <div v-if="hasSideContent" :class="`text-center lg:hidden print:hidden ${asideButtonMargin}`">
         <UButton
           block
           :ui="{ rounded: 'rounded-t-lg rounded-b-none' }"

@@ -187,7 +187,7 @@
           @decoded="(value) => {searchQuery = value}"
         />
 
-        <div class="flex flex-row items-center mb-4 gap-2">
+        <div class="flex flex-row items-center mb-4 gap-2 print:hidden">
           <UInput
             class="flex-1"
             v-model="searchQueryInput"
@@ -274,7 +274,7 @@
     </template>
 
     <template #side>
-      <UCard>
+      <UCard class="print:hidden">
         <div class="text-4xl text-center">{{ formatMonetary(cartTotalPrice) }}</div>
         <div class="mt-4">
           <div class="flex text-xs align-center mt-1">
@@ -305,7 +305,7 @@
         </div>
       </UCard>
 
-      <UCard>
+      <UCard class="print:hidden">
         <UFormGroup label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'" class="mb-2">
           <UTextarea v-model="cartComment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente"/>
         </UFormGroup>
