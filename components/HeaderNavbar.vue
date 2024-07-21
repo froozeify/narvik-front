@@ -2,6 +2,7 @@
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import type {Image} from "~/types/image";
   import {useAppConfigStore} from "~/stores/useAppConfig";
+  import {isTouchDevice} from "~/utils/browser";
 
   const colorMode = useColorMode()
   const selfStore = useSelfMemberStore();
@@ -23,7 +24,6 @@
 
   const siteLogo: Ref<Image | null> = appConfigStore.getLogo()
 
-  const rightMenuOpen = ref(false)
   const rightMenu = [
     [{
       label: !isBadger ? 'Profil' : 'Pointeuse',
@@ -72,24 +72,22 @@
         <div v-if="isSupervisor">
           <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton>
         </div>
-        <UButton
-          variant="ghost"
-          color="gray"
-          :label="!isBadger ? selfStore.member?.fullName : 'Pointeuse'"
-          @click="rightMenuOpen = true">
-          <template #trailing>
-            <UAvatar v-if="!isBadger"
-              size="xs"
-              :alt="selfStore.member?.fullName"
-              :src="selfStore.member?.profileImageBase64"
-            />
-            <UIcon v-else
-               name="i-heroicons-clock"
-            />
-          </template>
-        </UButton>
-        <UDropdown v-model:open="rightMenuOpen" :items="rightMenu">
-          <div></div><!-- Button is not here so we can use open logic on mobile. Nuxt bug otherwise. -->
+        <UDropdown :items="rightMenu" :disabled="isTouchDevice()">
+          <UButton
+            variant="ghost"
+            color="gray"
+            :label="!isBadger ? selfStore.member?.fullName : 'Pointeuse'">
+            <template #trailing>
+              <UAvatar v-if="!isBadger"
+                       size="xs"
+                       :alt="selfStore.member?.fullName"
+                       :src="selfStore.member?.profileImageBase64"
+              />
+              <UIcon v-else
+                     name="i-heroicons-clock"
+              />
+            </template>
+          </UButton>
           <template #darkMode>
               <UIcon
                 :name="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
