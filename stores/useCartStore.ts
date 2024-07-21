@@ -9,6 +9,13 @@ export const useCartStore = defineStore('cart', () => {
   const searchQuery: Ref<string> = ref('')
 
   const cart: Ref<Map<string, {item: InventoryItem, quantity: number}>> = ref(new Map())
+  const cartTotalItems = computed( () => {
+    let total: number = 0
+    cart.value.forEach( item => {
+      total += item.quantity ?? 0
+    } )
+    return total
+  })
   const cartTotalPrice = computed( () => {
     let total: number = 0
     cart.value.forEach( item => {
@@ -93,6 +100,7 @@ export const useCartStore = defineStore('cart', () => {
     searchQuery,
 
     cart,
+    cartTotalItems,
     cartTotalPrice,
     cartComment,
 

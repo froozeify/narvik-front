@@ -127,7 +127,7 @@
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = undefined;" tabindex="-1">
+  <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = undefined;" :has-side-content="selectedItem !== undefined" :mobile-side-title="selectedItem?.name" tabindex="-1">
     <template #main>
       <UCard>
         <div class="flex gap-2 flex-col flex-wrap sm:flex-row">

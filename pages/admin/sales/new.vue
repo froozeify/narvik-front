@@ -165,10 +165,20 @@
   loadItems()
   loadPaymentModes()
 
+  const mobileSideTitle: Ref<string|undefined> = ref(undefined)
+  watchEffect(() => {
+    mobileSideTitle.value = `Panier (${cartStore.cartTotalItems} `
+    if (cartStore.cartTotalItems > 1) {
+      mobileSideTitle.value += 'articles'
+    } else {
+      mobileSideTitle.value += 'article'
+    }
+    mobileSideTitle.value += ')'
+  })
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide>
+  <GenericLayoutContentWithStickySide :mobile-side-title="mobileSideTitle">
     <template #main>
       <UCard>
         <GenericBarcodeReader

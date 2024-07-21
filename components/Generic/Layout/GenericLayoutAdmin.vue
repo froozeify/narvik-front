@@ -29,7 +29,7 @@ watchEffect(() => {
               v-if="!isDesktopDisplay"
               class="mb-2"
               icon="i-heroicons-bars-3"
-              :label="menuVisible ? 'Masquer le menu' : 'Afficher le menu'"
+              :label="menuVisible ? 'Masquer le menu' : 'Menu'"
               @click="menuVisible = !menuVisible"
             />
             <UVerticalNavigation

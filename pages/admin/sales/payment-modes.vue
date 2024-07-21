@@ -167,7 +167,7 @@ definePageMeta({
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedPaymentMode = null;" tabindex="-1">
+  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedPaymentMode = null;" :has-side-content="isVisible" :mobile-side-title="selectedPaymentMode?.name" tabindex="-1">
     <template #main>
       <UCard>
 

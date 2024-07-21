@@ -160,7 +160,7 @@
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedCategory = null;" tabindex="-1">
+  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedCategory = null;" :has-side-content="isVisible" :mobile-side-title="selectedCategory?.name" tabindex="-1">
     <template #main>
       <UCard>
 
