@@ -28,7 +28,6 @@ definePageMeta({
   const isVisible = ref(false);
   // We watch the selected item so we close the side menu if unselected
   watch(selectedPaymentMode, (value, oldValue) => {
-    console.log(value)
     isVisible.value = value !== undefined
   })
 
@@ -100,7 +99,7 @@ definePageMeta({
     await getPaymentModesPaginated();
   }
 
-  async function createPaymentMode() {
+  function createPaymentMode() {
     selectedPaymentMode.value = {
       available: true,
       name: '',
