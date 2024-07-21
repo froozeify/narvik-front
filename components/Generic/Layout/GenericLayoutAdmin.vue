@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import FooterCopyright from "~/components/FooterCopyright.vue";
-import {isDesktop, watchBreakpoint} from "~/utils/browser";
+import {isDesktop} from "~/utils/browser";
+
 const props = defineProps(
   {
     links: {
@@ -20,7 +21,7 @@ watchEffect(() => {
 
 <template>
   <div class="flex flex-col">
-    <HeaderNavbar/>
+    <HeaderNavbar />
     <main class="min-h-full flex-1">
       <div class="container mx-auto p-4">
         <div class="flex flex-col xl:flex xl:flex-row xl:gap-8">
@@ -65,7 +66,8 @@ watchEffect(() => {
     <footer class="mb-4">
       <FooterCopyright />
     </footer>
-    <UNotifications/>
+    <UModals />
+    <UNotifications />
   </div>
 </template>
 

@@ -311,7 +311,7 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
   };
 }
 
-export async function useDeleteItem(item: Item | null) {
+export async function useDeleteItem(item?: Item | null) {
   let error: Error | null = null;
 
   if (!item || !item["@id"]) {

@@ -25,7 +25,7 @@ export abstract class AbstractQuery<T> {
 		return usePatchItem<T>(item, payload)
 	}
 
-	async delete(item: Item | null) {
+	async delete(item?: Item | null) {
 		return useDeleteItem(item)
 	}
 }

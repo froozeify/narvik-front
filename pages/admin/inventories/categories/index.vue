@@ -3,6 +3,8 @@
   import type {InventoryCategory} from "~/types/inventorycategory";
   import {usePaginationValues} from "~/composables/api/list";
   import type {Member} from "~/types/member";
+  import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+  import type {FormError} from "#ui/types";
 
   definePageMeta({
     layout: "pos"
@@ -13,18 +15,19 @@
   })
 
   const toast = useToast()
+  const modal = useModal()
   const apiQuery = new InventoryCategoryQuery();
 
   const categories: Ref<InventoryCategory[]> = ref([])
   const isLoading = ref(true);
   const totalCategories = ref(0)
-  const selectedCategory: Ref<InventoryCategory | null> = ref(null)
+  const selectedCategory: Ref<InventoryCategory | undefined> = ref(undefined)
 
   // Side menu visible
   const isVisible = ref(false);
   // We watch the selected item so we close the side menu if unselected
   watch(selectedCategory, (value, oldValue) => {
-    isVisible.value = value !== null
+    isVisible.value = value !== undefined
   })
 
   // Table settings
@@ -109,7 +112,7 @@
     if (!category.id) {
       await apiQuery.post(payload).then(value => {
         error = value.error
-        selectedCategory.value = null
+        selectedCategory.value = value.created
       });
     } else { // Update
       await apiQuery.patch(category, payload).then(value => {
@@ -137,11 +140,10 @@
     await getCategoriesPaginated();
   }
 
-  async function deleteCategory(close: Function) {
+  async function deleteCategory() {
     isLoading.value = true
     const { error } = await apiQuery.delete(selectedCategory.value)
     isLoading.value = false
-    close()
 
     if (error) {
       toast.add({
@@ -152,96 +154,94 @@
       return;
     }
 
-    selectedCategory.value = null
+    selectedCategory.value = undefined
     // We refresh the list
     await getCategoriesPaginated();
+  }
+
+  const validate = (state: any): FormError[] => {
+    const errors = []
+    if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
+    return errors
   }
 
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedCategory = null;" :has-side-content="isVisible" :mobile-side-title="selectedCategory?.name" tabindex="-1">
+  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedCategory = undefined;" :has-side-content="isVisible" :mobile-side-title="selectedCategory?.name" tabindex="-1">
     <template #main>
       <UCard>
+        <div>
+          <div class="flex gap-4">
+            <div class="flex-1"></div>
+            <UButton @click="createCategory">
+              Créer une catégorie
+            </UButton>
+          </div>
 
-        <div class="flex gap-4">
+          <UTable
+            class="w-full"
+            :loading="isLoading"
+            :sort="sort"
+            :columns="columns"
+            :rows="categories"
+            @select="rowClicked">
+            <template #empty-state>
+              <div class="flex flex-col items-center justify-center py-6 gap-3">
+                <span class="italic text-sm">Aucune catégories.</span>
+              </div>
+            </template>
 
-          <div class="flex-1"></div>
-          <UButton @click="createCategory" >
-            Créer une catégorie
-          </UButton>
+            <template #name-data="{ row }">
+              {{ row.name }}
+            </template>
+
+            <template #actions-data="{ row }">
+              <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+            </template>
+
+          </UTable>
+
+          <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getCategoriesPaginated()" />
+            <UPagination v-model="page" @update:model-value="getCategoriesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalCategories" />
+          </div>
         </div>
-
-        <UTable
-          class="w-full"
-          :loading="isLoading"
-          :sort="sort"
-          :columns="columns"
-          :rows="categories"
-          @select="rowClicked">
-          <template #empty-state>
-            <div class="flex flex-col items-center justify-center py-6 gap-3">
-              <span class="italic text-sm">Aucune catégories.</span>
-            </div>
-          </template>
-
-          <template #name-data="{ row }">
-            {{ row.name }}
-          </template>
-
-          <template #actions-data="{ row }">
-            <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
-          </template>
-
-        </UTable>
-
-        <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-          <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getCategoriesPaginated()" />
-          <UPagination v-model="page" @update:model-value="getCategoriesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalCategories" />
-        </div>
-
       </UCard>
     </template>
 
     <template #side>
       <template v-if="selectedCategory">
-        <UCard class="overflow-y-auto">
+        <UForm :state="selectedCategory" @submit="updateCategory(selectedCategory)" :validate="validate" class="flex flex-col gap-4">
+          <UCard>
+            <div class="flex gap-2 flex-col">
+              <UFormGroup label="Nom" name="name">
+                <UInput v-model="selectedCategory.name" />
+              </UFormGroup>
+            </div>
 
-          <div class="flex gap-2 flex-col">
-            <UFormGroup label="Nom" :error="!selectedCategory.name && 'Champ requis'">
-              <UInput v-model="selectedCategory.name" />
-            </UFormGroup>
-          </div>
+          </UCard>
 
-        </UCard>
+          <UButton v-if="selectedCategory.id" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + selectedCategory.id">Voir les articles</UButton>
 
-        <UButton v-if="selectedCategory.id" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + selectedCategory.id">Voir les articles</UButton>
+          <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
-        <UButton block :loading="isLoading" @click="updateCategory(selectedCategory)">Enregistrer</UButton>
-
-        <UPopover v-if="selectedCategory.id">
           <UButton
-            color="red" block
+            v-if="selectedCategory.id"
+            block
+            color="red"
             :loading="isLoading"
-            :disabled="selectedCategory.items?.length > 0"
+            :disabled="(selectedCategory?.items?.length ?? 0) > 0"
+            @click="modal.open(ModalDeleteConfirmation, {
+              onDelete() {
+                modal.close()
+                deleteCategory()
+              }
+            })"
           >
             Supprimer
           </UButton>
-
-          <template #panel="{ close }">
-            <div class="p-4 w-56 flex flex-col gap-4">
-              <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
-
-              <UButton
-                @click="deleteCategory(close)"
-                color="red"
-                class="mx-auto"
-              >
-                Supprimer
-              </UButton>
-            </div>
-          </template>
-        </UPopover>
+        </UForm>
 
       </template>
     </template>
