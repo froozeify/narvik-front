@@ -229,7 +229,7 @@
               <div v-if="item.description" class="text-xs">{{ item.description }}</div>
             </div>
             <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
-            <UButton icon="i-heroicons-shopping-cart" size="2xs" @click="cartStore.addToCart(item)" />
+            <UButton class="print:hidden" icon="i-heroicons-shopping-cart" size="2xs" @click="cartStore.addToCart(item)" />
           </div>
         </div>
 
