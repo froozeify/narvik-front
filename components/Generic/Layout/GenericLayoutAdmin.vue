@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import FooterCopyright from "~/components/FooterCopyright.vue";
+import {isDesktop, watchBreakpoint} from "~/utils/browser";
 const props = defineProps(
   {
     links: {
-      type: Boolean,
-      default: true
+      type: Array,
+      default: []
     }
   }
 )
+
+const isDesktopDisplay = isDesktop()
+const menuVisible: Ref<boolean> = ref(false)
+watchEffect(() => {
+  menuVisible.value = isDesktopDisplay.value;
+})
+
 </script>
 
 <template>
@@ -16,9 +24,18 @@ const props = defineProps(
     <main class="min-h-full flex-1">
       <div class="container mx-auto p-4">
         <div class="flex flex-col xl:flex xl:flex-row xl:gap-8">
-          <div class="mb-4 xl:basis-52 print:hidden">
+          <div class="mb-4 xl:basis-60 print:hidden">
+            <UButton
+              v-if="!isDesktopDisplay"
+              class="mb-2"
+              icon="i-heroicons-bars-3"
+              :label="menuVisible ? 'Masquer le menu' : 'Afficher le menu'"
+              @click="menuVisible = !menuVisible"
+            />
             <UVerticalNavigation
+              v-if="menuVisible"
               :links="links"
+              @click="menuVisible = isDesktopDisplay"
               :ui="{
                   wrapper: 'border-s border-gray-200 dark:border-gray-800 space-y-2 sticky top-20',
                   base: 'group block border-s -ms-px xl:leading-6 before:hidden inline-flex',

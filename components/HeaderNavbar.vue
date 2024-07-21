@@ -2,7 +2,7 @@
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import type {Image} from "~/types/image";
   import {useAppConfigStore} from "~/stores/useAppConfig";
-  import {isTouchDevice} from "~/utils/browser";
+  import {isTouchDevice, watchBreakpoint} from "~/utils/browser";
 
   const colorMode = useColorMode()
   const selfStore = useSelfMemberStore();
@@ -47,6 +47,15 @@
       }
     }]
   ]
+
+  onMounted(() => {
+    watchBreakpoint()
+    window.addEventListener('resize', watchBreakpoint)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', watchBreakpoint)
+  })
 </script>
 
 <template>
