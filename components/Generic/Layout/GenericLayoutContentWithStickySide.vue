@@ -3,8 +3,8 @@
 const props = defineProps(
   {
     displaySide: {
-      type: Boolean,
-      default: true
+      type: Array,
+      default: []
     }
   }
 )

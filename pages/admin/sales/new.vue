@@ -182,7 +182,6 @@
             class="flex-1"
             v-model="searchQueryInput"
             @update:model-value="searchQueryUpdated()"
-            autofocus
             :loading="isLoading"
             placeholder="Rechercher..."
             :ui="{ icon: { trailing: { pointer: '' } } }"
