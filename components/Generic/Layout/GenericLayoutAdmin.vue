@@ -33,6 +33,8 @@ watchEffect(() => {
               :label="menuVisible ? 'Masquer le menu' : 'Menu'"
               @click="menuVisible = !menuVisible"
             />
+            <pre>{{ links }}</pre>
+
             <UVerticalNavigation
               v-if="menuVisible"
               :links="links"

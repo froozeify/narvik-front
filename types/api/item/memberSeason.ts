@@ -1,5 +1,5 @@
-import type { Item } from "./item";
-import type {AgeCategory} from "~/types/agecategory";
+import type { Item } from "../item";
+import type {AgeCategory} from "~/types/api/item/ageCategory";
 
 export interface MemberSeason extends Item {
   member?: any;

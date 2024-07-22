@@ -1,7 +1,7 @@
 <script lang="ts" setup>
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
   import MetricQuery from "~/composables/api/query/MetricQuery";
-  import type {Metric} from "~/types/metric";
+  import type {Metric} from "~/types/api/item/metric";
   import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
 
   definePageMeta({

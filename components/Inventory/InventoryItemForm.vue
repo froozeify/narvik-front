@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type {PropType, Ref} from "vue";
-import type {InventoryItem} from "~/types/inventoryItem";
+import type {InventoryItem} from "~/types/api/item/inventoryItem";
 import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-import type {InventoryCategory} from "~/types/inventorycategory";
+import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
 import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
 import type {FormError, FormErrorEvent} from "#ui/types";
 

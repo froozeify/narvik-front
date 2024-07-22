@@ -1,8 +1,8 @@
-import type {ExternalPresence} from "~/types/externalpresence";
+import type {ExternalPresence} from "~/types/api/item/externalPresence";
 import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
 import dayjs from "dayjs";
-import type {InventoryItem} from "~/types/inventoryItem";
-import type {SalePaymentMode} from "~/types/salePaymentMode";
+import type {InventoryItem} from "~/types/api/item/inventoryItem";
+import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
 import type {FormError} from "#ui/types";
 
 export const useCartStore = defineStore('cart', () => {

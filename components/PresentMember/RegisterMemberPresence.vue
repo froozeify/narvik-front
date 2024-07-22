@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/activity";
+import type {Activity} from "~/types/api/item/activity";
 import type {PropType, Ref} from "vue";
-import type {Member} from "~/types/member";
+import type {Member} from "~/types/api/item/member";
 import type {FormSubmitEvent} from "#ui/types";
-import type {MemberPresence} from "~/types/memberpresence";
+import type {MemberPresence} from "~/types/api/item/memberPresence";
 import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
 import {formatDateInput, formatDateReadable} from "~/utils/date";
 

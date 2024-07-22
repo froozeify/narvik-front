@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import type {Member} from "~/types/member";
+  import type {Member} from "~/types/api/item/member";
   import {usePresenceStore} from "~/stores/usePresenceStore";
-  import type {ExternalPresence} from "~/types/externalpresence";
+  import type {ExternalPresence} from "~/types/api/item/externalPresence";
   import {formatDateInput, formatDateReadable} from "~/utils/date";
-  import type {MemberPresence} from "~/types/memberpresence";
+  import type {MemberPresence} from "~/types/api/item/memberPresence";
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
   import {usePaginationValues} from "~/composables/api/list";
   import {useSelfMemberStore} from "~/stores/useSelfMember";

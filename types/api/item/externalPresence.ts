@@ -1,5 +1,5 @@
-import type {Activity} from "~/types/activity";
-import type {TimestampItem} from "~/types/timestampItem";
+import type {Activity} from "~/types/api/item/activity";
+import type {TimestampItem} from "~/types/api/timestampItem";
 
 export interface ExternalPresence extends TimestampItem {
   activities?: Activity[];

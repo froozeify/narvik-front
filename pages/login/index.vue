@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type {FormError, FormSubmitEvent} from '#ui/types'
 import {useLoginUser} from "~/composables/api/api";
-import type {Image} from "~/types/image";
+import type {Image} from "~/types/api/item/image";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 

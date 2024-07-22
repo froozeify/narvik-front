@@ -1,11 +1,11 @@
 <script setup lang="ts">
 
 import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
-import type {GlobalSetting} from "~/types/globalsetting";
+import type {GlobalSetting} from "~/types/api/item/globalSetting";
 import clipboard from "clipboardy";
 import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/activity";
-import type {Image} from "~/types/image";
+import type {Activity} from "~/types/api/item/activity";
+import type {Image} from "~/types/api/item/image";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";

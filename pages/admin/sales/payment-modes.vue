@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type {InventoryCategory} from "~/types/inventorycategory";
+import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
 import {usePaginationValues} from "~/composables/api/list";
 import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
-import type {SalePaymentMode} from "~/types/salePaymentMode";
+import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
 import type {FormError} from "#ui/types";
 import {UModals} from "#components";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";

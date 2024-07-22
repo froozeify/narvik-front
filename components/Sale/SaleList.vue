@@ -3,12 +3,12 @@
   import {formatMonetary} from "~/utils/string";
   import {formatDateInput, formatDateRangeReadable, formatDateTimeReadable} from "~/utils/date";
   import dayjs from "dayjs";
-  import type {Sale} from "~/types/sale";
+  import type {Sale} from "~/types/api/item/sale";
   import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
-  import type {SalePaymentMode} from "~/types/salePaymentMode";
+  import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
 
   const props = defineProps({
-    today: {
+    perItem: {
       type: Boolean,
       required: false,
       default: false
@@ -16,7 +16,7 @@
   })
 
   const isLoading = ref(true)
-  const selectedRange: Ref<{start: Date, end: Date}> = props.today ? ref({ start: new Date(), end: new Date() }) : ref({ start: dayjs().subtract(30, 'day').toDate(), end: new Date() })
+  const selectedRange: Ref<{start: Date, end: Date}> = ref({ start: new Date(), end: new Date() })
 
   const saleQuery = new SaleQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
@@ -111,7 +111,7 @@
       <UButton icon="i-heroicons-calendar-days-20-solid" :label="selectedRange ? formatDateRangeReadable(selectedRange) || 'Choisir une plage' : 'Choisir une plage'" />
 
       <template #panel="{ close }">
-        <GenericDateRangePicker v-if="!props.today" v-model="selectedRange" />
+        <GenericDateRangePicker v-model="selectedRange" />
       </template>
     </UPopover>
 
@@ -168,6 +168,10 @@
             label: 'Montant',
           },
           {
+            key: 'comment',
+            label: 'Commentaire'
+          },
+          {
             key: 'id',
             label: 'Détail'
           }
@@ -200,7 +204,7 @@
              :to="'/admin/sales/' + row.id"
              variant="soft"
              :ui="{ rounded: 'rounded-full' }">
-            Voir la vente
+            Voir le détail
           </UButton>
         </template>
 

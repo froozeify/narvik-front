@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type {Member} from "~/types/member";
+  import type {Member} from "~/types/api/item/member";
   import MemberQuery from "~/composables/api/query/MemberQuery";
   import {formatDateReadable} from "~/utils/date";
   import ImageQuery from "~/composables/api/query/ImageQuery";

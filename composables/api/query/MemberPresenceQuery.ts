@@ -1,8 +1,8 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
-import type {MemberPresence} from "~/types/memberpresence";
-import type {FetchAllData} from "~/types/api";
+import type {MemberPresence} from "~/types/api/item/memberPresence";
+import type {FetchAllData} from "~/types/api/api";
 import {useFetchList, useGetCsv, usePost, useUploadFile} from "~/composables/api/api";
-import type {Member} from "~/types/member";
+import type {Member} from "~/types/api/item/member";
 
 export default class MemberPresenceQuery extends AbstractQuery<MemberPresence> {
     rootPath = "member-presences";

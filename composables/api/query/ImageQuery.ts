@@ -1,6 +1,6 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
-import type {Image} from "~/types/image";
-import type {FetchItemData} from "~/types/api";
+import type {Image} from "~/types/api/item/image";
+import type {FetchItemData} from "~/types/api/api";
 import {id} from "postcss-selector-parser";
 import {useFetchItem} from "~/composables/api/api";
 

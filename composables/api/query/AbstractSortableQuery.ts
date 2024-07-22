@@ -1,6 +1,6 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import {usePut} from "~/composables/api/api";
-import type {Item} from "~/types/item";
+import type {Item} from "~/types/api/item";
 
 export abstract class AbstractSortableQuery<T> extends AbstractQuery<T> {
 

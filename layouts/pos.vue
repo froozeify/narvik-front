@@ -22,7 +22,24 @@
       to: '/admin/sales/new'
     },
     {
-      label: 'Ventes du jour',
+      label: 'Historique par articles',
+      icon: 'i-heroicons-shopping-cart',
+      to: '/admin/sales'
+    },
+    {
+      label: 'Historique',
+      icon: 'i-heroicons-receipt-refund',
+      to: '/admin/sales/history'
+    }
+  ]
+
+  const historySection = [
+    {
+      label: 'Historique',
+      labelClass: 'font-bold pb-2 pointer-events-none'
+    },
+    {
+      label: 'Historique par articles',
       icon: 'i-heroicons-shopping-cart',
       to: '/admin/sales'
     },
@@ -52,7 +69,8 @@
   ]
 
   let links = [
-    salesSection
+    salesSection,
+    historySection
   ]
 
   if (isAdmin) {

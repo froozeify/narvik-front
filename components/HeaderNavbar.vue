@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import {useSelfMemberStore} from "~/stores/useSelfMember";
-  import type {Image} from "~/types/image";
+  import type {Image} from "~/types/api/item/image";
   import {useAppConfigStore} from "~/stores/useAppConfig";
   import {isTouchDevice, watchBreakpoint} from "~/utils/browser";
 

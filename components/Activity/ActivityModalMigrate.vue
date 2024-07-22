@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import type {PropType} from "vue";
-import type {Activity} from "~/types/activity";
+import type {Activity} from "~/types/api/item/activity";
 
 const props = defineProps(
   {

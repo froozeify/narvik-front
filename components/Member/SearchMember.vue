@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MemberQuery from "~/composables/api/query/MemberQuery";
-import type {Member} from "~/types/member";
+import type {Member} from "~/types/api/item/member";
 
 const props = defineProps({
   query: {

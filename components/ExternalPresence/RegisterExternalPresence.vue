@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/activity";
+import type {Activity} from "~/types/api/item/activity";
 import type {PropType, Ref} from "vue";
 import type {FormSubmitEvent} from "#ui/types";
-import type {ExternalPresence} from "~/types/externalpresence";
+import type {ExternalPresence} from "~/types/api/item/externalPresence";
 import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
 import SearchMember from "~/components/Member/SearchMember.vue";
-import type {Member} from "~/types/member";
+import type {Member} from "~/types/api/item/member";
 import MemberQuery from "~/composables/api/query/MemberQuery";
 
 const props = defineProps({

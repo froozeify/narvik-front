@@ -1,9 +1,9 @@
 import type {Ref} from "vue";
-import type {Config} from "~/types/config";
+import type {Config} from "~/types/api/item/config";
 import ImageQuery from "~/composables/api/query/ImageQuery";
 import ConfigQuery from "~/composables/api/query/ConfigQuery";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
-import type {Image} from "~/types/image";
+import type {Image} from "~/types/api/item/image";
 
 export const useAppConfigStore = defineStore('appConfig', () => {
 	const config: Ref<Config | null> = ref(null)

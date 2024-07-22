@@ -1,12 +1,12 @@
 <script setup lang="ts">
   import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
   import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
-  import type {InventoryItem} from "~/types/inventoryItem";
+  import type {InventoryItem} from "~/types/api/item/inventoryItem";
   import {formatMonetary} from "~/utils/string";
-  import type {SalePaymentMode} from "~/types/salePaymentMode";
+  import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
   import SaleQuery from "~/composables/api/query/SaleQuery";
-  import type {Sale} from "~/types/sale";
-  import type {SalePurchasedItem} from "~/types/salePurchasedItem";
+  import type {Sale} from "~/types/api/item/sale";
+  import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
   import {useCartStore} from "~/stores/useCartStore";
 
   definePageMeta({

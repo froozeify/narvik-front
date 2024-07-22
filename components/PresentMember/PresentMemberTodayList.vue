@@ -3,12 +3,12 @@
 import SearchMember from "~/components/Member/SearchMember";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence";
 import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
-import type {MemberPresence} from "~/types/memberpresence";
-import type {Member} from "~/types/member";
+import type {MemberPresence} from "~/types/api/item/memberPresence";
+import type {Member} from "~/types/api/item/member";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence";
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
 import {formatDateReadable, formatTimeReadable} from "~/utils/date";
-import type {ExternalPresence} from "~/types/externalpresence";
+import type {ExternalPresence} from "~/types/api/item/externalPresence";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 
 const memberPresenceQuery = new MemberPresenceQuery();

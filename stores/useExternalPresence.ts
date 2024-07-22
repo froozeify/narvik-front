@@ -1,4 +1,4 @@
-import type {ExternalPresence} from "~/types/externalpresence";
+import type {ExternalPresence} from "~/types/api/item/externalPresence";
 import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
 
 export const useExternalPresenceStore = defineStore('externalPresence', () => {

@@ -1,5 +1,5 @@
-import type {InventoryCategory} from "~/types/inventorycategory";
-import type {TimestampItem} from "~/types/timestampItem";
+import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
+import type {TimestampItem} from "~/types/api/timestampItem";
 
 export interface InventoryItem extends TimestampItem {
   category?: InventoryCategory|null;

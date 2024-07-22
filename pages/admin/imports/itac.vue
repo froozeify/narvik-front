@@ -1,7 +1,7 @@
 <script lang="ts" setup>
   import MemberQuery from "~/composables/api/query/MemberQuery";
   import MetricQuery from "~/composables/api/query/MetricQuery";
-  import type {Metric} from "~/types/metric";
+  import type {Metric} from "~/types/api/item/metric";
   import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
   import { formatDateReadable } from "~/utils/date";
   import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";

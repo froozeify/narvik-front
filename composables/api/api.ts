@@ -1,7 +1,7 @@
-import type {PagedCollection} from "~/types/collection";
-import type {FetchAllData, FetchItemData} from "~/types/api";
-import type {View} from "~/types/view";
-import type {Item} from "~/types/item";
+import type {PagedCollection} from "~/types/api/collection";
+import type {FetchAllData, FetchItemData} from "~/types/api/api";
+import type {View} from "~/types/api/view";
+import type {Item} from "~/types/api/item";
 import {mergician} from 'mergician';
 import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/useApiData";
 import {useSelfMemberStore} from "~/stores/useSelfMember";

@@ -9,7 +9,7 @@
 </script>
 
 <template>
-  <SaleList :today="true" />
+  <SaleList :per-item="true" />
 </template>
 
 <style scoped lang="scss">

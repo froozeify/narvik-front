@@ -1,7 +1,7 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
-import type {InventoryItem} from "~/types/inventoryItem";
+import type {InventoryItem} from "~/types/api/item/inventoryItem";
 import {useFetchList} from "~/composables/api/api";
-import type {InventoryItemHistory} from "~/types/inventoryItemHistory";
+import type {InventoryItemHistory} from "~/types/api/item/inventoryItemHistory";
 
 export default class InventoryItemQuery extends AbstractQuery<InventoryItem> {
     rootPath = "inventory-items";

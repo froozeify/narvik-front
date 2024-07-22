@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {PropType} from "vue";
-import type {ExternalPresence} from "~/types/externalpresence";
+import type {ExternalPresence} from "~/types/api/item/externalPresence";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence.vue";
 import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
 
