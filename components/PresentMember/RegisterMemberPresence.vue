@@ -95,7 +95,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   }
 
   let item: MemberPresence | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   if (!props.memberPresence) {
     let { created, error: errorMessage } = await memberPresenceQuery.post(memberPresence);

@@ -108,7 +108,7 @@
     }
 
     // We verify if it's a creation or an update
-    let error: Error | null = null
+    let error: Error | undefined = undefined
     if (!category.id) {
       await apiQuery.post(payload).then(value => {
         error = value.error

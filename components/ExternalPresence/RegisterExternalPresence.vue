@@ -100,7 +100,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
   let item: ExternalPresence | undefined = undefined;
   let isUpdating = false
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   if (!props.externalPresence) {
     let { created, error: errorMessage } = await externalPresenceQuery.post(externalPresence);
