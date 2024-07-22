@@ -601,7 +601,8 @@
               },
               {
                 key: 'activities',
-                label: 'Activités'
+                label: 'Activités',
+                class: 'w-full'
               },
               {
                 key: 'actions'
@@ -639,7 +640,7 @@
           </template>
 
           <template #actions-data="{row}" >
-            <div v-if="isSupervisor" class="w-96 flex gap-4">
+            <div v-if="isSupervisor" class="flex gap-4">
               <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
 
               <UPopover overlay>
