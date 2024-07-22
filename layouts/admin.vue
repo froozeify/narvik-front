@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
 
   useHead({
     titleTemplate: (titleChunk) => {
@@ -42,22 +43,22 @@
 
   const importSection = [
     {
-      label: 'Import membres',
+      label: 'Membres',
       icon: 'i-heroicons-users',
       to: '/admin/imports/itac'
     },
     {
-      label: 'Import membres club secondaire',
+      label: 'Club secondaire',
       icon: 'i-heroicons-user-plus',
       to: '/admin/imports/itac-secondary-club'
     },
     {
-      label: 'Import photos',
+      label: 'Photos',
       icon: 'i-heroicons-photo',
       to: '/admin/imports/photos'
     },
     {
-      label: 'Import présences',
+      label: 'Présences',
       icon: 'i-heroicons-calendar-days',
       to: '/admin/imports/presences'
     },
@@ -81,18 +82,26 @@
     )
   }
 
-  let links = [
-    globalSection,
-    entitiesSection
+  let links: GroupedNavigationLinks[] = [
+    {
+      links: globalSection
+    },
+    {
+      title: '',
+      links: entitiesSection
+    }
   ]
 
   if (isAdmin) {
-    links.push(importSection)
+    links.push({
+      title: 'Imports',
+      links: importSection
+    })
   }
 </script>
 
 <template>
-  <GenericLayoutAdmin :links>
+  <GenericLayoutAdmin :links="links">
     <slot></slot>
   </GenericLayoutAdmin>
 </template>

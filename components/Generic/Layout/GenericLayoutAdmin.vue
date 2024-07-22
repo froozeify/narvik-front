@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import FooterCopyright from "~/components/FooterCopyright.vue";
 import {isDesktop} from "~/utils/browser";
+import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
+import type {PropType} from "vue";
 
 const props = defineProps(
   {
     links: {
-      type: Array,
-      default: []
+      type: Array as PropType<GroupedNavigationLinks[]>,
     }
   }
 )
@@ -25,7 +25,7 @@ watchEffect(() => {
     <main class="min-h-full flex-1">
       <div class="container mx-auto p-4">
         <div class="flex flex-col xl:flex xl:flex-row xl:gap-8">
-          <div class="mb-4 xl:basis-60 print:hidden">
+          <div class="mb-4 xl:mb-0 xl:basis-60 xl:sticky xl:top-20 h-fit print:hidden">
             <UButton
               v-if="!isDesktopDisplay"
               class="mb-2"
@@ -33,14 +33,17 @@ watchEffect(() => {
               :label="menuVisible ? 'Masquer le menu' : 'Menu'"
               @click="menuVisible = !menuVisible"
             />
-            <pre>{{ links }}</pre>
+            <template v-if="menuVisible" v-for="groupedLinks in props.links">
+              <UDivider v-if="groupedLinks.title !== undefined"
+                        class="p-2"
+                        :label="groupedLinks.title"
+              />
 
-            <UVerticalNavigation
-              v-if="menuVisible"
-              :links="links"
-              @click="menuVisible = isDesktopDisplay"
-              :ui="{
-                  wrapper: 'border-s border-gray-200 dark:border-gray-800 space-y-2 sticky top-20',
+              <UVerticalNavigation
+                :links="groupedLinks.links"
+                @click="menuVisible = isDesktopDisplay"
+                :ui="{
+                  wrapper: 'border-s border-gray-200 dark:border-gray-800 space-y-2',
                   base: 'group block border-s -ms-px xl:leading-6 before:hidden inline-flex',
                   padding: 'p-0 ps-4',
                   rounded: '',
@@ -55,7 +58,8 @@ watchEffect(() => {
                     inactive: 'text-gray-400 dark:text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-200'
                   }
                 }"
-            />
+              />
+            </template>
 
           </div>
           <div class="xl:basis-full">

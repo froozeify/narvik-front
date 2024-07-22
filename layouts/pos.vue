@@ -2,6 +2,7 @@
   import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import FooterCopyright from "~/components/FooterCopyright.vue";
+  import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
 
   useHead({
     titleTemplate: (titleChunk) => {
@@ -20,31 +21,17 @@
       label: 'Faire une vente',
       icon: 'i-heroicons-banknotes',
       to: '/admin/sales/new'
-    },
-    {
-      label: 'Historique par articles',
-      icon: 'i-heroicons-shopping-cart',
-      to: '/admin/sales'
-    },
-    {
-      label: 'Historique',
-      icon: 'i-heroicons-receipt-refund',
-      to: '/admin/sales/history'
     }
   ]
 
   const historySection = [
     {
-      label: 'Historique',
-      labelClass: 'font-bold pb-2 pointer-events-none'
-    },
-    {
-      label: 'Historique par articles',
+      label: 'Articles',
       icon: 'i-heroicons-shopping-cart',
       to: '/admin/sales'
     },
     {
-      label: 'Historique',
+      label: 'Ventes',
       icon: 'i-heroicons-receipt-refund',
       to: '/admin/sales/history'
     }
@@ -57,24 +44,31 @@
       to: '/admin/inventories'
     },
     {
-      label: 'Catégorie',
+      label: 'Catégories',
       icon: 'i-heroicons-tag',
       to: '/admin/inventories/categories'
     },
     {
-      label: 'Moyen de paiement',
+      label: 'Moyen de paiements',
       icon: 'i-heroicons-credit-card',
       to: '/admin/sales/payment-modes'
     }
   ]
 
-  let links = [
-    salesSection,
-    historySection
+  let links: GroupedNavigationLinks[] = [
+    {
+      links: salesSection
+    },{
+      title: 'Historique',
+      links: historySection
+    }
   ]
 
   if (isAdmin) {
-    links.push(inventorySection)
+    links.push({
+      title: 'Gestion',
+      links: inventorySection
+    })
   }
 
 </script>
