@@ -6,6 +6,7 @@
   import type {Sale} from "~/types/api/item/sale";
   import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
   import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+  import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
 
   const props = defineProps({
     perItem: {
@@ -103,6 +104,65 @@
     isLoading.value = false
   }
 
+  function getPerItems() {
+    let items: Map<string, { item: SalePurchasedItem, paymentModesCount: Map<string, { count: number, amount: number }> }> = new Map()
+    const paymentModeDefaultMap = new Map<string, { count: number, amount: number }>()
+    paymentModes.value.forEach((paymentMode) => {
+      if (!paymentMode.name) return
+      paymentModeDefaultMap.set(paymentMode.name, { count: 0, amount: 0})
+    })
+
+    sales.value.forEach((sale) => {
+      if (
+        !sale.salePurchasedItems
+        || !sale.paymentMode
+        || typeof sale.paymentMode == 'string'
+      ) {
+        return
+      }
+
+      const salePaymentMode = sale.paymentMode.name
+      if (!salePaymentMode) return
+
+      // We loop through each purchases
+      sale.salePurchasedItems.forEach((salePurchasedItem) => {
+        if (
+          !salePurchasedItem.id
+          || !salePurchasedItem.itemPrice
+        ) {
+          return
+        }
+
+        let salePurchasedItemMap = items.get(salePurchasedItem.id.toString())
+
+        if (!salePurchasedItemMap) {
+          salePurchasedItemMap = {
+            item: salePurchasedItem,
+            paymentModesCount: paymentModeDefaultMap
+          }
+        }
+
+        // We update the item count
+        let mappedPaymentMode = salePurchasedItemMap.paymentModesCount.get(salePaymentMode)
+        if (!mappedPaymentMode) return
+
+        mappedPaymentMode.count += 1
+        mappedPaymentMode.amount += Number(salePurchasedItem.itemPrice)
+        salePurchasedItemMap.paymentModesCount.set(salePaymentMode, mappedPaymentMode)
+
+        items.set(salePurchasedItem.id.toString(), salePurchasedItemMap)
+      })
+    })
+
+    const array = Array.from(items.values()).sort((a, b) => {
+      const aCategory = a.item.itemCategory ?? '00'
+      const bCategory = b.item.itemCategory ?? '00'
+      return aCategory.toLowerCase() > bCategory.toLowerCase() ? 1 : -1
+    })
+
+    return array
+  }
+
 </script>
 
 <template>
@@ -145,12 +205,35 @@
       </GenericStatCard>
     </div>
 
-    <UCard>
-      <div class="text-xl font-bold">Ventes</div>
-      <UTable
-        class="w-full"
-        :loading="isLoading"
-        :columns="[
+    <template v-if="props.perItem">
+      <div class="flex flex-col gap-4 xl:grid xl:grid-flow-row xl:grid-cols-4">
+        <UCard v-for="itemMap in getPerItems()">
+          <div class="flex flex-col gap-2">
+            <div class="text-center">
+              <UButton v-if="itemMap.item.itemCategory"
+                       variant="soft"
+                       :ui="{ rounded: 'rounded-full' }"
+              >
+                {{ itemMap.item.itemCategory }}
+              </UButton>
+            </div>
+
+            <div class="text-xl font-bold text-center">{{ itemMap.item.itemName }}</div>
+
+            <div v-for="[name, pmMap] in itemMap.paymentModesCount">
+              {{ name }} : {{ pmMap.count }} - {{ formatMonetary(pmMap.amount) }}
+            </div>
+          </div>
+        </UCard>
+      </div>
+    </template>
+    <template v-else>
+      <UCard>
+        <div class="text-xl font-bold">Ventes</div>
+        <UTable
+          class="w-full"
+          :loading="isLoading"
+          :columns="[
           {
             key: 'createdAt',
             label: 'Date',
@@ -176,40 +259,41 @@
             label: 'Détail'
           }
         ]"
-        :sort="{
+          :sort="{
           column: 'date',
           direction: 'desc'
         }"
-        :rows="sales">
-        <template #empty-state>
-          <div class="flex flex-col items-center justify-center py-6 gap-3">
-            <span class="italic text-sm">Aucun articles.</span>
-          </div>
-        </template>
+          :rows="sales">
+          <template #empty-state>
+            <div class="flex flex-col items-center justify-center py-6 gap-3">
+              <span class="italic text-sm">Aucun articles.</span>
+            </div>
+          </template>
 
-        <template #createdAt-data="{ row }">
-          {{ formatDateTimeReadable(row.createdAt) }}
-        </template>
+          <template #createdAt-data="{ row }">
+            {{ formatDateTimeReadable(row.createdAt) }}
+          </template>
 
-        <template #price-data="{ row }">
-          {{ formatMonetary(row.price) }}
-        </template>
+          <template #price-data="{ row }">
+            {{ formatMonetary(row.price) }}
+          </template>
 
-        <template #total-data="{ row }">
-          {{ formatMonetary(Number(Number(row.itemPrice) * Number(row.quantity)).toFixed(2)) }}
-        </template>
+          <template #total-data="{ row }">
+            {{ formatMonetary(Number(Number(row.itemPrice) * Number(row.quantity)).toFixed(2)) }}
+          </template>
 
-        <template #id-data="{ row }">
-          <UButton
-             :to="'/admin/sales/' + row.id"
-             variant="soft"
-             :ui="{ rounded: 'rounded-full' }">
-            Voir le détail
-          </UButton>
-        </template>
+          <template #id-data="{ row }">
+            <UButton
+              :to="'/admin/sales/' + row.id"
+              variant="soft"
+              :ui="{ rounded: 'rounded-full' }">
+              Voir le détail
+            </UButton>
+          </template>
 
-      </UTable>
-    </UCard>
+        </UTable>
+      </UCard>
+    </template>
   </div>
 </template>
 
