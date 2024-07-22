@@ -5,22 +5,22 @@ export interface FetchAllData<T> {
   items: T[];
   totalItems: number | undefined
   view: View | undefined;
-  error: Error | null;
+  error: Error | undefined;
   hubUrl: URL | undefined;
 }
 
 export interface FetchItemData<T> {
   retrieved: T | undefined;
-  error: Error | null;
+  error: Error | undefined;
   hubUrl: URL | undefined;
 }
 
 export interface CreateItemData<T> {
   created: T | undefined;
-  error: Error | null;
+  error: Error | undefined;
 }
 
 export interface UpdateItemData<T> {
   updated: T | undefined;
-  error: Error | null;
+  error: Error | undefined;
 }

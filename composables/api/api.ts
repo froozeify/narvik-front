@@ -1,7 +1,6 @@
 import type {PagedCollection} from "~/types/collection";
 import type {FetchAllData, FetchItemData} from "~/types/api";
 import type {View} from "~/types/view";
-import type {SubmissionErrors} from "~/types/error";
 import type {Item} from "~/types/item";
 import {mergician} from 'mergician';
 import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/useApiData";
@@ -89,7 +88,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
   let totalItems: number | undefined = undefined;
   let view: View | undefined = undefined;
   let hubUrl: URL | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   try {
     const data = await useApi<PagedCollection<T>>(resource, {
@@ -118,7 +117,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
 export async function useFetchItem<T>(path: string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<T>> {
   let retrieved: T | undefined = undefined;
   let hubUrl: URL | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   try {
     const data = await useApi<T>(path, {
@@ -144,7 +143,7 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false, r
 
 export async function useCreateItem<T>(resource: string, payload: Item) {
   let created: T | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   try {
     const data = await useApi<T>(resource, {
@@ -165,7 +164,7 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
 
 export async function useUploadFile(resource: string, payload: FormData, requireLogin: boolean = true) {
   let created: Object | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   try {
     const data = await useApi(resource, {
@@ -190,7 +189,7 @@ export async function useUploadFile(resource: string, payload: FormData, require
 
 export async function useUpdateItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   try {
     const data = await useApi<T>(item["@id"] ?? "", {
@@ -215,7 +214,7 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
 
 export async function useGetCsv(path: string) {
   let data = null;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   try {
     data = await useApi(path, {
@@ -236,7 +235,7 @@ export async function useGetCsv(path: string) {
 
 export async function usePost<T>(path: string, payload: object) {
   let item: T | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   try {
     const data = await useApi<T>(path, {
@@ -262,10 +261,10 @@ export async function usePost<T>(path: string, payload: object) {
 
 export async function usePut(path: string, payload: object) {
   let updated: object | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   try {
-    const data = await useApi<object>(path, {
+    updated = await useApi<object>(path, {
       method: "PUT",
       body: payload,
       headers: {
@@ -273,8 +272,6 @@ export async function usePut(path: string, payload: object) {
         "Content-Type": MIME_TYPE,
       },
     });
-
-    updated = data;
   } catch (e) {
     error = e as Error
   }
@@ -288,7 +285,7 @@ export async function usePut(path: string, payload: object) {
 
 export async function usePatchItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   try {
     const data = await useApi(item["@id"] ?? "", {
@@ -312,7 +309,7 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
 }
 
 export async function useDeleteItem(item?: Item | null) {
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   if (!item || !item["@id"]) {
     error = new Error("No item found. Please reload");
