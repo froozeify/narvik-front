@@ -26,12 +26,12 @@
 
   const historySection = [
     {
-      label: 'Articles',
+      label: 'Par Articles',
       icon: 'i-heroicons-shopping-cart',
       to: '/admin/sales'
     },
     {
-      label: 'Ventes',
+      label: 'Par Ventes',
       icon: 'i-heroicons-receipt-refund',
       to: '/admin/sales/history'
     }
