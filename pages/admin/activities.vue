@@ -18,7 +18,7 @@ const modal = useModal()
 
 const isLoading = ref(true)
 const activities: Ref<Activity[]> = ref([])
-const selectedActivity: Ref<Activity|undefined> = ref(undefined)
+const selectedActivity: Ref<Activity | undefined> = ref(undefined)
 
 // Side menu visible
 const isVisible = ref(false);
@@ -28,19 +28,29 @@ watch(selectedActivity, (value, oldValue) => {
 
 const activityQuery = new ActivityQuery();
 
-const columns = [{
-  key: 'name',
-  label: 'Nom',
-  class: 'w-full'
-},
-{
-  key: 'actions',
-}]
+const columns = [
+  {
+    key: 'enabled',
+    label: 'Disponible'
+  },
+  {
+    key: 'name',
+    label: 'Nom',
+    class: 'w-full'
+  },
+  {
+    key: 'actions',
+  }]
 
 async function getActivities() {
   isLoading.value = true
 
-  const { items } = await activityQuery.getAll()
+  const urlParams = new URLSearchParams({
+    'order[isEnabled]': 'ASC',
+    'order[name]': 'ASC',
+  });
+
+  const {items} = await activityQuery.getAll(urlParams)
   activities.value = items
 
   isLoading.value = false
@@ -53,7 +63,7 @@ function rowClicked(row: Activity) {
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
+  if (!state.name) errors.push({path: 'name', message: 'Champ requis'})
   return errors
 }
 
@@ -75,11 +85,11 @@ async function updateActivity(activity: Activity) {
   // We verify if it's a creation or an update
   let errorApi: Error | undefined = undefined
   if (!activity.id) {
-    const { error, created } = await activityQuery.post(payload)
+    const {error, created} = await activityQuery.post(payload)
     errorApi = error
     selectedActivity.value = created
   } else { // Update
-    const { error } = await activityQuery.patch(activity, payload);
+    const {error} = await activityQuery.patch(activity, payload);
     errorApi = error
   }
 
@@ -106,7 +116,7 @@ async function deleteActivity() {
   if (!selectedActivity.value) return
 
   isLoading.value = true
-  const { error } = await activityQuery.delete(selectedActivity.value);
+  const {error} = await activityQuery.delete(selectedActivity.value);
   isLoading.value = false
 
   if (error) {
@@ -130,7 +140,7 @@ async function migrateActivity(migrationTarget: string) {
   if (!selectedActivity.value?.id || !migrationTarget) return;
 
   isLoading.value = true
-  const { error } = await activityQuery.mergeTo(selectedActivity.value.id, migrationTarget)
+  const {error} = await activityQuery.mergeTo(selectedActivity.value.id, migrationTarget)
   isLoading.value = false
   selectedActivity.value = undefined
 
@@ -156,7 +166,9 @@ getActivities()
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedActivity = undefined;" :has-side-content="isVisible" :mobile-side-title="selectedActivity?.name" tabindex="-1">
+  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedActivity = undefined;"
+                                      :has-side-content="isVisible" :mobile-side-title="selectedActivity?.name"
+                                      tabindex="-1">
     <template #main>
       <UCard>
         <div>
@@ -179,6 +191,10 @@ getActivities()
                 <UButton class="mt-4" label="Créer" @click="createActivity()"/>
               </div>
             </template>
+
+            <template #enabled-data="{ row }">
+              <UToggle :model-value="row.isEnabled" />
+            </template>
           </UTable>
         </div>
       </UCard>
@@ -190,11 +206,11 @@ getActivities()
           <UCard>
             <div class="flex gap-2 flex-col">
               <UFormGroup label="Disponible" name="available">
-                <UToggle v-model="selectedActivity.isEnabled" />
+                <UToggle v-model="selectedActivity.isEnabled"/>
               </UFormGroup>
 
               <UFormGroup label="Nom" name="name">
-                <UInput v-model="selectedActivity.name" />
+                <UInput v-model="selectedActivity.name"/>
               </UFormGroup>
             </div>
 
@@ -203,8 +219,7 @@ getActivities()
           <UButton class="mt-4" block type="submit" :loading="isLoading">Enregistrer</UButton>
         </UForm>
 
-        <UButton
-          v-if="selectedActivity.id"
+        <UButton v-if="selectedActivity.id && !selectedActivity.isEnabled"
           block
           color="red"
           :loading="isLoading"
@@ -219,11 +234,11 @@ getActivities()
           Supprimer
         </UButton>
 
-        <UButton v-if="!selectedActivity.isEnabled"
-           block
-           color="orange"
-           :loading="isLoading"
-           @click="modal.open(ActivityModalMigrate, {
+        <UButton v-if="selectedActivity.id && !selectedActivity.isEnabled"
+                 block
+                 color="orange"
+                 :loading="isLoading"
+                 @click="modal.open(ActivityModalMigrate, {
              title: selectedActivity.name,
              activities: activities,
              onMigrate(targetId: string) {
