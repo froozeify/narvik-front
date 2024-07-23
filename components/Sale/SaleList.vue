@@ -6,7 +6,6 @@
   import type {Sale} from "~/types/api/item/sale";
   import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
   import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
-  import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
 
   const props = defineProps({
     perItem: {
@@ -67,10 +66,6 @@
   async function getSales(page: number = 1) {
     isLoading.value = true
 
-    if (page === 1) {
-      salesLoading.value = []
-    }
-
     const urlParams = new URLSearchParams({
       page: page.toString(),
     });
@@ -90,77 +85,22 @@
     const { items, view } = await saleQuery.getAll(urlParams)
     salesLoading.value = salesLoading.value.concat(items)
 
-    if (view &&view["hydra:next"]) {
+    // We load the next page
+    if (view && view["hydra:next"]) {
       await getSales(page + 1)
       return;
     }
 
+    // No more pages to load
+
     sales.value = salesLoading.value
+    salesLoading.value = []
 
     // We load the payment modes
     const { items: paymentModesResponse } = await paymentModeQuery.getAll()
     paymentModes.value = paymentModesResponse
 
     isLoading.value = false
-  }
-
-  function getPerItems() {
-    let items: Map<string, { item: SalePurchasedItem, paymentModesCount: Map<string, { count: number, amount: number }> }> = new Map()
-    const paymentModeDefaultMap = new Map<string, { count: number, amount: number }>()
-    paymentModes.value.forEach((paymentMode) => {
-      if (!paymentMode.name) return
-      paymentModeDefaultMap.set(paymentMode.name, { count: 0, amount: 0})
-    })
-
-    sales.value.forEach((sale) => {
-      if (
-        !sale.salePurchasedItems
-        || !sale.paymentMode
-        || typeof sale.paymentMode == 'string'
-      ) {
-        return
-      }
-
-      const salePaymentMode = sale.paymentMode.name
-      if (!salePaymentMode) return
-
-      // We loop through each purchases
-      sale.salePurchasedItems.forEach((salePurchasedItem) => {
-        if (
-          !salePurchasedItem.id
-          || !salePurchasedItem.itemPrice
-        ) {
-          return
-        }
-
-        let salePurchasedItemMap = items.get(salePurchasedItem.id.toString())
-
-        if (!salePurchasedItemMap) {
-          salePurchasedItemMap = {
-            item: salePurchasedItem,
-            paymentModesCount: paymentModeDefaultMap
-          }
-        }
-
-        // We update the item count
-        let mappedPaymentMode = salePurchasedItemMap.paymentModesCount.get(salePaymentMode)
-        if (!mappedPaymentMode) return
-
-        mappedPaymentMode.count += 1
-        mappedPaymentMode.amount += Number(salePurchasedItem.itemPrice)
-        salePurchasedItemMap.paymentModesCount.set(salePaymentMode, mappedPaymentMode)
-
-        items.set(salePurchasedItem.id.toString(), salePurchasedItemMap)
-      })
-    })
-
-    const array = Array.from(items.values()).sort((a, b) => {
-      const aCategory = a.item.itemCategory ?? '00'
-      const bCategory = b.item.itemCategory ?? '00'
-      return aCategory.toLowerCase() > bCategory.toLowerCase() ? 1 : -1
-    })
-
-    return array
   }
 
 </script>
@@ -171,7 +111,7 @@
       <UButton icon="i-heroicons-calendar-days-20-solid" :label="selectedRange ? formatDateRangeReadable(selectedRange) || 'Choisir une plage' : 'Choisir une plage'" />
 
       <template #panel="{ close }">
-        <GenericDateRangePicker v-model="selectedRange" />
+        <GenericDateRangePicker v-model="selectedRange" @close="close" />
       </template>
     </UPopover>
 
@@ -206,26 +146,7 @@
     </div>
 
     <template v-if="props.perItem">
-      <div class="flex flex-col gap-4 xl:grid xl:grid-flow-row xl:grid-cols-4">
-        <UCard v-for="itemMap in getPerItems()">
-          <div class="flex flex-col gap-2">
-            <div class="text-center">
-              <UButton v-if="itemMap.item.itemCategory"
-                       variant="soft"
-                       :ui="{ rounded: 'rounded-full' }"
-              >
-                {{ itemMap.item.itemCategory }}
-              </UButton>
-            </div>
-
-            <div class="text-xl font-bold text-center">{{ itemMap.item.itemName }}</div>
-
-            <div v-for="[name, pmMap] in itemMap.paymentModesCount">
-              {{ name }} : {{ pmMap.count }} - {{ formatMonetary(pmMap.amount) }}
-            </div>
-          </div>
-        </UCard>
-      </div>
+      <SalePerItemList :sales="sales" :payment-modes="paymentModes" />
     </template>
     <template v-else>
       <UCard>

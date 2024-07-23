@@ -65,10 +65,6 @@
   async function loadItems(page: number = 1) {
     isLoading.value = true
 
-    if (page === 1) {
-      inventoryItemsLoading.value = []
-    }
-
     const urlParams = new URLSearchParams({
       page: page.toString(),
       canBeSold: 'true',
@@ -82,12 +78,16 @@
     const { items, view } = await inventoryItemQuery.getAll(urlParams)
     inventoryItemsLoading.value = inventoryItemsLoading.value.concat(items)
 
+    // We load the next page
     if (view &&view["hydra:next"]) {
       await loadItems(page + 1)
       return;
     }
 
+    // No more pages to load
+
     inventoryItems.value = inventoryItemsLoading.value
+    inventoryItemsLoading.value = []
     isLoading.value = false
   }
 
