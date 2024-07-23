@@ -5,6 +5,7 @@ import SaleQuery from "~/composables/api/query/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import dayjs from "dayjs";
+import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 
 definePageMeta({
     layout: "pos"
@@ -18,6 +19,7 @@ definePageMeta({
   const isAdmin = selfStore.isAdmin()
 
   const toast = useToast()
+  const modal = useModal()
   const route = useRoute()
   const itemId = route.params.id;
 
@@ -60,7 +62,7 @@ definePageMeta({
         title: "Vente non trouvé",
       })
 
-      navigateTo('/admin/sales')
+      navigateTo('/admin/sales/history')
       return
     }
 
@@ -84,7 +86,7 @@ definePageMeta({
       return
     }
 
-    navigateTo('/admin/sales')
+    navigateTo('/admin/sales/history')
   }
 
   // Main code
@@ -112,26 +114,16 @@ definePageMeta({
       </div>
 
       <UTooltip v-if="isAdmin || dayjs(dayjs(sale?.createdAt)).isAfter(dayjs().startOf('day'))" text="Supprimer">
-        <UPopover>
-          <UButton
-            icon="i-heroicons-trash"
-            color="red"
-          />
-
-          <template #panel="{ close }">
-            <div class="p-4 w-56 flex flex-col gap-4">
-              <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
-
-              <UButton
-                @click="deleteSale(close);"
-                color="red"
-                class="mx-auto"
-              >
-                Supprimer
-              </UButton>
-            </div>
-          </template>
-        </UPopover>
+        <UButton
+          icon="i-heroicons-trash"
+          color="red"
+          @click="modal.open(ModalDeleteConfirmation, {
+            onDelete() {
+              modal.close()
+              deleteSale()
+            }
+          })"
+        />
       </UTooltip>
     </div>
 

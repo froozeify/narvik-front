@@ -6,6 +6,7 @@
   import type {Sale} from "~/types/api/item/sale";
   import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
   import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+  import {useSaleStore} from "~/stores/useSaleStore";
 
   const props = defineProps({
     perItem: {
@@ -16,7 +17,9 @@
   })
 
   const isLoading = ref(true)
-  const selectedRange: Ref<{start: Date, end: Date}> = ref({ start: new Date(), end: new Date() })
+
+  const saleStore = useSaleStore()
+  const { selectedRange } = storeToRefs(saleStore)
 
   const saleQuery = new SaleQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
