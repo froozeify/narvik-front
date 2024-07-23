@@ -16,16 +16,14 @@
     },
   })
 
-  const isLoading = ref(true)
+  const isLoading = ref(false)
 
   const saleStore = useSaleStore()
-  const { selectedRange } = storeToRefs(saleStore)
+  const { selectedRange, sales, paymentModes } = storeToRefs(saleStore)
 
   const saleQuery = new SaleQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
-  const paymentModes: Ref<SalePaymentMode[]> = ref([])
 
-  const sales: Ref<Sale[]> = ref([])
   const salesLoading: Ref<Sale[]> = ref([])
   const totalAmountSales = computed(() => {
     let amount = 0
@@ -61,7 +59,9 @@
     return amountPerPayment
   })
 
-  getSales() // We load the default setting
+  if (sales.value.length == 0) {
+    getSales() // We load the default setting
+  }
   watch(selectedRange, () => {
     getSales()
   })
@@ -149,7 +149,7 @@
     </div>
 
     <template v-if="props.perItem">
-      <SalePerItemList :sales="sales" :payment-modes="paymentModes" />
+      <SalePerItemList :is-loading="isLoading" />
     </template>
     <template v-else>
       <UCard>
@@ -158,35 +158,35 @@
           class="w-full"
           :loading="isLoading"
           :columns="[
-          {
-            key: 'createdAt',
-            label: 'Date',
-            class: 'w-40',
-            sortable: true
-          },
-          {
-            key: 'paymentMode.name',
-            label: 'Moyen de paiement',
-            class: 'w-48',
-            sortable: true
-          },
-          {
-            key: 'price',
-            label: 'Montant',
-          },
-          {
-            key: 'comment',
-            label: 'Commentaire'
-          },
-          {
-            key: 'id',
-            label: 'Détail'
-          }
-        ]"
+            {
+              key: 'createdAt',
+              label: 'Date',
+              class: 'w-40',
+              sortable: true
+            },
+            {
+              key: 'paymentMode.name',
+              label: 'Moyen de paiement',
+              class: 'w-48',
+              sortable: true
+            },
+            {
+              key: 'price',
+              label: 'Montant',
+            },
+            {
+              key: 'comment',
+              label: 'Commentaire'
+            },
+            {
+              key: 'id',
+              label: 'Détail'
+            }
+          ]"
           :sort="{
-          column: 'date',
-          direction: 'desc'
-        }"
+            column: 'date',
+            direction: 'desc'
+          }"
           :rows="sales">
           <template #empty-state>
             <div class="flex flex-col items-center justify-center py-6 gap-3">

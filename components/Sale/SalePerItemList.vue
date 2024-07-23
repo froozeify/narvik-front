@@ -3,17 +3,11 @@ import type {PropType, Ref} from "vue";
 import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
 import type {Sale} from "~/types/api/item/sale";
 import {formatMonetary} from "~/utils/string";
-import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
-
 
 const props = defineProps({
-  sales: {
-    type: Array as PropType<Sale[]>,
-    required: true
-  },
-  paymentModes: {
-    type: Array as PropType<SalePaymentMode[]>,
-    required: true
+  isLoading: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -32,15 +26,13 @@ interface PaymentModeCountMapping {
   amount: number
 }
 
-
-
-const sales: Ref<Sale[]> = toRef(props, 'sales')
-const paymentModes: Ref<SalePaymentMode[]> = toRef(props, 'paymentModes')
+const saleStore = useSaleStore()
+const { paymentModes, sales } = storeToRefs(saleStore)
 
 const categories: Ref<Map<string, CategoryMapping>> = ref(new Map())
 const mapping: Ref<CategoryMapping[]> = ref([])
 
-watch(props, () => {
+watchEffect(() => {
   generateList()
 })
 
@@ -122,7 +114,13 @@ function generateList() {
 </script>
 
 <template>
-  <UCard v-for="categoryMap in mapping">
+  <UCard v-if="isLoading" v-for="i in Math.floor(Math.random() * 3) + 1">
+    <USkeleton class="h-8 w-36 mb-4" />
+    <div class="gap-2 grid grid-flow-row grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <USkeleton v-for="i in Math.floor(Math.random() * 5) + 2" class="h-24 w-full" />
+    </div>
+  </UCard>
+  <UCard v-else v-for="categoryMap in mapping">
     <div>
       <div class="text-xl font-bold mb-4">{{ categoryMap.name == '000' ? 'Sans catégorie' : categoryMap.name }}</div>
       <div class="gap-2 grid grid-flow-row grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
