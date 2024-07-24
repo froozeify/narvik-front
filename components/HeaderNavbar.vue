@@ -2,7 +2,7 @@
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import type {Image} from "~/types/api/item/image";
   import {useAppConfigStore} from "~/stores/useAppConfig";
-  import {isTouchDevice, watchBreakpoint} from "~/utils/browser";
+  import {isDesktop, isTouchDevice, watchBreakpoint} from "~/utils/browser";
 
   const colorMode = useColorMode()
   const selfStore = useSelfMemberStore();
@@ -21,6 +21,9 @@
   const isAdmin = selfStore.isAdmin()
   const isBadger = selfStore.isBadger()
   const isSupervisor = selfStore.hasSupervisorRole()
+
+  const isDesktopDisplay = isDesktop()
+  const isTabletDisplay = isTablet()
 
   const siteLogo: Ref<Image | null> = appConfigStore.getLogo()
 
@@ -83,7 +86,7 @@
           <UButton
             variant="ghost"
             color="gray"
-            :label="!isBadger ? selfStore.member?.fullName : 'Pointeuse'">
+            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? selfStore.member?.fullName : 'Pointeuse') : undefined">
             <template #trailing>
               <UAvatar v-if="!isBadger"
                        size="xs"
