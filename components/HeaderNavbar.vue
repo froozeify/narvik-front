@@ -64,15 +64,13 @@
     <nav class="container mx-auto p-4 flex justify-between h-full overflow-y-auto">
       <div class="flex gap-4 flex-shrink-0">
         <div>
-          <NuxtLink to="/" class="flex align-middle">
-            <span v-if="!siteLogo">Accueil</span>
-            <UTooltip v-else
-                      text="Accueil"
-            >
+          <NuxtLink v-if="siteLogo" to="/" class="flex align-middle">
+            <UTooltip text="Accueil">
               <img :src="siteLogo.base64" class="w-7"/>
             </UTooltip>
           </NuxtLink>
         </div>
+        <UButton class="-mx-3 hidden lg:block" to="/admin/sales/new" variant="ghost" color="gray">Accueil</UButton>
         <div v-if="isSupervisor">
           <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
         </div>
