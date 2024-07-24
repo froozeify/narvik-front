@@ -1,14 +1,10 @@
 <script setup lang="ts">
-  import SaleQuery from "~/composables/api/query/SaleQuery";
-  import {formatMonetary} from "~/utils/string";
-  import {formatDateInput, formatDateRangeReadable, formatDateTimeReadable} from "~/utils/date";
-  import dayjs from "dayjs";
-  import type {Sale} from "~/types/api/item/sale";
-  import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
-  import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
-  import {useSaleStore} from "~/stores/useSaleStore";
+import {formatMonetary} from "~/utils/string";
+import {formatDateRangeReadable, formatDateTimeReadable} from "~/utils/date";
+import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+import {useSaleStore} from "~/stores/useSaleStore";
 
-  const props = defineProps({
+const props = defineProps({
     perItem: {
       type: Boolean,
       required: false,
@@ -16,15 +12,10 @@
     },
   })
 
-  const isLoading = ref(false)
-
   const saleStore = useSaleStore()
-  const { selectedRange, sales, paymentModes } = storeToRefs(saleStore)
+  const { selectedRange, isLoading, lastRefreshDate, sales, paymentModes } = storeToRefs(saleStore)
 
-  const saleQuery = new SaleQuery()
-  const paymentModeQuery = new SalePaymentModeQuery()
 
-  const salesLoading: Ref<Sale[]> = ref([])
   const totalAmountSales = computed(() => {
     let amount = 0
     sales.value.forEach(sale => {
@@ -60,63 +51,40 @@
   })
 
   if (sales.value.length == 0) {
-    getSales() // We load the default setting
+    saleStore.getSales() // We load the default setting
   }
   watch(selectedRange, () => {
-    getSales()
+    saleStore.getSales()
   })
-
-  async function getSales(page: number = 1) {
-    isLoading.value = true
-
-    const urlParams = new URLSearchParams({
-      page: page.toString(),
-    });
-
-    const formattedStartDate = formatDateInput(selectedRange.value.start.toString())
-    const formattedEndDate = formatDateInput(dayjs(selectedRange.value.end).add(1, 'days').toString())
-    if (formattedStartDate) {
-      urlParams.append(`createdAt[after]`, formattedStartDate);
-
-      if (formattedEndDate) {
-        urlParams.append(`createdAt[before]`, formattedEndDate);
-      } else {
-        urlParams.append(`createdAt[before]`, formattedStartDate);
-      }
-    }
-
-    const { items, view } = await saleQuery.getAll(urlParams)
-    salesLoading.value = salesLoading.value.concat(items)
-
-    // We load the next page
-    if (view && view["hydra:next"]) {
-      await getSales(page + 1)
-      return;
-    }
-
-    // No more pages to load
-
-    sales.value = salesLoading.value
-    salesLoading.value = []
-
-    // We load the payment modes
-    const { items: paymentModesResponse } = await paymentModeQuery.getAll()
-    paymentModes.value = paymentModesResponse
-
-    isLoading.value = false
-  }
 
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <UPopover :popper="{ placement: 'bottom-start' }" class="self-center">
-      <UButton icon="i-heroicons-calendar-days-20-solid" :label="selectedRange ? formatDateRangeReadable(selectedRange) || 'Choisir une plage' : 'Choisir une plage'" />
+  <div class="flex flex-col gap-4 relative">
+    <div class="flex flex-wrap justify-center">
+      <UButton
+        color="gray"
+        variant="ghost"
+        size="2xs"
+        icon="i-heroicons-arrow-path"
+        :loading="isLoading"
+        @click="saleStore.getSales()"
+      >
+        Dernière mise à jour : {{ formatDateTimeReadable(lastRefreshDate) }}
+      </UButton>
 
-      <template #panel="{ close }">
-        <GenericDateRangePicker v-model="selectedRange" @close="close" />
-      </template>
-    </UPopover>
+      <div class="w-full mb-2"></div>
+
+      <UPopover :popper="{ placement: 'bottom-start' }" class="">
+        <UButton icon="i-heroicons-calendar-days-20-solid" :label="selectedRange ? formatDateRangeReadable(selectedRange) || 'Choisir une plage' : 'Choisir une plage'" />
+
+        <template #panel="{ close }">
+          <GenericDateRangePicker v-model="selectedRange" @close="close" />
+        </template>
+      </UPopover>
+
+    </div>
+
 
     <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-2">
       <GenericStatCard

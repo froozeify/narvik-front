@@ -1,7 +1,7 @@
 export function formatMonetary(value?: string|number): string {
-  if (typeof value === 'number') {
-    value = value.toFixed(2)
+  if (typeof value !== 'number' && value !== undefined) {
+    value = Number(value)
   }
 
-  return value ? value.replace('.', ',') + ' €' : 'Non défini'
+  return value !== undefined ? value.toLocaleString('fr-FR', { style: "currency", currency: 'EUR' }) : 'Non défini'
 }
