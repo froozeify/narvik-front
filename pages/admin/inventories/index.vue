@@ -63,14 +63,16 @@
   });
   const columns = [
     {
-      key: 'name',
-      label: 'Nom',
-      sortable: true
-    },
-    {
       key: 'category',
       label: 'Catégorie'
+    },
+    {
+      key: 'name',
+      label: 'Nom',
+      sortable: true,
+      class: 'w-full'
     }
+
   ]
 
   function rowClicked(row: object) {
