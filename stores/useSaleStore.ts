@@ -75,7 +75,11 @@ export const useSaleStore = defineStore('sale', () => {
   async function getSellers(page: number = 1) {
     isLoading.value = true
 
-    const urlParams = new URLSearchParams();
+    const urlParams = new URLSearchParams({
+      'order[lastname]': 'ASC',
+      'order[firstname]': 'ASC',
+      'exists[licence]': 'true', // Exclude super admin
+    });
     // URLSearchParams ways so both filter are applied
     urlParams.append('role[]', 'ROLE_ADMIN')
     urlParams.append('role[]', 'ROLE_SUPERVISOR')
