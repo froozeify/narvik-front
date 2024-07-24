@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/activity";
+import type {Activity} from "~/types/api/item/activity";
 import type {PropType, Ref} from "vue";
-import type {Member} from "~/types/member";
+import type {Member} from "~/types/api/item/member";
 import type {FormSubmitEvent} from "#ui/types";
-import type {MemberPresence} from "~/types/memberpresence";
+import type {MemberPresence} from "~/types/api/item/memberPresence";
 import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
 import {formatDateInput, formatDateReadable} from "~/utils/date";
 
@@ -95,7 +95,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   }
 
   let item: MemberPresence | undefined = undefined;
-  let error: Error | null = null;
+  let error: Error | undefined = undefined;
 
   if (!props.memberPresence) {
     let { created, error: errorMessage } = await memberPresenceQuery.post(memberPresence);
@@ -150,7 +150,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(selectedDate) || 'Choisir une date'" />
 
           <template #panel="{ close }">
-            <DatePicker v-model="selectedDate" @close="close" />
+            <GenericDatePicker v-model="selectedDate" @close="close" />
           </template>
         </UPopover>
 

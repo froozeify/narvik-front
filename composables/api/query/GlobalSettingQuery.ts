@@ -1,7 +1,7 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
-import type {GlobalSetting} from "~/types/globalsetting";
+import type {GlobalSetting} from "~/types/api/item/globalSetting";
 import {useFetchItem, useUploadFile} from "~/composables/api/api";
-import type {FetchItemData} from "~/types/api";
+import type {FetchItemData} from "~/types/api/api";
 
 export default class GlobalSettingQuery extends AbstractQuery<GlobalSetting> {
     rootPath = "global-settings";

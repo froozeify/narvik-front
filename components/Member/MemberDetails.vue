@@ -1,12 +1,12 @@
 <script setup lang="ts">
   import type {PropType} from "vue";
-  import {getAvailableMemberRoles, type Member} from "~/types/member";
+  import {getAvailableMemberRoles, type Member} from "~/types/api/item/member";
   import MemberQuery from "~/composables/api/query/MemberQuery";
-  import type {Image} from "~/types/image";
+  import type {Image} from "~/types/api/item/image";
   import ImageQuery from "~/composables/api/query/ImageQuery";
-  import type {MemberPresence} from "~/types/memberpresence";
+  import type {MemberPresence} from "~/types/api/item/memberPresence";
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
-  import { formatDateTime, formatDateReadable } from "~/utils/date"
+  import { formatDate, formatDateReadable } from "~/utils/date"
   import {useSelfMemberStore} from "~/stores/useSelfMember";
 
   import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
@@ -14,8 +14,8 @@
   import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
   import {usePaginationValues} from "~/composables/api/list";
   import ActivityQuery from "~/composables/api/query/ActivityQuery";
-  import type {Activity} from "~/types/activity";
-  import type {MemberSeason} from "~/types/memberseason";
+  import type {Activity} from "~/types/api/item/activity";
+  import type {MemberSeason} from "~/types/api/item/memberSeason";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
@@ -424,7 +424,7 @@
         <div class="flex gap-4">
           <UTooltip v-if="isSupervisor" text="Liste des membres" class="">
             <UButton
-                @click="navigateTo('/admin/members')"
+                to="/admin/members"
                 icon="i-heroicons-arrow-left"
                 size="xs"
                 variant="ghost"
@@ -601,7 +601,8 @@
               },
               {
                 key: 'activities',
-                label: 'Activités'
+                label: 'Activités',
+                class: 'w-full'
               },
               {
                 key: 'actions'
@@ -620,7 +621,7 @@
           </template>
 
           <template #date-data="{row}">
-            {{ formatDateTime(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
+            {{ formatDate(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
           </template>
 
           <template #activities-data="{row}">
@@ -639,7 +640,7 @@
           </template>
 
           <template #actions-data="{row}" >
-            <div v-if="isSupervisor" class="w-96 flex gap-4">
+            <div v-if="isSupervisor" class="flex gap-4">
               <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
 
               <UPopover overlay>

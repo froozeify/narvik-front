@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type {PropType} from "vue";
-import type {MemberPresence} from "~/types/memberpresence";
+import type {MemberPresence} from "~/types/api/item/memberPresence";
 import clipboard from "clipboardy";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
-import type {Image} from "~/types/image";
+import type {Image} from "~/types/api/item/image";
 import ImageQuery from "~/composables/api/query/ImageQuery";
 import MemberQuery from "~/composables/api/query/MemberQuery";
-import type {Member} from "~/types/member";
+import type {Member} from "~/types/api/item/member";
 import {formatDateReadable} from "~/utils/date";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
-import type {Member} from "~/types/member";
+import type {Member} from "~/types/api/item/member";
 import MemberQuery from "~/composables/api/query/MemberQuery";
-import type {MemberPresence} from "~/types/memberpresence";
+import type {MemberPresence} from "~/types/api/item/memberPresence";
 import {usePaginationValues} from "~/composables/api/list";
 
 const toast = useToast();

@@ -1,4 +1,4 @@
-import type { Item } from "../types/item";
+import type { Item } from "../types/api/item";
 
 const ENTRYPOINT = 'https://localhost';
 

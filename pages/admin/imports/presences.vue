@@ -29,7 +29,7 @@
     }
 
     fileUploading.value = true
-    const {created, violations, error} = await memberPresenceQuery.importFromCsv(formData)
+    const {created, error} = await memberPresenceQuery.importFromCsv(formData)
     fileUploading.value = false
 
     if (error) {

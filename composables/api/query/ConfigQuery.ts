@@ -1,4 +1,4 @@
-import type {Config} from "~/types/config";
+import type {Config} from "~/types/api/item/config";
 import {useFetchItem} from "~/composables/api/api";
 
 export default class ConfigQuery {

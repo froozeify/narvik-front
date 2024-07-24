@@ -28,7 +28,7 @@
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateRangeReadable(presenceStore.selectedRange) || 'Choisir une date'" />
 
           <template #panel="{ close }">
-            <DateRangePicker v-model="presenceStore.selectedRange" @close="close" />
+            <GenericDateRangePicker v-model="presenceStore.selectedRange" @close="close" />
           </template>
         </UPopover>
 

@@ -1,5 +1,5 @@
-import type { Item } from "./item";
-import type {MemberSeason} from "~/types/memberseason";
+import type { Item } from "../item";
+import type {MemberSeason} from "~/types/api/item/memberSeason";
 
 export enum MemberRole {
   User = 'ROLE_USER',

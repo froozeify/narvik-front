@@ -4,7 +4,16 @@ import {useAppConfigStore} from "~/stores/useAppConfig";
 
 const publicPaths = [
 	"^/login$",
-	"^/login/bdg/.*"
+	"^/login/bdg/.*",
+]
+
+const supervisorOnlyPaths = [
+  "^/admin$",
+  "^/admin/presences",
+  "^/admin/members",
+  "^/admin/thrombinoscope",
+
+  "^/admin/sales",
 ]
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
@@ -48,5 +57,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 		if (!selfStore.hasSupervisorRole()) {
 			return navigateTo("/self");
 		}
+
+    // User is not an admin (so supervisor) got access to only restrain uris
+    if (!selfStore.isAdmin()) {
+      if (!pathsMatch(supervisorOnlyPaths, to.fullPath)) {
+        return navigateTo('/admin')
+      }
+    }
 	}
 })

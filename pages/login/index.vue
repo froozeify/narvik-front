@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from '#ui/types'
+import type {FormError, FormSubmitEvent} from '#ui/types'
 import {useLoginUser} from "~/composables/api/api";
-import type {Image} from "~/types/image";
+import type {Image} from "~/types/api/item/image";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 
@@ -15,6 +15,13 @@ const state = reactive({
 
 const appConfigStore = useAppConfigStore();
 const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
+
+const validate = (state: any): FormError[] => {
+  const errors = []
+  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
+  if (!state.password) errors.push({ path: 'password', message: 'Champ requis' })
+  return errors
+}
 
 async function onSubmit(event: FormSubmitEvent<{email: string, password: string}>) {
   isLoading.value = true
@@ -45,9 +52,9 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
     </div>
 
     <UCard>
-      <UForm :state="state" class="space-y-4" @submit="onSubmit">
+      <UForm :state="state" class="space-y-4" :validate="validate" @submit="onSubmit">
         <UFormGroup label="Email" name="email">
-          <UInput v-model="state.email" />
+          <UInput v-model="state.email" type="email" />
         </UFormGroup>
 
         <UFormGroup label="Mot de passe" name="password">

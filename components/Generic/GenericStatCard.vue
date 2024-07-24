@@ -13,6 +13,9 @@ const props = defineProps({
   value: {
     type: [String, Number]
   },
+  valueClass: {
+    type: String
+  },
   tooltip: {
     type: String
   },
@@ -32,14 +35,24 @@ const emit = defineEmits([
 ])
 
 interface topRight {
-  value: string,
-  tooltip: string|null,
-  icon: string|null,
-  useDefaultIcon: boolean|undefined
+  value?: string,
+  tooltip?: string|null,
+  icon?: string|null,
+  useDefaultIcon?: boolean
 }
 
 const iconUp = 'heroicons:arrow-trending-up-20-solid'
 const iconDown = 'heroicons:arrow-trending-down-20-solid'
+
+const valueClass = computed( () => {
+  let classes = 'text-3xl font-semibold flex-1 flex justify-center items-center text-center'
+  if (props.valueClass) {
+    classes += ' ' + props.valueClass
+  }
+
+  return classes
+})
+
 
 const isIncreasing = computed( () => {
   return props.isIncreasing;
@@ -108,7 +121,7 @@ const topRightIcon = computed( () => {
         </p>
       </slot>
 
-      <p class="text-3xl font-semibold flex-1 flex justify-center items-center">{{ props.value }}</p>
+      <p :class="valueClass">{{ props.value }}</p>
       <UTooltip v-if="props.tooltip" :text="props.tooltip" class="w-full justify-center">
         <p class="text-lg text-center">{{ props.title }}</p>
       </UTooltip>

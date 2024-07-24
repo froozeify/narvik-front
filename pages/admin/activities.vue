@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/activity";
+import type {Activity} from "~/types/api/item/activity";
+import type {FormError} from "#ui/types";
+import ActivityModalDelete from "~/components/Activity/ActivityModalDelete.vue";
+import ActivityModalMigrate from "~/components/Activity/ActivityModalMigrate.vue";
 
 definePageMeta({
   layout: "admin"
@@ -10,253 +13,245 @@ useHead({
   title: 'Gestion des activités'
 })
 
-const isLoading = ref(true);
-const activities: Ref<DataItem[]> = ref([]);
-const migrationTarget: Ref<string|undefined> = ref(undefined);
-const toast = useToast();
+const toast = useToast()
+const modal = useModal()
 
-interface DataItem {
-  activity: Activity;
-  unsaved: boolean;
-  isUpdating: boolean;
-}
+const isLoading = ref(true)
+const activities: Ref<Activity[]> = ref([])
+const selectedActivity: Ref<Activity | undefined> = ref(undefined)
+
+// Side menu visible
+const isVisible = ref(false);
+watch(selectedActivity, (value, oldValue) => {
+  isVisible.value = value !== undefined
+})
 
 const activityQuery = new ActivityQuery();
 
-activityQuery.getAll().then(value => {
+const columns = [
+  {
+    key: 'enabled',
+    label: 'Disponible'
+  },
+  {
+    key: 'name',
+    label: 'Nom',
+    class: 'w-full'
+  },
+  {
+    key: 'actions',
+  }]
+
+async function getActivities() {
+  isLoading.value = true
+
+  const urlParams = new URLSearchParams({
+    'order[isEnabled]': 'ASC',
+    'order[name]': 'ASC',
+  });
+
+  const {items} = await activityQuery.getAll(urlParams)
+  activities.value = items
+
+  isLoading.value = false
+}
+
+function rowClicked(row: Activity) {
+  selectedActivity.value = {...row} // We make a shallow clone
+  isVisible.value = true
+}
+
+const validate = (state: any): FormError[] => {
+  const errors = []
+  if (!state.name) errors.push({path: 'name', message: 'Champ requis'})
+  return errors
+}
+
+function createActivity() {
+  selectedActivity.value = {
+    isEnabled: true,
+    name: ''
+  }
+}
+
+async function updateActivity(activity: Activity) {
+  isLoading.value = true
+
+  let payload: Activity = {
+    name: activity.name,
+    isEnabled: activity.isEnabled
+  }
+
+  // We verify if it's a creation or an update
+  let errorApi: Error | undefined = undefined
+  if (!activity.id) {
+    const {error, created} = await activityQuery.post(payload)
+    errorApi = error
+    selectedActivity.value = created
+  } else { // Update
+    const {error} = await activityQuery.patch(activity, payload);
+    errorApi = error
+  }
+
   isLoading.value = false
 
-  value.items.forEach(actvt => {
-    activities.value.push({
-      activity: actvt,
-      unsaved: false,
-      isUpdating: false,
+  if (errorApi) {
+    toast.add({
+      color: "red",
+      title: !activity.id ? "La création a échouée" : "La modification a échouée",
+      description: errorApi.message
+    });
+    return;
+  }
+
+  toast.add({
+    color: "green",
+    title: !activity.id ? "Activité créée" : "Activité modifiée",
+  });
+
+  await getActivities()
+}
+
+async function deleteActivity() {
+  if (!selectedActivity.value) return
+
+  isLoading.value = true
+  const {error} = await activityQuery.delete(selectedActivity.value);
+  isLoading.value = false
+
+  if (error) {
+    toast.add({
+      color: "red",
+      title: "La suppression a échouée",
+      description: error.message
     })
-  })
-  refreshActivityListOrder();
-});
-
-const columns = [{
-  key: 'activity.name',
-  label: 'Nom'
-}, {
-  key: 'activity.isEnabled',
-  label: 'Disponible'
-}, {
-  key: 'actions'
-}]
-
-function refreshActivityListOrder() {
-  activities.value
-      .sort((a, b) => (a.activity.name.toLowerCase() > b.activity.name.toLowerCase() ? 1 : -1))
-      .sort((a, b) => (a.activity.isEnabled < b.activity.isEnabled ? 1 : -1))
-}
-
-
-function addActivity() {
-  const activity: Activity = {
-    name: "0. Nouvelle activité",
-    isEnabled: true
+    return
   }
 
-  isLoading.value = true;
-  activityQuery.post(activity).then(({created, violations}) => {
-    isLoading.value = false;
-    if (created) {
-      activities.value.push({
-        activity: created,
-        unsaved: false,
-        isUpdating: false,
-      })
-      refreshActivityListOrder()
-    } else {
-      toast.add({
-        color: "red",
-        title: "L'enregistrement a échoué",
-        description: violations._error
-      })
-    }
+  toast.add({
+    color: "green",
+    title: "Activité supprimée"
   })
+  selectedActivity.value = undefined
+  await getActivities()
 }
 
-function updateText(event: any, dataItem: DataItem) {
-  dataItem.activity.name = event.target.value;
-  dataItem.unsaved = true
-}
+async function migrateActivity(migrationTarget: string) {
+  if (!selectedActivity.value?.id || !migrationTarget) return;
 
-function toggleClicked(dataItem: DataItem) {
-  dataItem.activity.isEnabled = !dataItem.activity.isEnabled
-  dataItem.unsaved = true
-}
+  isLoading.value = true
+  const {error} = await activityQuery.mergeTo(selectedActivity.value.id, migrationTarget)
+  isLoading.value = false
+  selectedActivity.value = undefined
 
-function saveRow(dataItem: DataItem) {
-  let payload: Activity = {
-    name: dataItem.activity.name,
-    isEnabled: dataItem.activity.isEnabled
+  if (error) {
+    toast.add({
+      color: "red",
+      title: "La migration a échouée",
+      description: error.message
+    })
+    return
   }
 
-  activityQuery.patch(dataItem.activity, payload).then(({updated, violations}) => {
-    if (updated) {
-      dataItem.unsaved = false;
-      toast.add({
-        color: "green",
-        title: "Activité enregistrée"
-      })
-      refreshActivityListOrder()
-    } else {
-      toast.add({
-        color: "red",
-        title: "L'enregistrement a échoué",
-        description: violations._error
-      })
-    }
-  });
-}
-
-async function deleteRow(dataItem: DataItem) {
-  dataItem.isUpdating = true
-  activityQuery.delete(dataItem.activity).then(({error}) => {
-    dataItem.isUpdating = false
-
-    if (!error) {
-      // We remove the activity from the array
-      activities.value = activities.value.filter(actvt => actvt.activity.id !== dataItem.activity.id);
-      refreshActivityListOrder()
-
-      toast.add({
-        color: "green",
-        title: "Activité supprimée"
-      })
-    } else {
-      toast.add({
-        color: "red",
-        title: "La suppression a échouée",
-        description: error
-      })
-    }
-  });
-}
-
-
-async function cancelRow(dataItem: DataItem) {
-  if (!dataItem.activity.id) return;
-
-  dataItem.isUpdating = true;
-  const { retrieved } = await activityQuery.get(dataItem.activity.id);
-  dataItem.isUpdating = false;
-  if (retrieved) {
-    dataItem.unsaved = false;
-    dataItem.activity = retrieved;
-  }
-}
-
-async function migrateRow(dataItem: DataItem) {
-  if (!dataItem.activity.id || !migrationTarget.value) return;
-
-  dataItem.isUpdating = true;
-  activityQuery.mergeTo(dataItem.activity.id, migrationTarget.value).then(({error}) => {
-    dataItem.isUpdating = false
-    if (!error) {
-      // We remove the activity from the array
-      activities.value = activities.value.filter(actvt => actvt.activity.id !== dataItem.activity.id);
-      refreshActivityListOrder()
-
-      toast.add({
-        color: "green",
-        title: "Activité migrée"
-      })
-    } else {
-      toast.add({
-        color: "red",
-        title: "La migration a échouée",
-        description: error.message
-      })
-    }
+  toast.add({
+    color: "green",
+    title: "Activité migrée"
   })
-
+  await getActivities()
 }
+
+// We get the data from the api
+getActivities()
 
 </script>
 
 <template>
-  <div>
-    <div class="flex justify-end mb-4">
-      <UButton label="Créer une nouvelle activité" @click="addActivity()"/>
-    </div>
+  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedActivity = undefined;"
+                                      :has-side-content="isVisible" :mobile-side-title="selectedActivity?.name"
+                                      tabindex="-1">
+    <template #main>
+      <UCard>
+        <div>
+          <div class="flex gap-4">
 
-    <UCard>
-      <UTable
+            <div class="flex-1"></div>
+            <UButton @click="createActivity">
+              Créer une nouvelle activité
+            </UButton>
+          </div>
+
+          <UTable
+            :loading="isLoading"
+            :columns="columns"
+            :rows="activities"
+            @select="rowClicked">
+            <template #empty-state>
+              <div class="flex flex-col items-center justify-center py-6 gap-3">
+                <span class="italic text-sm">Aucune activité enregistrée</span>
+                <UButton class="mt-4" label="Créer" @click="createActivity()"/>
+              </div>
+            </template>
+
+            <template #enabled-data="{ row }">
+              <UToggle :model-value="row.isEnabled" />
+            </template>
+          </UTable>
+        </div>
+      </UCard>
+    </template>
+
+    <template #side>
+      <div class="flex flex-col gap-4" v-if="selectedActivity">
+        <UForm :state="selectedActivity" @submit="updateActivity(selectedActivity)" :validate="validate">
+          <UCard>
+            <div class="flex gap-2 flex-col">
+              <UFormGroup label="Disponible" name="available">
+                <UToggle v-model="selectedActivity.isEnabled"/>
+              </UFormGroup>
+
+              <UFormGroup label="Nom" name="name">
+                <UInput v-model="selectedActivity.name"/>
+              </UFormGroup>
+            </div>
+
+          </UCard>
+
+          <UButton class="mt-4" block type="submit" :loading="isLoading">Enregistrer</UButton>
+        </UForm>
+
+        <UButton v-if="selectedActivity.id && !selectedActivity.isEnabled"
+          block
+          color="red"
           :loading="isLoading"
-          class="w-full"
-          :columns="columns"
-          :rows="activities">
-        <template #empty-state>
-          <div class="flex flex-col items-center justify-center py-6 gap-3">
-            <span class="italic text-sm">Aucune activité enregistrée</span>
-            <UButton class="mt-4" label="Créer" @click="addActivity()"/>
-          </div>
-        </template>
+          @click="modal.open(ActivityModalDelete, {
+            title: selectedActivity.name,
+            onDelete() {
+              modal.close()
+              deleteActivity()
+            }
+          })"
+        >
+          Supprimer
+        </UButton>
 
-        <template #activity.name-data="{row}">
-          <UInput
-              :model-value="row.activity.name"
-              variant="none"
-              class="hover:bg-gray-50 hover:dark:bg-gray-900 min-w-44"
-              :disabled="row.isUpdating"
-              @input="event => updateText(event, row)" />
-        </template>
-
-        <template #activity.isEnabled-data="{row}">
-          <UToggle :model-value="row.activity.isEnabled" :disabled="row.isUpdating" @click="toggleClicked(row)" />
-        </template>
-
-        <template #actions-data="{row}">
-          <div class="w-96 flex gap-4">
-            <UButton v-if="row.unsaved" color="green" label="Enregister" :disabled="row.isUpdating" @click="saveRow(row)"/>
-            <UButton v-if="row.unsaved" label="Annuler" :disabled="row.isUpdating" @click="cancelRow(row)"/>
-            <UPopover v-if="!row.activity.isEnabled" overlay>
-              <UButton color="orange" label="Migrer" :disabled="row.isUpdating" />
-
-              <template #panel>
-                <div class="p-4 w-[42rem] flex flex-col">
-                  <div class="text-center text-lg font-bold">{{ row.activity.name }}</div>
-                  <UAlert
-                      class="my-4"
-                      color="yellow"
-                      variant="soft"
-                      title="Une fois la migration effectuée, l'activité sera supprimée."
-                  />
-                  <UFormGroup class="mb-4" label="Activité cible">
-                    <USelect required v-model="migrationTarget" :options="activities" option-attribute="activity.name" value-attribute="activity.id" />
-                  </UFormGroup>
-                  <UButton class="mx-auto" color="orange" label="Migrer" :disabled="row.isUpdating" @click="migrateRow(row)" />
-                </div>
-              </template>
-            </UPopover>
-            <UPopover v-if="!row.activity.isEnabled" overlay>
-              <UButton color="red" label="Supprimer" :disabled="row.isUpdating" />
-
-              <template #panel>
-                <div class="p-4 w-[42rem] flex flex-col">
-                  <div class="text-center text-lg font-bold">{{ row.activity.name }}</div>
-                  <UAlert
-                      class="my-4"
-                      color="orange"
-                      variant="soft"
-                      title="La suppression d'une activité, supprimera aussi toutes les activités des membres liées."
-                      description="Il conseillé de faire un migration à la place."
-                  />
-                  <UButton class="mx-auto" color="red" label="Valider la suppression" :disabled="row.isUpdating" @click="deleteRow(row)" />
-                </div>
-              </template>
-            </UPopover>
-          </div>
-        </template>
-
-      </UTable>
-    </UCard>
-
-  </div>
+        <UButton v-if="selectedActivity.id && !selectedActivity.isEnabled"
+                 block
+                 color="orange"
+                 :loading="isLoading"
+                 @click="modal.open(ActivityModalMigrate, {
+             title: selectedActivity.name,
+             activities: activities,
+             onMigrate(targetId: string) {
+               modal.close()
+               migrateActivity(targetId)
+             }
+          })"
+        >
+          Migrer
+        </UButton>
+      </div>
+    </template>
+  </GenericLayoutContentWithStickySide>
 </template>
 
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import {usePresenceStore} from "~/stores/usePresenceStore";
-  import type {ExternalPresence} from "~/types/externalpresence";
+  import type {ExternalPresence} from "~/types/api/item/externalPresence";
   import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
   import {formatDateInput, formatDateReadable} from "~/utils/date";
   import {usePaginationValues} from "~/composables/api/list";

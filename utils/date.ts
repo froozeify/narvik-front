@@ -1,9 +1,15 @@
 import dayjs from "dayjs";
 
-export function formatDateTime(date?: string): string | null {
+export function formatDate(date?: string): string | null {
   if (!date) return null;
 
   return dayjs(date).format("DD/MM/YYYY");
+}
+
+export function formatDateTimeReadable(date?: string): string | null {
+  if (!date) return null;
+
+  return formatDateReadable(date) + " à " + formatTimeReadable(date);
 }
 
 export function formatDateReadable(date?: string): string | null {

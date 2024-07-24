@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {ExternalPresence} from "~/types/externalpresence";
+import type {ExternalPresence} from "~/types/api/item/externalPresence";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
 import {formatTimeReadable} from "~/utils/date";
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type {Member} from "~/types/member";
+  import type {Member} from "~/types/api/item/member";
   import MemberQuery from "~/composables/api/query/MemberQuery";
   import {formatDateReadable} from "~/utils/date";
   import ImageQuery from "~/composables/api/query/ImageQuery";
@@ -73,7 +73,7 @@
   async function loadMemberProfileImage(member: Member) {
     if (!member.profileImage) return null;
 
-    const {retrieved} = await imageQuery.get(member.profileImage);
+    const { retrieved } = await imageQuery.get(member.profileImage);
     if (!retrieved || !retrieved.base64) return null
 
     return retrieved.base64
