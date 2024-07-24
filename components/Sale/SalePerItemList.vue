@@ -94,8 +94,8 @@ function generateList() {
       let mappedPaymentMode = salePurchasedItemMap.counts.get(salePaymentMode)
       if (!mappedPaymentMode) return
 
-      mappedPaymentMode.count += 1
-      mappedPaymentMode.amount += Number(salePurchasedItem.itemPrice)
+      mappedPaymentMode.count += salePurchasedItem.quantity ?? 0
+      mappedPaymentMode.amount += Number(salePurchasedItem.itemPrice) * Number(salePurchasedItem.quantity ?? 0)
       salePurchasedItemMap.counts.set(salePaymentMode, mappedPaymentMode)
 
       categoryMapping.items.set(salePurchasedItem.itemName, salePurchasedItemMap)

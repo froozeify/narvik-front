@@ -25,7 +25,7 @@
   const saleStore = useSaleStore()
   const cartStore = useCartStore()
   const { searchQuery, cart, cartTotalPrice, cartComment, cartCustomItemModalOpen, customItemForm, selectedPaymentMode } = storeToRefs(cartStore)
-  const { sellers, seller } = storeToRefs(saleStore)
+  const { sellers, seller, paymentModes } = storeToRefs(saleStore)
 
   const inventoryItemQuery = new InventoryItemQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
@@ -60,9 +60,6 @@
     })
     return categories
   })
-
-  // Payment mode
-  const paymentModes: Ref<SalePaymentMode[]> = ref([])
 
   async function loadItems(page: number = 1) {
     isLoading.value = true
@@ -167,7 +164,7 @@
 
   // We load the page content
   loadItems()
-  loadPaymentModes()
+  saleStore.getPaymentModes()
   saleStore.getSellers()
 
   const mobileSideTitle: Ref<string|undefined> = ref(undefined)

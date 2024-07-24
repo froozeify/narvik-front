@@ -108,5 +108,6 @@ export const useSaleStore = defineStore('sale', () => {
 
     getSales,
     getSellers,
+    getPaymentModes,
   }
 })
