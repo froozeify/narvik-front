@@ -22,8 +22,10 @@
 
   const toast = useToast()
 
+  const saleStore = useSaleStore()
   const cartStore = useCartStore()
   const { searchQuery, cart, cartTotalPrice, cartComment, cartCustomItemModalOpen, customItemForm, selectedPaymentMode } = storeToRefs(cartStore)
+  const { sellers, seller } = storeToRefs(saleStore)
 
   const inventoryItemQuery = new InventoryItemQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
@@ -133,6 +135,7 @@
     })
 
     const payload: Sale = {
+      seller: seller.value?.["@id"],
       comment: cartComment.value.length ? cartComment.value : undefined,
       salePurchasedItems: salePurchasedItems,
       paymentMode: selectedPaymentMode.value?.["@id"]
@@ -157,6 +160,7 @@
     });
 
     cartStore.emptyCart()
+    saleStore.sales = [] // We empty the listing
 
     navigateTo('/admin/sales/' + created.id)
   }
@@ -164,6 +168,7 @@
   // We load the page content
   loadItems()
   loadPaymentModes()
+  saleStore.getSellers()
 
   const mobileSideTitle: Ref<string|undefined> = ref(undefined)
   watchEffect(() => {
@@ -306,7 +311,11 @@
       </UCard>
 
       <UCard class="print:hidden">
-        <UFormGroup label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'" class="mb-2">
+        <UFormGroup label="Vendeur" :error="!seller && 'Un vendeur doit être défini'">
+          <UInputMenu v-model="seller" :options="sellers" option-attribute="fullName" :search-attributes="['lastname', 'firstname']" />
+        </UFormGroup>
+
+        <UFormGroup label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'" class="my-2">
           <UTextarea v-model="cartComment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente"/>
         </UFormGroup>
 
@@ -326,7 +335,7 @@
           </div>
         </UFormGroup>
 
-        <UButton :loading="isCreatingSale" class="mt-4" block color="green" :disabled="cart.size < 1 || !selectedPaymentMode" @click="createSale()">Finaliser la vente</UButton>
+        <UButton :loading="isCreatingSale" class="mt-4" block color="green" :disabled="cart.size < 1 || !selectedPaymentMode || !seller" @click="createSale()">Finaliser la vente</UButton>
       </UCard>
     </template>
   </GenericLayoutContentWithStickySide>

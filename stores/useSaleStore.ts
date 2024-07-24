@@ -4,10 +4,13 @@ import {formatDateInput} from "~/utils/date";
 import dayjs from "dayjs";
 import SaleQuery from "~/composables/api/query/SaleQuery";
 import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
+import type {Member} from "~/types/api/item/member";
+import MemberQuery from "~/composables/api/query/MemberQuery";
 
 export const useSaleStore = defineStore('sale', () => {
   const saleQuery = new SaleQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
+  const memberQuery = new MemberQuery()
 
   const isLoading = ref(false)
   const selectedRange: Ref<{ start: Date, end: Date } | null> = ref({start: new Date(), end: new Date()})
@@ -15,6 +18,10 @@ export const useSaleStore = defineStore('sale', () => {
 
   const sales: Ref<Sale[]> = ref([])
   const salesLoading: Ref<Sale[]> = ref([])
+
+  const seller: Ref<Member | undefined> = ref(undefined)
+  const sellers: Ref<Member[]> = ref([])
+  const sellersLoading: Ref<Member[]> = ref([])
 
   const paymentModes: Ref<SalePaymentMode[]> = ref([])
 
@@ -65,8 +72,34 @@ export const useSaleStore = defineStore('sale', () => {
     isLoading.value = false
   }
 
+  async function getSellers(page: number = 1) {
+    isLoading.value = true
+
+    const urlParams = new URLSearchParams();
+    // URLSearchParams ways so both filter are applied
+    urlParams.append('role[]', 'ROLE_ADMIN')
+    urlParams.append('role[]', 'ROLE_SUPERVISOR')
+
+    const { items, view } = await memberQuery.getAll(urlParams)
+    sellersLoading.value = sellersLoading.value.concat(items)
+
+    // We load the next page
+    if (view && view["hydra:next"]) {
+      await getSellers(page + 1)
+      return;
+    }
+
+    // No more pages to load
+    isLoading.value = false
+
+    sellers.value = sellersLoading.value
+    sellersLoading.value = []
+  }
+
   return {
     sales,
+    seller,
+    sellers,
     paymentModes,
 
     isLoading,
@@ -74,5 +107,6 @@ export const useSaleStore = defineStore('sale', () => {
     lastRefreshDate,
 
     getSales,
+    getSellers,
   }
 })

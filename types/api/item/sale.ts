@@ -4,7 +4,7 @@ import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
 import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
 
 export interface Sale extends TimestampItem {
-  seller?: Member|null;
+  seller?: Member|string|null;
   paymentMode?: SalePaymentMode|string|null;
 
   salePurchasedItems?: SalePurchasedItem[]
