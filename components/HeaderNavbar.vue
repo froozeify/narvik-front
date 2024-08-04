@@ -73,7 +73,7 @@
             </UTooltip>
           </NuxtLink>
         </div>
-        <UButton class="-mx-3 hidden lg:block" to="/admin/sales/new" variant="ghost" color="gray">Accueil</UButton>
+        <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="gray">Accueil</UButton>
         <div v-if="isSupervisor">
           <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
         </div>
