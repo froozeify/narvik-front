@@ -2,7 +2,7 @@
 
 ARG NODE_VERSION=22.3
 
-FROM node:${NODE_VERSION}-slim as base
+FROM node:${NODE_VERSION}-slim AS base
 
 ARG PORT=3000
 ENV NODE_ENV=production
@@ -10,7 +10,7 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 # Build
-FROM base as build
+FROM base AS build
 
 COPY --link package.json yarn.lock .
 RUN yarn install --production=false
@@ -20,7 +20,7 @@ COPY --link . .
 RUN yarn run build
 
 # Run
-FROM base as run
+FROM base AS run
 
 ENV PORT=$PORT
 
