@@ -32,6 +32,9 @@ const controlShootingSetting: Ref<GlobalSetting | undefined> = ref(undefined);
 const selectedControlShootingActivityValue: Ref<string | undefined> = ref(undefined);
 const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
 
+const ignoredActivitiesOpeningStatsSetting: Ref<GlobalSetting | undefined> = ref(undefined);
+const excludedActivitiesFromCount: Ref<string[]> = ref([]);
+
 globalSettingQuery.get("CONTROL_SHOOTING_ACTIVITY_ID").then(value => {
   controlShootingSetting.value = value.retrieved
   if (controlShootingSetting.value && controlShootingSetting.value.value) {
@@ -39,6 +42,13 @@ globalSettingQuery.get("CONTROL_SHOOTING_ACTIVITY_ID").then(value => {
       selectedControlShootingActivity.value = actvt
       selectedControlShootingActivityValue.value = actvt?.id?.toString()
     })
+  }
+})
+
+globalSettingQuery.get("IGNORED_ACTIVITIES_OPENING_STATS").then(value => {
+  ignoredActivitiesOpeningStatsSetting.value = value.retrieved
+  if (ignoredActivitiesOpeningStatsSetting.value && ignoredActivitiesOpeningStatsSetting.value.value) {
+    excludedActivitiesFromCount.value = JSON.parse(ignoredActivitiesOpeningStatsSetting.value.value)
   }
 })
 
@@ -80,6 +90,30 @@ async function controlShootingUpdated() {
   }
 
   let { updated, error } = await globalSettingQuery.patch(controlShootingSetting.value, payload);
+
+  if (error) {
+    toast.add({
+      color: "red",
+      title: "L'enregistrement a échoué",
+      description: error.message
+    });
+    return;
+  }
+
+  toast.add({
+    color: "green",
+    title: "Paramètre enregistré"
+  });
+}
+
+async function ignoredActivitiesDaysUpdated() {
+  if (!ignoredActivitiesOpeningStatsSetting.value || !excludedActivitiesFromCount.value) return;
+
+  const payload: GlobalSetting = {
+    value: JSON.stringify(excludedActivitiesFromCount.value)
+  }
+
+  let { updated, error } = await globalSettingQuery.patch(ignoredActivitiesOpeningStatsSetting.value, payload);
 
   if (error) {
     toast.add({
@@ -187,21 +221,48 @@ async function deleteLogo() {
       </div>
     </UCard>
 
-    <UCard class="h-fit">
-      <div class="text-xl font-bold mb-4">Activité correspondant au tir de contrôle</div>
-      <div v-if="!controlShootingSetting" class="mt-4">
-        <USkeleton class="h-4 w-full" />
-      </div>
-      <div v-else>
-        <USelect
+    <div>
+      <UCard class="h-fit">
+        <div class="text-xl font-bold mb-4">Activité correspondant au tir de contrôle</div>
+        <div v-if="!controlShootingSetting" class="mt-4">
+          <USkeleton class="h-4 w-full" />
+        </div>
+        <div v-else>
+          <USelect
             v-model="selectedControlShootingActivityValue"
             @change="controlShootingUpdated"
             :options="activities"
             option-attribute="name"
             value-attribute="id"
             placeholder="Tir de contrôle non défini" />
-      </div>
-    </UCard>
+        </div>
+      </UCard>
+
+      <UCard class="h-fit mt-4">
+        <div class="text-xl font-bold mb-4">Activités exclus du compte des jours ouverts</div>
+        <div v-if="!ignoredActivitiesOpeningStatsSetting" class="mt-4">
+          <USkeleton class="h-4 w-full" />
+        </div>
+        <div v-else>
+          <USelectMenu
+            v-model="excludedActivitiesFromCount"
+            @change="ignoredActivitiesDaysUpdated"
+            :options="activities"
+            option-attribute="name"
+            value-attribute="id"
+            multiple
+          >
+            <template #label>
+              <span v-if="excludedActivitiesFromCount && activities && excludedActivitiesFromCount.length" class="truncate">
+                {{ activities.filter(a => (a.id && excludedActivitiesFromCount?.includes(a.id)) ).map(a => a.name).join(', ') }}
+              </span>
+              <span v-else>Aucune activités exclus</span>
+            </template>
+          </USelectMenu>
+        </div>
+      </UCard>
+
+    </div>
 
     <UCard>
       <div class="text-xl font-bold mb-4">Logo</div>
