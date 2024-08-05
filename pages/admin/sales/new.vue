@@ -219,8 +219,8 @@
         </div>
         <UProgress v-if="isLoading" animation="swing" class="mb-2" />
 
-        <div class="print:flex print:flex-wrap print:gap-2">
-          <div v-for="[title, items] in orderedItems" class="mb-4 print:mb-1 print:basis-[calc(50%-0.25rem)]">
+        <div class="print:columns-2 print:gap-2">
+          <div v-for="[title, items] in orderedItems" class="mb-4 print:mb-1 print:break-inside-avoid-column">
             <div class="print:text-base text-xl font-bold mb-2 border-b">{{ title }}</div>
             <div
               v-for="item in items"
