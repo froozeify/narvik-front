@@ -23,7 +23,7 @@ useSetSiteFavicon()
         </div>
       </div>
     </main>
-    <footer class="mb-4">
+    <footer class="print:hidden mb-4">
       <FooterCopyright />
     </footer>
     <UNotifications />
