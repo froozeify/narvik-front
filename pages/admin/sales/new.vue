@@ -219,19 +219,21 @@
         </div>
         <UProgress v-if="isLoading" animation="swing" class="mb-2" />
 
-        <div v-for="[title, items] in orderedItems" class="mb-4">
-          <div class="text-xl font-bold mb-2 border-b">{{ title }}</div>
-          <div
-            v-for="item in items"
-            class="flex items-center gap-2 mb-1 hover:bg-neutral-100 dark:hover:bg-gray-800/50 rounded-md"
-          >
-            <div class="flex-1 flex flex-col">
-              <div class="flex-1">{{ item.name }}</div>
-              <div v-if="item.sellingQuantity && item.sellingQuantity != 1" class="text-xs font-bold">Vendu par {{ item.sellingQuantity }}</div>
-              <div v-if="item.description" class="text-xs">{{ item.description }}</div>
+        <div class="print:flex print:flex-wrap print:gap-2">
+          <div v-for="[title, items] in orderedItems" class="mb-4 print:mb-1 print:basis-[calc(50%-0.25rem)]">
+            <div class="print:text-base text-xl font-bold mb-2 border-b">{{ title }}</div>
+            <div
+              v-for="item in items"
+              class="flex items-center gap-2 mb-1 hover:bg-neutral-100 dark:hover:bg-gray-800/50 rounded-md"
+            >
+              <div class="flex-1 flex flex-col">
+                <div class="print:text-xs flex-1">{{ item.name }}</div>
+                <div v-if="item.sellingQuantity && item.sellingQuantity != 1" class="text-xs font-bold">Vendu par {{ item.sellingQuantity }}</div>
+                <div v-if="item.description" class="text-xs print:hidden">{{ item.description }}</div>
+              </div>
+              <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
+              <UButton class="print:hidden" icon="i-heroicons-shopping-cart" size="2xs" @click="cartStore.addToCart(item)" />
             </div>
-            <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
-            <UButton class="print:hidden" icon="i-heroicons-shopping-cart" size="2xs" @click="cartStore.addToCart(item)" />
           </div>
         </div>
 
