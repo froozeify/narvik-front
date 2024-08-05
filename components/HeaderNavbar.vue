@@ -2,7 +2,7 @@
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import type {Image} from "~/types/api/item/image";
   import {useAppConfigStore} from "~/stores/useAppConfig";
-  import {isTouchDevice, watchBreakpoint} from "~/utils/browser";
+  import {isDesktop, isTouchDevice, watchBreakpoint} from "~/utils/browser";
 
   const colorMode = useColorMode()
   const selfStore = useSelfMemberStore();
@@ -21,6 +21,9 @@
   const isAdmin = selfStore.isAdmin()
   const isBadger = selfStore.isBadger()
   const isSupervisor = selfStore.hasSupervisorRole()
+
+  const isDesktopDisplay = isDesktop()
+  const isTabletDisplay = isTablet()
 
   const siteLogo: Ref<Image | null> = appConfigStore.getLogo()
 
@@ -64,15 +67,13 @@
     <nav class="container mx-auto p-4 flex justify-between h-full overflow-y-auto">
       <div class="flex gap-4 flex-shrink-0">
         <div>
-          <NuxtLink to="/" class="flex align-middle">
-            <span v-if="!siteLogo">Accueil</span>
-            <UTooltip v-else
-                      text="Accueil"
-            >
+          <NuxtLink v-if="siteLogo" to="/" class="flex align-middle">
+            <UTooltip text="Accueil">
               <img :src="siteLogo.base64" class="w-7"/>
             </UTooltip>
           </NuxtLink>
         </div>
+        <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="gray">Accueil</UButton>
         <div v-if="isSupervisor">
           <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
         </div>
@@ -85,7 +86,7 @@
           <UButton
             variant="ghost"
             color="gray"
-            :label="!isBadger ? selfStore.member?.fullName : 'Pointeuse'">
+            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? selfStore.member?.fullName : 'Pointeuse') : undefined">
             <template #trailing>
               <UAvatar v-if="!isBadger"
                        size="xs"

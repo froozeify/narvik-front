@@ -64,12 +64,12 @@ watchEffect(() => {
         <UButton
           block
           :ui="{ rounded: 'rounded-t-lg rounded-b-none' }"
-          :leading-icon="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')"
-          :trailing-icon="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')"
           variant="soft"
           @click="sideMobileVisible = !sideMobileVisible"
         >
+          <UIcon :name="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')" dynamic />
           <span class="flex-1">{{ props.mobileSideTitle }}</span>
+          <UIcon :name="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')" dynamic />
         </UButton>
       </div>
       <div v-if="sideMobileVisible" class="overflow-y-auto flex flex-col gap-4">
