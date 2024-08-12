@@ -67,9 +67,9 @@ watchEffect(() => {
           variant="soft"
           @click="sideMobileVisible = !sideMobileVisible"
         >
-          <UIcon :name="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')" dynamic />
+          <UIcon :name="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')" />
           <span class="flex-1">{{ props.mobileSideTitle }}</span>
-          <UIcon :name="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')" dynamic />
+          <UIcon :name="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')" />
         </UButton>
       </div>
       <div v-if="sideMobileVisible" class="overflow-y-auto flex flex-col gap-4">
