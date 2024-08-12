@@ -8,6 +8,8 @@
   import type {Sale} from "~/types/api/item/sale";
   import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
   import {useCartStore} from "~/stores/useCartStore";
+  import {formatDate} from "~/utils/date";
+  import dayjs from "dayjs";
 
   definePageMeta({
     layout: "pos"
@@ -218,6 +220,8 @@
           <UButton @click="cartCustomItemModalOpen = true;" icon="i-heroicons-plus" />
         </div>
         <UProgress v-if="isLoading" animation="swing" class="mb-2" />
+
+        <div class="hidden print:block text-right font-extralight text-xs mb-4">Prix à date du {{ formatDate(dayjs().toString()) }}</div>
 
         <div class="print:columns-2 print:gap-2">
           <div v-for="[title, items] in orderedItems" class="mb-4 print:mb-1 print:break-inside-avoid-column">
