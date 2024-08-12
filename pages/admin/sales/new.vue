@@ -184,7 +184,7 @@
 <template>
   <GenericLayoutContentWithStickySide :mobile-side-title="mobileSideTitle">
     <template #main>
-      <UCard>
+      <UCard class="print:ring-0 print:shadow-none print:!bg-transparent print:text-black">
         <GenericBarcodeReader
           class="mb-4"
           v-model="cameraPreview"
@@ -221,7 +221,7 @@
         </div>
         <UProgress v-if="isLoading" animation="swing" class="mb-2" />
 
-        <div class="hidden print:block text-right font-extralight text-xs mb-4">Prix à date du {{ formatDate(dayjs().toString()) }}</div>
+        <div class="hidden print:block text-right font-extralight text-xs mb-4">À date du {{ formatDate(dayjs().toString()) }}</div>
 
         <div class="print:columns-2 print:gap-2">
           <div v-for="[title, items] in orderedItems" class="mb-4 print:mb-1 print:break-inside-avoid-column">
@@ -239,7 +239,7 @@
                    class="print:hidden text-xs font-bold text-red-600">
                 Stock restant : {{ item.quantity }}
               </div>
-              <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
+              <div class="text-xs bg-neutral-200 print:!bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
               <UButton class="print:hidden" icon="i-heroicons-shopping-cart" size="2xs" @click="cartStore.addToCart(item)" />
             </div>
           </div>
