@@ -6,6 +6,7 @@ import {formatDateTimeReadable} from "~/utils/date";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import dayjs from "dayjs";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
 
 definePageMeta({
     layout: "pos"
@@ -101,7 +102,7 @@ definePageMeta({
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex gap-2">
+    <div class="flex flex-col lg:flex-row gap-2">
       <UButton
         to="/admin/sales/new"
         icon="i-heroicons-shopping-cart"
@@ -113,10 +114,28 @@ definePageMeta({
         {{ formatDateTimeReadable(sale?.createdAt) }}
       </div>
 
-      <UTooltip v-if="isAdmin || dayjs(dayjs(sale?.createdAt)).isAfter(dayjs().startOf('day'))" text="Supprimer">
+      <div v-if="isAdmin || dayjs(dayjs(sale?.createdAt)).isAfter(dayjs().startOf('day'))"
+           class="flex justify-between gap-2"
+      >
+        <UButton v-if="sale"
+          icon="i-heroicons-pencil"
+          color="yellow"
+          size="xs"
+          label="Modifier"
+          @click="modal.open(SaleModalEdit, {
+            sale: sale,
+            onDelete() {
+              modal.close()
+              deleteSale()
+            }
+          })"
+        />
+
         <UButton
           icon="i-heroicons-trash"
           color="red"
+          size="xs"
+          label="Supprimer"
           @click="modal.open(ModalDeleteConfirmation, {
             onDelete() {
               modal.close()
@@ -124,10 +143,10 @@ definePageMeta({
             }
           })"
         />
-      </UTooltip>
+      </div>
     </div>
 
-    <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-4">
+    <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <GenericStatCard
         title="Total"
         :value="formatMonetary(sale?.price?.toString())"

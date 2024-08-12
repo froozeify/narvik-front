@@ -30,7 +30,7 @@
 </script>
 
 <template>
-  <VCalendarDatePicker v-model="date" v-bind="{ ...attrs, ...$attrs }" />
+  <VCalendarDatePicker v-model="date" v-bind="{ ...attrs, ...$attrs }" is24hr />
 </template>
 
 <style>
