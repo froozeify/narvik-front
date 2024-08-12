@@ -208,7 +208,7 @@ definePageMeta({
 
 
             <template #icon-data="{ row }">
-              <UIcon :name="'i-heroicons-' + row.icon" dynamic />
+              <UIcon :name="'i-heroicons-' + row.icon" />
             </template>
 
             <template #actions-data="{ row }">
@@ -250,7 +250,7 @@ definePageMeta({
                 </template>
 
                 <template #hint v-if="selectedPaymentMode.icon">
-                  <UIcon :name="'i-heroicons-' + selectedPaymentMode.icon" dynamic />
+                  <UIcon :name="'i-heroicons-' + selectedPaymentMode.icon" />
                 </template>
 
                 <UInput v-model="selectedPaymentMode.icon" />

@@ -13,7 +13,6 @@ export default defineNuxtConfig({
 
   ui: {
     global: true,
-    icons: [],
   },
 
   css: [
