@@ -16,7 +16,7 @@ const props = defineProps(
         <div class="text-xl font-bold text-center">{{ props.title }}</div>
         <slot></slot>
 
-        <div class="flex gap-2 justify-end">
+        <div class="flex gap-2 justify-between sm:justify-end">
           <UButton color="gray" variant="ghost" @click="useModal().close()">
             Annuler
           </UButton>
