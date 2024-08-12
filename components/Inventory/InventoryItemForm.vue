@@ -10,7 +10,6 @@ const props = defineProps({
   item: {
     type: Object as PropType<InventoryItem>,
     required: false,
-    default: { canBeSold: true, sellingQuantity: 1}
   },
   categories: {
     type: Object as PropType<InventoryCategory[]>,
@@ -23,12 +22,11 @@ const props = defineProps({
   }
 })
 
-const item: Ref<InventoryItem> = ref(props.item)
-// const selectedCategory: Ref<InventoryCategory | undefined> = ref(undefined)
+const item: Ref<InventoryItem> = props.item ? ref(props.item) : ref(getDefaultInventoryItem())
 const categories: Ref<InventoryCategory[] | undefined> = ref(props.categories)
 
 watch(props, async value => {
-  item.value = props.item
+  item.value = props.item ?? getDefaultInventoryItem()
   if (!props.categories) {
     await getCategories()
   }
@@ -43,6 +41,15 @@ const isUpdating = ref(false)
 const toast = useToast()
 const inventoryItemQuery = new InventoryItemQuery()
 const inventoryCategoryQuery = new InventoryCategoryQuery()
+
+function getDefaultInventoryItem() {
+  const item: InventoryItem = {
+    id: undefined,
+    canBeSold: true,
+    sellingQuantity: 1
+  }
+  return item
+}
 
 // Form validation
 
@@ -92,12 +99,19 @@ async function updateItem() {
 
   let errorMessage = null
   if (isCreate) {
-    const { error } = await inventoryItemQuery.post(item.value)
+    const { created, error } = await inventoryItemQuery.post(item.value)
+    if (created) {
+      item.value = created
+    }
+
     if (error) {
       errorMessage = error.message
     }
   } else {
-    const { error } = await inventoryItemQuery.patch(item.value, item.value)
+    const { updated, error } = await inventoryItemQuery.patch(item.value, item.value)
+    if (updated) {
+      item.value = updated
+    }
     if (error) {
       errorMessage = error.message
     }
