@@ -58,21 +58,25 @@
   const page = ref(1);
   const itemsPerPage = ref(30);
   const sort = ref({
-    column: 'name',
+    column: 'quantity',
     direction: 'asc'
   });
   const columns = [
     {
-      key: 'category',
-      label: 'Catégorie'
+      key: 'quantity',
+      label: 'Quantité en stock',
+      sortable: true,
     },
     {
       key: 'name',
       label: 'Nom',
       sortable: true,
       class: 'w-full'
+    },
+    {
+      key: 'category',
+      label: 'Catégorie'
     }
-
   ]
 
   function rowClicked(row: object) {
@@ -94,11 +98,20 @@
         if (!filteredCategory.id) return;
         urlParams.append('category.id[]', filteredCategory.id.toString())
       })
-    } else {
+    }
+
+    // When filter by name the category is applied before
+    if (sort.value.column === 'name') {
       urlParams.append(`order[category.weight]`, 'asc');
     }
 
     urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+
+    // For remaining items we sort first by this then by category
+    if (sort.value.column === 'quantity') {
+      urlParams.append(`order[category.weight]`, 'asc');
+    }
+
 
     if (searchQuery.value.trim().length > 0) {
       urlParams.append('multiple[name, barcode]', searchQuery.value.trim())
@@ -202,6 +215,13 @@
 
           <template #name-data="{ row }">
             {{ row.name }}
+          </template>
+
+          <template #quantity-data="{ row }">
+            <p v-if="row.quantity" :class="row.quantityAlert && row.quantity <= row.quantityAlert ? 'font-bold text-red-600' : ''">
+              {{ row.quantity }}
+            </p>
+            <i v-else>Non définie</i>
           </template>
 
           <template #category-data="{ row }">

@@ -11,5 +11,6 @@ export interface InventoryItem extends TimestampItem {
   sellingPrice?: string;
   sellingQuantity?: number;
   quantity?: number|null
+  quantityAlert?: number|null
   barcode?: string;
 }

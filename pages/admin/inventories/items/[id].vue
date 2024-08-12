@@ -181,7 +181,7 @@
       </UTooltip>
     </div>
 
-    <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-4">
+    <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <GenericStatCard
         title="Prix d'achat"
         :value="formatMonetary(inventoryItem?.purchasePrice)"
@@ -197,6 +197,7 @@
       <GenericStatCard
         title="En stock"
         :value="inventoryItem?.quantity ?? '∞' "
+        :value-class="inventoryItem?.quantityAlert && inventoryItem?.quantity && inventoryItem?.quantity <= inventoryItem?.quantityAlert ? 'text-red-600' : ''"
         :loading="isLoading">
       </GenericStatCard>
 
