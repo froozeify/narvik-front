@@ -83,6 +83,9 @@ async function updateItem() {
   if (Number.isNaN(item.value.quantity) || item.value.quantity?.toString() == '') {
     item.value.quantity = null
   }
+  if (Number.isNaN(item.value.quantityAlert) || item.value.quantityAlert?.toString() == '') {
+    item.value.quantityAlert = null
+  }
   if (Number.isNaN(item.value.sellingQuantity) || item.value.sellingQuantity?.toString() == '') {
     item.value.sellingQuantity = 1
   }
@@ -208,6 +211,10 @@ async function getCategories() {
 
     <UFormGroup label="Quantité en stock">
       <UInput v-model="item.quantity" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+    </UFormGroup>
+
+    <UFormGroup label="Alerte quantité en stock critique">
+      <UInput v-model="item.quantityAlert" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
     <UButton type="submit" v-if="!props.viewOnly"

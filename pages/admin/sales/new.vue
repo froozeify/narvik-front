@@ -235,6 +235,10 @@
                 <div v-if="item.sellingQuantity && item.sellingQuantity != 1" class="text-xs font-bold">Vendu par {{ item.sellingQuantity }}</div>
                 <div v-if="item.description" class="text-xs print:hidden">{{ item.description }}</div>
               </div>
+              <div v-if="item.quantityAlert && item.quantity && item.quantity <= item.quantityAlert"
+                   class="print:hidden text-xs font-bold text-red-600">
+                Stock restant : {{ item.quantity }}
+              </div>
               <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
               <UButton class="print:hidden" icon="i-heroicons-shopping-cart" size="2xs" @click="cartStore.addToCart(item)" />
             </div>
