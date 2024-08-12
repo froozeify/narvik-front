@@ -23,7 +23,7 @@ const isDesktopDisplay = isDesktop()
 const isTabletDisplay = isTablet()
 
 const asideMobileClasses = ref(['overflow-y-auto', 'flex flex-col gap-4 fixed bottom-0 left-4 right-4 rounded-t-lg backdrop-blur-2xl z-10'])
-const asideDesktopClasses = 'lg:w-1/3 lg:sticky lg:top-20 lg:h-fit lg:max-h-[calc(100vh-6rem)]'
+const asideDesktopClasses = 'print:hidden lg:w-1/3 lg:sticky lg:top-20 lg:h-fit lg:max-h-[calc(100vh-6rem)]'
 const asideButtonMargin = ref('')
 
 const sideClasses = computed(() => {
