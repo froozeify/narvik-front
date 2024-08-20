@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useAppConfigStore} from "~/stores/useAppConfig";
   import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
 
   useHead({
@@ -12,6 +13,8 @@
   useSetSiteFavicon()
 
   const selfStore = useSelfMemberStore()
+  const appConfigStore = useAppConfigStore()
+
   const isAdmin = selfStore.isAdmin()
   const isSupervisor = selfStore.hasSupervisorRole()
 
@@ -20,6 +23,24 @@
       label: 'Accueil',
       icon: 'i-heroicons-home',
       to: '/admin'
+    }
+  ]
+
+  const configsSection = [
+    {
+      label: 'Globale',
+      icon: 'i-heroicons-wrench-screwdriver',
+      to: '/admin/config'
+    },
+    {
+      label: 'Activités',
+      icon: 'i-heroicons-rocket-launch',
+      to: '/admin/config/activities'
+    },
+    {
+      label: 'Email',
+      icon: 'i-heroicons-envelope',
+      to: '/admin/config/email'
     }
   ]
 
@@ -64,24 +85,6 @@
     },
   ]
 
-  if (isAdmin) {
-    globalSection.push(
-      {
-        label: 'Configuration globale',
-        icon: 'i-heroicons-wrench-screwdriver',
-        to: '/admin/config'
-      }
-    )
-
-    entitiesSection.unshift(
-{
-        label: 'Activités',
-        icon: 'i-heroicons-rocket-launch',
-        to: '/admin/activities'
-      }
-    )
-  }
-
   let links: GroupedNavigationLinks[] = [
     {
       links: globalSection
@@ -89,13 +92,18 @@
     {
       title: '',
       links: entitiesSection
-    }
+    },
   ]
 
   if (isAdmin) {
     links.push({
       title: 'Imports',
       links: importSection
+    })
+
+    links.push({
+      title: 'Configurations',
+      links: configsSection,
     })
   }
 </script>

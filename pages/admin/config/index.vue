@@ -15,7 +15,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'Configuration'
+  title: 'Configuration globale'
 })
 
 const toast = useToast()

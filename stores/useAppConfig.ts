@@ -4,12 +4,25 @@ import ImageQuery from "~/composables/api/query/ImageQuery";
 import ConfigQuery from "~/composables/api/query/ConfigQuery";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import type {Image} from "~/types/api/item/image";
+import type {ConfigValue} from "~/types/api/configValue";
 
 export const useAppConfigStore = defineStore('appConfig', () => {
 	const config: Ref<Config | null> = ref(null)
 
 	// Not exposed
 	const logoImage: Ref<Image | null> = ref(null)
+
+  async function refresh(requireLogin?: boolean) {
+    const selfStore = useSelfMemberStore()
+
+    if (requireLogin == undefined) requireLogin = selfStore.isLogged()
+
+    const configQuery = new ConfigQuery();
+    const { retrieved } = await configQuery.get(requireLogin)
+    if (retrieved) {
+      config.value = retrieved
+    }
+  }
 
 	function getLogo(useCache: boolean = true): Ref<Image|null> {
 		if (useCache && logoImage.value) {
@@ -31,22 +44,19 @@ export const useAppConfigStore = defineStore('appConfig', () => {
 		return logoImage
 	}
 
-	async function refresh(requireLogin?: boolean) {
-		const selfStore = useSelfMemberStore()
+  function getModuleConfig(name: string): Ref<ConfigValue|null> {
+    if (!config.value || !config.value.modules || !config.value.modules[name]) {
+      return ref(null)
+    }
 
-		if (requireLogin == undefined) requireLogin = selfStore.isLogged()
-
-		const configQuery = new ConfigQuery();
-		const { retrieved } = await configQuery.get(requireLogin)
-		if (retrieved) {
-			config.value = retrieved
-		}
-	}
+    return ref(config.value.modules[name])
+  }
 
 	return {
 		config,
 
 		refresh,
 		getLogo,
+    getModuleConfig,
 	}
 })
