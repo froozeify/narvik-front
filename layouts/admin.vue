@@ -1,19 +1,17 @@
 <script setup lang="ts">
   import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
-  import {useAppConfigStore} from "~/stores/useAppConfig";
   import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
 
   useHead({
     titleTemplate: (titleChunk) => {
-      return titleChunk ? `${titleChunk} - Adminstration - Narvik` : 'Adminstration - Narvik';
+      return titleChunk ? `${titleChunk} - Administration - Narvik` : 'Administration - Narvik';
     }
   });
 
   useSetSiteFavicon()
 
   const selfStore = useSelfMemberStore()
-  const appConfigStore = useAppConfigStore()
 
   const isAdmin = selfStore.isAdmin()
   const isSupervisor = selfStore.hasSupervisorRole()
