@@ -49,15 +49,9 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
 }
 
 export async function useLoginUser(email: string, password: string) {
-  const data = await $localApi("auth", {
-    method: "POST",
-    headers: {
-      Accept: MIME_TYPE_JSON,
-    },
-    body: {
-      email: email,
-      password: password
-    }
+  const { data } = await usePostRawJson("auth", {
+    email: email,
+    password: password
   });
 
   const selfStore = useSelfMemberStore()
@@ -67,12 +61,7 @@ export async function useLoginUser(email: string, password: string) {
 }
 
 export async function useLoginBadger(loginToken: string) {
-  const data = await $localApi("auth/bdg/" + loginToken, {
-    method: "POST",
-    headers: {
-      Accept: MIME_TYPE_JSON,
-    }
-  });
+  const { data } = await usePostRawJson("auth/bdg/" + loginToken);
 
   const selfStore = useSelfMemberStore()
   selfStore.setJwtSelfJwtTokenFromApiResponse(data)
@@ -81,6 +70,30 @@ export async function useLoginBadger(loginToken: string) {
 }
 
 
+
+
+export async function usePostRawJson(path: string, payload?: object) {
+  let data: any | undefined = undefined;
+  let error: Error | undefined = undefined;
+
+  try {
+    data = await $localApi(path, {
+      method: "POST",
+      headers: {
+        Accept: MIME_TYPE_JSON,
+      },
+      body: payload
+    });
+
+  } catch (e) {
+    error = e as Error
+  }
+
+  return {
+    data,
+    error,
+  };
+}
 
 
 export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>> {
