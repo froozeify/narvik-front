@@ -95,6 +95,10 @@ async function initiatePasswordReset() {
       <img :src="siteLogo.base64" class="h-full" />
     </div>
 
+    <div>
+      <UButton size="2xs" variant="link" to="/login" label="Se connecter" icon="i-heroicons-arrow-uturn-left" />
+    </div>
+
     <UCard>
 
       <UTabs v-model="selected" :items="items">
