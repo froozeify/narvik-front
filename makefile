@@ -15,7 +15,7 @@ help: ## Outputs this help screen
 ## —— Docker 🐳 ————————————————————————————————————————————————————————————————
 
 build-prod:
-	@docker build --pull --no-cache -t benoitvignal/narvik-front:latest -t benoitvignal/narvik-front:1 -t benoitvignal/narvik-front:1.4 --target run .
+	@docker build --pull --no-cache -t benoitvignal/narvik-front:latest -t benoitvignal/narvik-front:1 -t benoitvignal/narvik-front:1.5 --target run .
 
 sh: ## Connect to the Node container
 	@$(NODE_CONT) sh
