@@ -7,6 +7,7 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
 import dayjs from "dayjs";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
+import {useSaleStore} from "~/stores/useSaleStore";
 
 definePageMeta({
     layout: "pos"
@@ -16,6 +17,7 @@ definePageMeta({
     title: "Détail vente"
   })
 
+  const saleStore = useSaleStore()
   const selfStore = useSelfMemberStore()
   const isAdmin = selfStore.isAdmin()
 
@@ -87,6 +89,7 @@ definePageMeta({
       return
     }
 
+    saleStore.shouldRefreshSales = true
     navigateTo('/admin/sales/history')
   }
 
@@ -123,11 +126,7 @@ definePageMeta({
           size="xs"
           label="Modifier"
           @click="modal.open(SaleModalEdit, {
-            sale: sale,
-            onDelete() {
-              modal.close()
-              deleteSale()
-            }
+            sale: sale
           })"
         />
 

@@ -50,7 +50,7 @@ const props = defineProps({
     return amountPerPayment
   })
 
-  if (sales.value.length == 0) {
+  if (sales.value.length == 0 || saleStore.shouldRefreshSales) {
     saleStore.getSales() // We load the default setting
   }
   watch(selectedRange, () => {

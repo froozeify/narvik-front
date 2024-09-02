@@ -16,6 +16,8 @@ export const useSaleStore = defineStore('sale', () => {
   const selectedRange: Ref<{ start: Date, end: Date } | null> = ref({start: new Date(), end: new Date()})
   const lastRefreshDate: Ref<Date> = ref(new Date())
 
+  const shouldRefreshSales = ref(false)
+
   const sales: Ref<Sale[]> = ref([])
   const salesLoading: Ref<Sale[]> = ref([])
 
@@ -55,6 +57,7 @@ export const useSaleStore = defineStore('sale', () => {
 
     // No more pages to load
     isLoading.value = false
+    shouldRefreshSales.value = false
 
     sales.value = salesLoading.value
     salesLoading.value = []
@@ -109,6 +112,7 @@ export const useSaleStore = defineStore('sale', () => {
     isLoading,
     selectedRange,
     lastRefreshDate,
+    shouldRefreshSales,
 
     getSales,
     getSellers,
