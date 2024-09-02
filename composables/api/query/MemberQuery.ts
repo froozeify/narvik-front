@@ -25,7 +25,7 @@ export default class MemberQuery extends AbstractQuery<Member> {
     return usePostRawJson(`${this.rootPath}/-/reset-password`, {
       email: email,
       password: password,
-      securityCode: securityCode
+      securityCode: securityCode.trim().toUpperCase()
     });
   }
 

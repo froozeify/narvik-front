@@ -120,7 +120,7 @@ async function initiatePasswordReset() {
             />
             <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="resetPassword">
               <UFormGroup label="Email" name="email">
-                <UInput v-model="state.email" type="email" />
+                <UInput v-model.trim="state.email" type="email" />
               </UFormGroup>
 
               <UFormGroup label="Nouveau mot de passe" name="password">
@@ -128,7 +128,7 @@ async function initiatePasswordReset() {
               </UFormGroup>
 
               <UFormGroup label="Code de sécurité" name="securityCode">
-                <UInput v-model="state.securityCode" />
+                <UInput v-model.trim="state.securityCode" />
               </UFormGroup>
 
               <div class="flex justify-between">
