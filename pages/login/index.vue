@@ -15,6 +15,7 @@ const state = reactive({
 
 const appConfigStore = useAppConfigStore();
 const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
+const notificationsModule = appConfigStore.getModuleConfig('notifications')
 
 const validate = (state: any): FormError[] => {
   const errors = []
@@ -61,9 +62,15 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
           <UInput v-model="state.password" type="password" />
         </UFormGroup>
 
-        <UButton type="submit" :loading="isLoading">
-          Connexion
-        </UButton>
+        <div class="flex justify-between">
+          <UButton type="submit" :loading="isLoading">
+            Connexion
+          </UButton>
+
+          <UButton v-if="notificationsModule && notificationsModule['enabled']" variant="ghost" @click="navigateTo('login/password-reset')">
+            Mot de passe oublié
+          </UButton>
+        </div>
       </UForm>
     </UCard>
   </div>

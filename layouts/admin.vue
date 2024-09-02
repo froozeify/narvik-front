@@ -5,13 +5,14 @@
 
   useHead({
     titleTemplate: (titleChunk) => {
-      return titleChunk ? `${titleChunk} - Adminstration - Narvik` : 'Adminstration - Narvik';
+      return titleChunk ? `${titleChunk} - Administration - Narvik` : 'Administration - Narvik';
     }
   });
 
   useSetSiteFavicon()
 
   const selfStore = useSelfMemberStore()
+
   const isAdmin = selfStore.isAdmin()
   const isSupervisor = selfStore.hasSupervisorRole()
 
@@ -20,6 +21,24 @@
       label: 'Accueil',
       icon: 'i-heroicons-home',
       to: '/admin'
+    }
+  ]
+
+  const configsSection = [
+    {
+      label: 'Globale',
+      icon: 'i-heroicons-wrench-screwdriver',
+      to: '/admin/config'
+    },
+    {
+      label: 'Activités',
+      icon: 'i-heroicons-rocket-launch',
+      to: '/admin/config/activities'
+    },
+    {
+      label: 'Email',
+      icon: 'i-heroicons-envelope',
+      to: '/admin/config/email'
     }
   ]
 
@@ -64,24 +83,6 @@
     },
   ]
 
-  if (isAdmin) {
-    globalSection.push(
-      {
-        label: 'Configuration globale',
-        icon: 'i-heroicons-wrench-screwdriver',
-        to: '/admin/config'
-      }
-    )
-
-    entitiesSection.unshift(
-{
-        label: 'Activités',
-        icon: 'i-heroicons-rocket-launch',
-        to: '/admin/activities'
-      }
-    )
-  }
-
   let links: GroupedNavigationLinks[] = [
     {
       links: globalSection
@@ -89,13 +90,18 @@
     {
       title: '',
       links: entitiesSection
-    }
+    },
   ]
 
   if (isAdmin) {
     links.push({
       title: 'Imports',
       links: importSection
+    })
+
+    links.push({
+      title: 'Configurations',
+      links: configsSection,
     })
   }
 </script>

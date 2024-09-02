@@ -4,6 +4,7 @@ import {useAppConfigStore} from "~/stores/useAppConfig";
 
 const publicPaths = [
 	"^/login$",
+	"^/login/password-reset$",
 	"^/login/bdg/.*",
 ]
 
@@ -30,10 +31,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
 	if (pathsMatch(publicPaths, to.fullPath)) {
 		if (selfStore.isLogged()) { // User is logged
-			// User is on login page, we redirect him to the default home
-			if (to.fullPath === "/login") {
-				return navigateTo("/");
-			}
+      return navigateTo("/");
 		}
 
 		// Nothing more to do, user is free to browse public page

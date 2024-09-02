@@ -1,7 +1,8 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {GlobalSetting} from "~/types/api/item/globalSetting";
-import {useFetchItem, useUploadFile} from "~/composables/api/api";
+import {useFetchItem, usePost, useUploadFile} from "~/composables/api/api";
 import type {FetchItemData} from "~/types/api/api";
+import type {SmtpConfig} from "~/types/api/smtp";
 
 export default class GlobalSettingQuery extends AbstractQuery<GlobalSetting> {
     rootPath = "global-settings";
@@ -12,5 +13,14 @@ export default class GlobalSettingQuery extends AbstractQuery<GlobalSetting> {
 
     async getPublic(id: number|string, useCache: boolean = false) {
         return useFetchItem<GlobalSetting>(`public/${this.rootPath}/${id}`, useCache, false);
+    }
+
+    async updateSmtpConfig(config: SmtpConfig) {
+      return usePost(this.rootPath + "/-/smtp", config)
+
+    }
+
+    async testSmtp(email: string) {
+      return usePost(this.rootPath + "/-/test-email", {to: email})
     }
 }
