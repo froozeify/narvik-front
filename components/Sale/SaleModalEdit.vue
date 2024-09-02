@@ -6,6 +6,7 @@ import type {FormError} from "#ui/types";
 import SaleQuery from "~/composables/api/query/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSaleStore} from "~/stores/useSaleStore";
 
 const props = defineProps(
   {
@@ -20,6 +21,7 @@ const toast = useToast()
 const modal = useModal()
 
 const selfStore = useSelfMemberStore();
+const saleStore = useSaleStore()
 const isAdmin = selfStore.isAdmin();
 
 const isLoading = ref(false)
@@ -73,6 +75,9 @@ async function updateSale() {
     color: "green",
     title: "Vente modifiée"
   });
+
+  // We trigger a refresh of the listing
+  saleStore.shouldRefreshSales = true
 
   await modal.close()
 }

@@ -3,10 +3,10 @@
   import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
   import type {InventoryItem} from "~/types/api/item/inventoryItem";
   import {formatMonetary} from "~/utils/string";
-  import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
   import SaleQuery from "~/composables/api/query/SaleQuery";
   import type {Sale} from "~/types/api/item/sale";
   import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
+  import {useSaleStore} from "~/stores/useSaleStore";
   import {useCartStore} from "~/stores/useCartStore";
   import {formatDate} from "~/utils/date";
   import dayjs from "dayjs";
@@ -159,7 +159,7 @@
     });
 
     cartStore.emptyCart()
-    saleStore.sales = [] // We empty the listing
+    saleStore.shouldRefreshSales = true
 
     navigateTo('/admin/sales/' + created.id)
   }
