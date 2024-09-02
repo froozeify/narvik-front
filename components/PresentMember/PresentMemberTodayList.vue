@@ -97,16 +97,17 @@ function refreshNight() {
   }
 }
 
-function getPresences(force: boolean = false) {
+async function getPresences(force: boolean = false) {
   isRefreshing.value = true
   if (externalPresenceStore.list === undefined || force) {
     externalPresenceStore.refresh()
   }
 
-  memberPresenceQuery.getPresentToday().then(value => {
-    presentMembers.value = value.items
-    isRefreshing.value = false
-  });
+  const {error, items} = await memberPresenceQuery.getPresentToday();
+  isRefreshing.value = false
+  if (items && !error) {
+    presentMembers.value = items
+  }
 }
 
 function rowClicked(row: MemberPresence) {

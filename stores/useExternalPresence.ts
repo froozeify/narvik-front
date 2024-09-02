@@ -10,8 +10,8 @@ export const useExternalPresenceStore = defineStore('externalPresence', () => {
 	async function refresh() {
 		isRefreshing.value = true
 		const externalPresenceQuery = new ExternalPresenceQuery();
-		const { items } = await externalPresenceQuery.getPresentToday()
-		if (items) {
+		const { items, error } = await externalPresenceQuery.getPresentToday()
+		if (items && !error) {
 			list.value = items
 		}
 		isRefreshing.value = false
