@@ -22,6 +22,7 @@ const isLoading = ref(false)
 const globalSettingQuery = new GlobalSettingQuery();
 
 const smtpSetting: Ref<SmtpConfig> = ref({});
+const smtpEnabled: Ref<boolean> = ref(false)
 const testEmail = ref('')
 loadSmtpSettings()
 
@@ -35,6 +36,10 @@ async function loadSmtpSettings() {
       if (retrieved.value) {
         if (retrieved.value === '1' || retrieved.value.toLowerCase() === 'true') {
           setValue = true
+          if (key === 'on') {
+            console.log(value)
+            smtpEnabled.value = true
+          }
         }
       }
       // @ts-ignore
@@ -58,6 +63,10 @@ async function loadSmtpSettings() {
 }
 
 const validate = (state: any): FormError[] => {
+  if (!smtpSetting.value.on) {
+    return []
+  }
+
   const errors = []
   if (!state.host) errors.push({ path: 'host', message: 'Champ requis' })
   if (!state.port) errors.push({ path: 'port', message: 'Champ requis' })
@@ -129,29 +138,31 @@ async function testSmtp() {
             <UToggle v-model="smtpSetting.on" />
           </UFormGroup>
 
-          <UFormGroup label="Hôte" name="host">
-            <UInput v-model="smtpSetting.host" />
-          </UFormGroup>
+          <div v-if="smtpSetting.on">
+            <UFormGroup label="Hôte" name="host">
+              <UInput v-model="smtpSetting.host" />
+            </UFormGroup>
 
-          <UFormGroup label="Port" name="port">
-            <UInput v-model="smtpSetting.port" />
-          </UFormGroup>
+            <UFormGroup label="Port" name="port">
+              <UInput v-model="smtpSetting.port" />
+            </UFormGroup>
 
-          <UFormGroup label="Utilisateur" name="username">
-            <UInput v-model="smtpSetting.username" />
-          </UFormGroup>
+            <UFormGroup label="Utilisateur" name="username">
+              <UInput v-model="smtpSetting.username" />
+            </UFormGroup>
 
-          <UFormGroup label="Mot de passe" name="password">
-            <UInput v-model="smtpSetting.password" type="password" />
-          </UFormGroup>
+            <UFormGroup label="Mot de passe" name="password">
+              <UInput v-model="smtpSetting.password" type="password" />
+            </UFormGroup>
 
-          <UFormGroup label="Email expéditeur" name="sender">
-            <UInput v-model="smtpSetting.sender" />
-          </UFormGroup>
+            <UFormGroup label="Email expéditeur" name="sender">
+              <UInput v-model="smtpSetting.sender" />
+            </UFormGroup>
 
-          <UFormGroup label="Nom expéditeur" name="senderName">
-            <UInput v-model="smtpSetting.senderName" />
-          </UFormGroup>
+            <UFormGroup label="Nom expéditeur" name="senderName">
+              <UInput v-model="smtpSetting.senderName" />
+            </UFormGroup>
+          </div>
 
           <UButton
             type="submit"
@@ -178,6 +189,7 @@ async function testSmtp() {
           block
           class="mt-4"
           :loading="isLoading"
+          :disabled="(!smtpEnabled || !smtpSetting.on)"
           @click="testSmtp()"
         >
           Envoyer le mail
