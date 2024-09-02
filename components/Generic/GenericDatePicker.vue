@@ -26,6 +26,17 @@
     color: 'primary',
     'is-dark': { selector: 'html', darkClass: 'dark' },
     'first-day-of-week': 2,
+    attributes: [
+      {
+        key: 'today',
+        dot: {
+          style: {
+            marginBottom: '2px'
+          }
+        },
+        dates: new Date(),
+      }
+    ]
   }
 </script>
 
