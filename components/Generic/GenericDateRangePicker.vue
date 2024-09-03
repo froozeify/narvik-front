@@ -13,6 +13,10 @@
 
   const emit = defineEmits(['update:model-value', 'close'])
 
+  const columns = computed(() => {
+    return isMobile().value ? 1 : 2
+  })
+
   const date = computed({
     get: () => props.modelValue,
     set: (value) => {
@@ -75,7 +79,7 @@
       />
     </div>
 
-    <VCalendarDatePicker v-model.range="date" :columns="2" v-bind="{ ...attrs, ...$attrs }" />
+    <VCalendarDatePicker v-model.range="date" :columns="columns" v-bind="{ ...attrs, ...$attrs }" />
   </div>
 
 </template>
