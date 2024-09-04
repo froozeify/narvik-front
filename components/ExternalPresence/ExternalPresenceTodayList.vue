@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type {ExternalPresence} from "~/types/api/item/externalPresence";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
-import {formatTimeReadable} from "~/utils/date";
 
 const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)
 
@@ -11,27 +10,6 @@ const { isRefreshing } = storeToRefs(externalPresenceStore)
 if (externalPresenceStore.list === undefined) {
   getExternalPresences()
 }
-
-const columns = [
-  {
-    key: 'createdAt',
-    label: 'Heure',
-    class: 'w-20',
-    sortable: true
-  },
-  {
-    key: 'licence',
-    label: 'Licence',
-    class: 'w-24'
-  }, {
-    key: 'fullName',
-    label: 'Nom',
-    class: 'w-1/4'
-  }, {
-    key: 'activities',
-    label: 'Activités'
-  }
-]
 
 async function getExternalPresences() {
   await externalPresenceStore.refresh()
@@ -57,7 +35,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
 
 <template>
 
-  <UCard class="bg-orange-50 dark:bg-orange-950">
+  <UCard v-if="externalPresenceStore.list" class="bg-orange-50 dark:bg-orange-950">
     <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700 items-center">
       <p class="font-bold dark:text-white">Licenciés autre club / non licenciés : {{ externalPresenceStore.list.length}}</p>
 
@@ -77,45 +55,21 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
       </div>
     </div>
 
-    <UTable
-        class="w-full"
-        :columns="columns"
-        :rows="externalPresenceStore.list"
-        :loading="isRefreshing"
-        @select="rowClicked">
-
-      <template #createdAt-data="{row}">
-        {{ formatTimeReadable(row.createdAt) }}
-      </template>
-
-      <template #licence-data="{row}">
-        <div v-if="!row.licence">
-          <i>Non communiquée</i>
-        </div>
-        <div v-else>
-          {{ row.licence }}
-        </div>
-      </template>
-
-      <template #activities-data="{row}">
-        <div v-if="row.activities.length == 0">
-          <i>Aucune activités déclarées</i>
-        </div>
-
-        <div class="flex flex-1 flex-wrap gap-4">
-          <UButton
-              v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-              color="orange"
-              :ui="{ rounded: 'rounded-full' }">
-            {{ activity.name }}
-          </UButton>
-        </div>
-      </template>
-
-    </UTable>
+    <PresenceTable
+      :is-external-presences="true"
+      :presences="externalPresenceStore.list"
+      :total-presences="externalPresenceStore.list.length"
+      :display-no-data-register="false"
+      :display-full-date="false"
+      :has-pagination="false"
+      :is-loading="isRefreshing"
+      accent-color="orange"
+      @rowClicked="rowClicked"
+    />
   </UCard>
 
   <UModal
+      v-if="selectedExternalPresence"
       v-model="externalPresenceStore.modalOpen">
     <ExternalPresenceDetails
         :item="selectedExternalPresence"

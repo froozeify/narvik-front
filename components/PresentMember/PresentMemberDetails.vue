@@ -166,7 +166,7 @@ function fullNameClicked() {
                 variant="ghost"
             />
           </UTooltip>
-          <UTooltip text="Supprimer la présence">
+          <UTooltip v-if="!member.blacklisted || (isSupervisor)" text="Supprimer la présence">
             <UPopover>
               <UButton
                   icon="i-heroicons-trash"
@@ -201,7 +201,7 @@ function fullNameClicked() {
           <div class="text-center text-2xl font-bold" @click="fullNameClicked">
             {{ member.fullName }}
           </div>
-          <div class="flex justify-center gap-2">
+          <div class="flex justify-center flex-wrap gap-2">
             <UBadge
                 v-if="member.currentSeason && member.currentSeason.ageCategory.code"
                 variant="subtle"
@@ -209,6 +209,14 @@ function fullNameClicked() {
                 :ui="{ rounded: 'rounded-full' }">
               {{ member.currentSeason.ageCategory.name }}
             </UBadge>
+
+            <div v-if="member.blacklisted" class="basis-full text-center">
+              <UButton
+                color="black"
+                :ui="{ rounded: 'rounded-full' }">
+                Blacklisté
+              </UButton>
+            </div>
 
             <UButton
               v-if="!member.currentSeason"

@@ -114,7 +114,7 @@ function generateList() {
 </script>
 
 <template>
-  <UCard v-if="isLoading" v-for="i in Math.floor(Math.random() * 3) + 1">
+  <UCard v-if="props.isLoading" v-for="i in Math.floor(Math.random() * 3) + 1">
     <USkeleton class="h-8 w-36 mb-4" />
     <div class="gap-2 grid grid-flow-row grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       <USkeleton v-for="i in Math.floor(Math.random() * 5) + 2" class="h-24 w-full" />

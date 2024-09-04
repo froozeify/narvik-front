@@ -7,9 +7,9 @@ import type {MemberPresence} from "~/types/api/item/memberPresence";
 import type {Member} from "~/types/api/item/member";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence";
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
-import {formatDateReadable, formatTimeReadable} from "~/utils/date";
 import type {ExternalPresence} from "~/types/api/item/externalPresence";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
+import type {TablePaginateInterface} from "~/components/Presence/PresenceTable.vue";
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
@@ -31,18 +31,6 @@ const presenceList = computed(() => {
 
   if (presentMembers.value) {
     response.loading = false
-
-    presentMembers.value.forEach(pm => {
-      // member.lastControlShooting
-      const isExpired = new Date((new Date()).setFullYear((new Date().getFullYear() - 1))) > new Date(pm.member.lastControlShooting);
-      if (isExpired) {
-        // @ts-ignore We add some specific class to warn the user
-        // pm['class'] = 'bg-red-500/50 dark:bg-red-400/50 animate-pulse';
-        // @ts-ignore We add some specific class to warn the user
-        pm['expired_shooting'] = new Date(pm.member.lastControlShooting);
-      }
-    })
-
     response.presentMembers = presentMembers.value
   }
   return response
@@ -57,27 +45,6 @@ const searchQuery = ref('')
 
 const selectedMemberPresence: Ref<MemberPresence | null> = ref(null)
 const selectedMember: Ref<Member | null> = ref(null)
-
-const columns = [
-  {
-    key: 'createdAt',
-    label: 'Heure',
-    class: 'w-20',
-    sortable: true
-  },
-  {
-    key: 'member.licence',
-    label: 'Licence',
-    class: 'w-24'
-  }, {
-    key: 'member.fullName',
-    label: 'Nom',
-    class: 'w-1/4'
-  }, {
-    key: 'activities',
-    label: 'Activités'
-  }
-]
 
 refreshNight()
 function refreshNight() {
@@ -236,73 +203,17 @@ onUnmounted(() => {
           </UTooltip>
         </div>
       </div>
-      <UTable
-          :loading="presenceList.loading || isRefreshing"
-          class="w-full"
-          :columns="columns"
-          :rows="presenceList.presentMembers"
-          :ui="{
-            td: {
-              base: 'md:whitespace-normal'
-            }
-          }"
-          @select="rowClicked">
-        <template #empty-state>
-          <div class="flex flex-col items-center justify-center py-6 gap-3">
-            <span class="italic text-sm">Aucune présence enregistrée</span>
-            <UButton class="mt-4" label="S'enregistrer" @click="openAddPresenceModal()"/>
-          </div>
-        </template>
 
-        <template #createdAt-data="{row}">
-          {{ formatTimeReadable(row.createdAt) }}
-        </template>
-
-        <template #member.fullName-data="{row}">
-          <div class="flex flex-wrap gap-2">
-            <p class="inline-flex items-center">{{ row.member.fullName }}</p>
-
-            <UBadge v-if="row.member.currentSeason && row.member.currentSeason.isSecondaryClub"
-                    variant="subtle"
-                    color="green"
-                    :ui="{ rounded: 'rounded-full' }">
-              Club secondaire
-            </UBadge>
-          </div>
-        </template>
-
-        <template #activities-data="{row}">
-          <div class="flex flex-1 flex-wrap gap-2">
-
-            <div v-if="!row.member.currentSeason" class="basis-full">
-              <UButton
-                  color="red"
-                  :ui="{ rounded: 'rounded-full' }">
-                Saison non renouvelée
-              </UButton>
-            </div>
-
-            <div v-if="row['expired_shooting']" class="basis-full">
-              <UButton
-                  color="red"
-                  :ui="{ rounded: 'rounded-full' }">
-                Dernier tir de contrôle : {{ formatDateReadable(row['expired_shooting']) }}
-              </UButton>
-            </div>
-
-            <div v-if="row.activities.length == 0">
-              <i>Aucune activités déclarées</i>
-            </div>
-            <UButton v-else
-                v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-                variant="soft"
-                :ui="{ rounded: 'rounded-full' }">
-              {{ activity.name }}
-            </UButton>
-          </div>
-        </template>
-
-      </UTable>
+      <PresenceTable
+        :presences="presenceList.presentMembers"
+        :total-presences="presenceList.presentMembers.length"
+        :display-no-data-register="true"
+        :display-full-date="false"
+        :has-pagination="false"
+        :is-loading="presenceList.loading || isRefreshing"
+        @register="openAddPresenceModal()"
+        @rowClicked="rowClicked"
+      />
 
     </UCard>
 

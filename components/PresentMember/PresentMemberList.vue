@@ -1,12 +1,10 @@
 <script setup lang="ts">
-  import type {Member} from "~/types/api/item/member";
   import {usePresenceStore} from "~/stores/usePresenceStore";
-  import type {ExternalPresence} from "~/types/api/item/externalPresence";
-  import {formatDateInput, formatDateReadable} from "~/utils/date";
+  import {formatDateInput} from "~/utils/date";
   import type {MemberPresence} from "~/types/api/item/memberPresence";
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
-  import {usePaginationValues} from "~/composables/api/list";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
 
   const props = defineProps({
     listOnly: {
@@ -32,12 +30,12 @@
 
   const page = ref(1);
   const itemsPerPage = ref(10);
-  const sort = ref({
+  const sort: Ref<TableSortInterface> = ref({
     column: 'date',
     direction: 'desc'
   });
 
-  const members: Ref<Member[]> = ref([])
+  const presences: Ref<MemberPresence[]> = ref([])
   const presenceQuery = new MemberPresenceQuery()
 
   getPresences();
@@ -46,26 +44,6 @@
     page.value = 1
     getPresences()
   })
-
-  const columns = [
-    {
-      key: 'date',
-      label: 'Date',
-      sortable: true
-    },
-    {
-      key: 'member.licence',
-      label: 'Licence',
-      class: 'w-24'
-    }, {
-      key: 'member.fullName',
-      label: 'Nom',
-      class: 'w-1/3'
-    }, {
-      key: 'activities',
-      label: 'Activités'
-    }
-  ]
 
   function getPresences() {
     isLoading.value = true;
@@ -110,13 +88,13 @@
       }
 
       if (value.items) {
-        members.value = value.items
+        presences.value = value.items
         presenceStore.totalMembers = value.totalItems || 0
       }
     });
   }
 
-  function rowClicked(row: ExternalPresence) {
+  function rowClicked(row: MemberPresence) {
     selectedPresence.value = row
     modalOpen.value = true
   }
@@ -196,51 +174,22 @@
       </template>
     </div>
 
-    <UTable
-        :loading="isLoading"
-        class="w-full"
-        v-model:sort="sort"
-        sort-mode="manual"
-        @update:sort="getPresences()"
-        :columns="columns"
-        :rows="members"
-        @select="rowClicked">
-      <template #empty-state>
-        <div class="flex flex-col items-center justify-center py-6 gap-3">
-          <span class="italic text-sm">Aucune présences trouvées.</span>
-        </div>
-      </template>
-
-      <template #date-data="{row}">
-        {{ formatDateReadable(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
-      </template>
-
-      <template #activities-data="{row}">
-        <div v-if="row.activities.length == 0">
-          <i>Aucune activités déclarées</i>
-        </div>
-
-        <div class="flex flex-1 flex-wrap gap-4">
-          <UButton
-              v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-              color="orange"
-              :ui="{ rounded: 'rounded-full' }">
-            {{ activity.name }}
-          </UButton>
-        </div>
-      </template>
-
-    </UTable>
-
-    <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getPresences()" />
-      <UPagination v-model="page" @update:model-value="getPresences()" :page-count="parseInt(itemsPerPage.toString())" :total="presenceStore.totalMembers" />
-    </div>
+    <PresenceTable
+      :presences="presences"
+      :total-presences="presenceStore.totalMembers"
+      :can-sort="true"
+      :display-no-data-register="false"
+      :is-loading="isLoading"
+      @rowClicked="rowClicked"
+      @sort="(object: TableSortInterface) => { sort = object; getPresences() }"
+      @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; sort = object.sort; getPresences() }"
+    />
 
     <UModal
+        v-if="selectedPresence"
         v-model="modalOpen">
       <PresentMemberDetails
-          :view-only="listOnly"
+          :view-only="props.listOnly"
           :item="selectedPresence"
           @updated="presenceUpdated"
       />

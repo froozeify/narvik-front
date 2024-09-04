@@ -2,8 +2,8 @@
   import {usePresenceStore} from "~/stores/usePresenceStore";
   import type {ExternalPresence} from "~/types/api/item/externalPresence";
   import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
-  import {formatDateInput, formatDateReadable} from "~/utils/date";
-  import {usePaginationValues} from "~/composables/api/list";
+  import {formatDateInput} from "~/utils/date";
+  import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
 
   const props = defineProps({
     listOnly: {
@@ -29,7 +29,7 @@
     direction: 'desc'
   });
 
-  const members: Ref<ExternalPresence[]> = ref([])
+  const presences: Ref<ExternalPresence[]> = ref([])
   const presenceQuery = new ExternalPresenceQuery()
 
   getPresences();
@@ -38,27 +38,6 @@
     page.value = 1
     getPresences()
   })
-
-  const columns = [
-    {
-      key: 'date',
-      label: 'Date',
-      sortable: true
-    },
-    {
-      key: 'licence',
-      label: 'Licence',
-      class: 'w-24'
-    },
-    {
-      key: 'fullName',
-      label: 'Nom',
-      class: 'w-1/3'
-    }, {
-      key: 'activities',
-      label: 'Activités'
-    }
-  ]
 
   function getPresences() {
     isLoading.value = true;
@@ -103,7 +82,7 @@
       }
 
       if (value.items) {
-        members.value = value.items
+        presences.value = value.items
         presenceStore.totalExternal = value.totalItems || 0
       }
     });
@@ -125,55 +104,18 @@
 <template>
   <div>
 
-    <UTable
-        :loading="isLoading"
-        class="w-full"
-        v-model:sort="sort"
-        sort-mode="manual"
-        @update:sort="getPresences()"
-        :columns="columns"
-        :rows="members"
-        @select="rowClicked">
-      <template #empty-state>
-        <div class="flex flex-col items-center justify-center py-6 gap-3">
-          <span class="italic text-sm">Aucune présences trouvées.</span>
-        </div>
-      </template>
-
-      <template #date-data="{row}">
-        {{ formatDateReadable(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
-      </template>
-
-      <template #licence-data="{row}">
-        <div v-if="!row.licence">
-          <i>Non communiquée</i>
-        </div>
-        <div v-else>
-          {{ row.licence }}
-        </div>
-      </template>
-
-      <template #activities-data="{row}">
-        <div v-if="row.activities.length == 0">
-          <i>Aucune activités déclarées</i>
-        </div>
-
-        <div class="flex flex-1 flex-wrap gap-4">
-          <UButton
-              v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-              color="orange"
-              :ui="{ rounded: 'rounded-full' }">
-            {{ activity.name }}
-          </UButton>
-        </div>
-      </template>
-
-    </UTable>
-
-    <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getPresences()" />
-      <UPagination v-model="page" @update:model-value="getPresences()" :page-count="parseInt(itemsPerPage.toString())" :total="presenceStore.totalExternal" />
-    </div>
+    <PresenceTable
+      :is-external-presences="true"
+      :presences="presences"
+      :total-presences="presenceStore.totalExternal"
+      :can-sort="true"
+      :display-no-data-register="false"
+      :is-loading="isLoading"
+      accent-color="orange"
+      @rowClicked="rowClicked"
+      @sort="(object: TableSortInterface) => { sort = object; getPresences() }"
+      @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; sort = object.sort; getPresences() }"
+    />
 
     <UModal
         v-model="modalOpen">

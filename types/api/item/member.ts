@@ -46,6 +46,7 @@ export interface Member extends Item {
   birthday?: string;
   handisport?: boolean;
   deceased?: boolean;
+  blacklisted?: boolean;
   postal1?: string;
   postal2?: string;
   postal3?: string;
