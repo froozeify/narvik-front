@@ -15,7 +15,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'updated',
-  'canceled'
+  'close'
 ])
 
 const selfStore = useSelfMemberStore()
@@ -50,16 +50,25 @@ async function deletePresence(close: Function) {
 
 <template>
   <UCard class="bg-orange-50 dark:bg-orange-950">
-    <div class="flex justify-end">
-      <UTooltip text="Editer">
-        <UButton
-            @click="updateExternalPresenceModalOpen = true"
-            icon="i-heroicons-pencil-square"
-            size="xs"
-            color="orange"
-            variant="ghost"
-        />
-      </UTooltip>
+    <div class="flex gap-2">
+      <UButton
+        @click="emit('close')"
+        icon="i-heroicons-x-circle"
+        color="orange"
+        variant="ghost"
+        size="xs"
+      />
+
+      <div class="flex-1"></div>
+
+      <UButton
+          @click="updateExternalPresenceModalOpen = true"
+          icon="i-heroicons-pencil-square"
+          size="xs"
+          color="orange"
+          variant="solid"
+          label="Editer"
+      />
 
       <UTooltip text="Supprimer" v-if="isSupervisor || isBadger">
         <UPopover>

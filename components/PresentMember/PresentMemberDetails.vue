@@ -35,6 +35,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'updated',
+  'close'
 ])
 
 const imageQuery = new ImageQuery()
@@ -157,39 +158,50 @@ function fullNameClicked() {
   <div>
     <template v-if="member">
       <UCard>
-        <div v-if="!viewOnly && (isSupervisor || isBadger)" class="flex justify-end">
-          <UTooltip text="Editer la présence">
+        <div class="flex gap-2 mb-2">
+          <UButton
+            @click="emit('close')"
+            icon="i-heroicons-x-circle"
+            color="white"
+            variant="ghost"
+            size="xs"
+          />
+
+          <div class="flex-1"/>
+
+          <template v-if="!viewOnly && (isSupervisor || isBadger)">
             <UButton
-                @click="updateMemberPresenceModalOpen = true"
-                icon="i-heroicons-pencil-square"
-                size="xs"
-                variant="ghost"
+              @click="updateMemberPresenceModalOpen = true"
+              icon="i-heroicons-pencil-square"
+              size="xs"
+              variant="soft"
+              label="Editer la présence"
             />
-          </UTooltip>
-          <UTooltip text="Supprimer la présence">
-            <UPopover>
-              <UButton
+            <UTooltip v-if="!member.blacklisted || (isSupervisor)" text="Supprimer la présence">
+              <UPopover>
+                <UButton
                   icon="i-heroicons-trash"
                   size="xs"
                   color="red"
                   variant="ghost"
-              />
+                />
 
-              <template #panel="{ close }">
-                <div class="p-4 w-56 flex flex-col gap-4">
-                  <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+                <template #panel="{ close }">
+                  <div class="p-4 w-56 flex flex-col gap-4">
+                    <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
-                  <UButton
+                    <UButton
                       @click="deletePresence(close);"
                       color="red"
                       class="mx-auto"
-                  >
-                    Supprimer
-                  </UButton>
-                </div>
-              </template>
-            </UPopover>
-          </UTooltip>
+                    >
+                      Supprimer
+                    </UButton>
+                  </div>
+                </template>
+              </UPopover>
+            </UTooltip>
+          </template>
         </div>
 
         <div class="mx-auto my-0 h-24 w-24 aspect-square">
@@ -201,7 +213,7 @@ function fullNameClicked() {
           <div class="text-center text-2xl font-bold" @click="fullNameClicked">
             {{ member.fullName }}
           </div>
-          <div class="flex justify-center gap-2">
+          <div class="flex justify-center flex-wrap gap-2">
             <UBadge
                 v-if="member.currentSeason && member.currentSeason.ageCategory.code"
                 variant="subtle"
@@ -209,6 +221,14 @@ function fullNameClicked() {
                 :ui="{ rounded: 'rounded-full' }">
               {{ member.currentSeason.ageCategory.name }}
             </UBadge>
+
+            <div v-if="member.blacklisted" class="basis-full text-center">
+              <UButton
+                color="black"
+                :ui="{ rounded: 'rounded-full' }">
+                Blacklisté
+              </UButton>
+            </div>
 
             <UButton
               v-if="!member.currentSeason"
