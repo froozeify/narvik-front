@@ -69,11 +69,12 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
   </UCard>
 
   <UModal
-      v-if="selectedExternalPresence"
       v-model="externalPresenceStore.modalOpen">
     <ExternalPresenceDetails
+        v-if="selectedExternalPresence"
         :item="selectedExternalPresence"
         @updated="externalPresenceUpdated"
+        @canceled="externalPresenceStore.modalOpen = false; selectedExternalPresence = undefined"
     />
   </UModal>
 

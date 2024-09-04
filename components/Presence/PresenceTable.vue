@@ -195,7 +195,7 @@ function emitPaginate() {
         <UButton v-else
           v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
           :color="props.accentColor"
-          variant="soft"
+          :variant="props.isExternalPresences ? 'solid' : 'soft'"
           :ui="{ rounded: 'rounded-full' }">
           {{ activity.name }}
         </UButton>

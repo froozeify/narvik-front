@@ -231,8 +231,10 @@ onUnmounted(() => {
         }"
     >
       <PresentMemberDetails
+          v-if="selectedMemberPresence"
           :item="selectedMemberPresence"
           @updated="memberPresenceUpdated"
+          @close="memberPresenceModalOpen = false; selectedMemberPresence = null"
       />
     </UModal>
 
