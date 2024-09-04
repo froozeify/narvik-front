@@ -74,7 +74,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
         v-if="selectedExternalPresence"
         :item="selectedExternalPresence"
         @updated="externalPresenceUpdated"
-        @canceled="externalPresenceStore.modalOpen = false; selectedExternalPresence = undefined"
+        @close="externalPresenceStore.modalOpen = false; selectedExternalPresence = undefined"
     />
   </UModal>
 

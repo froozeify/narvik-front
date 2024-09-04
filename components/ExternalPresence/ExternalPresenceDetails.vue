@@ -15,7 +15,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'updated',
-  'canceled'
+  'close'
 ])
 
 const selfStore = useSelfMemberStore()
@@ -52,7 +52,7 @@ async function deletePresence(close: Function) {
   <UCard class="bg-orange-50 dark:bg-orange-950">
     <div class="flex gap-2">
       <UButton
-        @click="emit('canceled')"
+        @click="emit('close')"
         icon="i-heroicons-x-circle"
         color="orange"
         variant="ghost"

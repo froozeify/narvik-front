@@ -123,7 +123,7 @@
           v-if="selectedExternalPresence"
           :item="selectedExternalPresence"
           @updated="externalPresenceUpdated"
-          @canceled="modalOpen = false; selectedExternalPresence = undefined"
+          @close="modalOpen = false; selectedExternalPresence = undefined"
       />
     </UModal>
   </div>
