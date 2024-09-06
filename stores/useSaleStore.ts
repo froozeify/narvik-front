@@ -6,6 +6,7 @@ import SaleQuery from "~/composables/api/query/SaleQuery";
 import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
 import type {Member} from "~/types/api/item/member";
 import MemberQuery from "~/composables/api/query/MemberQuery";
+import {createBrowserCsvDownload} from "~/utils/browser";
 
 export const useSaleStore = defineStore('sale', () => {
   const saleQuery = new SaleQuery()
@@ -13,6 +14,7 @@ export const useSaleStore = defineStore('sale', () => {
   const memberQuery = new MemberQuery()
 
   const isLoading = ref(false)
+  const isDownloadingCsv = ref(false)
   const selectedRange: Ref<{ start: Date, end: Date } | null> = ref({start: new Date(), end: new Date()})
   const lastRefreshDate: Ref<Date> = ref(new Date())
 
@@ -68,6 +70,41 @@ export const useSaleStore = defineStore('sale', () => {
 
   }
 
+  async function getSalesCsv() {
+    isDownloadingCsv.value = true
+
+    const urlParams = new URLSearchParams({
+      pagination: 'false',
+    });
+
+    if (selectedRange.value) {
+      const formattedStartDate = formatDateInput(selectedRange.value.start.toString())
+      const formattedEndDate = formatDateInput(selectedRange.value.end.toString())
+      if (formattedStartDate) {
+        urlParams.append(`createdAt[after]`, formattedStartDate);
+
+        if (formattedEndDate) {
+          urlParams.append(`createdAt[before]`, formattedEndDate);
+        } else {
+          urlParams.append(`createdAt[before]`, formattedStartDate);
+        }
+      }
+    } else {
+      isDownloadingCsv.value = false
+      useToast().add({
+        color: "red",
+        title: "Date non définie.",
+        description: "Veuillez sélectionner une date afin de pouvoir télécharger le csv."
+      })
+      return;
+    }
+
+    // We make the search
+    const { data } = await saleQuery.getAllCsv(urlParams)
+    isDownloadingCsv.value = false
+    createBrowserCsvDownload('sales.csv', data)
+  }
+
   async function getPaymentModes() {
     isLoading.value = true
     const { items: paymentModesResponse } = await paymentModeQuery.getAll()
@@ -110,11 +147,13 @@ export const useSaleStore = defineStore('sale', () => {
     paymentModes,
 
     isLoading,
+    isDownloadingCsv,
     selectedRange,
     lastRefreshDate,
     shouldRefreshSales,
 
     getSales,
+    getSalesCsv,
     getSellers,
     getPaymentModes,
   }
