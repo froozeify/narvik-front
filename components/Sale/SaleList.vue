@@ -3,6 +3,7 @@ import {formatMonetary} from "~/utils/string";
 import {formatDateRangeReadable, formatDateTimeReadable} from "~/utils/date";
 import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
 import {useSaleStore} from "~/stores/useSaleStore";
+import {useSelfMemberStore} from "~/stores/useSelfMember";
 
 const props = defineProps({
     perItem: {
@@ -12,9 +13,11 @@ const props = defineProps({
     },
   })
 
+  const selfStore = useSelfMemberStore()
   const saleStore = useSaleStore()
   const { selectedRange, isLoading, lastRefreshDate, sales, paymentModes } = storeToRefs(saleStore)
 
+  const isAdmin = selfStore.isAdmin()
 
   const totalAmountSales = computed(() => {
     let amount = 0
@@ -56,7 +59,6 @@ const props = defineProps({
   watch(selectedRange, () => {
     saleStore.getSales()
   })
-
 </script>
 
 <template>
@@ -121,7 +123,19 @@ const props = defineProps({
     </template>
     <template v-else>
       <UCard>
-        <div class="text-xl font-bold">Ventes</div>
+
+
+        <div class="flex flex-wrap items-center gap-4">
+          <div class="text-xl font-bold">Ventes</div>
+
+          <div class="flex-1"></div>
+
+          <template v-if="isAdmin">
+            <UButton @click="saleStore.getSalesCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="saleStore.isDownloadingCsv" :disabled="!selectedRange">
+              CSV
+            </UButton>
+          </template>
+        </div>
         <UTable
           class="w-full"
           :loading="isLoading"

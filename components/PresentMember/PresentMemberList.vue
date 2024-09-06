@@ -5,6 +5,7 @@
   import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
+  import {createBrowserCsvDownload} from "~/utils/browser";
 
   const props = defineProps({
     listOnly: {
@@ -142,19 +143,7 @@
     // We make the search
     const { data } = await presenceQuery.getAllCsv(urlParams)
     isDownloadingCsv.value = false
-    // We download in the browser
-    const filename = `presences.csv`
-    const blob = new Blob([data], {type: 'text/csv'})
-    if(window.navigator.msSaveOrOpenBlob) {
-      window.navigator.msSaveBlob(blob, filename)
-    } else {
-      const elem = window.document.createElement('a')
-      elem.href = window.URL.createObjectURL(blob)
-      elem.download = filename
-      document.body.appendChild(elem)
-      elem.click()
-      document.body.removeChild(elem)
-    }
+    createBrowserCsvDownload('presences.csv', data)
   }
 
 </script>
