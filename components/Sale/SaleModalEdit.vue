@@ -7,6 +7,7 @@ import SaleQuery from "~/composables/api/query/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import {useSaleStore} from "~/stores/useSaleStore";
+import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
 
 const props = defineProps(
   {
@@ -28,6 +29,11 @@ const isLoading = ref(false)
 
 const saleQuery = new SaleQuery()
 const sale: Sale = {...props.sale}
+const paymentModeValue = ref(sale.paymentMode?.id?.toString())
+
+if (saleStore.paymentModes.length < 1) {
+  saleStore.getPaymentModes()
+}
 
 const validate = (state: any): FormError[] => {
   const errors = []
@@ -50,6 +56,11 @@ async function updateSale() {
     createdAt: sale.createdAt
   }
 
+  if (paymentModeValue.value) {
+    const paymentModeQuery = new SalePaymentModeQuery()
+    payload.paymentMode = `/${paymentModeQuery.rootPath}/${paymentModeValue.value}`;
+  }
+
   if (payload.comment?.trim().length === 0) {
     payload.comment = null
   }
@@ -70,6 +81,7 @@ async function updateSale() {
   // We update the sale with the api update item
   props.sale.createdAt = updated.createdAt
   props.sale.comment = updated.comment
+  props.sale.paymentMode = updated.paymentMode
 
   toast.add({
     color: "green",
@@ -101,6 +113,10 @@ async function updateSale() {
             <GenericDatePicker v-model="sale.createdAt" mode="dateTime" />
           </template>
         </UPopover>
+      </UFormGroup>
+
+      <UFormGroup label="Moyen de paiement" name="paymentMode">
+        <USelect v-model="paymentModeValue" :options="saleStore.paymentModes" option-attribute="name" value-attribute="id" />
       </UFormGroup>
 
       <UFormGroup label="Commentaire" name="comment">
