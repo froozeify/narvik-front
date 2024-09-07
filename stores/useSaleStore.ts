@@ -79,7 +79,7 @@ export const useSaleStore = defineStore('sale', () => {
 
     if (selectedRange.value) {
       const formattedStartDate = formatDateInput(selectedRange.value.start.toString())
-      const formattedEndDate = formatDateInput(selectedRange.value.end.toString())
+      const formattedEndDate = formatDateInput(dayjs(selectedRange.value.end).add(1, 'days').toString())
       if (formattedStartDate) {
         urlParams.append(`createdAt[after]`, formattedStartDate);
 
