@@ -27,8 +27,19 @@ const validate = (state: any): FormError[] => {
 async function onSubmit(event: FormSubmitEvent<{email: string, password: string}>) {
   isLoading.value = true
 
+  const { error } = await useLoginUser(event.data.email, event.data.password);
+  if (error) {
+    toast.add({
+      color: "red",
+      title: error.statusCode === 401 ? "Erreur de connexion" : "Trop de tentative",
+      description: error.statusCode === 401 ? 'Mauvais email/mot de passe' : 'Veuillez réessayer dans 15 minutes.'
+    })
+    console.error(error)
+    isLoading.value = false
+    return;
+  }
+
   try {
-    await useLoginUser(event.data.email, event.data.password);
     const selfStore = useSelfMemberStore();
     await selfStore.refresh();
   } catch (e) {

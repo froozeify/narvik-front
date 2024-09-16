@@ -5,6 +5,7 @@ import type {Item} from "~/types/api/item";
 import {mergician} from 'mergician';
 import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/useApiData";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
+import type {NuxtError} from "#app";
 
 export const MIME_TYPE = "application/ld+json";
 export const MIME_TYPE_JSON = "application/json";
@@ -49,15 +50,17 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
 }
 
 export async function useLoginUser(email: string, password: string) {
-  const { data } = await usePostRawJson("auth", {
+  const { data, error } = await usePostRawJson("auth", {
     email: email,
     password: password
   });
 
-  const selfStore = useSelfMemberStore()
-  selfStore.setJwtSelfJwtTokenFromApiResponse(data)
+  if (data) {
+    const selfStore = useSelfMemberStore()
+    selfStore.setJwtSelfJwtTokenFromApiResponse(data)
+  }
 
-  return true;
+  return { error };
 }
 
 export async function useLoginBadger(loginToken: string) {
@@ -74,7 +77,7 @@ export async function useLoginBadger(loginToken: string) {
 
 export async function usePostRawJson(path: string, payload?: object) {
   let data: any | undefined = undefined;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     data = await $localApi(path, {
@@ -86,7 +89,7 @@ export async function usePostRawJson(path: string, payload?: object) {
     });
 
   } catch (e) {
-    error = e as Error
+    error = e as NuxtError
   }
 
   return {
@@ -101,7 +104,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
   let totalItems: number | undefined = undefined;
   let view: View | undefined = undefined;
   let hubUrl: URL | undefined = undefined;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     const data = await useApi<PagedCollection<T>>(resource, {
@@ -115,7 +118,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
     view = data["hydra:view"];
     totalItems = data["hydra:totalItems"];
   } catch (e) {
-    error = e as Error;
+    error = e as NuxtError;
   }
 
   return {
@@ -130,7 +133,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
 export async function useFetchItem<T>(path: string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<T>> {
   let retrieved: T | undefined = undefined;
   let hubUrl: URL | undefined = undefined;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     const data = await useApi<T>(path, {
@@ -143,7 +146,7 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false, r
 
     retrieved = data as T;
   } catch (e) {
-    error = e as Error;
+    error = e as NuxtError;
   }
 
 
@@ -156,7 +159,7 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false, r
 
 export async function useCreateItem<T>(resource: string, payload: Item) {
   let created: T | undefined = undefined;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     const data = await useApi<T>(resource, {
@@ -166,7 +169,7 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
 
     created = data as T;
   } catch (e) {
-    error = e as Error
+    error = e as NuxtError
   }
 
   return {
@@ -177,7 +180,7 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
 
 export async function useUploadFile(resource: string, payload: FormData, requireLogin: boolean = true) {
   let created: Object | undefined = undefined;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     const data = await useApi(resource, {
@@ -191,7 +194,7 @@ export async function useUploadFile(resource: string, payload: FormData, require
 
     created = data as Object;
   } catch (e) {
-    error = e as Error
+    error = e as NuxtError
   }
 
   return {
@@ -202,7 +205,7 @@ export async function useUploadFile(resource: string, payload: FormData, require
 
 export async function useUpdateItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     const data = await useApi<T>(item["@id"] ?? "", {
@@ -216,7 +219,7 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
 
     updated = data as T;
   } catch (e) {
-    error = e as Error
+    error = e as NuxtError
   }
 
   return {
@@ -227,7 +230,7 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
 
 export async function useGetCsv(path: string) {
   let data = null;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     data = await useApi(path, {
@@ -237,7 +240,7 @@ export async function useGetCsv(path: string) {
       },
     });
   } catch (e) {
-    error = e as Error
+    error = e as NuxtError
   }
 
   return {
@@ -248,7 +251,7 @@ export async function useGetCsv(path: string) {
 
 export async function usePost<T>(path: string, payload: object) {
   let item: T | undefined = undefined;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     const data = await useApi<T>(path, {
@@ -263,7 +266,7 @@ export async function usePost<T>(path: string, payload: object) {
 
     item = data as T;
   } catch (e) {
-    error = e as Error
+    error = e as NuxtError
   }
 
   return {
@@ -274,7 +277,7 @@ export async function usePost<T>(path: string, payload: object) {
 
 export async function usePut(path: string, payload: object) {
   let updated: object | undefined = undefined;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     updated = await useApi<object>(path, {
@@ -286,7 +289,7 @@ export async function usePut(path: string, payload: object) {
       },
     });
   } catch (e) {
-    error = e as Error
+    error = e as NuxtError
   }
 
   return {
@@ -298,7 +301,7 @@ export async function usePut(path: string, payload: object) {
 
 export async function usePatchItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let error: Error | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
 
   try {
     const data = await useApi(item["@id"] ?? "", {
@@ -312,7 +315,7 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
 
     updated = data as T;
   } catch (e) {
-    error = e as Error
+    error = e as NuxtError
   }
 
   return {
