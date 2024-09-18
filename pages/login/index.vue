@@ -10,10 +10,13 @@ const isLoading = ref(false)
 
 const state = reactive({
   email: undefined,
-  password: undefined
+  password: undefined,
+  turnstile: undefined,
 })
 
 const appConfigStore = useAppConfigStore();
+const hasTurnstile = useRuntimeConfig().public.clientTurnstile
+
 const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
 const notificationsModule = appConfigStore.getModuleConfig('notifications')
 
@@ -26,6 +29,27 @@ const validate = (state: any): FormError[] => {
 
 async function onSubmit(event: FormSubmitEvent<{email: string, password: string}>) {
   isLoading.value = true
+
+  // We validate the token
+  if (hasTurnstile) {
+    try {
+      // We validate the captcha
+      await $fetch('/_turnstile/validate', {
+        method: 'POST',
+        body: {
+          token: state.turnstile,
+        }
+      })
+    } catch (e) {
+      toast.add({
+        color: "red",
+        title: "Captcha invalide",
+      })
+      console.error(e)
+      isLoading.value = false
+      return;
+    }
+  }
 
   const { error } = await useLoginUser(event.data.email, event.data.password);
   if (error) {
@@ -72,6 +96,8 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
         <UFormGroup label="Mot de passe" name="password">
           <UInput v-model="state.password" type="password" />
         </UFormGroup>
+
+        <NuxtTurnstile v-show="hasTurnstile" v-model="state.turnstile" />
 
         <div class="flex justify-between">
           <UButton type="submit" :loading="isLoading">

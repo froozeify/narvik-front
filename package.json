@@ -11,7 +11,9 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@nuxt/scripts": "^0.9.2",
     "@nuxt/ui": "^2.18.4",
+    "@nuxtjs/turnstile": "^0.9.5",
     "chart.js": "^4.4.3",
     "jwt-decode": "^4.0.0",
     "mergician": "^2.0.2",
@@ -30,5 +32,6 @@
     "dayjs": "^1.11.11",
     "qs": "^6.12.1",
     "v-calendar": "^3.1.2"
-  }
+  },
+  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
 }

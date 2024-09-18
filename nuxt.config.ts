@@ -8,7 +8,9 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
     '@pinia/nuxt',
-    'nuxt-api-party'
+    'nuxt-api-party',
+    '@nuxtjs/turnstile',
+    '@nuxt/scripts',
   ],
 
   ui: {
@@ -25,9 +27,14 @@ export default defineNuxtConfig({
     }
   },
 
+  turnstile: {
+    addValidateEndpoint: true
+  },
+
   runtimeConfig: {
     public: {
-      clientVersion: pkg.version
+      clientVersion: pkg.version,
+      clientTurnstile: false
     },
 
     apiParty: {
