@@ -52,7 +52,7 @@ export const useSaleStore = defineStore('sale', () => {
     salesLoading.value = salesLoading.value.concat(items)
 
     // We load the next page
-    if (view && view["hydra:next"]) {
+    if (view && view["next"]) {
       await getSales(page + 1)
       return;
     }
@@ -128,7 +128,7 @@ export const useSaleStore = defineStore('sale', () => {
     sellersLoading.value = sellersLoading.value.concat(items)
 
     // We load the next page
-    if (view && view["hydra:next"]) {
+    if (view && view["next"]) {
       await getSellers(page + 1)
       return;
     }
