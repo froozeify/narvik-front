@@ -2,7 +2,7 @@
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import type {Image} from "~/types/api/item/image";
   import {useAppConfigStore} from "~/stores/useAppConfig";
-  import {isDesktop, isTouchDevice, watchBreakpoint} from "~/utils/browser";
+  import {isDesktop, watchBreakpoint} from "~/utils/browser";
 
   const colorMode = useColorMode()
   const selfStore = useSelfMemberStore();
@@ -82,7 +82,7 @@
         <div v-if="isSupervisor">
           <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton>
         </div>
-        <UDropdown :items="rightMenu" :disabled="isTouchDevice()">
+        <UDropdown :items="rightMenu">
           <UButton
             variant="ghost"
             color="gray"
