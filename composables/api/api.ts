@@ -114,9 +114,9 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
       },
     });
 
-    items = data["hydra:member"];
-    view = data["hydra:view"];
-    totalItems = data["hydra:totalItems"];
+    items = data["member"];
+    view = data["view"];
+    totalItems = data["totalItems"];
   } catch (e) {
     error = e as NuxtError;
   }

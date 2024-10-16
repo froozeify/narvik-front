@@ -61,7 +61,7 @@
           totalMembers.value = value.totalItems
         }
 
-        if (value.view && value.view["hydra:next"]) {
+        if (value.view && value.view["next"]) {
           page.value = page.value + 1;
           getMembers();
           return;

@@ -80,7 +80,7 @@
     inventoryItemsLoading.value = inventoryItemsLoading.value.concat(items)
 
     // We load the next page
-    if (view &&view["hydra:next"]) {
+    if (view &&view["next"]) {
       await loadItems(page + 1)
       return;
     }
