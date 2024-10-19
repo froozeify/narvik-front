@@ -190,7 +190,7 @@ const props = defineProps({
 
           <template #id-data="{ row }">
             <UButton
-              :to="'/admin/sales/' + row.id"
+              :to="'/admin/sales/' + row.uuid"
               variant="soft"
               :ui="{ rounded: 'rounded-full' }">
               Voir le détail

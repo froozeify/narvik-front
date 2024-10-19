@@ -123,7 +123,7 @@
         quantity: item.quantity
       }
 
-      if (Number(key) > 0) {
+      if (isNaN(Number(key))) {
         payload.item = item.item['@id']
       } else {
         payload.itemName = item.item.name
@@ -161,7 +161,7 @@
     cartStore.emptyCart()
     saleStore.shouldRefreshSales = true
 
-    navigateTo('/admin/sales/' + created.id)
+    navigateTo('/admin/sales/' + created.uuid)
   }
 
   // We load the page content
@@ -330,7 +330,7 @@
           <div class="flex flex-wrap gap-2">
             <UButton
               v-for="paymentMode in paymentModes"
-              :variant="selectedPaymentMode?.id == paymentMode.id ? 'solid' : 'soft'"
+              :variant="selectedPaymentMode?.uuid == paymentMode.uuid ? 'solid' : 'soft'"
               class="basis-[calc(50%-0.25rem)]">
               <div class="flex items-center w-full" @click="selectedPaymentMode = selectedPaymentMode === paymentMode ? null : paymentMode">
                 <UIcon :name="'i-heroicons-' + paymentMode.icon" />

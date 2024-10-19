@@ -1,7 +1,7 @@
-import type {Item} from "../item";
 import type {InventoryItem} from "~/types/api/item/inventoryItem";
+import type {UuidItem} from "~/types/api/uuidItem";
 
-export interface InventoryCategory extends Item {
+export interface InventoryCategory extends UuidItem {
   name?: string;
   weight?: number;
   items?: InventoryItem[];

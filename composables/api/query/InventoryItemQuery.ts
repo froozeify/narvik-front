@@ -6,7 +6,7 @@ import type {InventoryItemHistory} from "~/types/api/item/inventoryItemHistory";
 export default class InventoryItemQuery extends AbstractQuery<InventoryItem> {
     rootPath = "inventory-items";
 
-    async histories(id: number|string, urlParams?: URLSearchParams) {
+    async histories(id: string, urlParams?: URLSearchParams) {
       let url = `${this.rootPath}/${id}/histories`;
 
       if (!urlParams) {

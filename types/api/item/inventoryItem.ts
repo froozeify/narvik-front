@@ -1,7 +1,8 @@
 import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
 import type {TimestampItem} from "~/types/api/timestampItem";
+import type {UuidItem} from "~/types/api/uuidItem";
 
-export interface InventoryItem extends TimestampItem {
+export interface InventoryItem extends UuidItem, TimestampItem {
   category?: InventoryCategory|null;
 
   name?: string;

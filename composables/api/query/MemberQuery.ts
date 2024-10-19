@@ -53,7 +53,7 @@ export default class MemberQuery extends AbstractQuery<Member> {
     return useUploadFile(this.rootPath + "/-/photos-from-itac", formData)
   }
 
-  async seasons(id: number | string, urlParams?: URLSearchParams) {
+  async seasons(id: string, urlParams?: URLSearchParams) {
     let url = `${this.rootPath}/${id}/seasons`;
 
     if (!urlParams) {
@@ -65,7 +65,7 @@ export default class MemberQuery extends AbstractQuery<Member> {
     return useFetchList<MemberSeason>(url)
   }
 
-  async presences(id: number | string, urlParams?: URLSearchParams) {
+  async presences(id: string, urlParams?: URLSearchParams) {
     let url = `${this.rootPath}/${id}/presences`;
 
     if (!urlParams) {
@@ -80,7 +80,7 @@ export default class MemberQuery extends AbstractQuery<Member> {
     return useFetchList<MemberPresence>(url)
   }
 
-  async presencesCsv(id: number | string, urlParams?: URLSearchParams) {
+  async presencesCsv(id: string, urlParams?: URLSearchParams) {
     let url = `${this.rootPath}/${id}/presences.csv`;
 
     if (!urlParams) {

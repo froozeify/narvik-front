@@ -26,8 +26,8 @@
     categories.value = value.items
 
     // Filter is apply on a category
-    if (!isNaN(queryParams.category)) {
-      const matchedCategory = value.items.find( (category) => category.id == queryParams.category)
+    if (queryParams.category !== undefined) {
+      const matchedCategory = value.items.find( (category) => category.uuid == queryParams.category)
       if (matchedCategory) {
         filteredCategories.value.push(matchedCategory)
         useRouter().replace(useRouter().currentRoute.value.path) // We remove the param from the url
@@ -95,8 +95,8 @@
 
     if (filteredCategories.value.length > 0) {
       filteredCategories.value.forEach(filteredCategory => {
-        if (!filteredCategory.id) return;
-        urlParams.append('category.id[]', filteredCategory.id.toString())
+        if (!filteredCategory.uuid) return;
+        urlParams.append('category.uuid[]', filteredCategory.uuid)
       })
     }
 
@@ -260,7 +260,7 @@
           </UButton>
         </UCard>
 
-        <UButton block :to="'/admin/inventories/items/' + selectedItem.id">Voir en détail</UButton>
+        <UButton block :to="'/admin/inventories/items/' + selectedItem.uuid">Voir en détail</UButton>
       </template>
     </template>
 

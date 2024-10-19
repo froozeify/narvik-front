@@ -35,13 +35,13 @@ export const useCartStore = defineStore('cart', () => {
 
   // Cart management
   function addToCart(item: InventoryItem, modifier: number = 1) {
-    if (!item.id) {
+    if (!item.uuid) {
       return
     }
 
     searchQuery.value = '' // Since the item has been added to the cart, we revert to empty search
 
-    let cartItem = cart.value.get(item.id.toString())
+    let cartItem = cart.value.get(item.uuid)
 
     if (!cartItem) {
       cartItem = { quantity: modifier, item: item }
@@ -50,9 +50,9 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     if (cartItem.quantity <= 0) {
-      cart.value.delete(item.id.toString())
+      cart.value.delete(item.uuid)
     } else {
-      cart.value.set(item.id.toString(), cartItem)
+      cart.value.set(item.uuid, cartItem)
     }
   }
 
@@ -82,7 +82,7 @@ export const useCartStore = defineStore('cart', () => {
 
     // Negative ID, Backend know it's not a real item
     const item: InventoryItem = {
-      id: - Math.floor(Math.random() * 200000),
+      uuid: Number(- Math.floor(Math.random() * 200000)).toString(),
       name: customItemForm.name,
       sellingPrice: parseFloat(customItemForm.sellingPrice.replace(',', '.')).toFixed(2),
     }

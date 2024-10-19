@@ -142,7 +142,7 @@
         {{ inventoryItem?.name }}
 
         <UButton v-if="inventoryItem?.category"
-           :to="'/admin/inventories?category=' + inventoryItem.category.id"
+           :to="'/admin/inventories?category=' + inventoryItem.category.uuid"
            variant="soft"
            :ui="{ rounded: 'rounded-full' }">
           {{ inventoryItem.category.name }}

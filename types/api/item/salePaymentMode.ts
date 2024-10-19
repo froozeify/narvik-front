@@ -1,6 +1,6 @@
-import type {Item} from "../item";
+import type {UuidItem} from "~/types/api/uuidItem";
 
-export interface SalePaymentMode extends Item {
+export interface SalePaymentMode extends UuidItem {
   name?: string;
   icon?: string;
   available?: boolean;

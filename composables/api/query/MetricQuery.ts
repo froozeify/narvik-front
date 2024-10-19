@@ -6,7 +6,7 @@ export default class MetricQuery extends AbstractQuery<Metric> {
     rootPath = "metrics";
 
 
-    async get(id: number | string): Promise<FetchItemData<Metric>> {
+    override async get(id: string): Promise<FetchItemData<Metric>> {
         return super.get(id);
     }
 }

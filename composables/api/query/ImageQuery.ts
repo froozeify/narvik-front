@@ -7,8 +7,8 @@ import {useFetchItem} from "~/composables/api/api";
 export default class ImageQuery extends AbstractQuery<Image> {
     rootPath = "images";
 
-    async get(id: number | string) {
-        return useFetchItem<Image>(id.toString(), true);
+    override async get(id: string) {
+        return useFetchItem<Image>(id, true);
     }
 
     async getPublic(id: number | string, useCache: boolean = true) {

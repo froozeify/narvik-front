@@ -221,7 +221,7 @@ definePageMeta({
 
         <template #item-data="{ row }">
           <UButton v-if="row.item"
-             :to="'/admin/inventories/items/' + row.item.id"
+             :to="'/admin/inventories/items/' + row.item.uuid"
              variant="soft"
              :ui="{ rounded: 'rounded-full' }">
             Voir l'article

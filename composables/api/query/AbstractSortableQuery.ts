@@ -5,6 +5,6 @@ import type {Item} from "~/types/api/item";
 export abstract class AbstractSortableQuery<T> extends AbstractQuery<T> {
 
   async move(item: Item, direction: string) {
-    return usePut(this.rootPath + "/" + item.id + "/move", {direction: direction});
+    return usePut(item["@id"] + "/move", {direction: direction});
   }
 }

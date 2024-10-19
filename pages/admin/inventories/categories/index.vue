@@ -109,7 +109,7 @@
 
     // We verify if it's a creation or an update
     let error: Error | undefined = undefined
-    if (!category.id) {
+    if (!category.uuid) {
       await apiQuery.post(payload).then(value => {
         error = value.error
         selectedCategory.value = value.created
@@ -125,7 +125,7 @@
     if (error) {
       toast.add({
         color: "red",
-        title: !category.id ? "La création a échouée" : "La modification a échouée",
+        title: !category.uuid ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
       return;
@@ -133,7 +133,7 @@
 
     toast.add({
       color: "green",
-      title: !category.id ? "Catégorie créée" : "Catégorie modifiée",
+      title: !category.uuid ? "Catégorie créée" : "Catégorie modifiée",
     });
 
     // We refresh the list
@@ -222,12 +222,12 @@
 
           </UCard>
 
-          <UButton v-if="selectedCategory.id" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + selectedCategory.id">Voir les articles</UButton>
+          <UButton v-if="selectedCategory.uuid" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + selectedCategory.uuid">Voir les articles</UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
           <UButton
-            v-if="selectedCategory.id"
+            v-if="selectedCategory.uuid"
             block
             color="red"
             :loading="isLoading"
