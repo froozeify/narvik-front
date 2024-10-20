@@ -4,6 +4,7 @@ import {formatDateRangeReadable, formatDateTimeReadable} from "~/utils/date";
 import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
 import {useSaleStore} from "~/stores/useSaleStore";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {convertUuidToUrlUuid} from "~/utils/resource";
 
 const props = defineProps({
     perItem: {
@@ -190,7 +191,7 @@ const props = defineProps({
 
           <template #id-data="{ row }">
             <UButton
-              :to="'/admin/sales/' + row.uuid"
+              :to="'/admin/sales/' + convertUuidToUrlUuid(row.uuid)"
               variant="soft"
               :ui="{ rounded: 'rounded-full' }">
               Voir le détail

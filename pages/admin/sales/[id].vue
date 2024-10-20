@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
 import {useSaleStore} from "~/stores/useSaleStore";
+import {decodeUrlUuid} from "~/utils/resource";
 
 definePageMeta({
     layout: "pos"
@@ -24,7 +25,7 @@ definePageMeta({
   const toast = useToast()
   const modal = useModal()
   const route = useRoute()
-  const itemId = route.params.id;
+  const itemId = decodeUrlUuid(route.params.id.toString());
 
   const isLoading = ref(true)
 
