@@ -1,5 +1,5 @@
-import type { Item } from "../item";
 import type {MemberSeason} from "~/types/api/item/memberSeason";
+import type {UuidItem} from "~/types/api/uuidItem";
 
 export enum MemberRole {
   User = 'ROLE_USER',
@@ -28,7 +28,7 @@ export function getAvailableMemberRoles() {
   ]
 }
 
-export interface Member extends Item {
+export interface Member extends UuidItem {
   profileImage?: string;
   profileImageBase64?: string;
   lastControlShooting?: Date;

@@ -66,7 +66,7 @@
 
   async function loadHistories(itemId: string) {
     // We load the history
-    const { items, error } = await itemQuery.histories(itemId.toString())
+    const { items, error } = await itemQuery.histories(itemId)
 
     if (error) {
       inventoryItemHistories.value = []

@@ -84,7 +84,7 @@ async function updateActivity(activity: Activity) {
 
   // We verify if it's a creation or an update
   let errorApi: Error | undefined = undefined
-  if (!activity.id) {
+  if (!activity.uuid) {
     const {error, created} = await activityQuery.post(payload)
     errorApi = error
     selectedActivity.value = created
@@ -98,7 +98,7 @@ async function updateActivity(activity: Activity) {
   if (errorApi) {
     toast.add({
       color: "red",
-      title: !activity.id ? "La création a échouée" : "La modification a échouée",
+      title: !activity.uuid ? "La création a échouée" : "La modification a échouée",
       description: errorApi.message
     });
     return;
@@ -106,7 +106,7 @@ async function updateActivity(activity: Activity) {
 
   toast.add({
     color: "green",
-    title: !activity.id ? "Activité créée" : "Activité modifiée",
+    title: !activity.uuid ? "Activité créée" : "Activité modifiée",
   });
 
   await getActivities()
@@ -137,10 +137,10 @@ async function deleteActivity() {
 }
 
 async function migrateActivity(migrationTarget: string) {
-  if (!selectedActivity.value?.id || !migrationTarget) return;
+  if (!selectedActivity.value?.uuid || !migrationTarget) return;
 
   isLoading.value = true
-  const {error} = await activityQuery.mergeTo(selectedActivity.value.id, migrationTarget)
+  const {error} = await activityQuery.mergeTo(selectedActivity.value.uuid, migrationTarget)
   isLoading.value = false
   selectedActivity.value = undefined
 
@@ -219,7 +219,7 @@ getActivities()
           <UButton class="mt-4" block type="submit" :loading="isLoading">Enregistrer</UButton>
         </UForm>
 
-        <UButton v-if="selectedActivity.id && !selectedActivity.isEnabled"
+        <UButton v-if="selectedActivity.uuid && !selectedActivity.isEnabled"
           block
           color="red"
           :loading="isLoading"
@@ -234,7 +234,7 @@ getActivities()
           Supprimer
         </UButton>
 
-        <UButton v-if="selectedActivity.id && !selectedActivity.isEnabled"
+        <UButton v-if="selectedActivity.uuid && !selectedActivity.isEnabled"
                  block
                  color="orange"
                  :loading="isLoading"

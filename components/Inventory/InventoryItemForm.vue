@@ -79,7 +79,7 @@ function onDecoded(value: string) {
 
 async function updateItem() {
   isUpdating.value = true
-  const isCreate = !item.value.id
+  const isCreate = !item.value.uuid
 
   if (item.value.category) {
     item.value.category = item.value.category["@id"]
@@ -236,7 +236,7 @@ async function getCategories() {
       class="mt-2"
       :loading="isUpdating"
     >
-      <template v-if="item.id">
+      <template v-if="item.uuid">
         Modifier
       </template>
       <template v-else>

@@ -102,7 +102,7 @@
       <div class="grid grid-flow-row gap-4 grid-cols-1 sm:grid-cols-3 xl:grid-cols-5">
         <NuxtLink
           v-for="member in (members)"
-          :to="`/admin/members/${member.id}`"
+          :to="`/admin/members/${member.uuid}`"
           target="_blank"
           class="transition ease-in-out hover:scale-105 duration-300 "
         >

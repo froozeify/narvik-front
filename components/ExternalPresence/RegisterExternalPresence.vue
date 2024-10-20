@@ -66,9 +66,9 @@ if (props.externalPresence) {
   state.activities = []
   props.externalPresence.activities?.forEach(actvt => {
     if (!actvt.isEnabled) {
-      state.activities[actvt.id] = false
+      state.activities[actvt.uuid] = false
     } else {
-      state.activities[actvt.id] = true
+      state.activities[actvt.uuid] = true
     }
   });
 }
@@ -195,8 +195,8 @@ function presenceCanceled() {
             <UCheckbox
                 class="w-full"
                 v-for="activity in activities"
-                v-model="state.activities[activity.id]"
-                :name="'actvt-' + activity.id"
+                v-model="state.activities[activity.uuid]"
+                :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
           </div>
         </div>

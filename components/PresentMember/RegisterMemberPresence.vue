@@ -52,9 +52,9 @@ if (props.memberPresence) {
   }
   props.memberPresence.activities?.forEach(actvt => {
     if (!actvt.isEnabled) {
-      state.activities[actvt.id] = false
+      state.activities[actvt.uuid] = false
     } else {
-      state.activities[actvt.id] = true
+      state.activities[actvt.uuid] = true
     }
   });
 }
@@ -76,7 +76,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     activities: []
   }
   if (props.member) {
-    memberPresence.member = `/members/${props.member.id}`
+    memberPresence.member = `/members/${props.member.uuid}`
   } else if (props.memberPresence) {
     delete memberPresence.member // We remove the member key since we only update the activities (PATCH request)
   }
@@ -160,8 +160,8 @@ async function onSubmit(event: FormSubmitEvent<any>) {
             <UCheckbox
                 class="w-full"
                 v-for="activity in activities"
-                v-model="state.activities[activity.id]"
-                :name="'actvt-' + activity.id"
+                v-model="state.activities[activity.uuid]"
+                :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
           </div>
         </div>

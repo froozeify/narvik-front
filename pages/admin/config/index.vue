@@ -40,7 +40,7 @@ globalSettingQuery.get("CONTROL_SHOOTING_ACTIVITY_ID").then(value => {
   if (controlShootingSetting.value && controlShootingSetting.value.value) {
     getActivity(controlShootingSetting.value.value).then(actvt => {
       selectedControlShootingActivity.value = actvt
-      selectedControlShootingActivityValue.value = actvt?.id?.toString()
+      selectedControlShootingActivityValue.value = actvt?.uuid
     })
   }
 })
@@ -86,7 +86,7 @@ async function controlShootingUpdated() {
   if (!controlShootingSetting.value || !selectedControlShootingActivity.value) return;
 
   const payload: GlobalSetting = {
-    value: selectedControlShootingActivity.value.id?.toString()
+    value: selectedControlShootingActivity.value.uuid
   }
 
   let { updated, error } = await globalSettingQuery.patch(controlShootingSetting.value, payload);
@@ -233,7 +233,7 @@ async function deleteLogo() {
             @change="controlShootingUpdated"
             :options="activities"
             option-attribute="name"
-            value-attribute="id"
+            value-attribute="uuid"
             placeholder="Tir de contrôle non défini" />
         </div>
       </UCard>
@@ -249,12 +249,12 @@ async function deleteLogo() {
             @change="ignoredActivitiesDaysUpdated"
             :options="activities"
             option-attribute="name"
-            value-attribute="id"
+            value-attribute="uuid"
             multiple
           >
             <template #label>
               <span v-if="excludedActivitiesFromCount && activities && excludedActivitiesFromCount.length" class="truncate">
-                {{ activities.filter(a => (a.id && excludedActivitiesFromCount?.includes(a.id)) ).map(a => a.name).join(', ') }}
+                {{ activities.filter(a => (a.uuid && excludedActivitiesFromCount?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
               </span>
               <span v-else>Aucune activités exclus</span>
             </template>

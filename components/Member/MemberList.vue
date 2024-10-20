@@ -91,7 +91,7 @@ function queryUpdated() {
 }
 
 function rowClicked(row: Member) {
-  navigateTo(`/admin/members/${row.id}`)
+  navigateTo(`/admin/members/${row.uuid}`)
 }
 
 

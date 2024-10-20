@@ -29,7 +29,7 @@ const isLoading = ref(false)
 
 const saleQuery = new SaleQuery()
 const sale: Sale = {...props.sale}
-const paymentModeValue = ref(sale.paymentMode?.id?.toString())
+const paymentModeValue = ref(sale.paymentMode?.uuid)
 
 if (saleStore.paymentModes.length < 1) {
   saleStore.getPaymentModes()
@@ -116,7 +116,7 @@ async function updateSale() {
       </UFormGroup>
 
       <UFormGroup label="Moyen de paiement" name="paymentMode">
-        <USelect v-model="paymentModeValue" :options="saleStore.paymentModes" option-attribute="name" value-attribute="id" />
+        <USelect v-model="paymentModeValue" :options="saleStore.paymentModes" option-attribute="name" value-attribute="uuid" />
       </UFormGroup>
 
       <UFormGroup label="Commentaire" name="comment">

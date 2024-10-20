@@ -247,8 +247,8 @@
   }
 
   async function getMemberSeasons() {
-    if (!member.value || !member.value.id) return;
-    const { error, items } = await memberQuery.seasons(member.value.id)
+    if (!member.value || !member.value.uuid) return;
+    const { error, items } = await memberQuery.seasons(member.value.uuid)
     if (error) {
       return
     }
@@ -256,7 +256,7 @@
   }
 
   async function getMemberPresences() {
-    if (!member.value || !member.value.id) return;
+    if (!member.value || !member.value.uuid) return;
 
     await getMemberSeasons()
 
@@ -265,7 +265,7 @@
       'date[after]': new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().slice(0, 10)
     });
 
-    const { totalItems, items } = await memberQuery.presences(member.value.id, presenceUrlParams)
+    const { totalItems, items } = await memberQuery.presences(member.value.uuid, presenceUrlParams)
     if (totalItems && totalItems > 0) {
       memberPresences.value = items
 
@@ -301,7 +301,7 @@
   }
 
   async function getMemberPresencesPaginated() {
-    if (!member.value || !member.value.id) return;
+    if (!member.value || !member.value.uuid) return;
     isLoadingMemberPresencesPaginated.value = true
 
     const urlParams = new URLSearchParams({
@@ -315,13 +315,13 @@
 
     if (filteredActivities.value.length > 0) {
       filteredActivities.value.forEach(filteredActivity => {
-        if (!filteredActivity.id) return;
-        urlParams.append('activities.id[]', filteredActivity.id.toString())
+        if (!filteredActivity.uuid) return;
+        urlParams.append('activities.uuid[]', filteredActivity.uuid)
       })
     }
 
     // We make the search
-    const { totalItems, items } = await memberQuery.presences(member.value.id, urlParams)
+    const { totalItems, items } = await memberQuery.presences(member.value.uuid, urlParams)
     memberPresencesPaginated.value = items
     if (totalItems) {
       totalMemberPresencesPaginated.value = totalItems
@@ -363,7 +363,7 @@
   }
 
   async function downloadCsv() {
-    if (!member.value || !member.value.id) return;
+    if (!member.value || !member.value.uuid) return;
     isDownloadingCsv.value = true
 
     const urlParams = new URLSearchParams({
@@ -375,13 +375,13 @@
 
     if (filteredActivities.value.length > 0) {
       filteredActivities.value.forEach(filteredActivity => {
-        if (!filteredActivity.id) return;
-        urlParams.append('activities.id[]', filteredActivity.id.toString())
+        if (!filteredActivity.uuid) return;
+        urlParams.append('activities.uuid[]', filteredActivity.uuid)
       })
     }
 
     // We make the search
-    const { data } = await memberQuery.presencesCsv(member.value.id, urlParams)
+    const { data } = await memberQuery.presencesCsv(member.value.uuid, urlParams)
     isDownloadingCsv.value = false
     // We download in the browser
     const filename = `${member.value.licence}-presences.csv`

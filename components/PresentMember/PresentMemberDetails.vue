@@ -59,9 +59,9 @@ const chartOptions = ref({
 
 const updateMemberPresenceModalOpen = ref(false);
 
-if (memberPresence.value && memberPresence.value.member?.id) {
+if (memberPresence.value && memberPresence.value.member?.uuid) {
   // We request the real member datas
-  memberQuery.get(memberPresence.value.member.id).then(memberResponse => {
+  memberQuery.get(memberPresence.value.member.uuid).then(memberResponse => {
     if (memberResponse.retrieved) {
       member.value = memberResponse.retrieved
 
@@ -78,7 +78,7 @@ if (memberPresence.value && memberPresence.value.member?.id) {
 }
 
 function loadPresenceHistory() {
-  if (!member.value || !member.value.id) return;
+  if (!member.value || !member.value.uuid) return;
 
   // We load the member stats
   const presenceUrlParams = new URLSearchParams({
@@ -87,7 +87,7 @@ function loadPresenceHistory() {
   });
 
   isLoadingPresences.value = true
-  memberQuery.presences(member.value.id, presenceUrlParams).then(presencesResponse => {
+  memberQuery.presences(member.value.uuid, presenceUrlParams).then(presencesResponse => {
     isLoadingPresences.value = false
     if (presencesResponse.items.length > 0) {
       memberPresences.value = presencesResponse.items
@@ -148,7 +148,7 @@ async function copyLicence() {
 
 function fullNameClicked() {
   if (selfStore.hasSupervisorRole() && member.value) {
-    navigateTo(`/admin/members/${member.value.id}`)
+    navigateTo(`/admin/members/${member.value.uuid}`)
   }
 }
 
