@@ -223,7 +223,7 @@ async function deleteLogo() {
 
     <div>
       <UCard class="h-fit">
-        <div class="text-xl font-bold mb-4">Activité correspondant au tir de contrôle</div>
+        <div class="text-xl font-bold mb-4">Activité correspondante au tir de contrôle</div>
         <div v-if="!controlShootingSetting" class="mt-4">
           <USkeleton class="h-4 w-full" />
         </div>
