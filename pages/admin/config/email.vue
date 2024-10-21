@@ -37,7 +37,6 @@ async function loadSmtpSettings() {
         if (retrieved.value === '1' || retrieved.value.toLowerCase() === 'true') {
           setValue = true
           if (key === 'on') {
-            console.log(value)
             smtpEnabled.value = true
           }
         }
