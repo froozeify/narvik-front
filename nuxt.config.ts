@@ -3,6 +3,11 @@ import pkg from './package.json'
 
 export default defineNuxtConfig({
   devtools: {enabled: true},
+  devServer: {
+    https: true,
+    host: "0.0.0.0" // Expose to local network
+  },
+
   ssr: false,
 
   modules: [
