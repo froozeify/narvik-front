@@ -1,9 +1,7 @@
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
-import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
-import dayjs from "dayjs";
 import type {InventoryItem} from "~/types/api/item/inventoryItem";
 import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
 import type {FormError} from "#ui/types";
+import {defineStore} from "pinia";
 
 export const useCartStore = defineStore('cart', () => {
   const searchQuery: Ref<string> = ref('')

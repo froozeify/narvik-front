@@ -112,7 +112,7 @@
             }"
           >
             <div class="h-24 w-24 aspect-square mx-auto">
-              <img class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800" v-if="member.profileImageBase64" :src="member.profileImageBase64" />
+              <img class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800" loading="lazy" v-if="member.profileImageBase64" :src="member.profileImageBase64" />
               <USkeleton v-else class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
             </div>
 

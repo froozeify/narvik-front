@@ -7,6 +7,7 @@ import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
 import type {Member} from "~/types/api/item/member";
 import MemberQuery from "~/composables/api/query/MemberQuery";
 import {createBrowserCsvDownload} from "~/utils/browser";
+import {defineStore} from "pinia";
 
 export const useSaleStore = defineStore('sale', () => {
   const saleQuery = new SaleQuery()

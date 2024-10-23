@@ -3,9 +3,8 @@ import MemberQuery from "~/composables/api/query/MemberQuery";
 import {MIME_TYPE_JSON} from "~/composables/api/api";
 import {JwtToken} from "~/types/jwtTokens";
 import type {Ref} from "vue";
-import type {Image} from "~/types/api/item/image";
 import ImageQuery from "~/composables/api/query/ImageQuery";
-import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
+import {defineStore} from "pinia";
 
 export const useSelfMemberStore = defineStore('selfMember', () => {
   const member: Ref<Member | undefined> = ref(undefined)

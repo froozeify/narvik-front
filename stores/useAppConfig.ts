@@ -5,6 +5,7 @@ import ConfigQuery from "~/composables/api/query/ConfigQuery";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import type {Image} from "~/types/api/item/image";
 import type {ConfigValue} from "~/types/api/configValue";
+import {defineStore} from "pinia";
 
 export const useAppConfigStore = defineStore('appConfig', () => {
 	const config: Ref<Config | null> = ref(null)
