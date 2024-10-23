@@ -41,7 +41,7 @@ const selectedDate: Ref<Date|null> = ref(null);
 
 const state = reactive({
   member: props.member,
-  activities: []
+  activities: [] as Array<Activity>
 })
 
 if (props.memberPresence) {
@@ -51,10 +51,8 @@ if (props.memberPresence) {
     selectedDate.value = new Date(props.memberPresence.date)
   }
   props.memberPresence.activities?.forEach(actvt => {
-    if (!actvt.isEnabled) {
-      state.activities[actvt.uuid] = false
-    } else {
-      state.activities[actvt.uuid] = true
+    if (actvt.isEnabled) {
+      state.activities.push(actvt)
     }
   });
 }
@@ -81,9 +79,9 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     delete memberPresence.member // We remove the member key since we only update the activities (PATCH request)
   }
 
-  event.data.activities.forEach( (checked: boolean, actvt: string) => {
-    if (checked) {
-      memberPresence.activities.push(activityQuery.rootPath + "/" + actvt)
+  event.data.activities.forEach( (actvt: Activity) => {
+    if (actvt["@id"]) {
+      memberPresence.activities.push(actvt["@id"])
     }
   })
 
@@ -160,7 +158,8 @@ async function onSubmit(event: FormSubmitEvent<any>) {
             <UCheckbox
                 class="w-full"
                 v-for="activity in activities"
-                v-model="state.activities[activity.uuid]"
+                v-model="state.activities"
+                :value="activity"
                 :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
           </div>
