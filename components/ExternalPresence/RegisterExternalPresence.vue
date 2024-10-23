@@ -42,7 +42,7 @@ const state = reactive({
   licence: undefined as string|undefined,
   firstname: undefined as string|undefined,
   lastname: undefined as string|undefined,
-  activities: []
+  activities: [] as Array<Activity>
 })
 
 watch(state, async (value) => {
@@ -65,10 +65,8 @@ if (props.externalPresence) {
 
   state.activities = []
   props.externalPresence.activities?.forEach(actvt => {
-    if (!actvt.isEnabled) {
-      state.activities[actvt.uuid] = false
-    } else {
-      state.activities[actvt.uuid] = true
+    if (actvt.isEnabled) {
+      state.activities.push(actvt)
     }
   });
 }
@@ -92,9 +90,9 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     activities: []
   }
 
-  event.data.activities.forEach( (checked: boolean, actvt: string) => {
-    if (checked) {
-      externalPresence.activities.push(activityQuery.rootPath + "/" + actvt)
+  event.data.activities.forEach( (actvt: Activity) => {
+    if (actvt["@id"]) {
+      externalPresence.activities.push(actvt["@id"])
     }
   })
 
@@ -195,7 +193,8 @@ function presenceCanceled() {
             <UCheckbox
                 class="w-full"
                 v-for="activity in activities"
-                v-model="state.activities[activity.uuid]"
+                v-model="state.activities"
+                :value="activity"
                 :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
           </div>
