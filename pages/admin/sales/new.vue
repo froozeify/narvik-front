@@ -10,6 +10,7 @@
   import {useCartStore} from "~/stores/useCartStore";
   import {formatDate} from "~/utils/date";
   import dayjs from "dayjs";
+  import {convertUuidToUrlUuid} from "~/utils/resource";
 
   definePageMeta({
     layout: "pos"
@@ -161,7 +162,7 @@
     cartStore.emptyCart()
     saleStore.shouldRefreshSales = true
 
-    navigateTo('/admin/sales/' + created.uuid)
+    navigateTo('/admin/sales/' + convertUuidToUrlUuid(created.uuid))
   }
 
   // We load the page content

@@ -6,6 +6,7 @@
   import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors } from 'chart.js'
   import { Line } from 'vue-chartjs'
   import {formatMonetary} from "~/utils/string";
+  import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors)
 
   definePageMeta({
@@ -16,7 +17,7 @@
 
   const toast = useToast()
   const route = useRoute()
-  const itemId = route.params.id;
+  const itemId = decodeUrlUuid(route.params.id.toString());
 
   const inventoryItemModalOpen = ref(false)
 
@@ -142,7 +143,7 @@
         {{ inventoryItem?.name }}
 
         <UButton v-if="inventoryItem?.category"
-           :to="'/admin/inventories?category=' + inventoryItem.category.uuid"
+           :to="'/admin/inventories?category=' + convertUuidToUrlUuid(inventoryItem.category.uuid)"
            variant="soft"
            :ui="{ rounded: 'rounded-full' }">
           {{ inventoryItem.category.name }}

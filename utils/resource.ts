@@ -12,13 +12,19 @@ export const getIdFromIri = (iri?: string): string => {
   return id;
 };
 
-export function convertUuidToUrlUuid(uuid: string): string {
-  const encoder = new UuidEncoder('base36')
+export function convertUuidToUrlUuid(uuid?: string): string {
+  if (!uuid) {
+    return ''
+  }
+  const encoder = new UuidEncoder('base62')
   return encoder.encode(uuid)
 }
 
-export function decodeUrlUuid(uuid: string): string {
-  const encoder = new UuidEncoder('base36')
+export function decodeUrlUuid(uuid?: string): string {
+  if (!uuid) {
+    return ''
+  }
+  const encoder = new UuidEncoder('base62')
   return encoder.decode(uuid)
 }
 

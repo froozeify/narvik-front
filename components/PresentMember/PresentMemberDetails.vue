@@ -13,6 +13,8 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
 import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
 import { Doughnut } from 'vue-chartjs'
 import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+import {convertUuidToUrlUuid} from "~/utils/resource";
+
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 const toast = useToast()
@@ -148,7 +150,7 @@ async function copyLicence() {
 
 function fullNameClicked() {
   if (selfStore.hasSupervisorRole() && member.value) {
-    navigateTo(`/admin/members/${member.value.uuid}`)
+    navigateTo(`/admin/members/${convertUuidToUrlUuid(member.value.uuid)}`)
   }
 }
 

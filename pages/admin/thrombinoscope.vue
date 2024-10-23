@@ -1,8 +1,8 @@
 <script setup lang="ts">
   import type {Member} from "~/types/api/item/member";
   import MemberQuery from "~/composables/api/query/MemberQuery";
-  import {formatDateReadable} from "~/utils/date";
   import ImageQuery from "~/composables/api/query/ImageQuery";
+  import {convertUuidToUrlUuid} from "~/utils/resource";
 
   definePageMeta({
     layout: "admin"
@@ -102,7 +102,7 @@
       <div class="grid grid-flow-row gap-4 grid-cols-1 sm:grid-cols-3 xl:grid-cols-5">
         <NuxtLink
           v-for="member in (members)"
-          :to="`/admin/members/${member.uuid}`"
+          :to="`/admin/members/${convertUuidToUrlUuid(member.uuid)}`"
           target="_blank"
           class="transition ease-in-out hover:scale-105 duration-300 "
         >

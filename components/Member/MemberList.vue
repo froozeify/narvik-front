@@ -2,8 +2,8 @@
 
 import type {Member} from "~/types/api/item/member";
 import MemberQuery from "~/composables/api/query/MemberQuery";
-import type {MemberPresence} from "~/types/api/item/memberPresence";
 import {usePaginationValues} from "~/composables/api/list";
+import {convertUuidToUrlUuid} from "~/utils/resource";
 
 const toast = useToast();
 const isLoading = ref(true);
@@ -91,7 +91,7 @@ function queryUpdated() {
 }
 
 function rowClicked(row: Member) {
-  navigateTo(`/admin/members/${row.uuid}`)
+  navigateTo(`/admin/members/${convertUuidToUrlUuid(row.uuid)}`)
 }
 
 

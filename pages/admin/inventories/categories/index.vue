@@ -5,6 +5,7 @@
   import type {Member} from "~/types/api/item/member";
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
   import type {FormError} from "#ui/types";
+  import {convertUuidToUrlUuid} from "~/utils/resource";
 
   definePageMeta({
     layout: "pos"
@@ -222,7 +223,7 @@
 
           </UCard>
 
-          <UButton v-if="selectedCategory.uuid" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + selectedCategory.uuid">Voir les articles</UButton>
+          <UButton v-if="selectedCategory.uuid" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 

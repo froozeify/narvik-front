@@ -5,6 +5,7 @@
   import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
   import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
   import {verifyCameraIsPresent} from "~/utils/browser";
+  import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
 
   definePageMeta({
     layout: "pos"
@@ -27,7 +28,7 @@
 
     // Filter is apply on a category
     if (queryParams.category !== undefined) {
-      const matchedCategory = value.items.find( (category) => category.uuid == queryParams.category)
+      const matchedCategory = value.items.find( (category) => category.uuid == decodeUrlUuid(queryParams.category?.toString()))
       if (matchedCategory) {
         filteredCategories.value.push(matchedCategory)
         useRouter().replace(useRouter().currentRoute.value.path) // We remove the param from the url
@@ -260,7 +261,7 @@
           </UButton>
         </UCard>
 
-        <UButton block :to="'/admin/inventories/items/' + selectedItem.uuid">Voir en détail</UButton>
+        <UButton block :to="'/admin/inventories/items/' + convertUuidToUrlUuid(selectedItem.uuid)">Voir en détail</UButton>
       </template>
     </template>
 

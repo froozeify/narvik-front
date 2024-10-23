@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
 import {useSaleStore} from "~/stores/useSaleStore";
-import {decodeUrlUuid} from "~/utils/resource";
+import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
 
 definePageMeta({
     layout: "pos"
@@ -222,7 +222,7 @@ definePageMeta({
 
         <template #item-data="{ row }">
           <UButton v-if="row.item"
-             :to="'/admin/inventories/items/' + row.item.uuid"
+             :to="'/admin/inventories/items/' + convertUuidToUrlUuid(row.item.uuid)"
              variant="soft"
              :ui="{ rounded: 'rounded-full' }">
             Voir l'article
