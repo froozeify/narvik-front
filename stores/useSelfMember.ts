@@ -5,6 +5,7 @@ import {JwtToken} from "~/types/jwtTokens";
 import type {Ref} from "vue";
 import ImageQuery from "~/composables/api/query/ImageQuery";
 import {defineStore} from "pinia";
+import dayjs from "dayjs";
 
 export const useSelfMemberStore = defineStore('selfMember', () => {
   const member: Ref<Member | undefined> = ref(undefined)
@@ -17,16 +18,16 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
   function getSelfJwtToken(): Ref<JwtToken|null> {
     if (selfJwtToken.value) {
       // We remove the authCookie if he is not in the cookie
-      const authCookie = useCookie('auth');
+      const authCookie = useCookie('auth_jwt');
       if (!authCookie || authCookie.value == undefined) {
         selfJwtToken.value.access = undefined
-        refreshCookie('auth')
+        refreshCookie('auth_jwt')
       }
 
-      const refreshTokenCookie = useCookie('auth_refresh');
+      const refreshTokenCookie = useCookie('auth_jwt_refresh');
       if (!refreshTokenCookie || refreshTokenCookie.value == undefined) {
         selfJwtToken.value.refresh = undefined
-        refreshCookie('auth_refresh')
+        refreshCookie('auth_jwt_refresh')
       }
 
       return selfJwtToken
@@ -35,13 +36,13 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
     // Settings from cookies storage
     let jwtToken: JwtToken|null = null;
 
-    const authCookie = useCookie('auth');
+    const authCookie = useCookie('auth_jwt');
     if (authCookie && authCookie.value != undefined) {
       jwtToken = new JwtToken();
       jwtToken.access = JSON.parse(atob(authCookie.value));
     }
 
-    const refreshTokenCookie = useCookie('auth_refresh');
+    const refreshTokenCookie = useCookie('auth_jwt_refresh');
     if (refreshTokenCookie && refreshTokenCookie.value != undefined) {
       if (!jwtToken) {
         jwtToken = new JwtToken()
@@ -61,24 +62,28 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
     selfJwtToken.value = payload
 
     if (payload.access) {
-      const authCookie = useCookie('auth', {
-        expires: new Date(payload.access.date),
+      const expireDate = payload.access.date ?? dayjs().add(30, 'minutes').toDate()
+
+      const authCookie = useCookie('auth_jwt', {
+        expires: new Date(expireDate),
         httpOnly: false,
         sameSite: true,
       });
       authCookie.value = btoa(JSON.stringify(payload.access))
-      refreshCookie('auth')
+      refreshCookie('auth_jwt')
     }
 
-    if (payload.refresh && payload.refresh.date) {
+    if (payload.refresh) {
+      const expireRefreshDate = payload.refresh.date ?? dayjs().add(10, 'day').toDate()
+
       // Expire at the date returned by the refresh token
-      const refreshTokenCookie = useCookie('auth_refresh', {
-        expires: new Date(payload.refresh.date),
+      const refreshTokenCookie = useCookie('auth_jwt_refresh', {
+        expires: new Date(expireRefreshDate),
         httpOnly: false,
         sameSite: true,
       });
       refreshTokenCookie.value = btoa(JSON.stringify(payload.refresh))
-      refreshCookie('auth_refresh')
+      refreshCookie('auth_jwt_refresh')
     }
   }
 
@@ -214,13 +219,13 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
     selfJwtToken.value = null
     member.value = undefined
 
-    const authCookie = useCookie('auth');
+    const authCookie = useCookie('auth_jwt');
     authCookie.value = null
-    refreshCookie('auth')
+    refreshCookie('auth_jwt')
 
-    const refreshTokenCookie = useCookie('auth_refresh');
+    const refreshTokenCookie = useCookie('auth_jwt_refresh');
     refreshTokenCookie.value = null;
-    refreshCookie('auth_refresh')
+    refreshCookie('auth_jwt_refresh')
 
     // We refresh the config we got from the api
     appConfigStore.refresh(false)
