@@ -11,26 +11,28 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@nuxt/ui": "^2.18.7",
-    "chart.js": "^4.4.3",
+    "@nuxt/image": "1.9.0",
+    "@nuxt/ui": "^2.21.0",
+    "chart.js": "^4.4.7",
     "jwt-decode": "^4.0.0",
     "mergician": "^2.0.2",
-    "nuxt": "^3.13.2",
-    "nuxt-api-party": "^1.1.1",
-    "sass": "^1.72.0",
+    "nuxt": "^3.15.2",
+    "nuxt-api-party": "^2.1.2",
+    "sass": "^1.83.4",
     "uuid-encoder": "^1.2.0",
-    "vue": "^3.4.31",
-    "vue-chartjs": "^5.3.1",
-    "vue-qrcode-reader": "^5.5.6",
-    "vue-router": "^4.4.0"
+    "vue": "^3.5.13",
+    "vue-chartjs": "^5.3.2",
+    "vue-qrcode-reader": "^5.7.0",
+    "vue-router": "^4.5.0"
   },
   "dependencies": {
-    "@iconify/json": "^2.2.236",
-    "@pinia/nuxt": "^0.5.5",
-    "@types/qs": "^6.9.14",
+    "@iconify/json": "^2.2.299",
+    "@pinia/nuxt": "^0.9.0",
+    "@types/qs": "^6.9.18",
     "dayjs": "^1.11.13",
-    "qs": "^6.12.1",
+    "pinia": "^2.3.1",
+    "qs": "^6.14.0",
     "v-calendar": "^3.1.2"
   },
-  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
+  "packageManager": "yarn@1.22.22"
 }
