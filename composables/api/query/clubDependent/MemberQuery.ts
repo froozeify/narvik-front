@@ -1,4 +1,3 @@
-import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {Member} from "~/types/api/item/clubDependent/member";
 import {
   useFetchItem,
@@ -11,8 +10,9 @@ import {
 } from "~/composables/api/api";
 import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
+import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
-export default class MemberQuery extends AbstractQuery<Member> {
+export default class MemberQuery extends AbstractClubDependentQuery<Member> {
   rootPath = "members";
 
   async passwordResetInitialise(email: string) {
@@ -38,23 +38,23 @@ export default class MemberQuery extends AbstractQuery<Member> {
   }
 
   async search(query: string) {
-    return usePost<Member[]>(`${this.rootPath}/-/search`, {query});
+    return usePost<Member[]>(`${this.getRootUrl()}/-/search`, {query});
   }
 
   async importFromItac(formData: FormData) {
-    return useUploadFile(this.rootPath + "/-/from-itac", formData)
+    return useUploadFile(this.getRootUrl() + "/-/from-itac", formData)
   }
 
   async importFromItacSecondary(formData: FormData) {
-    return useUploadFile(this.rootPath + "/-/secondary-from-itac", formData)
+    return useUploadFile(this.getRootUrl() + "/-/secondary-from-itac", formData)
   }
 
   async importPhotosFromItac(formData: FormData) {
-    return useUploadFile(this.rootPath + "/-/photos-from-itac", formData)
+    return useUploadFile(this.getRootUrl() + "/-/photos-from-itac", formData)
   }
 
   async seasons(id: string, urlParams?: URLSearchParams) {
-    let url = `${this.rootPath}/${id}/seasons`;
+    let url = `${this.getRootUrl()}/${id}/seasons`;
 
     if (!urlParams) {
       urlParams = new URLSearchParams()
@@ -66,7 +66,7 @@ export default class MemberQuery extends AbstractQuery<Member> {
   }
 
   async presences(id: string, urlParams?: URLSearchParams) {
-    let url = `${this.rootPath}/${id}/presences`;
+    let url = `${this.getRootUrl()}/${id}/presences`;
 
     if (!urlParams) {
       urlParams = new URLSearchParams()
@@ -81,7 +81,7 @@ export default class MemberQuery extends AbstractQuery<Member> {
   }
 
   async presencesCsv(id: string, urlParams?: URLSearchParams) {
-    let url = `${this.rootPath}/${id}/presences.csv`;
+    let url = `${this.getRootUrl()}/${id}/presences.csv`;
 
     if (!urlParams) {
       urlParams = new URLSearchParams()

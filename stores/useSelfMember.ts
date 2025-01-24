@@ -288,6 +288,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 
   return {
     member,
+    club,
 
     refresh,
     logout,
