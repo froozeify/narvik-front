@@ -2,7 +2,7 @@
   import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
   import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
   import {usePaginationValues} from "~/composables/api/list";
-  import type {Member} from "~/types/api/item/member";
+  import type {Member} from "~/types/api/item/clubDependent/member";
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
   import type {FormError} from "#ui/types";
   import {convertUuidToUrlUuid} from "~/utils/resource";

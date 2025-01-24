@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   import MemberQuery from "~/composables/api/query/MemberQuery";
-  import type {Member} from "~/types/api/item/member";
+  import type {Member} from "~/types/api/item/clubDependent/member";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
 
   definePageMeta({

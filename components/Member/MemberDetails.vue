@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import type {PropType} from "vue";
-  import {getAvailableMemberRoles, type Member} from "~/types/api/item/member";
+  import {getAvailableMemberRoles, type Member} from "~/types/api/item/clubDependent/member";
   import MemberQuery from "~/composables/api/query/MemberQuery";
   import type {Image} from "~/types/api/item/image";
   import ImageQuery from "~/composables/api/query/ImageQuery";
@@ -15,7 +15,7 @@
   import {usePaginationValues} from "~/composables/api/list";
   import ActivityQuery from "~/composables/api/query/ActivityQuery";
   import type {Activity} from "~/types/api/item/activity";
-  import type {MemberSeason} from "~/types/api/item/memberSeason";
+  import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 

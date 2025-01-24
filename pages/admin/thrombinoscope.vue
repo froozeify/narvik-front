@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type {Member} from "~/types/api/item/member";
+  import type {Member} from "~/types/api/item/clubDependent/member";
   import MemberQuery from "~/composables/api/query/MemberQuery";
   import ImageQuery from "~/composables/api/query/ImageQuery";
   import {convertUuidToUrlUuid} from "~/utils/resource";

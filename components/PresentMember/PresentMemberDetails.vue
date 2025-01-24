@@ -6,7 +6,7 @@ import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPre
 import type {Image} from "~/types/api/item/image";
 import ImageQuery from "~/composables/api/query/ImageQuery";
 import MemberQuery from "~/composables/api/query/MemberQuery";
-import type {Member} from "~/types/api/item/member";
+import type {Member} from "~/types/api/item/clubDependent/member";
 import {formatDateReadable} from "~/utils/date";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 

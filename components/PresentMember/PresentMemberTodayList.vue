@@ -4,7 +4,7 @@ import SearchMember from "~/components/Member/SearchMember";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence";
 import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
 import type {MemberPresence} from "~/types/api/item/memberPresence";
-import type {Member} from "~/types/api/item/member";
+import type {Member} from "~/types/api/item/clubDependent/member";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence";
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
 import type {ExternalPresence} from "~/types/api/item/externalPresence";

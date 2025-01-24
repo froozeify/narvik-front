@@ -1,4 +1,4 @@
-import type {MemberSeason} from "~/types/api/item/memberSeason";
+import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
 import type {UuidItem} from "~/types/api/uuidItem";
 
 export enum MemberRole {

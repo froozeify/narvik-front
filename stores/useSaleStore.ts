@@ -4,7 +4,7 @@ import {formatDateInput} from "~/utils/date";
 import dayjs from "dayjs";
 import SaleQuery from "~/composables/api/query/SaleQuery";
 import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
-import type {Member} from "~/types/api/item/member";
+import type {Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/MemberQuery";
 import {createBrowserCsvDownload} from "~/utils/browser";
 import {defineStore} from "pinia";

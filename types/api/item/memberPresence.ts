@@ -1,5 +1,5 @@
 import type {Activity} from "~/types/api/item/activity";
-import type {Member} from "~/types/api/item/member";
+import type {Member} from "~/types/api/item/clubDependent/member";
 import type {TimestampItem} from "~/types/api/timestampItem";
 import type {UuidItem} from "~/types/api/uuidItem";
 

@@ -1,4 +1,4 @@
-import {type Member, MemberRole} from "~/types/api/item/member";
+import {type Member, MemberRole} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/MemberQuery";
 import {MIME_TYPE_JSON} from "~/composables/api/api";
 import {JwtToken} from "~/types/jwtTokens";
@@ -6,9 +6,11 @@ import type {Ref} from "vue";
 import ImageQuery from "~/composables/api/query/ImageQuery";
 import {defineStore} from "pinia";
 import dayjs from "dayjs";
+import type {Club} from "~/types/api/item/club";
 
 export const useSelfMemberStore = defineStore('selfMember', () => {
   const member: Ref<Member | undefined> = ref(undefined)
+  const club: Ref<Club | undefined> = ref(undefined)
 
   const appConfigStore = useAppConfigStore()
 
@@ -190,6 +192,11 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
     const {retrieved} = await memberQuery.self()
     if (retrieved) {
       member.value = retrieved
+
+      // TODO: In future get stored selected club from cookies
+      if (club.value === undefined) {
+
+      }
 
       // We load the profile image
       const image = await loadProfileImage()

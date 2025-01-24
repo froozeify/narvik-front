@@ -8,7 +8,7 @@ import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
 import SearchMember from "~/components/Member/SearchMember.vue";
-import type {Member} from "~/types/api/item/member";
+import type {Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/MemberQuery";
 
 const props = defineProps({

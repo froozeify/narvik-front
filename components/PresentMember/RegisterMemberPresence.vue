@@ -2,7 +2,7 @@
 import ActivityQuery from "~/composables/api/query/ActivityQuery";
 import type {Activity} from "~/types/api/item/activity";
 import type {PropType, Ref} from "vue";
-import type {Member} from "~/types/api/item/member";
+import type {Member} from "~/types/api/item/clubDependent/member";
 import type {FormSubmitEvent} from "#ui/types";
 import type {MemberPresence} from "~/types/api/item/memberPresence";
 import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
