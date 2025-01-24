@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import type {Member} from "~/types/api/item/clubDependent/member";
-import MemberQuery from "~/composables/api/query/MemberQuery";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {usePaginationValues} from "~/composables/api/list";
 import {convertUuidToUrlUuid} from "~/utils/resource";
 

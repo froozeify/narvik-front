@@ -1,7 +1,7 @@
 <script setup lang="ts">
-  import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-  import type {InventoryItem} from "~/types/api/item/inventoryItem";
-  import type {InventoryItemHistory} from "~/types/api/item/inventoryItemHistory";
+  import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
+  import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
+  import type {InventoryItemHistory} from "~/types/api/item/clubDependent/plugin/sale/inventoryItemHistory";
 
   import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors } from 'chart.js'
   import { Line } from 'vue-chartjs'

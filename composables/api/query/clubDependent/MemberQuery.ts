@@ -9,7 +9,7 @@ import {
   usePut,
   useUploadFile
 } from "~/composables/api/api";
-import type {MemberPresence} from "~/types/api/item/memberPresence";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
 
 export default class MemberQuery extends AbstractQuery<Member> {

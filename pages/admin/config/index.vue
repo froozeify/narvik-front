@@ -3,8 +3,8 @@
 import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
 import type {GlobalSetting} from "~/types/api/item/globalSetting";
 import clipboard from "clipboardy";
-import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/api/item/activity";
+import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import type {Image} from "~/types/api/item/image";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import {useAppConfigStore} from "~/stores/useAppConfig";

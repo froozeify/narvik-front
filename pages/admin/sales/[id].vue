@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {formatMonetary} from "~/utils/string";
-import type {Sale} from "~/types/api/item/sale";
-import SaleQuery from "~/composables/api/query/SaleQuery";
+import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
+import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import dayjs from "dayjs";

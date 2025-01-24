@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+  import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
   import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
 
   definePageMeta({

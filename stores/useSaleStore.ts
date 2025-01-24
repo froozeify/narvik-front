@@ -1,11 +1,11 @@
-import type {Sale} from "~/types/api/item/sale";
-import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
+import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
 import {formatDateInput} from "~/utils/date";
 import dayjs from "dayjs";
-import SaleQuery from "~/composables/api/query/SaleQuery";
-import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
+import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
+import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
 import type {Member} from "~/types/api/item/clubDependent/member";
-import MemberQuery from "~/composables/api/query/MemberQuery";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {createBrowserCsvDownload} from "~/utils/browser";
 import {defineStore} from "pinia";
 

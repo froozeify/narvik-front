@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
-  import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
+  import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
+  import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
   import {usePaginationValues} from "~/composables/api/list";
   import type {Member} from "~/types/api/item/clubDependent/member";
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";

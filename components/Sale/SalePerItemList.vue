@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type {PropType, Ref} from "vue";
-import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
-import type {Sale} from "~/types/api/item/sale";
+import type {SalePurchasedItem} from "~/types/api/item/clubDependent/plugin/sale/salePurchasedItem";
+import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
 import {formatMonetary} from "~/utils/string";
 
 const props = defineProps({

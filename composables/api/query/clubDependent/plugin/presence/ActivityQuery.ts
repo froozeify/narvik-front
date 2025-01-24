@@ -1,5 +1,5 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
-import type {Activity} from "~/types/api/item/activity";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import {useCreateItem} from "~/composables/api/api";
 
 export default class ActivityQuery extends AbstractQuery<Activity> {

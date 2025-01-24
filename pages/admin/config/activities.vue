@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/api/item/activity";
+import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import type {FormError} from "#ui/types";
 import ActivityModalDelete from "~/components/Activity/ActivityModalDelete.vue";
 import ActivityModalMigrate from "~/components/Activity/ActivityModalMigrate.vue";

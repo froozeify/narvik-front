@@ -1,13 +1,13 @@
 <script setup lang="ts">
 
 import type {PropType} from "vue";
-import type {Sale} from "~/types/api/item/sale";
+import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
 import type {FormError} from "#ui/types";
-import SaleQuery from "~/composables/api/query/SaleQuery";
+import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import {useSaleStore} from "~/stores/useSaleStore";
-import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
+import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
 
 const props = defineProps(
   {

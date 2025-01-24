@@ -1,5 +1,5 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
-import type {MemberPresence} from "~/types/api/item/memberPresence";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import type {FetchAllData} from "~/types/api/api";
 import {useFetchList, useGetCsv, usePost, useUploadFile} from "~/composables/api/api";
 import type {Member} from "~/types/api/item/clubDependent/member";

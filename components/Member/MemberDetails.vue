@@ -1,11 +1,11 @@
 <script setup lang="ts">
   import type {PropType} from "vue";
   import {getAvailableMemberRoles, type Member} from "~/types/api/item/clubDependent/member";
-  import MemberQuery from "~/composables/api/query/MemberQuery";
+  import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
   import type {Image} from "~/types/api/item/image";
   import ImageQuery from "~/composables/api/query/ImageQuery";
-  import type {MemberPresence} from "~/types/api/item/memberPresence";
-  import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+  import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
+  import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
   import { formatDate, formatDateReadable } from "~/utils/date"
   import {useSelfMemberStore} from "~/stores/useSelfMember";
 
@@ -13,8 +13,8 @@
   import { Doughnut } from 'vue-chartjs'
   import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
   import {usePaginationValues} from "~/composables/api/list";
-  import ActivityQuery from "~/composables/api/query/ActivityQuery";
-  import type {Activity} from "~/types/api/item/activity";
+  import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
+  import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
   import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 

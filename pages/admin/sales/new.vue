@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-  import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
-  import type {InventoryItem} from "~/types/api/item/inventoryItem";
+  import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
+  import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
+  import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
   import {formatMonetary} from "~/utils/string";
-  import SaleQuery from "~/composables/api/query/SaleQuery";
-  import type {Sale} from "~/types/api/item/sale";
-  import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
+  import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
+  import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
+  import type {SalePurchasedItem} from "~/types/api/item/clubDependent/plugin/sale/salePurchasedItem";
   import {useSaleStore} from "~/stores/useSaleStore";
   import {useCartStore} from "~/stores/useCartStore";
   import {formatDate} from "~/utils/date";

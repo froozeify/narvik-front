@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import MemberQuery from "~/composables/api/query/MemberQuery";
+  import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
   import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
 
   definePageMeta({

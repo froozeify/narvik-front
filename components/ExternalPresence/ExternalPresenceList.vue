@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {usePresenceStore} from "~/stores/usePresenceStore";
-  import type {ExternalPresence} from "~/types/api/item/externalPresence";
-  import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
+  import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
+  import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
   import {formatDateInput} from "~/utils/date";
   import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
 

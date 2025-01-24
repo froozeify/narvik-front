@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import type {PropType} from "vue";
-import type {Activity} from "~/types/api/item/activity";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 
 const props = defineProps(
   {

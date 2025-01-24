@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import type {PropType} from "vue";
-import type {MemberPresence} from "~/types/api/item/memberPresence";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import clipboard from "clipboardy";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
 import type {Image} from "~/types/api/item/image";
 import ImageQuery from "~/composables/api/query/ImageQuery";
-import MemberQuery from "~/composables/api/query/MemberQuery";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import type {Member} from "~/types/api/item/clubDependent/member";
 import {formatDateReadable} from "~/utils/date";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 
 import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
 import { Doughnut } from 'vue-chartjs'
-import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
 import {convertUuidToUrlUuid} from "~/utils/resource";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)

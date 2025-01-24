@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/api/item/activity";
+import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import type {PropType, Ref} from "vue";
 import type {Member} from "~/types/api/item/clubDependent/member";
 import type {FormSubmitEvent} from "#ui/types";
-import type {MemberPresence} from "~/types/api/item/memberPresence";
-import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
+import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
 import {formatDateInput, formatDateReadable} from "~/utils/date";
 
 const props = defineProps({

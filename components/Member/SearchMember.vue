@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MemberQuery from "~/composables/api/query/MemberQuery";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import type {Member} from "~/types/api/item/clubDependent/member";
 
 const props = defineProps({

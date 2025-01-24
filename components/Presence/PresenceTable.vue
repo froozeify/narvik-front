@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type {MemberPresence} from "~/types/api/item/memberPresence";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import type {PropType} from "vue";
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {usePaginationValues} from "~/composables/api/list";
 import {formatDateReadable} from "~/utils/date";
 

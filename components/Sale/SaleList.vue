@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {formatMonetary} from "~/utils/string";
 import {formatDateRangeReadable, formatDateTimeReadable} from "~/utils/date";
-import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
 import {useSaleStore} from "~/stores/useSaleStore";
 import {useSelfMemberStore} from "~/stores/useSelfMember";
 import {convertUuidToUrlUuid} from "~/utils/resource";

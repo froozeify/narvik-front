@@ -1,5 +1,5 @@
-import type {InventoryItem} from "~/types/api/item/inventoryItem";
-import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
+import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
 import type {FormError} from "#ui/types";
 import {defineStore} from "pinia";
 

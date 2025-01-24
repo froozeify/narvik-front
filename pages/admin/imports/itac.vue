@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import MemberQuery from "~/composables/api/query/MemberQuery";
+  import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
   import MetricQuery from "~/composables/api/query/MetricQuery";
   import type {Metric} from "~/types/api/item/metric";
   import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";

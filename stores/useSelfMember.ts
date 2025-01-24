@@ -1,5 +1,5 @@
 import {type Member, MemberRole} from "~/types/api/item/clubDependent/member";
-import MemberQuery from "~/composables/api/query/MemberQuery";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {MIME_TYPE_JSON} from "~/composables/api/api";
 import {JwtToken} from "~/types/jwtTokens";
 import type {Ref} from "vue";

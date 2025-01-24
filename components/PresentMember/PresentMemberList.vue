@@ -1,8 +1,8 @@
 <script setup lang="ts">
   import {usePresenceStore} from "~/stores/usePresenceStore";
   import {formatDateInput} from "~/utils/date";
-  import type {MemberPresence} from "~/types/api/item/memberPresence";
-  import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+  import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
+  import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
   import {createBrowserCsvDownload} from "~/utils/browser";

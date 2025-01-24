@@ -2,7 +2,7 @@
 import type {FormError} from '#ui/types'
 import type {Image} from "~/types/api/item/image";
 import {useAppConfigStore} from "~/stores/useAppConfig";
-import MemberQuery from "~/composables/api/query/MemberQuery";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 
 const toast = useToast()
 const isLoading = ref(false)

@@ -1,5 +1,6 @@
 import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
 import type {UuidItem} from "~/types/api/uuidItem";
+import type {ClubLinkedItem} from "~/types/api/clubLinkedItem";
 
 export enum MemberRole {
   User = 'ROLE_USER',
@@ -28,7 +29,7 @@ export function getAvailableMemberRoles() {
   ]
 }
 
-export interface Member extends UuidItem {
+export interface Member extends UuidItem, ClubLinkedItem {
   profileImage?: string;
   profileImageBase64?: string;
   lastControlShooting?: Date;

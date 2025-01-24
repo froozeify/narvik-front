@@ -1,9 +1,9 @@
 <script setup lang="ts">
   import {usePaginationValues} from "~/composables/api/list";
-  import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-  import type {InventoryItem} from "~/types/api/item/inventoryItem";
-  import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
-  import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
+  import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
+  import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
+  import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
+  import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
   import {verifyCameraIsPresent} from "~/utils/browser";
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
 

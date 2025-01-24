@@ -1,5 +1,5 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
-import type {Sale} from "~/types/api/item/sale";
+import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
 import {useGetCsv} from "~/composables/api/api";
 
 export default class SaleQuery extends AbstractQuery<Sale> {

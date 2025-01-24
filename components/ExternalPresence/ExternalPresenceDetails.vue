@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type {PropType} from "vue";
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence.vue";
-import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
+import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
 
 const toast = useToast()
 
