@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import {useSetSiteFavicon} from "~/composables/image";
 import FooterCopyright from "~/components/FooterCopyright.vue";
 
 
@@ -8,9 +7,6 @@ useHead({
     return title ? `${title} - Narvik` : 'Narvik'
   }
 })
-
-useSetSiteFavicon()
-
 </script>
 
 <template>

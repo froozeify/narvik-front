@@ -135,51 +135,51 @@ async function getActivity(id: string) {
   return response.retrieved;
 }
 
-async function uploadLogo(event) {
-  const formData = getFileFormDataFromUInputChangeEvent(event);
-
-  if (!formData) {
-    return;
-  }
-
-  logoUploading.value = true
-  const { created, error } = await globalSettingQuery.importLogo(formData)
-  logoUploading.value = false
-
-  if (error) {
-    return displayFileErrorToast(error.message)
-  }
-
-  displayFileSuccessToast('Logo envoyé')
-  await appConfigStore.refresh()
-  siteLogo.value = appConfigStore.getLogo(false).value
-}
-
-async function deleteLogo() {
-  logoUploading.value = true
-
-  const formData = new FormData()
-
-  const { created, error } = await globalSettingQuery.importLogo(formData)
-  logoUploading.value = false
-
-  if (error) {
-    toast.add({
-      title: "Erreur lors de la suppression du logo",
-      description: error.message,
-      color: "red"
-    })
-    return
-  }
-
-  await appConfigStore.refresh()
-  siteLogo.value = appConfigStore.getLogo(false).value
-  toast.add({
-    title: "Logo supprimé",
-    color: "green"
-  })
-
-}
+// async function uploadLogo(event) {
+//   const formData = getFileFormDataFromUInputChangeEvent(event);
+//
+//   if (!formData) {
+//     return;
+//   }
+//
+//   logoUploading.value = true
+//   const { created, error } = await globalSettingQuery.importLogo(formData)
+//   logoUploading.value = false
+//
+//   if (error) {
+//     return displayFileErrorToast(error.message)
+//   }
+//
+//   displayFileSuccessToast('Logo envoyé')
+//   await appConfigStore.refresh()
+//   siteLogo.value = appConfigStore.getLogo(false).value
+// }
+//
+// async function deleteLogo() {
+//   logoUploading.value = true
+//
+//   const formData = new FormData()
+//
+//   const { created, error } = await globalSettingQuery.importLogo(formData)
+//   logoUploading.value = false
+//
+//   if (error) {
+//     toast.add({
+//       title: "Erreur lors de la suppression du logo",
+//       description: error.message,
+//       color: "red"
+//     })
+//     return
+//   }
+//
+//   await appConfigStore.refresh()
+//   siteLogo.value = appConfigStore.getLogo(false).value
+//   toast.add({
+//     title: "Logo supprimé",
+//     color: "green"
+//   })
+//
+// }
 
 
 </script>
@@ -264,40 +264,40 @@ async function deleteLogo() {
 
     </div>
 
-    <UCard>
-      <div class="text-xl font-bold mb-4">Logo</div>
-      <div v-if="siteLogo" class="mt-4 flex justify-center">
-        <img :src="siteLogo.base64" class="w-48" />
-      </div>
+<!--    <UCard>-->
+<!--      <div class="text-xl font-bold mb-4">Logo</div>-->
+<!--      <div v-if="siteLogo" class="mt-4 flex justify-center">-->
+<!--        <img :src="siteLogo.base64" class="w-48" />-->
+<!--      </div>-->
 
-      <UInput
-          :loading="logoUploading"
-          class="my-4"
-          type="file"
-          accept="image/png"
-          icon="i-heroicons-paint-brush"
-          v-model="state.file"
-          @change="uploadLogo"
-      />
+<!--      <UInput-->
+<!--          :loading="logoUploading"-->
+<!--          class="my-4"-->
+<!--          type="file"-->
+<!--          accept="image/png"-->
+<!--          icon="i-heroicons-paint-brush"-->
+<!--          v-model="state.file"-->
+<!--          @change="uploadLogo"-->
+<!--      />-->
 
-      <UPopover overlay v-if="siteLogo">
-        <UButton color="red">
-          Supprimer le logo
-        </UButton>
+<!--      <UPopover overlay v-if="siteLogo">-->
+<!--        <UButton color="red">-->
+<!--          Supprimer le logo-->
+<!--        </UButton>-->
 
-        <template #panel="{ close }">
-          <div class="p-4 w-56 flex flex-col gap-4">
-            <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+<!--        <template #panel="{ close }">-->
+<!--          <div class="p-4 w-56 flex flex-col gap-4">-->
+<!--            <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>-->
 
-            <UButton color="red" @click="deleteLogo" class="mx-auto">
-              Supprimer le logo
-            </UButton>
-          </div>
-        </template>
+<!--            <UButton color="red" @click="deleteLogo" class="mx-auto">-->
+<!--              Supprimer le logo-->
+<!--            </UButton>-->
+<!--          </div>-->
+<!--        </template>-->
 
-      </UPopover>
+<!--      </UPopover>-->
 
-    </UCard>
+<!--    </UCard>-->
   </div>
 </template>
 

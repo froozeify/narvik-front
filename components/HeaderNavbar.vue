@@ -1,21 +1,12 @@
 <script setup lang="ts">
   import {useSelfMemberStore} from "~/stores/useSelfMember";
-  import type {Image} from "~/types/api/item/image";
   import {useAppConfigStore} from "~/stores/useAppConfig";
-  import {isDesktop, watchBreakpoint} from "~/utils/browser";
+  import {isDarkMode, isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
 
-  const colorMode = useColorMode()
   const selfStore = useSelfMemberStore();
   const appConfigStore = useAppConfigStore();
 
-  const isDark = computed({
-    get() {
-      return colorMode.value === 'dark'
-    },
-    set() {
-      colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-    }
-  });
+  const isDark = isDarkMode()
 
   // const, to avoid it being reactive and login back user
   const isAdmin = selfStore.isAdmin()
@@ -25,7 +16,7 @@
   const isDesktopDisplay = isDesktop()
   const isTabletDisplay = isTablet()
 
-  const siteLogo: Ref<Image | null> = appConfigStore.getLogo()
+  const siteLogo: Ref<string> = appConfigStore.getLogo()
 
   const rightMenu = [
     [{
@@ -66,13 +57,11 @@
     class="backdrop-blur -mb-px sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-16 print:hidden">
     <nav class="container mx-auto p-4 flex justify-between h-full overflow-y-auto">
       <div class="flex gap-4 flex-shrink-0">
-        <div>
-          <NuxtLink v-if="siteLogo" to="/" class="flex align-middle">
-            <UTooltip text="Accueil">
-              <img :src="siteLogo.base64" class="w-7"/>
-            </UTooltip>
-          </NuxtLink>
-        </div>
+        <NuxtLink v-if="siteLogo" to="/" class="flex align-middle">
+          <UTooltip text="Accueil">
+            <NuxtImg :src="siteLogo" class="w-7 object-contain"/>
+          </UTooltip>
+        </NuxtLink>
         <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="gray">Accueil</UButton>
         <div v-if="isSupervisor">
           <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>

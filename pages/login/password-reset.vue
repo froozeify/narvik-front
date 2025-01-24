@@ -14,7 +14,7 @@ const state = reactive({
 })
 
 const appConfigStore = useAppConfigStore();
-const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
+const siteLogo: Ref<string> = appConfigStore.getLogo()
 
 const memberQuery = new MemberQuery()
 
@@ -92,7 +92,7 @@ async function initiatePasswordReset() {
 <template>
   <div>
     <div v-if="siteLogo" class="h-24 flex justify-center mb-4">
-      <img :src="siteLogo.base64" class="h-full" />
+      <NuxtImg :src="siteLogo" class="h-full" />
     </div>
 
     <div>

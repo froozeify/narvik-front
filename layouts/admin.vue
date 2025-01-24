@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
 
@@ -8,8 +7,6 @@
       return titleChunk ? `${titleChunk} - Administration - Narvik` : 'Administration - Narvik';
     }
   });
-
-  useSetSiteFavicon()
 
   const selfStore = useSelfMemberStore()
 

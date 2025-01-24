@@ -1,7 +1,4 @@
 <script setup lang="ts">
-  import {useSetSiteFavicon} from "~/composables/image";
-
-  useSetSiteFavicon()
 </script>
 
 <template>

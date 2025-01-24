@@ -28,6 +28,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       titleTemplate: 'Narvik',
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      ]
     }
   },
 

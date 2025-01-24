@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import {useSetSiteFavicon} from "~/composables/image";
   import {useSelfMemberStore} from "~/stores/useSelfMember";
   import FooterCopyright from "~/components/FooterCopyright.vue";
   import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
@@ -9,8 +8,6 @@
       return titleChunk ? `${titleChunk} - POS - Narvik` : 'POS - Narvik';
     }
   });
-
-  useSetSiteFavicon()
 
   const selfStore = useSelfMemberStore()
   const isAdmin = selfStore.isAdmin()
