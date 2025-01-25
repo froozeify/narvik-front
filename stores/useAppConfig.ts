@@ -2,7 +2,7 @@ import type {Ref} from "vue";
 import type {Config} from "~/types/api/item/config";
 import ImageQuery from "~/composables/api/query/ImageQuery";
 import ConfigQuery from "~/composables/api/query/ConfigQuery";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import type {Image} from "~/types/api/item/image";
 import type {ConfigValue} from "~/types/api/configValue";
 import {defineStore} from "pinia";
@@ -27,7 +27,7 @@ export const useAppConfigStore = defineStore('appConfig', () => {
   }
 
   async function refresh(requireLogin?: boolean) {
-    const selfStore = useSelfMemberStore()
+    const selfStore = useSelfUserStore()
 
     if (requireLogin == undefined) requireLogin = selfStore.isLogged()
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   import type {Member} from "~/types/api/item/clubDependent/member";
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
 
   definePageMeta({
     layout: "member"
@@ -10,7 +10,7 @@
     title: "Mes informations"
   })
 
-  const selfStore = useSelfMemberStore()
+  const selfStore = useSelfUserStore()
   const self: Ref<Member | undefined> = ref(selfStore.member)
 
   selfStore.refresh()

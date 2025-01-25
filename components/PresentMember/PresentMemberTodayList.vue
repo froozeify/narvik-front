@@ -8,7 +8,7 @@ import type {Member} from "~/types/api/item/clubDependent/member";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence";
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import type {TablePaginateInterface} from "~/components/Presence/PresenceTable.vue";
 
 const memberPresenceQuery = new MemberPresenceQuery();
@@ -17,7 +17,7 @@ const externalPresenceStore = useExternalPresenceStore()
 const presentMembers: Ref<MemberPresence[] | undefined> = ref(undefined);
 const isRefreshing: Ref<boolean> = ref(false)
 
-const selfStore = useSelfMemberStore();
+const selfStore = useSelfUserStore();
 const isSupervisor = selfStore.hasSupervisorRole()
 let refreshInterval: NodeJS.Timeout
 

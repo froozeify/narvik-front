@@ -6,7 +6,7 @@ import clipboard from "clipboardy";
 import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import type {Image} from "~/types/api/item/image";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
 
@@ -62,7 +62,7 @@ const state = reactive({
   file: undefined
 })
 
-const selfStore = useSelfMemberStore();
+const selfStore = useSelfUserStore();
 const appConfigStore = useAppConfigStore();
 
 const siteLogo: Ref<Image|null> = appConfigStore.getLogo()

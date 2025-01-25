@@ -3,7 +3,7 @@ import {formatMonetary} from "~/utils/string";
 import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
 import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import dayjs from "dayjs";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
@@ -19,7 +19,7 @@ definePageMeta({
   })
 
   const saleStore = useSaleStore()
-  const selfStore = useSelfMemberStore()
+  const selfStore = useSelfUserStore()
   const isAdmin = selfStore.isAdmin()
 
   const toast = useToast()

@@ -7,7 +7,7 @@
   import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
   import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
   import { formatDate, formatDateReadable } from "~/utils/date"
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
 
   import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
   import { Doughnut } from 'vue-chartjs'
@@ -35,7 +35,7 @@
   // Default var setting
 
   const toast = useToast()
-  const selfStore = useSelfMemberStore();
+  const selfStore = useSelfUserStore();
 
   const loggedUsername = selfStore.member?.email
   const isAdmin = selfStore.isAdmin();

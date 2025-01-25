@@ -5,7 +5,7 @@ import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
 import type {FormError} from "#ui/types";
 import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useSaleStore} from "~/stores/useSaleStore";
 import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
 
@@ -21,7 +21,7 @@ const props = defineProps(
 const toast = useToast()
 const modal = useModal()
 
-const selfStore = useSelfMemberStore();
+const selfStore = useSelfUserStore();
 const saleStore = useSaleStore()
 const isAdmin = selfStore.isAdmin();
 

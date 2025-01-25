@@ -1,5 +1,5 @@
 import {pathsMatch} from "~/utils/resource";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 
 const publicPaths = [
@@ -18,7 +18,7 @@ const supervisorOnlyPaths = [
 ]
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const selfStore = useSelfMemberStore();
+  const selfStore = useSelfUserStore();
   const appConfigStore = useAppConfigStore();
 
   if (!selfStore.user && selfStore.isLogged()) {
@@ -46,8 +46,18 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   }
 
   if (to.fullPath === "/") {
+    if (selfStore.isSuperAdmin() && !selfStore.selectedProfile) {
+      return navigateTo("/super-admin")
+    }
+
     if (!selfStore.hasSupervisorRole() && !selfStore.isBadger()) {
       return navigateTo("/self")
+    }
+  }
+
+  if (pathsMatch(["^/super-admin", "^/super-admin/.*"], to.fullPath)) {
+    if (!selfStore.isSuperAdmin()) {
+      return navigateTo("/");
     }
   }
 

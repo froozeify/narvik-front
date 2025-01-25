@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
   import {useAppConfigStore} from "~/stores/useAppConfig";
   import {isDarkMode, isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
 
-  const selfStore = useSelfMemberStore();
+  const selfStore = useSelfUserStore();
   const appConfigStore = useAppConfigStore();
 
   const isDark = isDarkMode()
@@ -11,7 +11,7 @@
   // const, to avoid it being reactive and login back user
   const isAdmin = selfStore.isAdmin()
   const isBadger = selfStore.isBadger()
-  const isSupervisor = selfStore.hasSupervisorRole()
+  const isSupervisor = selfStore.hasSupervisorRole() && selfStore.selectedProfile
 
   const isDesktopDisplay = isDesktop()
   const isTabletDisplay = isTablet()

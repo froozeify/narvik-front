@@ -4,7 +4,7 @@ import type {View} from "~/types/api/view";
 import type {Item} from "~/types/api/item";
 import {mergician} from 'mergician';
 import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/useApiData";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import type {NuxtError} from "#app";
 
 export const MIME_TYPE = "application/ld+json";
@@ -18,7 +18,7 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
   let overloadedOptions = {}
 
   if (requireLogin) {
-    const selfStore = useSelfMemberStore()
+    const selfStore = useSelfUserStore()
     const jwtToken = await selfStore.enhanceJwtTokenDefined();
     // We throw an error if at this point we still don't have an access token
     if (!jwtToken.value || !jwtToken.value.access) {
@@ -56,7 +56,7 @@ export async function useLoginUser(email: string, password: string) {
   });
 
   if (data) {
-    const selfStore = useSelfMemberStore()
+    const selfStore = useSelfUserStore()
     selfStore.setJwtSelfJwtTokenFromApiResponse(data)
   }
 
@@ -66,7 +66,7 @@ export async function useLoginUser(email: string, password: string) {
 export async function useLoginBadger(loginToken: string) {
   const { data } = await usePostRawJson("auth/bdg/" + loginToken);
 
-  const selfStore = useSelfMemberStore()
+  const selfStore = useSelfUserStore()
   selfStore.setJwtSelfJwtTokenFromApiResponse(data)
 
   return true;

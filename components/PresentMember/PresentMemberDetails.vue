@@ -8,7 +8,7 @@ import ImageQuery from "~/composables/api/query/ImageQuery";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import type {Member} from "~/types/api/item/clubDependent/member";
 import {formatDateReadable} from "~/utils/date";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 
 import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
 import { Doughnut } from 'vue-chartjs'
@@ -18,7 +18,7 @@ import {convertUuidToUrlUuid} from "~/utils/resource";
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 const toast = useToast()
-const selfStore = useSelfMemberStore()
+const selfStore = useSelfUserStore()
 const isAdmin = selfStore.isAdmin()
 const isSupervisor = selfStore.hasSupervisorRole()
 const isBadger = selfStore.isBadger()

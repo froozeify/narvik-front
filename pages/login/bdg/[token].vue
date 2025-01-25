@@ -1,10 +1,10 @@
 <script setup lang="ts">
   import {useLoginBadger} from "~/composables/api/api";
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
 
   const route = useRoute()
 
-  const selfStore = useSelfMemberStore();
+  const selfStore = useSelfUserStore();
 
   if (selfStore.isLogged()) {
     navigateTo('/');

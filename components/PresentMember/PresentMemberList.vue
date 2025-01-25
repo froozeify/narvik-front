@@ -3,7 +3,7 @@
   import {formatDateInput} from "~/utils/date";
   import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
   import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
   import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
   import {createBrowserCsvDownload} from "~/utils/browser";
 
@@ -18,7 +18,7 @@
   const toast = useToast();
   const isLoading = ref(true);
 
-  const selfStore = useSelfMemberStore()
+  const selfStore = useSelfUserStore()
   const presenceStore = usePresenceStore()
   const { selectedRange, searchQuery } = storeToRefs(presenceStore)
 

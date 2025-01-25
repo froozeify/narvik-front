@@ -12,7 +12,7 @@ import type {User} from "~/types/api/item/user";
 import {UserRole} from "~/types/api/item/user";
 import {ClubRole} from "~/types/api/item/club";
 
-export const useSelfMemberStore = defineStore('selfMember', () => {
+export const useSelfUserStore = defineStore('selfUser', () => {
   const member: Ref<Member | undefined> = ref(undefined)
   const user: Ref<User | undefined> = ref(undefined)
   const selectedProfile: Ref<LinkedProfile | undefined> = ref(undefined)
@@ -301,6 +301,8 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 
   function hasSupervisorRole(): boolean {
     if (!isLogged()) return false;
+
+    if (isSuperAdmin()) return true;
 
     if (selectedProfile.value && selectedProfile.value.role) {
       return selectedProfile.value.role === ClubRole.Supervisor || isAdmin()

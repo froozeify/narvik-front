@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
   import FooterCopyright from "~/components/FooterCopyright.vue";
   import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
 
@@ -9,7 +9,7 @@
     }
   });
 
-  const selfStore = useSelfMemberStore()
+  const selfStore = useSelfUserStore()
   const isAdmin = selfStore.isAdmin()
   const isSupervisor = selfStore.hasSupervisorRole()
 

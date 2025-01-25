@@ -1,5 +1,5 @@
 import type {Image} from "~/types/api/item/image";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 
 // export function useSetSiteFavicon() {

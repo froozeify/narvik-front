@@ -3,7 +3,7 @@ import type {FormError, FormSubmitEvent} from '#ui/types'
 import {useLoginUser} from "~/composables/api/api";
 import type {Image} from "~/types/api/item/image";
 import {useAppConfigStore} from "~/stores/useAppConfig";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 
 const toast = useToast()
 const isLoading = ref(false)
@@ -14,6 +14,7 @@ const state = reactive({
 })
 
 const appConfigStore = useAppConfigStore();
+const selfStore = useSelfUserStore();
 const siteLogo: Ref<string> = appConfigStore.getLogo()
 const notificationsModule = appConfigStore.getModuleConfig('notifications')
 
@@ -40,7 +41,7 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
   }
 
   try {
-    const selfStore = useSelfMemberStore();
+    const selfStore = useSelfUserStore();
     await selfStore.refresh();
   } catch (e) {
     toast.add({
@@ -53,6 +54,10 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
   }
 
   isLoading.value = false
+  //TODO: For super admin redirect to super admin page
+  if (selfStore.isSuperAdmin()) {
+    navigateTo('/super-admin');
+  }
   navigateTo('/');
 }
 </script>

@@ -10,6 +10,7 @@ import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPre
 import SearchMember from "~/components/Member/SearchMember.vue";
 import type {Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 
 const props = defineProps({
   externalPresence: {
@@ -26,7 +27,7 @@ const emit = defineEmits([
 const toast = useToast()
 
 const externalPresenceQuery = new ExternalPresenceQuery();
-const selfStore = useSelfMemberStore()
+const selfStore = useSelfUserStore()
 
 const isSupervisor = selfStore.hasSupervisorRole()
 const isBadger = selfStore.isBadger()
