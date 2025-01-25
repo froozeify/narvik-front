@@ -74,7 +74,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     activities: []
   }
   if (props.member) {
-    memberPresence.member = `/members/${props.member.uuid}`
+    memberPresence.member = props.member["@id"]
   } else if (props.memberPresence) {
     delete memberPresence.member // We remove the member key since we only update the activities (PATCH request)
   }
