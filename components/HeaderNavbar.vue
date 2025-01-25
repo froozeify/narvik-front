@@ -42,6 +42,16 @@
     }]
   ]
 
+  if (selfStore.isSuperAdmin()) {
+    rightMenu.unshift([
+      {
+        label: 'Administration global',
+        icon: 'i-heroicons-building-library',
+        to: "/super-admin"
+      }
+    ]);
+  }
+
   onMounted(() => {
     watchBreakpoint()
     window.addEventListener('resize', watchBreakpoint)

@@ -246,6 +246,8 @@ export const useSelfUserStore = defineStore('selfUser', () => {
 
     selfJwtToken.value = null
     member.value = undefined
+    user.value = undefined
+    selectedProfile.value = undefined
 
     const authCookie = useCookie('auth_jwt');
     authCookie.value = null
