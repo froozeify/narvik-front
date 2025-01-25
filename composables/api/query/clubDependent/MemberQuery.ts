@@ -15,28 +15,6 @@ import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDe
 export default class MemberQuery extends AbstractClubDependentQuery<Member> {
   rootPath = "members";
 
-  async passwordResetInitialise(email: string) {
-    return usePostRawJson(`${this.rootPath}/-/initiate-reset-password`, {
-      email: email
-    });
-  }
-
-  async passwordReset(email: string, password: string, securityCode: string) {
-    return usePostRawJson(`${this.rootPath}/-/reset-password`, {
-      email: email,
-      password: password,
-      securityCode: securityCode.trim().toUpperCase()
-    });
-  }
-
-  async self() {
-    return useFetchItem<Member>('/self');
-  }
-
-  async selfUpdatePassword(currentPassword: string, newPassword: string) {
-    return usePut('/self/update-password', {current: currentPassword, new: newPassword});
-  }
-
   async search(query: string) {
     return usePost<Member[]>(`${this.getRootUrl()}/-/search`, {query});
   }

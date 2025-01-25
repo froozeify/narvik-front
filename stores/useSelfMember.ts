@@ -7,10 +7,12 @@ import ImageQuery from "~/composables/api/query/ImageQuery";
 import {defineStore} from "pinia";
 import dayjs from "dayjs";
 import type {Club} from "~/types/api/item/club";
+import UserQuery from "~/composables/api/query/UserQuery";
+import type {LinkedProfile} from "~/types/api/linkedProfile";
 
 export const useSelfMemberStore = defineStore('selfMember', () => {
   const member: Ref<Member | undefined> = ref(undefined)
-  const club: Ref<Club | undefined> = ref(undefined)
+  const selectedProfile: Ref<LinkedProfile | undefined> = ref(undefined)
 
   const appConfigStore = useAppConfigStore()
 
@@ -188,21 +190,33 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 
 
   async function refresh() {
-    const memberQuery = new MemberQuery();
-    const {retrieved} = await memberQuery.self()
+    const userQuery = new UserQuery()
+    const {retrieved} = await userQuery.self()
     if (retrieved) {
-      member.value = retrieved
+      if (!retrieved.linkedProfiles || retrieved.linkedProfiles.length === 0) {
+        return
+      }
 
       // TODO: In future get stored selected club from cookies
-      if (club.value === undefined) {
+      if (selectedProfile.value === undefined) {
+        selectedProfile.value = retrieved.linkedProfiles[0]
+      }
 
+
+      const memberQuery = new MemberQuery()
+      member.value = selectedProfile.value.member
+      if (member.value && member.value.uuid) {
+        const { retrieved:retrievedMember } = await memberQuery.get(member.value.uuid.toString())
+        if (retrievedMember) {
+          member.value = retrievedMember
+        }
       }
 
       // We load the profile image
-      const image = await loadProfileImage()
-      if (image) {
-        member.value.profileImageBase64 = image
-      }
+      // const image = await loadProfileImage()
+      // if (image) {
+      //   member.value.profileImageBase64 = image
+      // }
     }
 
     // We refresh the config we got from the api
@@ -288,7 +302,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
 
   return {
     member,
-    club,
+    selectedProfile,
 
     refresh,
     logout,

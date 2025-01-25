@@ -16,6 +16,7 @@
   import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
   import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
   import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
+  import UserQuery from "~/composables/api/query/UserQuery";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
@@ -78,6 +79,7 @@
   const isUpdating = ref(false);
 
   const memberQuery = new MemberQuery();
+  const userQuery = new UserQuery();
   const memberPresenceQuery = new MemberPresenceQuery();
   const imageQuery = new ImageQuery();
 
@@ -175,7 +177,7 @@
       return failedPasswordUpdate("Mot de passe actuel non défini")
     }
 
-    const { error } = await memberQuery.selfUpdatePassword(passwordState.current, passwordState.new)
+    const { error } = await userQuery.selfUpdatePassword(passwordState.current, passwordState.new)
     if (error) {
       return failedPasswordUpdate(error.message)
     }

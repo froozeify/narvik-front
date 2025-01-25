@@ -4,11 +4,11 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
 export abstract class AbstractClubDependentQuery<T> extends AbstractQuery<T> {
   protected override getRootUrl(): string {
     const selfStore = useSelfMemberStore()
-    const club = selfStore.club
-    if (club === undefined) {
-      throw new Error("No club selected")
+    const profile = selfStore.selectedProfile
+    if (profile === undefined) {
+      throw new Error("No profile selected")
     }
 
-    return club["@id"] + "/" + this.rootPath;
+    return profile.club["@id"] + "/" + this.rootPath;
   }
 }
