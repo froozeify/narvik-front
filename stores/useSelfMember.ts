@@ -1,4 +1,4 @@
-import {type Member, MemberRole} from "~/types/api/item/clubDependent/member";
+import {type Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {MIME_TYPE_JSON} from "~/composables/api/api";
 import {JwtToken} from "~/types/jwtTokens";
@@ -6,12 +6,15 @@ import type {Ref} from "vue";
 import ImageQuery from "~/composables/api/query/ImageQuery";
 import {defineStore} from "pinia";
 import dayjs from "dayjs";
-import type {Club} from "~/types/api/item/club";
 import UserQuery from "~/composables/api/query/UserQuery";
 import type {LinkedProfile} from "~/types/api/linkedProfile";
+import type {User} from "~/types/api/item/user";
+import {UserRole} from "~/types/api/item/user";
+import {ClubRole} from "~/types/api/item/club";
 
 export const useSelfMemberStore = defineStore('selfMember', () => {
   const member: Ref<Member | undefined> = ref(undefined)
+  const user: Ref<User | undefined> = ref(undefined)
   const selectedProfile: Ref<LinkedProfile | undefined> = ref(undefined)
 
   const appConfigStore = useAppConfigStore()
@@ -193,6 +196,8 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
     const userQuery = new UserQuery()
     const {retrieved} = await userQuery.self()
     if (retrieved) {
+      user.value = retrieved
+
       if (!retrieved.linkedProfiles || retrieved.linkedProfiles.length === 0) {
         return
       }
@@ -272,11 +277,22 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
     return true
   }
 
+  function isSuperAdmin(): boolean {
+    if (!isLogged()) return false;
+    if (user.value) {
+      return user.value.role === UserRole.SuperAdmin
+    }
+
+    return false
+  }
+
   function isAdmin(): boolean {
     if (!isLogged()) return false;
 
-    if (member.value && member.value.role) {
-      return member.value.role === MemberRole.Admin
+    if (isSuperAdmin()) return true;
+
+    if (selectedProfile.value && selectedProfile.value.role) {
+      return selectedProfile.value.role === ClubRole.Admin
     }
     return false;
   }
@@ -284,8 +300,8 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
   function hasSupervisorRole(): boolean {
     if (!isLogged()) return false;
 
-    if (member.value && member.value.role) {
-      return member.value.role === MemberRole.Supervisor || isAdmin()
+    if (selectedProfile.value && selectedProfile.value.role) {
+      return selectedProfile.value.role === ClubRole.Supervisor || isAdmin()
     }
 
     return false;
@@ -294,13 +310,14 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
   function isBadger(): boolean {
     if (!isLogged()) return false;
 
-    if (member.value && member.value.role) {
-      return member.value.role === MemberRole.Badger
+    if (user.value) {
+      return user.value.role === UserRole.Badger
     }
     return false;
   }
 
   return {
+    user,
     member,
     selectedProfile,
 
@@ -308,6 +325,7 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
     logout,
 
     isLogged,
+    isSuperAdmin,
     isAdmin,
     isBadger,
 

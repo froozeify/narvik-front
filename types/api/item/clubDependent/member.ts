@@ -2,33 +2,6 @@ import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
 import type {UuidItem} from "~/types/api/uuidItem";
 import type {ClubLinkedItem} from "~/types/api/clubLinkedItem";
 
-export enum MemberRole {
-  User = 'ROLE_USER',
-
-  Badger = 'ROLE_BADGER',
-
-  Member = 'ROLE_MEMBER',
-  Supervisor = 'ROLE_SUPERVISOR',
-  Admin = 'ROLE_ADMIN'
-}
-
-export function getAvailableMemberRoles() {
-  return [
-    {
-      text:  'Administateur',
-      value: MemberRole.Admin
-    },
-    {
-      text:  'Superviseur/Permanent',
-      value: MemberRole.Supervisor
-    },
-    {
-      text:  'Membre',
-      value: MemberRole.Member
-    },
-  ]
-}
-
 export interface Member extends UuidItem, ClubLinkedItem {
   profileImage?: string;
   profileImageBase64?: string;
@@ -36,7 +9,6 @@ export interface Member extends UuidItem, ClubLinkedItem {
   currentSeason?: MemberSeason;
   accountActivated?: boolean;
   plainPassword?: string;
-  role?: string;
 
   email?: string;
   licence?: string;

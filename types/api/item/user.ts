@@ -11,9 +11,9 @@ export enum UserRole {
 export interface User extends UuidItem {
   accountActivated?: boolean;
   plainPassword?: string;
-  role?: string;
+  role: string;
 
-  email?: string;
+  email: string;
   firstname?: string;
   lastname?: string;
   fullName?: string;

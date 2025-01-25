@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import type {PropType} from "vue";
-  import {getAvailableMemberRoles, type Member} from "~/types/api/item/clubDependent/member";
+  import {type Member} from "~/types/api/item/clubDependent/member";
   import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
   import type {Image} from "~/types/api/item/image";
   import ImageQuery from "~/composables/api/query/ImageQuery";
@@ -17,6 +17,7 @@
   import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
   import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
   import UserQuery from "~/composables/api/query/UserQuery";
+  import {getAvailableClubRoles} from "~/types/api/item/club";
   ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
@@ -95,7 +96,7 @@
   })
 
   const selectedNewRole: Ref<string | undefined> = ref(undefined);
-  const availableRoles = getAvailableMemberRoles()
+  const availableRoles = getAvailableClubRoles()
 
   watch(member, (newValue, oldValue) => {
     if (newValue) {

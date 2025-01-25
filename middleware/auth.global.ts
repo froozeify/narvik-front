@@ -3,9 +3,9 @@ import {useSelfMemberStore} from "~/stores/useSelfMember";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 
 const publicPaths = [
-	"^/login$",
-	"^/login/password-reset$",
-	"^/login/bdg/.*",
+  "^/login$",
+  "^/login/password-reset$",
+  "^/login/bdg/.*",
 ]
 
 const supervisorOnlyPaths = [
@@ -18,43 +18,43 @@ const supervisorOnlyPaths = [
 ]
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-	const selfStore = useSelfMemberStore();
-	const appConfigStore = useAppConfigStore();
+  const selfStore = useSelfMemberStore();
+  const appConfigStore = useAppConfigStore();
 
-	if (!selfStore.member && selfStore.isLogged()) {
-		await selfStore.refresh();
-	}
+  if (!selfStore.user && selfStore.isLogged()) {
+    await selfStore.refresh();
+  }
 
-	if (!appConfigStore.config) {
-		await appConfigStore.refresh();
-	}
+  if (!appConfigStore.config) {
+    await appConfigStore.refresh();
+  }
 
-	if (pathsMatch(publicPaths, to.fullPath)) {
-		if (selfStore.isLogged()) { // User is logged
+  if (pathsMatch(publicPaths, to.fullPath)) {
+    if (selfStore.isLogged()) { // User is logged
       return navigateTo("/");
-		}
+    }
 
-		// Nothing more to do, user is free to browse public page
-		return;
-	}
+    // Nothing more to do, user is free to browse public page
+    return;
+  }
 
-	// Protected pages
+  // Protected pages
 
-	// User not logged, we redirect him to login page
-	if (!selfStore.isLogged()) {
-		return navigateTo("/login");
-	}
+  // User not logged, we redirect him to login page
+  if (!selfStore.isLogged()) {
+    return navigateTo("/login");
+  }
 
-	if (to.fullPath === "/") {
-		if (!selfStore.hasSupervisorRole() && !selfStore.isBadger()) {
-			return navigateTo("/self")
-		}
-	}
+  if (to.fullPath === "/") {
+    if (!selfStore.hasSupervisorRole() && !selfStore.isBadger()) {
+      return navigateTo("/self")
+    }
+  }
 
-	if (pathsMatch(["^/admin", "^/admin/.*"], to.fullPath)) {
-		if (!selfStore.hasSupervisorRole()) {
-			return navigateTo("/self");
-		}
+  if (pathsMatch(["^/admin", "^/admin/.*"], to.fullPath)) {
+    if (!selfStore.hasSupervisorRole()) {
+      return navigateTo("/self");
+    }
 
     // User is not an admin (so supervisor) got access to only restrain uris
     if (!selfStore.isAdmin()) {
@@ -62,5 +62,5 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         return navigateTo('/admin')
       }
     }
-	}
+  }
 })
