@@ -75,7 +75,7 @@
           <UButton
             variant="ghost"
             color="gray"
-            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? selfStore.member?.fullName : 'Pointeuse') : undefined">
+            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? selfStore.selectedProfile?.displayName : 'Pointeuse') : undefined">
             <template #trailing>
               <UAvatar v-if="!isBadger"
                        size="xs"

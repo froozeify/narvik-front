@@ -11,9 +11,9 @@
   })
 
   const selfStore = useSelfMemberStore()
-
-  await selfStore.refresh()
   const self: Ref<Member | undefined> = ref(selfStore.member)
+
+  selfStore.refresh()
 </script>
 
 <template>

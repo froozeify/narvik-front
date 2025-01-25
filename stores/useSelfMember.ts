@@ -205,11 +205,13 @@ export const useSelfMemberStore = defineStore('selfMember', () => {
       // TODO: In future get stored selected club from cookies
       if (selectedProfile.value === undefined) {
         selectedProfile.value = retrieved.linkedProfiles[0]
+      } else {
+        selectedProfile.value = retrieved.linkedProfiles.find( (profile) => profile.id === selectedProfile.value?.id)
       }
 
 
       const memberQuery = new MemberQuery()
-      member.value = selectedProfile.value.member
+      member.value = selectedProfile.value?.member
       if (member.value && member.value.uuid) {
         const { retrieved:retrievedMember } = await memberQuery.get(member.value.uuid.toString())
         if (retrievedMember) {
