@@ -2,9 +2,10 @@ import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
 import type {UuidItem} from "~/types/api/uuidItem";
 import type {ClubLinkedItem} from "~/types/api/clubLinkedItem";
 import type {ClubRole} from "~/types/api/item/club";
+import type {File} from "~/types/api/item/file";
 
 export interface Member extends UuidItem, ClubLinkedItem {
-  profileImage?: string;
+  profileImage?: File;
   profileImageBase64?: string;
   lastControlShooting?: Date;
   currentSeason?: MemberSeason;

@@ -102,8 +102,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
   watch(member, (newValue, oldValue) => {
     if (newValue) {
       if (member.value) {
-        if (member.value.profileImage) {
-          imageQuery.get(member.value.profileImage).then(imageResponse => {
+        if (member.value.profileImage?.privateUrl) {
+          imageQuery.getFromUrl(member.value.profileImage.privateUrl).then(imageResponse => {
             memberProfileImage.value = imageResponse.retrieved
           })
         }

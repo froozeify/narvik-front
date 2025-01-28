@@ -15,7 +15,7 @@
   const isLoading = ref(true);
 
   const page = ref(1);
-  const itemsPerPage = ref(30);
+  const itemsPerPage = ref(100);
   const sort = ref({
     column: 'lastname',
     direction: 'asc'
@@ -71,9 +71,9 @@
   }
 
   async function loadMemberProfileImage(member: Member) {
-    if (!member.profileImage) return null;
+    if (!member.profileImage?.privateUrl) return null;
 
-    const { retrieved } = await imageQuery.get(member.profileImage);
+    const { retrieved } = await imageQuery.getFromUrl(member.profileImage.privateUrl);
     if (!retrieved || !retrieved.base64) return null
 
     return retrieved.base64
@@ -111,9 +111,8 @@
               background: 'bg-white dark:bg-slate-950'
             }"
           >
-            <div class="h-24 w-24 aspect-square mx-auto">
-              <img class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800" loading="lazy" v-if="member.profileImageBase64" :src="member.profileImageBase64" />
-              <USkeleton v-else class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+            <div v-if="member.profileImageBase64" class="h-24 w-24 aspect-square mx-auto">
+              <NuxtImg class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800"  :src="member.profileImageBase64" />
             </div>
 
             <div class="mt-4 mx-auto text-center">

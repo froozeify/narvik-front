@@ -68,8 +68,8 @@ if (memberPresence.value && memberPresence.value.member?.uuid) {
       member.value = memberResponse.retrieved
 
       // We load the profile image
-      if (memberResponse.retrieved.profileImage) {
-        imageQuery.get(memberResponse.retrieved.profileImage).then(profileImage => {
+      if (memberResponse.retrieved.profileImage?.privateUrl) {
+        imageQuery.getFromUrl(memberResponse.retrieved.profileImage.privateUrl).then(profileImage => {
           if (profileImage.retrieved) {
             memberProfileImage.value = profileImage.retrieved
           }

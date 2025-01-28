@@ -8,6 +8,10 @@ export default class ImageQuery extends AbstractQuery<Image> {
     rootPath = "images";
 
     async getPublic(id: number | string, useCache: boolean = true) {
-        return useFetchItem<Image>(`public/${this.rootPath}/${id.toString()}`, useCache, false);
+        return useFetchItem<Image>(`public/${this.getRootUrl()}/${id.toString()}`, useCache, false);
+    }
+
+    async getFromUrl(url: string) {
+      return useFetchItem<Image>(url, false);
     }
 }
