@@ -1,24 +1,25 @@
 <script setup lang="ts">
-  import type {PropType} from "vue";
-  import {type Member} from "~/types/api/item/clubDependent/member";
-  import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
-  import type {Image} from "~/types/api/item/image";
-  import ImageQuery from "~/composables/api/query/ImageQuery";
-  import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
-  import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
-  import { formatDate, formatDateReadable } from "~/utils/date"
-  import {useSelfUserStore} from "~/stores/useSelfUser";
+import type {PropType} from "vue";
+import {type Member} from "~/types/api/item/clubDependent/member";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
+import type {Image} from "~/types/api/item/image";
+import ImageQuery from "~/composables/api/query/ImageQuery";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
+import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
+import {formatDate, formatDateReadable} from "~/utils/date"
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
+import {usePaginationValues} from "~/composables/api/list";
+import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
+import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
+import UserQuery from "~/composables/api/query/UserQuery";
+import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
 
-  import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
-  import { Doughnut } from 'vue-chartjs'
-  import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
-  import {usePaginationValues} from "~/composables/api/list";
-  import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
-  import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
-  import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
-  import UserQuery from "~/composables/api/query/UserQuery";
-  import {getAvailableClubRoles} from "~/types/api/item/club";
-  ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
+import { ArcElement, CategoryScale, Chart as ChartJS, Colors, DoughnutController, Legend, LinearScale, Title, Tooltip } from 'chart.js'
+import {Doughnut} from 'vue-chartjs'
+
+ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
   const props = defineProps({
@@ -198,39 +199,36 @@
     })
   }
 
-  function activateMemberAccount(activated: boolean, close: Function) {
-    if (!isAdmin || !member.value) return;
-
-    let payload: Member = {
-      accountActivated: activated
-    }
-    memberQuery.patch(member.value, payload).then(({updated, error}) => {
-      if (error) {
-        toast.add({
-          color: "red",
-          title: activated ? "L'activation a échoué" : "La désactivation a échoué",
-          description: error.message
-        })
-        return;
-      }
-
-      toast.add({
-        color: "green",
-        title: activated ? "Compte activé" : "Compté désactivé"
-      })
-      member.value = updated
-      close();
-    });
-
-  }
+  // function activateMemberAccount(activated: boolean, close: Function) {
+  //   if (!isAdmin || !member.value) return;
+  //
+  //   let payload: Member = {
+  //     accountActivated: activated
+  //   }
+  //   memberQuery.patch(member.value, payload).then(({updated, error}) => {
+  //     if (error) {
+  //       toast.add({
+  //         color: "red",
+  //         title: activated ? "L'activation a échoué" : "La désactivation a échoué",
+  //         description: error.message
+  //       })
+  //       return;
+  //     }
+  //
+  //     toast.add({
+  //       color: "green",
+  //       title: activated ? "Compte activé" : "Compté désactivé"
+  //     })
+  //     member.value = updated
+  //     close();
+  //   });
+  //
+  // }
 
   function changeMemberRole(close: Function) {
-    if (!isAdmin || !member.value) return;
+    if (!isAdmin || !member.value || !selectedNewRole.value) return;
 
-    let payload: Member = {
-      role: selectedNewRole.value
-    }
-    memberQuery.patch(member.value, payload).then(({updated, error}) => {
+    memberQuery.updateRole(member.value, selectedNewRole.value as ClubRole).then(({updated, error}) => {
       if (error) {
         toast.add({
           color: "red",
@@ -244,7 +242,11 @@
         color: "green",
         title: "Rôle modifié"
       })
-      member.value = updated
+
+      if (member.value && updated) {
+        member.value.role = updated.role
+      }
+
       close();
     });
   }
@@ -441,7 +443,7 @@
           </UButton>
           <!-- Admin && not current account -->
           <template v-if="isAdmin && member.email != loggedUsername">
-            <UPopover v-if="member.accountActivated" overlay>
+            <UPopover overlay>
               <UButton color="violet">
                 Modifier les permissions
               </UButton>
@@ -469,26 +471,26 @@
 
             </UPopover>
 
-            <UPopover overlay>
-              <UButton color="yellow">
-                {{ !member.accountActivated ? 'Activer' : 'Désactiver' }} le compte
-              </UButton>
+<!--            <UPopover overlay>-->
+<!--              <UButton color="yellow">-->
+<!--                {{ !member.accountActivated ? 'Activer' : 'Désactiver' }} le compte-->
+<!--              </UButton>-->
 
-              <template #panel="{ close }">
-                <div class="p-4 w-56 flex flex-col gap-4">
-                  <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+<!--              <template #panel="{ close }">-->
+<!--                <div class="p-4 w-56 flex flex-col gap-4">-->
+<!--                  <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>-->
 
-                  <UButton
-                           @click="activateMemberAccount(!member.accountActivated, close)"
-                           color="yellow"
-                           class="mx-auto"
-                  >
-                    {{ !member.accountActivated ? 'Activer' : 'Désactiver' }}
-                  </UButton>
-                </div>
-              </template>
+<!--                  <UButton-->
+<!--                           @click="activateMemberAccount(!member.accountActivated, close)"-->
+<!--                           color="yellow"-->
+<!--                           class="mx-auto"-->
+<!--                  >-->
+<!--                    {{ !member.accountActivated ? 'Activer' : 'Désactiver' }}-->
+<!--                  </UButton>-->
+<!--                </div>-->
+<!--              </template>-->
 
-            </UPopover>
+<!--            </UPopover>-->
           </template>
 
         </div>

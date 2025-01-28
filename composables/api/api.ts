@@ -299,6 +299,29 @@ export async function usePut(path: string, payload: object) {
 }
 
 
+export async function usePatch<T>(path: string, payload: object) {
+  let updated: T | undefined = undefined;
+  let error: NuxtError | undefined = undefined;
+
+  try {
+    updated = await useApi<T>(path, {
+      method: "PATCH",
+      body: payload,
+      headers: {
+        Accept: MIME_TYPE,
+        "Content-Type": MIME_TYPE_JSON_PATCH,
+      },
+    });
+  } catch (e) {
+    error = e as NuxtError
+  }
+
+  return {
+    updated,
+    error,
+  };
+}
+
 export async function usePatchItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
   let error: NuxtError | undefined = undefined;

@@ -2,7 +2,7 @@ import type {Member} from "~/types/api/item/clubDependent/member";
 import {
   useFetchItem,
   useFetchList,
-  useGetCsv,
+  useGetCsv, usePatch, usePatchItem,
   usePost,
   usePostRawJson,
   usePut,
@@ -11,9 +11,19 @@ import {
 import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
+import type {ClubRole} from "~/types/api/item/club";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 
 export default class MemberQuery extends AbstractClubDependentQuery<Member> {
   rootPath = "members";
+
+  async updateRole(member: Member, role: ClubRole) {
+    let payload: Member = {
+      role: role
+    }
+
+    return usePatch<Member>(`${member["@id"]}/role`, payload)
+  }
 
   async search(query: string) {
     return usePost<Member[]>(`${this.getRootUrl()}/-/search`, {query});

@@ -10,7 +10,8 @@ import UserQuery from "~/composables/api/query/UserQuery";
 import type {LinkedProfile} from "~/types/api/linkedProfile";
 import type {User} from "~/types/api/item/user";
 import {UserRole} from "~/types/api/item/user";
-import {ClubRole} from "~/types/api/item/club";
+import {type Club, ClubRole} from "~/types/api/item/club";
+import {AppCookie} from "~/types/cookie";
 
 export const useSelfUserStore = defineStore('selfUser', () => {
   const member: Ref<Member | undefined> = ref(undefined)
@@ -25,16 +26,16 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   function getSelfJwtToken(): Ref<JwtToken|null> {
     if (selfJwtToken.value) {
       // We remove the authCookie if he is not in the cookie
-      const authCookie = useCookie('auth_jwt');
+      const authCookie = useCookie(AppCookie.access_token);
       if (!authCookie || authCookie.value == undefined) {
         selfJwtToken.value.access = undefined
-        refreshCookie('auth_jwt')
+        refreshCookie(AppCookie.access_token)
       }
 
-      const refreshTokenCookie = useCookie('auth_jwt_refresh');
+      const refreshTokenCookie = useCookie(AppCookie.refresh_token);
       if (!refreshTokenCookie || refreshTokenCookie.value == undefined) {
         selfJwtToken.value.refresh = undefined
-        refreshCookie('auth_jwt_refresh')
+        refreshCookie(AppCookie.refresh_token)
       }
 
       return selfJwtToken
@@ -43,13 +44,13 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     // Settings from cookies storage
     let jwtToken: JwtToken|null = null;
 
-    const authCookie = useCookie('auth_jwt');
+    const authCookie = useCookie(AppCookie.access_token);
     if (authCookie && authCookie.value != undefined) {
       jwtToken = new JwtToken();
       jwtToken.access = JSON.parse(atob(authCookie.value));
     }
 
-    const refreshTokenCookie = useCookie('auth_jwt_refresh');
+    const refreshTokenCookie = useCookie(AppCookie.refresh_token);
     if (refreshTokenCookie && refreshTokenCookie.value != undefined) {
       if (!jwtToken) {
         jwtToken = new JwtToken()
@@ -71,26 +72,28 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     if (payload.access) {
       const expireDate = payload.access.date ?? dayjs().add(30, 'minutes').toDate()
 
-      const authCookie = useCookie('auth_jwt', {
+      const authCookie = useCookie(AppCookie.access_token, {
         expires: new Date(expireDate),
         httpOnly: false,
+        secure: true,
         sameSite: true,
       });
       authCookie.value = btoa(JSON.stringify(payload.access))
-      refreshCookie('auth_jwt')
+      refreshCookie(AppCookie.access_token)
     }
 
     if (payload.refresh) {
       const expireRefreshDate = payload.refresh.date ?? dayjs().add(10, 'day').toDate()
 
       // Expire at the date returned by the refresh token
-      const refreshTokenCookie = useCookie('auth_jwt_refresh', {
+      const refreshTokenCookie = useCookie(AppCookie.refresh_token, {
         expires: new Date(expireRefreshDate),
         httpOnly: false,
+        secure: true,
         sameSite: true,
       });
       refreshTokenCookie.value = btoa(JSON.stringify(payload.refresh))
-      refreshCookie('auth_jwt_refresh')
+      refreshCookie(AppCookie.refresh_token)
     }
   }
 
@@ -249,13 +252,13 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     user.value = undefined
     selectedProfile.value = undefined
 
-    const authCookie = useCookie('auth_jwt');
+    const authCookie = useCookie(AppCookie.access_token);
     authCookie.value = null
-    refreshCookie('auth_jwt')
+    refreshCookie(AppCookie.access_token)
 
-    const refreshTokenCookie = useCookie('auth_jwt_refresh');
+    const refreshTokenCookie = useCookie(AppCookie.refresh_token);
     refreshTokenCookie.value = null;
-    refreshCookie('auth_jwt_refresh')
+    refreshCookie(AppCookie.refresh_token)
 
     // We refresh the config we got from the api
     appConfigStore.refresh(false)

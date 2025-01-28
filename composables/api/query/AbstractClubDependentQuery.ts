@@ -4,11 +4,13 @@ import {useSelfUserStore} from "~/stores/useSelfUser";
 export abstract class AbstractClubDependentQuery<T> extends AbstractQuery<T> {
   protected override getRootUrl(): string {
     const selfStore = useSelfUserStore()
+
     const profile = selfStore.selectedProfile
-    if (profile === undefined) {
+    if (profile === undefined || !profile.club["@id"]) {
       throw new Error("No profile selected")
     }
+    const clubPath = profile.club["@id"]
 
-    return profile.club["@id"] + "/" + this.rootPath;
+    return clubPath + "/" + this.rootPath;
   }
 }
