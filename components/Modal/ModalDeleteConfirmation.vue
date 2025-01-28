@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type {AlertColor} from "#ui/types";
+import type {PropType} from "vue";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
+
 const props = defineProps(
   {
     title: {
@@ -7,6 +11,10 @@ const props = defineProps(
     },
     description: {
       type: String,
+      default: undefined
+    },
+    descriptionColor: {
+      type: String as PropType<AlertColor>,
       default: undefined
     }
   }
@@ -19,7 +27,17 @@ const emit = defineEmits(['delete'])
 <template>
   <ModalWithActions :title="props.title">
 
-    <slot>{{ props.description }}</slot>
+    <slot>
+      <template v-if="!descriptionColor">
+        {{ props.description }}
+      </template>
+      <UAlert v-else
+        class="mb-4"
+        variant="subtle"
+        :color="descriptionColor"
+        :description="description"
+      />
+    </slot>
 
     <template #actions>
       <UButton

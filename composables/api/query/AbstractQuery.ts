@@ -1,12 +1,23 @@
 import {useCreateItem, useDeleteItem, useFetchItem, useFetchList, usePatchItem} from "~/composables/api/api";
 import type {FetchAllData, FetchItemData} from "~/types/api/api";
 import type {Item} from "~/types/api/item";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 
 export abstract class AbstractQuery<T> {
 	protected abstract rootPath: string;
 
   protected getRootUrl(): string {
     return this.rootPath;
+  }
+
+  protected getCurrentClubPath(): string {
+    const selfStore = useSelfUserStore()
+
+    const profile = selfStore.selectedProfile
+    if (profile === undefined || !profile.club["@id"]) {
+      throw new Error("No profile selected")
+    }
+    return profile.club["@id"]
   }
 
 	async get(id: string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<T>> {
