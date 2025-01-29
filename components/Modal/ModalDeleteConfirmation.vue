@@ -9,11 +9,20 @@ const props = defineProps(
       type: String,
       default: 'Êtes-vous certain ?'
     },
+
     description: {
       type: String,
       default: undefined
     },
-    descriptionColor: {
+    alertTitle: {
+      type: String,
+      default: undefined
+    },
+    alertDescription: {
+      type: String,
+      default: undefined
+    },
+    alertColor: {
       type: String as PropType<AlertColor>,
       default: undefined
     }
@@ -28,15 +37,18 @@ const emit = defineEmits(['delete'])
   <ModalWithActions :title="props.title">
 
     <slot>
-      <template v-if="!descriptionColor">
-        {{ props.description }}
-      </template>
-      <UAlert v-else
-        class="mb-4"
-        variant="subtle"
-        :color="descriptionColor"
-        :description="description"
-      />
+      <div>
+        <UAlert v-if="alertTitle || alertDescription || alertColor"
+                class="mb-4"
+                variant="subtle"
+                :color="alertColor"
+                :title="alertTitle"
+                :description="alertDescription"
+        />
+        <div>
+          {{ props.description }}
+        </div>
+      </div>
     </slot>
 
     <template #actions>

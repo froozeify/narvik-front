@@ -337,7 +337,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
     isLoadingMemberPresencesPaginated.value = false
   }
 
-  async function deleteRow(memberPresence: MemberPresence, close: Function) {
+  async function deleteRow(memberPresence: MemberPresence) {
     isUpdating.value = true
 
     memberPresenceQuery.delete(memberPresence).then(async ({error}) => {
@@ -345,7 +345,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         toast.add({
           color: "red",
           title: "La suppression a échouée",
-          description: error
+          description: error.message
         })
         isUpdating.value = false
         return;
@@ -359,7 +359,6 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         title: "Présence supprimée"
       })
 
-      close();
       isUpdating.value = false
     })
   }
@@ -516,8 +515,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
           icon="i-heroicons-trash"
           color="red"
           @click="modal.open(ModalDeleteConfirmation, {
-                description: 'Les historiques de présences seront anonymisés et ne pourront être rétablie auprès de ce membre.',
-                descriptionColor: 'orange',
+                alertDescription: 'Les historiques de présences seront anonymisés et ne pourront être rétablie auprès de ce membre.',
+                alertColor: 'orange',
                 onDelete() {
                   modal.close()
                   // deletePaymentMode()
@@ -684,6 +683,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                     icon="i-heroicons-trash"
                     color="red"
                     @click="modal.open(ModalDeleteConfirmation, {
+                      alertTitle: `Suppression de la saison ${row.season.name} pour ${member?.fullName}`,
+                      alertColor: 'orange',
                       onDelete() {
                         modal.close()
                         deleteMemberSeason(row)
@@ -801,22 +802,19 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
               <div v-if="isSupervisor" class="flex gap-4">
                 <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
 
-                <UPopover overlay>
-                  <UButton color="red" label="Supprimer" />
-
-                  <template #panel="{ close }">
-                    <div class="p-4 w-[42rem] flex flex-col">
-                      <div class="text-center text-lg font-bold">Présence du {{ formatDateReadable(row.date) }}</div>
-                      <UAlert
-                        class="my-4"
-                        color="orange"
-                        variant="soft"
-                        title="La suppression de la présence sera définitive."
-                      />
-                      <UButton class="mx-auto" color="red" label="Valider la suppression" :disabled="isUpdating" @click="deleteRow(row, close);" />
-                    </div>
-                  </template>
-                </UPopover>
+                <UButton
+                  color="red"
+                  label="Supprimer"
+                  @click="modal.open(ModalDeleteConfirmation, {
+                    title: `Présence du ${formatDateReadable(row.date)}`,
+                    alertTitle: 'La suppression de la présence sera définitive.',
+                    alertColor: 'orange',
+                    onDelete() {
+                      modal.close()
+                      deleteRow(row)
+                    }
+                  })"
+                />
               </div>
             </template>
 
