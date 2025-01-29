@@ -19,6 +19,7 @@ import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
 import { ArcElement, CategoryScale, Chart as ChartJS, Colors, DoughnutController, Legend, LinearScale, Title, Tooltip } from 'chart.js'
 import {Doughnut} from 'vue-chartjs'
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeasonQuery";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
@@ -60,6 +61,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
   const memberProfileImage: Ref<Image | undefined> = ref(undefined)
   const memberPresences: Ref<MemberPresence[]> = ref([])
   const totalMemberPresences = computed(() => memberPresences.value.length)
+
+  const isLoadingMemberSeasons = ref(false)
   const memberSeasons: Ref<MemberSeason[]> = ref([])
 
   const isLoadingMemberPresencesPaginated = ref(false)
@@ -92,8 +95,10 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
     direction: 'desc'
   });
 
-  const memberQuery = new MemberQuery();
   const userQuery = new UserQuery();
+  const memberQuery = new MemberQuery();
+  let memberSeasonQuery: MemberSeasonQuery|null = null
+
   const memberPresenceQuery = new MemberPresenceQuery();
   const imageQuery = new ImageQuery();
 
@@ -114,6 +119,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
   watch(member, (newValue, oldValue) => {
     if (newValue) {
       if (member.value) {
+        memberSeasonQuery = new MemberSeasonQuery(member.value)
+
         if (member.value.profileImage?.privateUrl) {
           imageQuery.getFromUrl(member.value.profileImage.privateUrl).then(imageResponse => {
             memberProfileImage.value = imageResponse.retrieved
@@ -243,7 +250,9 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 
   async function getMemberSeasons() {
     if (!member.value || !member.value.uuid) return;
+    isLoadingMemberSeasons.value = true
     const { error, items } = await memberQuery.seasons(member.value.uuid)
+    isLoadingMemberSeasons.value = false
     if (error) {
       return
     }
@@ -393,6 +402,29 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
     }
   }
 
+  async function deleteMemberSeason(memberSeason: MemberSeason) {
+    if (!memberSeasonQuery) {
+      return
+    }
+
+    memberSeasonQuery.delete(memberSeason).then(async ({error}) => {
+      if (error) {
+        toast.add({
+          color: "red",
+          title: "La suppression a échouée",
+          description: error.message
+        })
+        return;
+      }
+
+      await getMemberSeasons()
+
+      toast.add({
+        color: "green",
+        title: "Saison supprimée"
+      })
+    })
+  }
 </script>
 
 <template>
@@ -589,15 +621,16 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
             <UTable
               class="flex-1"
               :columns="[
-            {
-              key: 'season.name',
-              label: 'Saison',
-              class: 'w-full'
-            },
-            {
-              key: 'actions'
-            }
-          ]"
+                {
+                  key: 'season.name',
+                  label: 'Saison',
+                  class: 'w-full'
+                },
+                {
+                  key: 'actions'
+                }
+              ]"
+              :loading="isLoadingMemberSeasons"
               :rows="memberSeasonRows"
             >
 
@@ -615,7 +648,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                     @click="modal.open(ModalDeleteConfirmation, {
                       onDelete() {
                         modal.close()
-                        // deletePaymentMode()
+                        deleteMemberSeason(row)
                       }
                     })"
                   >

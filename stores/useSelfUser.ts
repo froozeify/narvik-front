@@ -219,14 +219,14 @@ export const useSelfUserStore = defineStore('selfUser', () => {
         const { retrieved:retrievedMember } = await memberQuery.get(member.value.uuid.toString())
         if (retrievedMember) {
           member.value = retrievedMember
+
+          // We load the profile image
+          const image = await loadProfileImage()
+          if (image) {
+            member.value.profileImageBase64 = image
+          }
         }
       }
-
-      // We load the profile image
-      // const image = await loadProfileImage()
-      // if (image) {
-      //   member.value.profileImageBase64 = image
-      // }
     }
 
     // We refresh the config we got from the api
@@ -234,10 +234,10 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   }
 
   async function loadProfileImage() {
-    if (!member.value || !member.value.profileImage) return null;
+    if (!member.value || !member.value.profileImage?.privateUrl) return null;
 
     const imageQuery = new ImageQuery();
-    const { retrieved } = await imageQuery.get(member.value.profileImage);
+    const { retrieved } = await imageQuery.getFromUrl(member.value.profileImage.privateUrl);
 
     if (!retrieved || !retrieved.base64) return null
 
