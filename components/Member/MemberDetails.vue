@@ -20,6 +20,9 @@ import { ArcElement, CategoryScale, Chart as ChartJS, Colors, DoughnutController
 import {Doughnut} from 'vue-chartjs'
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeasonQuery";
+import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
+import SeasonSelectModal from "~/components/Season/SeasonSelectModal.vue";
+import type {Season} from "~/types/api/item/season";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
@@ -402,6 +405,35 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
     }
   }
 
+  async function addMemberSeason(seasonIri: String) {
+    if (!memberSeasonQuery || !member.value) {
+      return
+    }
+
+    const memberSeason: MemberSeason = {
+      member: member.value["@id"],
+      season: seasonIri
+    }
+
+    memberSeasonQuery.post(memberSeason).then(async ({error}) => {
+      if (error) {
+        toast.add({
+          color: "red",
+          title: "L'ajout a échoué",
+          description: error.data?.detail || error.message
+        })
+        return;
+      }
+
+      await loadItem()
+
+      toast.add({
+        color: "green",
+        title: "Saison ajoutée"
+      })
+    })
+  }
+
   async function deleteMemberSeason(memberSeason: MemberSeason) {
     if (!memberSeasonQuery) {
       return
@@ -613,7 +645,13 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
           <div class="flex flex-col h-full">
             <div v-if="isSupervisor" class="flex gap-4">
               <div class="flex-1"></div>
-              <UButton @click="addMemberPresenceModal = true" >
+              <UButton
+                @click="modal.open(SeasonSelectModal, {
+                  onSelected(seasonIri: String) {
+                    addMemberSeason(seasonIri)
+                  }
+                })"
+              >
                 Ajouter une saison
               </UButton>
             </div>

@@ -6,6 +6,7 @@ import {mergician} from 'mergician';
 import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/useApiData";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import type {NuxtError} from "#app";
+import type {ItemError} from "~/types/api/itemError";
 
 export const MIME_TYPE = "application/ld+json";
 export const MIME_TYPE_JSON = "application/json";
@@ -159,7 +160,7 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false, r
 
 export async function useCreateItem<T>(resource: string, payload: Item) {
   let created: T | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi<T>(resource, {
@@ -169,7 +170,7 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
 
     created = data as T;
   } catch (e) {
-    error = e as NuxtError
+    error = e as NuxtError<ItemError>
   }
 
   return {
