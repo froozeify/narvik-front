@@ -78,7 +78,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 
   // Season table
   const seasonPage = ref(1)
-  const seasonItemsPerPage = ref(3);
+  const seasonItemsPerPage = ref(5);
   const memberSeasonRows = computed(() => {
     return memberSeasons.value.slice((seasonPage.value - 1) * seasonItemsPerPage.value, (seasonPage.value) * seasonItemsPerPage.value)
   })
@@ -469,24 +469,25 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 
     <div class="flex flex-row flex-wrap gap-4">
 
-      <UCard v-if="!member" class="w-2/3">
-        <div class="mx-auto my-0 h-24 w-24 aspect-square">
-          <USkeleton class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
-        </div>
 
-        <div class="space-y-4 w-full mt-4">
-          <div v-for="w in ['w-52 h-8', 'w-36 h-4', 'w-48 h-4']" class="flex justify-center">
-            <USkeleton :class="w" />
-          </div>
-          <div class="flex gap-4 justify-center flex-wrap">
-            <USkeleton v-for="i in (Math.floor(Math.random()*6) + 2)" class="w-14 h-4" />
+      <div class="flex-grow">
+        <UCard v-if="!member">
+          <div class="mx-auto my-0 h-24 w-24 aspect-square">
+            <USkeleton class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
           </div>
 
-        </div>
-      </UCard>
+          <div class="space-y-4 w-full mt-4">
+            <div v-for="w in ['w-52 h-8', 'w-36 h-4', 'w-48 h-4']" class="flex justify-center">
+              <USkeleton :class="w" />
+            </div>
+            <div class="flex gap-4 justify-center flex-wrap">
+              <USkeleton v-for="i in (Math.floor(Math.random()*6) + 2)" class="w-14 h-4" />
+            </div>
 
-      <div v-else class="flex flex-col flex-1 gap-4">
-        <UCard class="flex-1">
+          </div>
+        </UCard>
+
+        <UCard v-else class="h-full">
           <div class="flex flex-col gap-4 relative">
 
             <div class="h-24 w-24 aspect-square self-center">
@@ -494,8 +495,20 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
               <USkeleton v-else class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
             </div>
 
-            <div class="flex items-center justify-center flex-wrap gap-1">
-              <div v-if="!member.currentSeason" class="basis-full text-center">
+            <div class="text-center text-2xl font-bold">
+              {{ member.fullName }}
+            </div>
+
+            <div class="flex flex-col items-center justify-center flex-wrap gap-1">
+              <div v-if="member.blacklisted">
+                <UButton
+                  color="black"
+                  :ui="{ rounded: 'rounded-full' }">
+                  Blacklisté
+                </UButton>
+              </div>
+
+              <div v-if="!member.currentSeason">
                 <UButton
                   color="red"
                   :ui="{ rounded: 'rounded-full' }">
@@ -505,8 +518,28 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
             </div>
 
             <div class="grid grid-cols-2">
+              <div v-if="member.lastControlShooting" class="col-span-2 flex items-center text-sm">
+                Dernier contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
+              </div>
+
               <div class="flex items-center">
-                {{ member.lastname }} {{ member.firstname }}
+                <UIcon class="mr-4" name="i-heroicons-identification" />
+                <p class="text-sm">{{ member.licence }}</p>
+              </div>
+
+              <div class="flex items-center">
+                <UIcon class="mr-2" name="i-heroicons-at-symbol" />
+                <UButton variant="link" :to="'mailto:' + member.email">{{ member.email }}</UButton>
+              </div>
+
+              <div class="flex items-center">
+                <UIcon class="mr-2" name="i-heroicons-phone" />
+                <template v-if="member.phone">
+                  <UButton variant="link" :to="'tel:' + member.phone">{{ member.phone.match(/.{1,2}/g).join(' ') }}</UButton>
+                </template>
+                <template v-else>
+                  <UButton variant="link" disabled>Non défini</UButton>
+                </template>
               </div>
 
               <div class="flex items-center">
@@ -519,18 +552,14 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                 </template>
               </div>
 
-              <div class="flex items-center">
-                <UIcon class="mr-2" name="i-heroicons-identification" />
-                <p>{{ member.licence }}</p>
-              </div>
+              <UDivider label="Adresse" class="col-span-2 mt-4" />
 
-              <div class="flex items-center">
-                <UIcon class="mr-2" name="i-heroicons-at-symbol" />
-                <UButton variant="link" :to="'mailto:' + member.email">{{ member.email }}</UButton>
-              </div>
-
-              <div v-if="member.lastControlShooting">
-                Dernier tir de contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
+              <div class="col-span-2 text-sm">
+                <p>{{ member.postal1 }}</p>
+                <p>{{ member.postal2 }}</p>
+                <p>{{ member.postal3 }}</p>
+                <p>{{ member.zipCode }} {{ member.city }}</p>
+                <p>{{ member.country }}</p>
               </div>
 
             </div>
@@ -538,12 +567,18 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
           </div>
 
         </UCard>
-
       </div>
 
       <div class="flex basis-1/3">
-        <UCard class="flex-1">
-          <div>
+        <UCard
+          class="flex-1"
+          :ui="{
+            body: {
+              padding: 'h-full'
+            }
+          }"
+        >
+          <div class="flex flex-col h-full">
             <div v-if="isSupervisor" class="flex gap-4">
               <div class="flex-1"></div>
               <UButton @click="addMemberPresenceModal = true" >
@@ -578,11 +613,11 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                     icon="i-heroicons-trash"
                     color="red"
                     @click="modal.open(ModalDeleteConfirmation, {
-                  onDelete() {
-                    modal.close()
-                    // deletePaymentMode()
-                  }
-                })"
+                      onDelete() {
+                        modal.close()
+                        // deletePaymentMode()
+                      }
+                    })"
                   >
                   </UButton>
                 </div>
@@ -590,8 +625,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 
             </UTable>
 
-            <div class="flex flex-wrap justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-              <UPagination v-model="seasonPage"  :page-count="parseInt(seasonItemsPerPage.toString())" :total="memberSeasons.length" />
+            <div class="flex flex-wrap justify-end gap-4 px-3">
+              <UPagination v-model="seasonPage" :page-count="parseInt(seasonItemsPerPage.toString())" :total="memberSeasons.length" />
             </div>
 
           </div>
