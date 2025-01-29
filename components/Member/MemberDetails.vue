@@ -420,12 +420,12 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         toast.add({
           color: "red",
           title: "L'ajout a échoué",
-          description: error.data?.detail || error.message
+          description: error.message
         })
         return;
       }
 
-      await loadItem()
+      loadItem()
 
       toast.add({
         color: "green",

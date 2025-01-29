@@ -105,7 +105,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
   let totalItems: number | undefined = undefined;
   let view: View | undefined = undefined;
   let hubUrl: URL | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi<PagedCollection<T>>(resource, {
@@ -119,7 +119,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
     view = data["view"];
     totalItems = data["totalItems"];
   } catch (e) {
-    error = e as NuxtError;
+    error = formatError(e as NuxtError<ItemError>)
   }
 
   return {
@@ -134,7 +134,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
 export async function useFetchItem<T>(path: string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<T>> {
   let retrieved: T | undefined = undefined;
   let hubUrl: URL | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi<T>(path, {
@@ -147,7 +147,7 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false, r
 
     retrieved = data as T;
   } catch (e) {
-    error = e as NuxtError;
+    error = formatError(e as NuxtError<ItemError>)
   }
 
 
@@ -170,7 +170,7 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
 
     created = data as T;
   } catch (e) {
-    error = e as NuxtError<ItemError>
+    error = formatError(e as NuxtError<ItemError>)
   }
 
   return {
@@ -206,7 +206,7 @@ export async function useUploadFile(resource: string, payload: FormData, require
 
 export async function useUpdateItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi<T>(item["@id"] ?? "", {
@@ -220,7 +220,7 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
 
     updated = data as T;
   } catch (e) {
-    error = e as NuxtError
+    error = formatError(e as NuxtError<ItemError>)
   }
 
   return {
@@ -325,7 +325,7 @@ export async function usePatch<T>(path: string, payload: object) {
 
 export async function usePatchItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi(item["@id"] ?? "", {
@@ -339,7 +339,7 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
 
     updated = data as T;
   } catch (e) {
-    error = e as NuxtError
+    error = formatError(e as NuxtError<ItemError>)
   }
 
   return {
@@ -369,4 +369,13 @@ export async function useDeleteItem(item?: Item | null) {
   return {
     error,
   };
+}
+
+function formatError(error: NuxtError<ItemError>): NuxtError<ItemError> {
+  // We try setting the message based on the api error response
+  if (error.data?.description) {
+    error.message = error.data.description
+  }
+
+  return error
 }
