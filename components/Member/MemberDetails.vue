@@ -460,8 +460,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 </script>
 
 <template>
-  <div class="flex flex-row flex-wrap gap-4">
-    <div class="flex flex-1 gap-4">
+  <div class="flex flex-col lg:flex-row lg:flex-wrap gap-4">
+    <div class="flex-1 flex flex-col lg:flex-row gap-2">
       <UTooltip v-if="isSupervisor" text="Liste des membres" class="">
         <UButton
           to="/admin/members"
@@ -503,20 +503,21 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 
         <div class="flex-1"></div>
 
-        <UButton
-          v-if="isAdmin"
-          icon="i-heroicons-pencil-square"
-          color="yellow"
-          @click="itemModalOpen = true"
-        >
-          Modifier
-        </UButton>
+        <div class="flex flex-1 justify-between lg:justify-end gap-2">
+          <UButton
+            v-if="isAdmin"
+            icon="i-heroicons-pencil-square"
+            color="yellow"
+            @click="itemModalOpen = true"
+          >
+            Modifier
+          </UButton>
 
-        <UButton
-          v-if="member.uuid && (isSuperAdmin || (isAdmin && member.email != loggedUsername))"
-          icon="i-heroicons-trash"
-          color="red"
-          @click="modal.open(ModalDeleteConfirmation, {
+          <UButton
+            v-if="member.uuid && (isSuperAdmin || (isAdmin && member.email != loggedUsername))"
+            icon="i-heroicons-trash"
+            color="red"
+            @click="modal.open(ModalDeleteConfirmation, {
                 alertDescription: 'Les historiques de présences seront anonymisés et ne pourront être rétablie auprès de ce membre.',
                 alertColor: 'orange',
                 onDelete() {
@@ -524,16 +525,14 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                   // deletePaymentMode()
                 }
               })"
-        >
-          Supprimer
-        </UButton>
-
+          >
+            Supprimer
+          </UButton>
+        </div>
       </template>
 
     </div>
-
-    <div class="flex flex-row flex-wrap gap-4">
-
+    <div class="flex flex-col lg:flex-row lg:flex-wrap gap-4">
 
       <div class="flex-grow">
         <UCard v-if="!member">
@@ -589,8 +588,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
               </div>
             </div>
 
-            <div class="grid grid-cols-2">
-              <div v-if="member.lastControlShooting" class="col-span-2 flex items-center text-sm">
+            <div class="grid lg:grid-cols-2 text-sm">
+              <div v-if="member.lastControlShooting" class="col-span-2 flex items-center">
                 Dernier contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
               </div>
 
@@ -624,9 +623,9 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                 </template>
               </div>
 
-              <UDivider label="Adresse" class="col-span-2 mt-4" />
+              <UDivider label="Adresse" class="lg:col-span-2 mt-4" />
 
-              <div class="col-span-2 text-sm">
+              <div class="lg:col-span-2">
                 <p>{{ member.postal1 }}</p>
                 <p>{{ member.postal2 }}</p>
                 <p>{{ member.postal3 }}</p>
@@ -641,7 +640,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         </UCard>
       </div>
 
-      <div class="flex basis-1/3">
+      <div class="flex basis-full lg:basis-1/3">
         <UCard
           class="flex-1"
           :ui="{
@@ -714,7 +713,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         </UCard>
       </div>
 
-      <div class="w-full">
+      <div class="basis-full">
         <UCard v-if="totalMemberPresences > 0">
 
           <div class="text-xl font-bold">{{ totalMemberPresences }} présences ces 12 derniers mois</div>
@@ -731,37 +730,38 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         </UCard>
       </div>
 
-      <div class="w-full">
+      <div class="basis-full">
         <UCard>
-          <div v-if="isSupervisor" class="flex gap-4">
-            <USelectMenu
-              class="w-44"
-              v-model="filteredActivities"
-              :options="activities"
-              option-attribute="name"
-              multiple
-            >
-              <template #label>
+          <div class="flex flex-col">
+            <div v-if="isSupervisor" class="flex flex-col-reverse lg:flex-row gap-4">
+              <USelectMenu
+                class="w-44"
+                v-model="filteredActivities"
+                :options="activities"
+                option-attribute="name"
+                multiple
+              >
+                <template #label>
               <span v-if="filteredActivities.length" class="truncate">
                 {{ filteredActivities.map(fa => fa.name).join(', ') }}
               </span>
-                <span v-else>Activités</span>
-              </template>
-            </USelectMenu>
+                  <span v-else>Activités</span>
+                </template>
+              </USelectMenu>
 
-            <div class="flex-1"></div>
-            <UButton @click="addMemberPresenceModal = true" >
-              Ajouter une activité
-            </UButton>
+              <div class="flex-1"></div>
+              <UButton @click="addMemberPresenceModal = true" >
+                Ajouter une activité
+              </UButton>
 
-            <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
-              CSV
-            </UButton>
-          </div>
+              <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
+                CSV
+              </UButton>
+            </div>
 
-          <UTable
-            :loading="isLoadingMemberPresencesPaginated"
-            :columns="[
+            <UTable
+              :loading="isLoadingMemberPresencesPaginated"
+              :columns="[
               {
                 key: 'date',
                 label: 'Date',
@@ -776,45 +776,45 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                 key: 'actions'
               }
             ]"
-            v-model:sort="sort"
-            sort-mode="manual"
-            @update:sort="getMemberPresencesPaginated()"
-            :rows="memberPresencesPaginated"
-          >
+              v-model:sort="sort"
+              sort-mode="manual"
+              @update:sort="getMemberPresencesPaginated()"
+              :rows="memberPresencesPaginated"
+            >
 
-            <template #empty-state>
-              <div class="flex flex-col items-center justify-center py-6 gap-3">
-                <span class="italic text-sm">Aucune présence enregistrée</span>
-              </div>
-            </template>
+              <template #empty-state>
+                <div class="flex flex-col items-center justify-center py-6 gap-3">
+                  <span class="italic text-sm">Aucune présence enregistrée</span>
+                </div>
+              </template>
 
-            <template #date-data="{row}">
-              {{ formatDate(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
-            </template>
+              <template #date-data="{row}">
+                {{ formatDate(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
+              </template>
 
-            <template #activities-data="{row}">
-              <div v-if="row.activities.length == 0">
-                <i>Aucune activités déclarées</i>
-              </div>
+              <template #activities-data="{row}">
+                <div v-if="row.activities.length == 0">
+                  <i>Aucune activités déclarées</i>
+                </div>
 
-              <div class="flex flex-1 flex-wrap gap-4">
-                <UButton
-                  v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-                  variant="soft"
-                  :ui="{ rounded: 'rounded-full' }">
-                  {{ activity.name }}
-                </UButton>
-              </div>
-            </template>
+                <div class="flex flex-1 flex-wrap gap-4">
+                  <UButton
+                    v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
+                    variant="soft"
+                    :ui="{ rounded: 'rounded-full' }">
+                    {{ activity.name }}
+                  </UButton>
+                </div>
+              </template>
 
-            <template #actions-data="{row}" >
-              <div v-if="isSupervisor" class="flex gap-4">
-                <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
+              <template #actions-data="{row}" >
+                <div v-if="isSupervisor" class="flex gap-4">
+                  <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
 
-                <UButton
-                  color="red"
-                  label="Supprimer"
-                  @click="modal.open(ModalDeleteConfirmation, {
+                  <UButton
+                    color="red"
+                    label="Supprimer"
+                    @click="modal.open(ModalDeleteConfirmation, {
                     title: `Présence du ${formatDateReadable(row.date)}`,
                     alertTitle: 'La suppression de la présence sera définitive.',
                     alertColor: 'orange',
@@ -823,15 +823,16 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                       deleteRow(row)
                     }
                   })"
-                />
-              </div>
-            </template>
+                  />
+                </div>
+              </template>
 
-          </UTable>
+            </UTable>
 
-          <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMemberPresencesPaginated()" />
-            <UPagination v-model="page" @update:model-value="getMemberPresencesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMemberPresencesPaginated" />
+            <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+              <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMemberPresencesPaginated()" />
+              <UPagination v-model="page" @update:model-value="getMemberPresencesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMemberPresencesPaginated" />
+            </div>
           </div>
         </UCard>
       </div>
