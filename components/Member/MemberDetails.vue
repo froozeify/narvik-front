@@ -23,6 +23,7 @@ import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeaso
 import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
 import SeasonSelectModal from "~/components/Season/SeasonSelectModal.vue";
 import type {Season} from "~/types/api/item/season";
+import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
@@ -405,14 +406,15 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
     }
   }
 
-  async function addMemberSeason(seasonIri: String) {
+  async function addMemberSeason(seasonIri: String, isSecondary: boolean = false) {
     if (!memberSeasonQuery || !member.value) {
       return
     }
 
     const memberSeason: MemberSeason = {
       member: member.value["@id"],
-      season: seasonIri
+      season: seasonIri,
+      isSecondaryClub: isSecondary
     }
 
     memberSeasonQuery.post(memberSeason).then(async ({error}) => {
@@ -653,9 +655,9 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
             <div v-if="isSupervisor" class="flex gap-4">
               <div class="flex-1"></div>
               <UButton
-                @click="modal.open(SeasonSelectModal, {
-                  onSelected(seasonIri: String) {
-                    addMemberSeason(seasonIri)
+                @click="modal.open(MemberSeasonSelectModal, {
+                  onSelected(seasonIri: String, isSecondary: boolean) {
+                    addMemberSeason(seasonIri, isSecondary)
                   }
                 })"
               >
@@ -670,6 +672,10 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                   key: 'season.name',
                   label: 'Saison',
                   class: 'w-full'
+                },
+                {
+                  key: 'isSecondaryClub',
+                  label: 'Club secondaire',
                 },
                 {
                   key: 'actions'
@@ -703,6 +709,9 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                 </div>
               </template>
 
+              <template #isSecondaryClub-data="{ row }">
+                <UToggle :model-value="row.isSecondaryClub" />
+              </template>
             </UTable>
 
             <div class="flex flex-wrap justify-end gap-4 px-3">

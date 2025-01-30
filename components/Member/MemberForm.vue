@@ -119,7 +119,7 @@ async function updateItem() {
         <UToggle v-model="item.handisport" :disabled="props.viewOnly" />
       </UFormGroup>
 
-      <UFormGroup label="Est Blacklisté">
+      <UFormGroup label="Blacklisté">
         <UToggle v-model="item.blacklisted" :disabled="props.viewOnly" />
       </UFormGroup>
     </div>
