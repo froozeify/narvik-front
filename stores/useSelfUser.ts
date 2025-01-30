@@ -12,6 +12,8 @@ import type {User} from "~/types/api/item/user";
 import {UserRole} from "~/types/api/item/user";
 import {type Club, ClubRole} from "~/types/api/item/club";
 import {AppCookie} from "~/types/cookie";
+import ClubQuery from "~/composables/api/query/ClubQuery";
+import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
 
 export const useSelfUserStore = defineStore('selfUser', () => {
   const member: Ref<Member | undefined> = ref(undefined)
@@ -212,6 +214,21 @@ export const useSelfUserStore = defineStore('selfUser', () => {
         selectedProfile.value = retrieved.linkedProfiles.find( (profile) => profile.id === selectedProfile.value?.id)
       }
 
+      if (selectedProfile.value?.club) {
+        const clubQuery = new ClubQuery()
+        const { retrieved: retrievedClub } = await clubQuery.getCurrentClub()
+        if (retrievedClub) {
+          selectedProfile.value.club = retrievedClub
+
+          if (retrievedClub.settings?.uuid) {
+            const clubSettingQuery = new ClubSettingQuery()
+            const { retrieved: clubSettings } = await clubSettingQuery.get(retrievedClub.settings.uuid)
+            if (clubSettings) {
+              selectedProfile.value.club.settings = clubSettings
+            }
+          }
+        }
+      }
 
       const memberQuery = new MemberQuery()
       member.value = selectedProfile.value?.member

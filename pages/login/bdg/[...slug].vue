@@ -10,7 +10,10 @@
     navigateTo('/');
   } else {
     try {
-      await useLoginBadger(route.params.token);
+      if (route.params.slug.length !== 2) {
+        navigateTo('/login')
+      }
+      await useLoginBadger(route.params.slug[0], route.params.slug[1]);
     } catch (e) {
       navigateTo('/login')
     }

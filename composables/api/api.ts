@@ -7,6 +7,7 @@ import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/us
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import type {NuxtError} from "#app";
 import type {ItemError} from "~/types/api/itemError";
+import {decodeUrlUuid} from "~/utils/resource";
 
 export const MIME_TYPE = "application/ld+json";
 export const MIME_TYPE_JSON = "application/json";
@@ -64,8 +65,11 @@ export async function useLoginUser(email: string, password: string) {
   return { error };
 }
 
-export async function useLoginBadger(loginToken: string) {
-  const { data } = await usePostRawJson("auth/bdg/" + loginToken);
+export async function useLoginBadger(clubId: string, loginToken: string) {
+  const { data } = await usePostRawJson("auth/bdg", {
+    token: loginToken,
+    club: decodeUrlUuid(clubId)
+  });
 
   const selfStore = useSelfUserStore()
   selfStore.setJwtSelfJwtTokenFromApiResponse(data)

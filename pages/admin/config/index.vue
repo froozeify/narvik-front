@@ -9,6 +9,7 @@ import type {Image} from "~/types/api/item/image";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
+import {convertUuidToUrlUuid} from "~/utils/resource";
 
 definePageMeta({
   layout: "admin"
@@ -20,13 +21,15 @@ useHead({
 
 const toast = useToast()
 
+const selfStore = useSelfUserStore();
+const appConfigStore = useAppConfigStore();
+
+const { selectedProfile } = storeToRefs(selfStore)
+
 const globalSettingQuery = new GlobalSettingQuery();
 const activityQuery = new ActivityQuery();
 
-const badgerSetting: Ref<GlobalSetting | undefined> = ref(undefined);
-globalSettingQuery.get("BADGER_TOKEN").then(value =>  {
-  badgerSetting.value = value.retrieved
-})
+const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.badgerToken);
 
 const controlShootingSetting: Ref<GlobalSetting | undefined> = ref(undefined);
 const selectedControlShootingActivityValue: Ref<string | undefined> = ref(undefined);
@@ -62,15 +65,20 @@ const state = reactive({
   file: undefined
 })
 
-const selfStore = useSelfUserStore();
-const appConfigStore = useAppConfigStore();
-
 const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
 
-function copyBadgerLink() {
-  if (!badgerSetting.value) return;
+function getBadgerLoginPath(): string|undefined {
+  if (!badgerSetting.value || !selectedProfile.value) {
+    return undefined
+  }
 
-  clipboard.write(window.location.origin + '/login/bdg/' + badgerSetting.value.value)
+  return `/login/bdg/${convertUuidToUrlUuid(selectedProfile.value.club.uuid)}/${badgerSetting.value}`
+}
+
+function copyBadgerLink() {
+  if (!getBadgerLoginPath()) return;
+
+  clipboard.write(window.location.origin + getBadgerLoginPath())
   toast.add({
     title: 'URL Copiée',
     color: "green"
@@ -205,15 +213,14 @@ async function getActivity(id: string) {
          @click.prevent="copyBadgerLink"
         >
 
-        <UAlert v-if="!badgerSetting.value"
+        <UAlert v-if="!badgerSetting"
                 class="mb-4"
                 icon="i-heroicons-exclamation-triangle"
                 color="red"
                 title="Token de connexion non défini"
                 description="Cela peut arriver lorsque le script de post-installation n'a pas été exécuté."
         />
-
-        <a v-else :href="'/login/bdg/' + badgerSetting.value"
+        <a v-else :href="getBadgerLoginPath()"
            class="focus:outline-none disabled:cursor-not-allowed disabled:opacity-75 flex-shrink-0 font-medium rounded-md text-sm gap-x-1.5 px-2.5 py-1.5 shadow-sm text-white dark:text-gray-900 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-500 dark:bg-yellow-400 dark:hover:bg-yellow-500 dark:disabled:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500 dark:focus-visible:outline-yellow-400 flex justify-center"
         >
           Gestion de présence

@@ -1,4 +1,5 @@
 import type {UuidItem} from "~/types/api/uuidItem";
+import type {ClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 
 export enum ClubRole {
   Badger = 'CLUB_BADGER',
@@ -26,5 +27,8 @@ export function getAvailableClubRoles() {
 }
 
 export interface Club extends UuidItem {
-  name?: string;
+  name: string;
+  salesEnabled: boolean
+  badgerToken?: string
+  settings: ClubSetting
 }
