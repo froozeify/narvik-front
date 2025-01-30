@@ -282,7 +282,7 @@ export async function usePost<T>(path: string, payload: object) {
 
 export async function usePut(path: string, payload: object) {
   let updated: object | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     updated = await useApi<object>(path, {
@@ -294,7 +294,7 @@ export async function usePut(path: string, payload: object) {
       },
     });
   } catch (e) {
-    error = e as NuxtError
+    error = formatError(e as NuxtError<ItemError>)
   }
 
   return {
@@ -306,7 +306,7 @@ export async function usePut(path: string, payload: object) {
 
 export async function usePatch<T>(path: string, payload: object) {
   let updated: T | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     updated = await useApi<T>(path, {
@@ -318,7 +318,7 @@ export async function usePatch<T>(path: string, payload: object) {
       },
     });
   } catch (e) {
-    error = e as NuxtError
+    error = formatError(e as NuxtError<ItemError>)
   }
 
   return {

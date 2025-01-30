@@ -239,12 +239,12 @@ getActivities()
                  color="orange"
                  :loading="isLoading"
                  @click="modal.open(ActivityModalMigrate, {
-             title: selectedActivity.name,
-             activities: activities,
-             onMigrate(targetId: string) {
-               modal.close()
-               migrateActivity(targetId)
-             }
+                 title: selectedActivity.name,
+                 activities: activities,
+                 onMigrate(targetId: string) {
+                   modal.close()
+                   migrateActivity(targetId)
+                 }
           })"
         >
           Migrer
