@@ -46,6 +46,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
   const selfStore = useSelfUserStore();
 
   const loggedUsername = selfStore.member?.email
+  const isSuperAdmin = selfStore.isSuperAdmin();
   const isAdmin = selfStore.isAdmin();
   const isSupervisor = selfStore.hasSupervisorRole();
 
@@ -471,8 +472,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
       </UTooltip>
 
       <!-- Admin && not current account -->
-      <template v-if="member && isAdmin && member.email != loggedUsername">
-        <UPopover overlay>
+      <template v-if="member">
+        <UPopover overlay v-if="isSuperAdmin || (isAdmin && member.email != loggedUsername)">
           <UButton color="violet">
             Modifier les permissions
           </UButton>
@@ -503,6 +504,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         <div class="flex-1"></div>
 
         <UButton
+          v-if="isAdmin"
           icon="i-heroicons-pencil-square"
           color="yellow"
           @click="itemModalOpen = true"
@@ -511,7 +513,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         </UButton>
 
         <UButton
-          v-if="member.uuid"
+          v-if="member.uuid && (isSuperAdmin || (isAdmin && member.email != loggedUsername))"
           icon="i-heroicons-trash"
           color="red"
           @click="modal.open(ModalDeleteConfirmation, {
