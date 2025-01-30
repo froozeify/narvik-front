@@ -8,6 +8,7 @@ import type {Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {createBrowserCsvDownload} from "~/utils/browser";
 import {defineStore} from "pinia";
+import {ClubRole} from "~/types/api/item/club";
 
 export const useSaleStore = defineStore('sale', () => {
   const saleQuery = new SaleQuery()
@@ -122,8 +123,8 @@ export const useSaleStore = defineStore('sale', () => {
       'exists[licence]': 'true', // Exclude super admin
     });
     // URLSearchParams ways so both filter are applied
-    urlParams.append('role[]', 'ROLE_ADMIN')
-    urlParams.append('role[]', 'ROLE_SUPERVISOR')
+    urlParams.append('userMember.role[]', ClubRole.Admin)
+    urlParams.append('userMember.role[]', ClubRole.Supervisor)
 
     const { items, view } = await memberQuery.getAll(urlParams)
     sellersLoading.value = sellersLoading.value.concat(items)
