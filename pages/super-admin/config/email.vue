@@ -9,7 +9,7 @@ import {
 import type {FormError, FormErrorEvent} from "#ui/types";
 
 definePageMeta({
-  layout: "admin"
+  layout: "super-admin"
 });
 
 useHead({
@@ -132,17 +132,17 @@ async function testSmtp() {
         </UButton>
 
         <UProgress v-if="isLoading" animation="swing" class="mb-2" />
-        <UForm v-else class="flex gap-2 flex-col" :state="smtpSetting" :validate="validate" @submit="updateSmtpSetting" @error="onError">
+        <UForm v-else class="flex gap-2 flex-col" :state="smtpSetting" :validate="validate" @submit="updateSmtpSetting" @error="onError" autocomplete="off">
           <UFormGroup label="Activé">
             <UToggle v-model="smtpSetting.on" />
           </UFormGroup>
 
           <div v-if="smtpSetting.on">
-            <UFormGroup label="Hôte" name="host">
+            <UFormGroup label="Hôte" name="host" required>
               <UInput v-model="smtpSetting.host" />
             </UFormGroup>
 
-            <UFormGroup label="Port" name="port">
+            <UFormGroup label="Port" name="port" required>
               <UInput v-model="smtpSetting.port" />
             </UFormGroup>
 
@@ -154,7 +154,7 @@ async function testSmtp() {
               <UInput v-model="smtpSetting.password" type="password" />
             </UFormGroup>
 
-            <UFormGroup label="Email expéditeur" name="sender">
+            <UFormGroup label="Email expéditeur" name="sender" required>
               <UInput v-model="smtpSetting.sender" />
             </UFormGroup>
 

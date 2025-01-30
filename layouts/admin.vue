@@ -31,11 +31,6 @@
       label: 'Activités',
       icon: 'i-heroicons-rocket-launch',
       to: '/admin/config/activities'
-    },
-    {
-      label: 'Email',
-      icon: 'i-heroicons-envelope',
-      to: '/admin/config/email'
     }
   ]
 

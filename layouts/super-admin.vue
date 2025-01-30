@@ -1,0 +1,66 @@
+<script setup lang="ts">
+  import {useSelfUserStore} from "~/stores/useSelfUser";
+  import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
+
+  useHead({
+    titleTemplate: (titleChunk) => {
+      return titleChunk ? `${titleChunk} - Administration - Narvik` : 'Administration - Narvik';
+    }
+  });
+
+  const selfStore = useSelfUserStore()
+
+  const globalSection = [
+    {
+      label: 'Accueil',
+      icon: 'i-heroicons-home',
+      to: '/super-admin'
+    }
+  ]
+
+  const configsSection = [
+    {
+      label: 'Email',
+      icon: 'i-heroicons-envelope',
+      to: '/super-admin/config/email'
+    }
+  ]
+
+  const entitiesSection = [
+    {
+      label: 'Clubs',
+      icon: 'i-heroicons-building-storefront',
+      to: '/super-admin/clubs'
+    },
+    {
+      label: 'Utilisateurs',
+      icon: 'i-heroicons-users',
+      to: '/super-admin/users'
+    },
+  ]
+
+  let links: GroupedNavigationLinks[] = [
+    {
+      links: globalSection
+    },
+    {
+      title: '',
+      links: entitiesSection
+    },
+    {
+      title: 'Configurations',
+      links: configsSection,
+    }
+  ]
+
+</script>
+
+<template>
+  <GenericLayoutAdmin :links="links">
+    <slot></slot>
+  </GenericLayoutAdmin>
+</template>
+
+<style lang="scss" scoped>
+
+</style>

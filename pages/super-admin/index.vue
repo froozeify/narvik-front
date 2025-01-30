@@ -7,7 +7,7 @@
 
 
   definePageMeta({
-    layout: "admin" //TODO: Change it for super admin
+    layout: "super-admin" //TODO: Change it for super admin
   });
 
 </script>
