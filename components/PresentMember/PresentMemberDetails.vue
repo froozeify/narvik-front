@@ -207,8 +207,15 @@ function fullNameClicked() {
         </div>
 
         <div class="mx-auto my-0 h-24 w-24 aspect-square">
-          <img class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800" v-if="memberProfileImage" :src="memberProfileImage.base64" />
-          <USkeleton v-else class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+          <UAvatar
+            class="w-full h-full"
+            size="3xl"
+            :src="memberProfileImage?.base64"
+            :alt="member.fullName"
+            :ui="{
+              rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+            }"
+          />
         </div>
 
         <div class="space-y-4 w-full my-4">

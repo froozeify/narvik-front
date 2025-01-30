@@ -24,7 +24,10 @@
       avatar: {
         icon: 'i-heroicons-user',
         size: 'xs',
-        src: selfStore.member?.profileImageBase64
+        src: selfStore.member?.profileImageBase64,
+        ui: {
+          rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+        }
       },
       to: !isBadger ? "/self" : ''
     }], [{

@@ -554,8 +554,15 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
           <div class="flex flex-col gap-4 relative">
 
             <div class="h-24 w-24 aspect-square self-center">
-              <img class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800" v-if="memberProfileImage" :src="memberProfileImage.base64" />
-              <USkeleton v-else class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+              <UAvatar
+                class="w-full h-full"
+                size="3xl"
+                :src="memberProfileImage?.base64"
+                :alt="member.fullName"
+                :ui="{
+                  rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+                }"
+              />
             </div>
 
             <div class="text-center text-2xl font-bold">

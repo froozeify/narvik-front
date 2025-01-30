@@ -29,7 +29,7 @@
 
   getMembers();
 
-  function getMembers() {
+  async function getMembers() {
     isLoading.value = true;
 
     const urlParams = new URLSearchParams({
@@ -42,17 +42,14 @@
     urlParams.append(`order[firstname]`, 'asc');
     urlParams.append('currentSeason[memberSeasons.season]', 'true');
 
-    memberQuery.getAll(urlParams).then(value => {
-      isLoading.value = false;
-
+    memberQuery.getAll(urlParams).then(async value => {
       if (value.items) {
-        value.items.forEach(member => {
-          loadMemberProfileImage(member).then(img => {
-            if (img) {
-              member.profileImageBase64 = img;
-            }
-          })
-        })
+        for (const member of value.items) {
+          const img = await loadMemberProfileImage(member)
+          if (img) {
+            member.profileImageBase64 = img;
+          }
+        }
 
         members.value = members.value.concat(value.items)
 
@@ -66,6 +63,7 @@
           getMembers();
           return;
         }
+        isLoading.value = false;
       }
     });
   }
@@ -82,7 +80,7 @@
 
 <template>
   <div>
-    <UCard class="print:ring-0 print:shadow-none">
+    <UCard class="print:ring-0 print:shadow-none print:!bg-transparent">
       <div class="text-xl font-bold mb-4">Trombinoscope pour la saison actuelle ({{totalMembers}} membres)</div>
 
       <UProgress
@@ -111,8 +109,16 @@
               background: 'bg-white dark:bg-slate-950'
             }"
           >
-            <div v-if="member.profileImageBase64" class="h-24 w-24 aspect-square mx-auto">
-              <NuxtImg class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800"  :src="member.profileImageBase64" />
+            <div class="h-24 w-24 aspect-square mx-auto">
+              <UAvatar
+                class="w-full h-full"
+                size="3xl"
+                :src="member?.profileImageBase64"
+                :alt="member.fullName"
+                :ui="{
+                  rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+                }"
+              />
             </div>
 
             <div class="mt-4 mx-auto text-center">
