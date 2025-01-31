@@ -28,6 +28,7 @@ export function getAvailableClubRoles() {
 
 interface _Club extends UuidItem {
   name: string;
+  isActivated: boolean
   salesEnabled: boolean
   badgerToken?: string
   settings?: ClubSetting

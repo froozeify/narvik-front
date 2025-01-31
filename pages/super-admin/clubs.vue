@@ -52,6 +52,10 @@
   });
   const columns = [
     {
+      key: 'isActivated',
+      label: 'Activé'
+    },
+    {
       key: 'name',
       label: 'Nom',
       class: 'w-full'
@@ -106,7 +110,8 @@
     // We recreate the payload so we don't edit the settings
     let payload: WriteClub = {
       name: item.name,
-      salesEnabled: item.salesEnabled
+      salesEnabled: item.salesEnabled,
+      isActivated: item.isActivated
     }
 
     // We verify if it's a creation or an update
@@ -210,6 +215,10 @@
               </div>
             </template>
 
+            <template #isActivated-data="{ row }">
+              <UToggle :model-value="row.isActivated" />
+            </template>
+
             <template #name-data="{ row }">
               {{ row.name }}
             </template>
@@ -233,6 +242,9 @@
         <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
             <div class="flex gap-2 flex-col">
+              <UFormGroup label="Activé" name="sale">
+                <UToggle v-model="selectedItem.isActivated" />
+              </UFormGroup>
               <UFormGroup label="Nom" name="name" required>
                 <UInput v-model="selectedItem.name" />
               </UFormGroup>
