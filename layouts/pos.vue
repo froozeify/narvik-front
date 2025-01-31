@@ -72,6 +72,15 @@
 
 <template>
   <GenericLayoutAdmin :links="links">
+    <UAlert
+      v-if="!selfStore.selectedProfile?.club.salesEnabled"
+      class="mb-4"
+      icon="i-heroicons-link-slash"
+      color="red"
+      variant="subtle"
+      title="Lecture seule. Plugin non activé."
+      description="Pour pouvoir l'utiliser veuillez contacter le support."
+    />
     <slot/>
   </GenericLayoutAdmin>
 </template>
