@@ -11,13 +11,13 @@ import {
 import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
-import type {Club, ClubRole} from "~/types/api/item/club";
+import type {Club, ClubRole, WriteClub} from "~/types/api/item/club";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {FetchItemData} from "~/types/api/api";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 
-export default class ClubQuery extends AbstractQuery<Club, Club> {
+export default class ClubQuery extends AbstractQuery<Club, WriteClub> {
   rootPath = "clubs";
 
   async getCurrentClub(useCache: boolean = false) {
