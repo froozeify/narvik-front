@@ -7,7 +7,7 @@
 
 
   definePageMeta({
-    layout: "super-admin" //TODO: Change it for super admin
+    layout: "super-admin"
   });
 
 </script>
@@ -15,7 +15,7 @@
 <template>
   <div>
     <UCard>
-      <div class="text-xl font-bold">TODO Super admin page</div>
+      <div class="text-xl font-bold">TODO Super admin stats page</div>
     </UCard>
   </div>
 </template>
