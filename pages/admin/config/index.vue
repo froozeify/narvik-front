@@ -179,8 +179,8 @@ async function deleteLogo() {
 </script>
 
 <template>
-  <div class="grid gap-4 md:grid-cols-3">
-    <UCard class="md:col-span-3">
+  <div class="grid gap-4 md:grid-cols-4">
+    <UCard class="md:col-span-4">
       <div class="text-xl font-bold mb-4">Lien de connexion badger</div>
       <div>A mettre en favoris sur l'ordinateur accessible publiquement.</div>
       <div>Ce lien permet d'être automatiquement connecté en tant que badgeuse (accès seulement à la liste de présence).</div>
@@ -214,21 +214,8 @@ async function deleteLogo() {
       </div>
     </UCard>
 
-    <div>
+    <div class="md:col-span-2">
       <UCard class="h-fit">
-        <div class="text-xl font-bold mb-4">Activité correspondante au tir de contrôle</div>
-        <div>
-          <USelect
-            v-model="configState.selectedControlShootingActivity"
-            @change="controlShootingUpdated"
-            :options="activities"
-            option-attribute="name"
-            value-attribute="uuid"
-            placeholder="Tir de contrôle non défini" />
-        </div>
-      </UCard>
-
-      <UCard class="h-fit mt-4">
         <div class="text-xl font-bold mb-4">Activités exclus du compte des jours ouverts</div>
         <div>
           <USelectMenu
@@ -249,9 +236,21 @@ async function deleteLogo() {
         </div>
       </UCard>
 
+      <UCard class="h-fit mt-4">
+        <div class="text-xl font-bold mb-4">Activité correspondante au contrôle</div>
+        <div>
+          <USelect
+            v-model="configState.selectedControlShootingActivity"
+            @change="controlShootingUpdated"
+            :options="activities"
+            option-attribute="name"
+            value-attribute="uuid"
+            placeholder="Aucun contrôle défini" />
+        </div>
+      </UCard>
     </div>
 
-    <UCard>
+    <UCard class="md:col-span-2">
       <div class="text-xl font-bold mb-4">Logo</div>
       <div v-if="selectedProfile?.club.settings.logoBase64" class="mt-4 flex justify-center">
         <NuxtImg :src="selectedProfile.club.settings.logoBase64" class="w-48" />
