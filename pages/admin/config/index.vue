@@ -21,8 +21,6 @@ useHead({
 const toast = useToast()
 
 const selfStore = useSelfUserStore();
-const appConfigStore = useAppConfigStore();
-
 const { selectedProfile } = storeToRefs(selfStore)
 
 const clubSettingQuery = new ClubSettingQuery();
@@ -45,9 +43,6 @@ const logoUploading = ref(false)
 const state = reactive({
   file: undefined
 })
-
-// TODO: Change for clubLogo (when created in BE)
-// const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
 
 function getBadgerLoginPath(): string|undefined {
   if (!badgerSetting.value || !selectedProfile.value) {
@@ -136,51 +131,49 @@ async function getActivity(id: string) {
   return response.retrieved;
 }
 
-// async function uploadLogo(event) {
-//   const formData = getFileFormDataFromUInputChangeEvent(event);
-//
-//   if (!formData) {
-//     return;
-//   }
-//
-//   logoUploading.value = true
-//   const { created, error } = await globalSettingQuery.importLogo(formData)
-//   logoUploading.value = false
-//
-//   if (error) {
-//     return displayFileErrorToast(error.message)
-//   }
-//
-//   displayFileSuccessToast('Logo envoyé')
-//   await appConfigStore.refresh()
-//   siteLogo.value = appConfigStore.getLogo(false).value
-// }
-//
-// async function deleteLogo() {
-//   logoUploading.value = true
-//
-//   const formData = new FormData()
-//
-//   const { created, error } = await globalSettingQuery.importLogo(formData)
-//   logoUploading.value = false
-//
-//   if (error) {
-//     toast.add({
-//       title: "Erreur lors de la suppression du logo",
-//       description: error.message,
-//       color: "red"
-//     })
-//     return
-//   }
-//
-//   await appConfigStore.refresh()
-//   siteLogo.value = appConfigStore.getLogo(false).value
-//   toast.add({
-//     title: "Logo supprimé",
-//     color: "green"
-//   })
-//
-// }
+async function uploadLogo(event) {
+  if (!selectedProfile.value?.club.settings) return;
+
+  const formData = getFileFormDataFromUInputChangeEvent(event);
+
+  if (!formData) {
+    return;
+  }
+
+  logoUploading.value = true
+  const { created, error } = await clubSettingQuery.importLogo(selectedProfile.value.club.settings, formData)
+  logoUploading.value = false
+
+  if (error) {
+    return displayFileErrorToast(error.message)
+  }
+
+  displayFileSuccessToast('Logo envoyé')
+  await selfStore.refreshSelectedClub()
+}
+
+async function deleteLogo() {
+  if (!selectedProfile.value?.club.settings) return;
+
+  logoUploading.value = true
+
+  const formData = new FormData()
+
+  const { created, error } = await clubSettingQuery.importLogo(selectedProfile.value.club.settings, formData)
+  logoUploading.value = false
+
+  if (error) {
+    toast.add({
+      title: "Erreur lors de la suppression du logo",
+      description: error.message,
+      color: "red"
+    })
+    return
+  }
+
+  await selfStore.refreshSelectedClub()
+  displayFileSuccessToast('Logo supprimé')
+}
 
 
 </script>
@@ -258,40 +251,40 @@ async function getActivity(id: string) {
 
     </div>
 
-<!--    <UCard>-->
-<!--      <div class="text-xl font-bold mb-4">Logo</div>-->
-<!--      <div v-if="siteLogo" class="mt-4 flex justify-center">-->
-<!--        <img :src="siteLogo.base64" class="w-48" />-->
-<!--      </div>-->
+    <UCard>
+      <div class="text-xl font-bold mb-4">Logo</div>
+      <div v-if="selectedProfile?.club.settings.logoBase64" class="mt-4 flex justify-center">
+        <NuxtImg :src="selectedProfile.club.settings.logoBase64" class="w-48" />
+      </div>
 
-<!--      <UInput-->
-<!--          :loading="logoUploading"-->
-<!--          class="my-4"-->
-<!--          type="file"-->
-<!--          accept="image/png"-->
-<!--          icon="i-heroicons-paint-brush"-->
-<!--          v-model="state.file"-->
-<!--          @change="uploadLogo"-->
-<!--      />-->
+      <UInput
+          :loading="logoUploading"
+          class="my-4"
+          type="file"
+          accept="image/png"
+          icon="i-heroicons-paint-brush"
+          v-model="state.file"
+          @change="uploadLogo"
+      />
 
-<!--      <UPopover overlay v-if="siteLogo">-->
-<!--        <UButton color="red">-->
-<!--          Supprimer le logo-->
-<!--        </UButton>-->
+      <UPopover overlay v-if="selectedProfile?.club.settings.logo">
+        <UButton color="red">
+          Supprimer le logo
+        </UButton>
 
-<!--        <template #panel="{ close }">-->
-<!--          <div class="p-4 w-56 flex flex-col gap-4">-->
-<!--            <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>-->
+        <template #panel="{ close }">
+          <div class="p-4 w-56 flex flex-col gap-4">
+            <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
-<!--            <UButton color="red" @click="deleteLogo" class="mx-auto">-->
-<!--              Supprimer le logo-->
-<!--            </UButton>-->
-<!--          </div>-->
-<!--        </template>-->
+            <UButton color="red" @click="deleteLogo" class="mx-auto">
+              Supprimer le logo
+            </UButton>
+          </div>
+        </template>
 
-<!--      </UPopover>-->
+      </UPopover>
 
-<!--    </UCard>-->
+    </UCard>
   </div>
 </template>
 

@@ -8,6 +8,8 @@
 
   const isDark = isDarkMode()
 
+  const { selectedProfile } = storeToRefs(selfStore)
+
   // const, to avoid it being reactive and login back user
   const isAdmin = selfStore.isAdmin()
   const isBadger = selfStore.isBadger()
@@ -70,9 +72,10 @@
     class="backdrop-blur -mb-px sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-16 print:hidden">
     <nav class="container mx-auto p-4 flex justify-between h-full overflow-y-auto">
       <div class="flex gap-4 flex-shrink-0">
-        <NuxtLink v-if="siteLogo" to="/" class="flex align-middle">
+        <NuxtLink to="/" class="flex align-middle">
           <UTooltip text="Accueil">
-            <NuxtImg :src="siteLogo" class="w-7 object-contain"/>
+            <NuxtImg v-if="selectedProfile?.club.settings.logoBase64" :src="selectedProfile.club.settings.logoBase64" class="w-7 object-contain"/>
+            <NuxtImg v-else :src="siteLogo" class="w-7 object-contain"/>
           </UTooltip>
         </NuxtLink>
         <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="gray">Accueil</UButton>

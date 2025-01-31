@@ -249,6 +249,12 @@ export const useSelfUserStore = defineStore('selfUser', () => {
           const { retrieved: clubSettings } = await clubSettingQuery.get(retrievedClub.settings.uuid)
           if (clubSettings) {
             selectedProfile.value.club.settings = clubSettings
+
+            // We load the club logo
+            const image = await loadClubLogo()
+            if (image) {
+              selectedProfile.value.club.settings.logoBase64 = image
+            }
           }
         }
       }
@@ -260,6 +266,16 @@ export const useSelfUserStore = defineStore('selfUser', () => {
 
     const imageQuery = new ImageQuery();
     const { retrieved } = await imageQuery.getFromUrl(member.value.profileImage.privateUrl);
+
+    if (!retrieved || !retrieved.base64) return null
+
+    return retrieved.base64
+  }
+
+  async function loadClubLogo() {
+    if (!selectedProfile.value?.club.settings.logo?.publicUrl) return null;
+    const imageQuery = new ImageQuery();
+    const { retrieved } = await imageQuery.getFromUrl(selectedProfile.value.club.settings.logo.publicUrl);
 
     if (!retrieved || !retrieved.base64) return null
 
