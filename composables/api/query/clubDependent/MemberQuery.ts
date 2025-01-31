@@ -14,7 +14,7 @@ import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDe
 import type {ClubRole} from "~/types/api/item/club";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 
-export default class MemberQuery extends AbstractClubDependentQuery<Member> {
+export default class MemberQuery extends AbstractClubDependentQuery<Member, Member> {
   rootPath = "members";
 
   async updateRole(member: Member, role: ClubRole) {

@@ -2,7 +2,7 @@ import {usePut} from "~/composables/api/api";
 import type {Item} from "~/types/api/item";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
-export abstract class AbstractSortableQuery<T> extends AbstractClubDependentQuery<T> {
+export abstract class AbstractSortableQuery<R, W> extends AbstractClubDependentQuery<R, W> {
 
   async move(item: Item, direction: string) {
     return usePut(item["@id"] + "/move", {direction: direction});

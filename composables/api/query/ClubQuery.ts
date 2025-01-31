@@ -17,7 +17,7 @@ import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {FetchItemData} from "~/types/api/api";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 
-export default class ClubQuery extends AbstractQuery<Club> {
+export default class ClubQuery extends AbstractQuery<Club, Club> {
   rootPath = "clubs";
 
   async getCurrentClub(useCache: boolean = false) {

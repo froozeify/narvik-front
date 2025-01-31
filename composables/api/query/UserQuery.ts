@@ -11,7 +11,7 @@ import {
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {User} from "~/types/api/item/user";
 
-export default class UserQuery extends AbstractQuery<User> {
+export default class UserQuery extends AbstractQuery<User, User> {
   rootPath = "users";
 
   async passwordResetInitialise(email: string) {

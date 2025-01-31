@@ -3,7 +3,7 @@ import type {FetchAllData, FetchItemData} from "~/types/api/api";
 import type {Item} from "~/types/api/item";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 
-export abstract class AbstractQuery<T> {
+export abstract class AbstractQuery<R, W> {
 	protected abstract rootPath: string;
 
   protected getRootUrl(): string {
@@ -20,24 +20,24 @@ export abstract class AbstractQuery<T> {
     return profile.club["@id"]
   }
 
-	async get(id: string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<T>> {
-		return useFetchItem<T>(this.getRootUrl() + "/" + id, useCache, requireLogin);
+	async get(id: string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<R>> {
+		return useFetchItem<R>(this.getRootUrl() + "/" + id, useCache, requireLogin);
 	}
 
-	async getAll(urlParams?: URLSearchParams): Promise<FetchAllData<T>> {
+	async getAll(urlParams?: URLSearchParams): Promise<FetchAllData<R>> {
 		let url = this.getRootUrl();
 		if (urlParams) {
 			url += '?' + urlParams.toString()
 		}
-		return useFetchList<T>(url);
+		return useFetchList<R>(url);
 	}
 
 	async post(payload: Item) {
-		return useCreateItem<T>(this.getRootUrl(), payload)
+		return useCreateItem<W>(this.getRootUrl(), payload)
 	}
 
 	async patch(item: Item, payload: Item) {
-		return usePatchItem<T>(item, payload)
+		return usePatchItem<R>(item, payload)
 	}
 
 	async delete(item?: Item | null) {

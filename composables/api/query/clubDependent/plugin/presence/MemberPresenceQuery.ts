@@ -5,7 +5,7 @@ import {useFetchList, useGetCsv, usePost, useUploadFile} from "~/composables/api
 import type {Member} from "~/types/api/item/clubDependent/member";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
-export default class MemberPresenceQuery extends AbstractClubDependentQuery<MemberPresence> {
+export default class MemberPresenceQuery extends AbstractClubDependentQuery<MemberPresence, MemberPresence> {
     rootPath = "member-presences";
 
     async getAllCsv(urlParams?: URLSearchParams) {

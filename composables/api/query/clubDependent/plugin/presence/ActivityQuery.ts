@@ -3,7 +3,7 @@ import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/acti
 import {useCreateItem, usePatch} from "~/composables/api/api";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
-export default class ActivityQuery extends AbstractClubDependentQuery<Activity> {
+export default class ActivityQuery extends AbstractClubDependentQuery<Activity, Activity> {
     rootPath = "activities";
 
     async mergeTo(id: string, target: string) {

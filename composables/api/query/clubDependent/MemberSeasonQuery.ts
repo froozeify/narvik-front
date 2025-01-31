@@ -2,7 +2,7 @@ import type {Member} from "~/types/api/item/clubDependent/member";
 import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
-export default class MemberSeasonQuery extends AbstractClubDependentQuery<MemberSeason> {
+export default class MemberSeasonQuery extends AbstractClubDependentQuery<MemberSeason, MemberSeason> {
   rootPath = "seasons";
   protected activeMember: Member;
 

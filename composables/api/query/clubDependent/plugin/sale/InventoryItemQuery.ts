@@ -3,7 +3,7 @@ import {useFetchList} from "~/composables/api/api";
 import type {InventoryItemHistory} from "~/types/api/item/clubDependent/plugin/sale/inventoryItemHistory";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
-export default class InventoryItemQuery extends AbstractClubDependentQuery<InventoryItem> {
+export default class InventoryItemQuery extends AbstractClubDependentQuery<InventoryItem, InventoryItem> {
     rootPath = "inventory-items";
 
     async histories(id: string, urlParams?: URLSearchParams) {

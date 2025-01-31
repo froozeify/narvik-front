@@ -4,7 +4,7 @@ import {useFetchList} from "~/composables/api/api";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
-export default class ExternalPresenceQuery extends AbstractClubDependentQuery<ExternalPresence> {
+export default class ExternalPresenceQuery extends AbstractClubDependentQuery<ExternalPresence, ExternalPresence> {
     rootPath = "external-presences";
 
     async getPresentToday(): Promise<FetchAllData<ExternalPresence>> {
