@@ -1,15 +1,14 @@
 <script setup lang="ts">
 
-import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
 import type {GlobalSetting} from "~/types/api/item/globalSetting";
 import clipboard from "clipboardy";
 import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
-import type {Image} from "~/types/api/item/image";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useAppConfigStore} from "~/stores/useAppConfig";
-import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
 import {convertUuidToUrlUuid} from "~/utils/resource";
+import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting";
+import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
 
 definePageMeta({
   layout: "admin"
@@ -26,34 +25,16 @@ const appConfigStore = useAppConfigStore();
 
 const { selectedProfile } = storeToRefs(selfStore)
 
-const globalSettingQuery = new GlobalSettingQuery();
+const clubSettingQuery = new ClubSettingQuery();
 const activityQuery = new ActivityQuery();
 
 const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.badgerToken);
 
-const controlShootingSetting: Ref<GlobalSetting | undefined> = ref(undefined);
-const selectedControlShootingActivityValue: Ref<string | undefined> = ref(undefined);
+const configState = reactive({
+  selectedControlShootingActivity: selectedProfile.value?.club.settings.controlShootingActivity?.uuid,
+  excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays.map((a: Activity) => a.uuid)
+})
 const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
-
-const ignoredActivitiesOpeningStatsSetting: Ref<GlobalSetting | undefined> = ref(undefined);
-const excludedActivitiesFromCount: Ref<string[]> = ref([]);
-
-globalSettingQuery.get("CONTROL_SHOOTING_ACTIVITY_ID").then(value => {
-  controlShootingSetting.value = value.retrieved
-  if (controlShootingSetting.value && controlShootingSetting.value.value) {
-    getActivity(controlShootingSetting.value.value).then(actvt => {
-      selectedControlShootingActivity.value = actvt
-      selectedControlShootingActivityValue.value = actvt?.uuid
-    })
-  }
-})
-
-globalSettingQuery.get("IGNORED_ACTIVITIES_OPENING_STATS").then(value => {
-  ignoredActivitiesOpeningStatsSetting.value = value.retrieved
-  if (ignoredActivitiesOpeningStatsSetting.value && ignoredActivitiesOpeningStatsSetting.value.value) {
-    excludedActivitiesFromCount.value = JSON.parse(ignoredActivitiesOpeningStatsSetting.value.value)
-  }
-})
 
 const activities: Ref<Activity[] | undefined> = ref(undefined);
 activityQuery.getAll().then(value => {
@@ -65,7 +46,8 @@ const state = reactive({
   file: undefined
 })
 
-const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
+// TODO: Change for clubLogo (when created in BE)
+// const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
 
 function getBadgerLoginPath(): string|undefined {
   if (!badgerSetting.value || !selectedProfile.value) {
@@ -86,18 +68,19 @@ function copyBadgerLink() {
 }
 
 async function controlShootingUpdated() {
-  if (selectedControlShootingActivityValue.value) {
-    const activity = await getActivity(selectedControlShootingActivityValue.value);
-    selectedControlShootingActivity.value = activity
+  if (!selectedProfile.value?.club.settings) return;
+
+  if (configState.selectedControlShootingActivity) {
+    selectedControlShootingActivity.value = await getActivity(configState.selectedControlShootingActivity)
   }
 
-  if (!controlShootingSetting.value || !selectedControlShootingActivity.value) return;
+  if (!selectedControlShootingActivity.value) return;
 
-  const payload: GlobalSetting = {
-    value: selectedControlShootingActivity.value.uuid
+  const payload: WriteClubSetting = {
+    controlShootingActivity: selectedControlShootingActivity.value["@id"]
   }
 
-  let { updated, error } = await globalSettingQuery.patch(controlShootingSetting.value, payload);
+  let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
 
   if (error) {
     toast.add({
@@ -107,6 +90,8 @@ async function controlShootingUpdated() {
     });
     return;
   }
+
+  selfStore.refreshSelectedClub().then()
 
   toast.add({
     color: "green",
@@ -115,13 +100,19 @@ async function controlShootingUpdated() {
 }
 
 async function ignoredActivitiesDaysUpdated() {
-  if (!ignoredActivitiesOpeningStatsSetting.value || !excludedActivitiesFromCount.value) return;
+  if (!selectedProfile.value?.club.settings || !configState.excludedActivitiesFromOpeningDays) return;
 
-  const payload: GlobalSetting = {
-    value: JSON.stringify(excludedActivitiesFromCount.value)
+  const uris: string[] = []
+  for (const excludedActivity of configState.excludedActivitiesFromOpeningDays) {
+    uris.push(`${activityQuery.getRootUrl()}/${excludedActivity}`)
   }
 
-  let { updated, error } = await globalSettingQuery.patch(ignoredActivitiesOpeningStatsSetting.value, payload);
+  if (uris.length == 0) return;
+  const payload: WriteClubSetting = {
+    excludedActivitiesFromOpeningDays: uris
+  }
+
+  let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
 
   if (error) {
     toast.add({
@@ -131,6 +122,8 @@ async function ignoredActivitiesDaysUpdated() {
     });
     return;
   }
+
+  selfStore.refreshSelectedClub().then()
 
   toast.add({
     color: "green",
@@ -231,12 +224,9 @@ async function getActivity(id: string) {
     <div>
       <UCard class="h-fit">
         <div class="text-xl font-bold mb-4">Activité correspondante au tir de contrôle</div>
-        <div v-if="!controlShootingSetting" class="mt-4">
-          <USkeleton class="h-4 w-full" />
-        </div>
-        <div v-else>
+        <div>
           <USelect
-            v-model="selectedControlShootingActivityValue"
+            v-model="configState.selectedControlShootingActivity"
             @change="controlShootingUpdated"
             :options="activities"
             option-attribute="name"
@@ -247,12 +237,9 @@ async function getActivity(id: string) {
 
       <UCard class="h-fit mt-4">
         <div class="text-xl font-bold mb-4">Activités exclus du compte des jours ouverts</div>
-        <div v-if="!ignoredActivitiesOpeningStatsSetting" class="mt-4">
-          <USkeleton class="h-4 w-full" />
-        </div>
-        <div v-else>
+        <div>
           <USelectMenu
-            v-model="excludedActivitiesFromCount"
+            v-model="configState.excludedActivitiesFromOpeningDays"
             @change="ignoredActivitiesDaysUpdated"
             :options="activities"
             option-attribute="name"
@@ -260,8 +247,8 @@ async function getActivity(id: string) {
             multiple
           >
             <template #label>
-              <span v-if="excludedActivitiesFromCount && activities && excludedActivitiesFromCount.length" class="truncate">
-                {{ activities.filter(a => (a.uuid && excludedActivitiesFromCount?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
+              <span v-if="configState.excludedActivitiesFromOpeningDays && activities && configState.excludedActivitiesFromOpeningDays.length" class="truncate">
+                {{ activities.filter(a => (a.uuid && configState.excludedActivitiesFromOpeningDays?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
               </span>
               <span v-else>Aucune activités exclus</span>
             </template>

@@ -214,21 +214,8 @@ export const useSelfUserStore = defineStore('selfUser', () => {
         selectedProfile.value = retrieved.linkedProfiles.find( (profile) => profile.id === selectedProfile.value?.id)
       }
 
-      if (selectedProfile.value?.club) {
-        const clubQuery = new ClubQuery()
-        const { retrieved: retrievedClub } = await clubQuery.getCurrentClub()
-        if (retrievedClub) {
-          selectedProfile.value.club = retrievedClub
-
-          if (retrievedClub.settings?.uuid) {
-            const clubSettingQuery = new ClubSettingQuery()
-            const { retrieved: clubSettings } = await clubSettingQuery.get(retrievedClub.settings.uuid)
-            if (clubSettings) {
-              selectedProfile.value.club.settings = clubSettings
-            }
-          }
-        }
-      }
+      // We refresh the club in an async way
+      refreshSelectedClub()
 
       const memberQuery = new MemberQuery()
       member.value = selectedProfile.value?.member
@@ -248,6 +235,24 @@ export const useSelfUserStore = defineStore('selfUser', () => {
 
     // We refresh the config we got from the api
     appConfigStore.refresh()
+  }
+
+  async function refreshSelectedClub() {
+    if (selectedProfile.value?.club) {
+      const clubQuery = new ClubQuery()
+      const { retrieved: retrievedClub } = await clubQuery.getCurrentClub()
+      if (retrievedClub) {
+        selectedProfile.value.club = retrievedClub
+
+        if (retrievedClub.settings?.uuid) {
+          const clubSettingQuery = new ClubSettingQuery()
+          const { retrieved: clubSettings } = await clubSettingQuery.get(retrievedClub.settings.uuid)
+          if (clubSettings) {
+            selectedProfile.value.club.settings = clubSettings
+          }
+        }
+      }
+    }
   }
 
   async function loadProfileImage() {
@@ -348,6 +353,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     selectedProfile,
 
     refresh,
+    refreshSelectedClub,
     logout,
 
     isLogged,
