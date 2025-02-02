@@ -91,7 +91,7 @@
     isLoading.value = false
   }
 
-  function rowClicked(row: object) {
+  function rowClicked(row: Club) {
     selectedItem.value = {...row} // We make a shallow clone
     isVisible.value = true
   }
@@ -99,6 +99,7 @@
   async function createItem() {
     let item: WriteClub = {
       name: '',
+      isActivated: true,
       salesEnabled: true
     }
     selectedItem.value = item
@@ -107,12 +108,14 @@
   async function updateItem(item: WriteClub) {
     isLoading.value = true
 
-    // We recreate the payload so we don't edit the settings
+    // We recreate the payload so we don't edit the settings, badgerToken, ...
     let payload: WriteClub = {
       name: item.name,
       salesEnabled: item.salesEnabled,
-      isActivated: item.isActivated
+      isActivated: item.isActivated,
+      comment: item.comment
     }
+
 
     // We verify if it's a creation or an update
     let error: NuxtError | undefined = undefined
@@ -250,6 +253,9 @@
               </UFormGroup>
               <UFormGroup label="Vente" name="sale">
                 <UToggle v-model="selectedItem.salesEnabled" />
+              </UFormGroup>
+              <UFormGroup label="Commentaire" :error="selectedItem.comment ? (selectedItem.comment.length > 249 && 'Longueur maximum atteinte (250)') : ''">
+                <UTextarea v-model="selectedItem.comment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire"/>
               </UFormGroup>
             </div>
 

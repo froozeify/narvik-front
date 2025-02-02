@@ -31,6 +31,7 @@ interface _Club extends UuidItem {
   isActivated: boolean
   salesEnabled: boolean
   badgerToken?: string
+  comment?: string
   settings?: ClubSetting
 }
 
