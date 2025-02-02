@@ -3,10 +3,15 @@ import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/s
 import type {FormError} from "#ui/types";
 import {defineStore} from "pinia";
 
+interface CartItem {
+  item: InventoryItem,
+  quantity: number
+}
+
 export const useCartStore = defineStore('cart', () => {
   const searchQuery: Ref<string> = ref('')
 
-  const cart: Ref<Map<string, {item: InventoryItem, quantity: number}>> = ref(new Map())
+  const cart: Ref<CartItem[]> = ref([])
   const cartTotalItems = computed( () => {
     let total: number = 0
     cart.value.forEach( item => {
@@ -39,23 +44,33 @@ export const useCartStore = defineStore('cart', () => {
 
     searchQuery.value = '' // Since the item has been added to the cart, we revert to empty search
 
-    let cartItem = cart.value.get(item.uuid)
+    console.log(cart.value)
 
-    if (!cartItem) {
+    const itemIndex = cart.value.findIndex((cartItem) => cartItem.item.uuid === item.uuid)
+
+    let cartItem: CartItem | undefined = undefined
+
+    if (itemIndex < 0) {
       cartItem = { quantity: modifier, item: item }
     } else {
+      cartItem = cart.value[itemIndex]
       cartItem.quantity += modifier
     }
 
     if (cartItem.quantity <= 0) {
-      cart.value.delete(item.uuid)
+      cart.value = cart.value.filter(cartItem => cartItem.item.uuid !== item.uuid)
     } else {
-      cart.value.set(item.uuid, cartItem)
+      // New item
+      if (itemIndex < 0) {
+        cart.value.push(cartItem)
+      } else {
+        cart.value[itemIndex] = cartItem
+      }
     }
   }
 
   function emptyCart() {
-    cart.value.clear()
+    cart.value = []
     searchQuery.value = ''
     selectedPaymentMode.value = undefined
     cartComment.value = ''
@@ -114,4 +129,17 @@ export const useCartStore = defineStore('cart', () => {
     addCustomItemToCart,
     closeCustomItemModal,
 	}
+}, {
+  persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+
+    // We only save those attributes
+    pick: [
+      'cart',
+      'cartTotalItems',
+      'cartTotalPrice',
+      'cartComment',
+      'selectedPaymentMode',
+    ],
+  }
 })

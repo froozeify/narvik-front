@@ -292,13 +292,13 @@
         <div class="mt-4">
           <div class="flex text-xs align-center mt-1">
             <div class="flex-1"></div>
-            <UButton v-if="cart.size > 0" size="xs" @click="cartStore.emptyCart()">Vider le panier</UButton>
+            <UButton v-if="cart.length > 0" size="xs" @click="cartStore.emptyCart()">Vider le panier</UButton>
           </div>
-          <div v-if="cart.size < 1" class="text-center">
+          <div v-if="cart.length < 1" class="text-center">
             <i>Aucun articles</i>
           </div>
           <div class="overflow-y-auto max-h-[25vh] mt-2">
-            <div v-for="[id , cartItem] in cart" class="flex items-center gap-2 mb-1">
+            <div v-for="cartItem in cart" class="flex items-center gap-2 mb-1">
               <GenericStackedUpDown @changed="modifier => { cartStore.addToCart(cartItem.item, modifier) }" />
 
               <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ cartItem.quantity }}</div>
