@@ -28,6 +28,7 @@ export default defineNuxtConfig({
 
   piniaPluginPersistedstate: {
     storage: 'localStorage',
+    key: 'narvik_%id',
   },
 
   app: {
