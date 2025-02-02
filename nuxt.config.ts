@@ -26,6 +26,10 @@ export default defineNuxtConfig({
     '~/assets/css/main.scss'
   ],
 
+  piniaPluginPersistedstate: {
+    storage: 'localStorage',
+  },
+
   app: {
     head: {
       titleTemplate: 'Narvik',

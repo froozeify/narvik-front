@@ -131,8 +131,6 @@ export const useCartStore = defineStore('cart', () => {
 	}
 }, {
   persist: {
-    storage: piniaPluginPersistedstate.localStorage(),
-
     // We only save those attributes
     pick: [
       'cart',
