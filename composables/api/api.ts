@@ -31,6 +31,10 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
         Authorization: `Bearer ${jwtToken.value?.access?.token}`
       }
     }, options);
+
+    if (selfStore.selectedProfile?.id) {
+      overloadedOptions.headers.Profile = `${selfStore.selectedProfile.id}`
+    }
   }
 
   overloadedOptions = mergician({
@@ -60,6 +64,8 @@ export async function useLoginUser(email: string, password: string) {
   if (data) {
     const selfStore = useSelfUserStore()
     selfStore.setJwtSelfJwtTokenFromApiResponse(data)
+
+    await selfStore.refresh()
   }
 
   return { error };
@@ -73,6 +79,8 @@ export async function useLoginBadger(clubId: string, loginToken: string) {
 
   const selfStore = useSelfUserStore()
   selfStore.setJwtSelfJwtTokenFromApiResponse(data)
+
+  await selfStore.refresh()
 
   return true;
 }

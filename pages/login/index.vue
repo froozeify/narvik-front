@@ -40,21 +40,6 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
     return;
   }
 
-  try {
-    const selfStore = useSelfUserStore();
-    await selfStore.refresh();
-  } catch (e) {
-    toast.add({
-      color: "red",
-      title: "Erreur de connexion"
-    })
-    console.error(e)
-    isLoading.value = false
-    return;
-  }
-
-  isLoading.value = false
-  //TODO: For super admin redirect to super admin page
   if (selfStore.isSuperAdmin()) {
     navigateTo('/super-admin');
   }
