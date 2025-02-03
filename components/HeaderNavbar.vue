@@ -13,7 +13,9 @@
   // const, to avoid it being reactive and login back user
   const isAdmin = selfStore.isAdmin()
   const isBadger = selfStore.isBadger()
-  const isSupervisor = selfStore.hasSupervisorRole() && selfStore.selectedProfile
+  const isSupervisor = computed(() => {
+    return selfStore.hasSupervisorRole() && selectedProfile.value
+  })
 
   const isDesktopDisplay = isDesktop()
   const isTabletDisplay = isTablet()
@@ -74,7 +76,7 @@
       <div class="flex gap-4 flex-shrink-0">
         <NuxtLink to="/" class="flex align-middle">
           <UTooltip text="Accueil">
-            <NuxtImg v-if="selectedProfile?.club.settings.logoBase64" :src="selectedProfile.club.settings.logoBase64" class="w-7 object-contain"/>
+            <NuxtImg v-if="selectedProfile?.club?.settings.logoBase64" :src="selectedProfile.club.settings.logoBase64" class="w-7 object-contain"/>
             <NuxtImg v-else :src="siteLogo" class="w-7 object-contain"/>
           </UTooltip>
         </NuxtLink>
@@ -87,11 +89,14 @@
         <div v-if="isSupervisor">
           <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton>
         </div>
+        <div v-if="selfStore.isImpersonating">
+          <UButton color="orange" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
+        </div>
         <UDropdown :items="rightMenu">
           <UButton
             variant="ghost"
             color="gray"
-            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? selfStore.selectedProfile?.displayName : 'Pointeuse') : undefined">
+            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? selectedProfile?.displayName : 'Pointeuse') : undefined">
             <template #trailing>
               <UAvatar v-if="!isBadger"
                        size="xs"

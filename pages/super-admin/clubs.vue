@@ -7,6 +7,7 @@
   import type {NuxtError} from "#app";
   import {usePaginationValues} from "~/composables/api/list";
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
 
   definePageMeta({
     layout: "super-admin"
@@ -19,6 +20,8 @@
   const toast = useToast()
   const modal = useModal()
   const apiQuery = new ClubQuery();
+
+  const selfStore = useSelfUserStore()
 
   const apiItems: Ref<Club[]> = ref([])
   const isLoading = ref(true);
@@ -175,6 +178,16 @@
     return errors
   }
 
+  async function impersonate(club: Club) {
+    const impersonated = await selfStore.impersonateClub(club)
+    if (!impersonated) {
+      console.error('nop')
+      return
+    }
+
+    console.log('YEAH')
+  }
+
 </script>
 
 <template>
@@ -261,7 +274,7 @@
 
           </UCard>
 
-          <UButton v-if="selectedItem.uuid" color="green" block :loading="isLoading" @click="console.log('todo club impersonation')">Impersonifier</UButton>
+          <UButton v-if="selectedItem.uuid" color="green" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
