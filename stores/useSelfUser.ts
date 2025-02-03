@@ -11,7 +11,6 @@ import type {LinkedProfile} from "~/types/api/linkedProfile";
 import type {User} from "~/types/api/item/user";
 import {UserRole} from "~/types/api/item/user";
 import {type Club, ClubRole} from "~/types/api/item/club";
-import {AppCookie} from "~/types/cookie";
 import ClubQuery from "~/composables/api/query/ClubQuery";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
 
@@ -20,83 +19,20 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   const user: Ref<User | undefined> = ref(undefined)
   const selectedProfile: Ref<LinkedProfile | undefined> = ref(undefined)
 
+  const isImpersonating = ref(false)
+
   const appConfigStore = useAppConfigStore()
 
   // Session Management
   const selfJwtToken: Ref<JwtToken | null> = ref(null)
   const isRefreshingJwtToken = ref(false);
   function getSelfJwtToken(): Ref<JwtToken|null> {
-    if (selfJwtToken.value) {
-      // We remove the authCookie if he is not in the cookie
-      const authCookie = useCookie(AppCookie.access_token);
-      if (!authCookie || authCookie.value == undefined) {
-        selfJwtToken.value.access = undefined
-        refreshCookie(AppCookie.access_token)
-      }
-
-      const refreshTokenCookie = useCookie(AppCookie.refresh_token);
-      if (!refreshTokenCookie || refreshTokenCookie.value == undefined) {
-        selfJwtToken.value.refresh = undefined
-        refreshCookie(AppCookie.refresh_token)
-      }
-
-      return selfJwtToken
-    }
-
-    // Settings from cookies storage
-    let jwtToken: JwtToken|null = null;
-
-    const authCookie = useCookie(AppCookie.access_token);
-    if (authCookie && authCookie.value != undefined) {
-      jwtToken = new JwtToken();
-      jwtToken.access = JSON.parse(atob(authCookie.value));
-    }
-
-    const refreshTokenCookie = useCookie(AppCookie.refresh_token);
-    if (refreshTokenCookie && refreshTokenCookie.value != undefined) {
-      if (!jwtToken) {
-        jwtToken = new JwtToken()
-      }
-      jwtToken.refresh = JSON.parse(atob(refreshTokenCookie.value));
-    }
-
-    if (jwtToken) {
-      setSelfJwtToken(jwtToken)
-    }
-
     return selfJwtToken;
   }
 
   function setSelfJwtToken(payload: JwtToken) {
     // We update the selfJwtToken ref
     selfJwtToken.value = payload
-
-    if (payload.access) {
-      const expireDate = payload.access.date ?? dayjs().add(30, 'minutes').toDate()
-
-      const authCookie = useCookie(AppCookie.access_token, {
-        expires: new Date(expireDate),
-        httpOnly: false,
-        secure: true,
-        sameSite: true,
-      });
-      authCookie.value = btoa(JSON.stringify(payload.access))
-      refreshCookie(AppCookie.access_token)
-    }
-
-    if (payload.refresh) {
-      const expireRefreshDate = payload.refresh.date ?? dayjs().add(10, 'day').toDate()
-
-      // Expire at the date returned by the refresh token
-      const refreshTokenCookie = useCookie(AppCookie.refresh_token, {
-        expires: new Date(expireRefreshDate),
-        httpOnly: false,
-        secure: true,
-        sameSite: true,
-      });
-      refreshTokenCookie.value = btoa(JSON.stringify(payload.refresh))
-      refreshCookie(AppCookie.refresh_token)
-    }
   }
 
   function delay(time: number) {
@@ -127,7 +63,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     }
 
     // Access token is expired
-    if (!jwtToken.value.access || !jwtToken.value.access.token || (jwtToken.value.access && jwtToken.value.access.date < new Date() )) {
+    if (!jwtToken.value.access || !jwtToken.value.access.token || (jwtToken.value.access && dayjs(jwtToken.value.access?.date).isBefore() )) {
       if (!(jwtToken.value.refresh && jwtToken.value.refresh.token)) {
         return logJwtError("No refresh access token.")
       }
@@ -137,7 +73,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
         // We are already refreshing we wait
         await delay(100)
         // Taking to long to refresh we are in timeout
-        if (delayedCalled > 100) { // 10 secondes
+        if (delayedCalled > 100) { // 10 seconds
           return displayJwtError("Taking too long to refresh the token.", true);
         }
         return enhanceJwtTokenDefined(++delayedCalled);
@@ -207,7 +143,6 @@ export const useSelfUserStore = defineStore('selfUser', () => {
         return
       }
 
-      // TODO: In future get stored selected club from cookies
       if (selectedProfile.value === undefined) {
         selectedProfile.value = retrieved.linkedProfiles[0]
       } else {
@@ -261,6 +196,29 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     }
   }
 
+  async function impersonateClub(club: Club) {
+    if (!isSuperAdmin()) return false
+
+    const fakeProfile: LinkedProfile = {
+      id: 'sc-' + club.uuid,
+      club: club,
+      displayName: `${club.name}`,
+      role: ClubRole.Admin
+    }
+
+    selectedProfile.value = fakeProfile
+    await refresh()
+    isImpersonating.value = true
+
+    return true
+  }
+
+  async function stopImpersonation() {
+    selectedProfile.value = undefined
+    isImpersonating.value = false
+    await refresh()
+  }
+
   async function loadProfileImage() {
     if (!member.value || !member.value.profileImage?.privateUrl) return null;
 
@@ -289,14 +247,6 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     member.value = undefined
     user.value = undefined
     selectedProfile.value = undefined
-
-    const authCookie = useCookie(AppCookie.access_token);
-    authCookie.value = null
-    refreshCookie(AppCookie.access_token)
-
-    const refreshTokenCookie = useCookie(AppCookie.refresh_token);
-    refreshTokenCookie.value = null;
-    refreshCookie(AppCookie.refresh_token)
 
     // We refresh the config we got from the api
     appConfigStore.refresh(false)
@@ -368,6 +318,10 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     member,
     selectedProfile,
 
+    isImpersonating,
+    impersonateClub,
+    stopImpersonation,
+
     refresh,
     refreshSelectedClub,
     logout,
@@ -385,5 +339,16 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     enhanceJwtTokenDefined,
     displayJwtError,
     logJwtError,
+  }
+}, {
+  persist: {
+    // We only save those attributes
+    pick: [
+      // 'user',
+      // 'member',
+      'isImpersonating',
+      'selectedProfile.id',
+      'selfJwtToken',
+    ],
   }
 })
