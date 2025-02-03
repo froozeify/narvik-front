@@ -44,8 +44,6 @@ export const useCartStore = defineStore('cart', () => {
 
     searchQuery.value = '' // Since the item has been added to the cart, we revert to empty search
 
-    console.log(cart.value)
-
     const itemIndex = cart.value.findIndex((cartItem) => cartItem.item.uuid === item.uuid)
 
     let cartItem: CartItem | undefined = undefined

@@ -181,11 +181,9 @@
   async function impersonate(club: Club) {
     const impersonated = await selfStore.impersonateClub(club)
     if (!impersonated) {
-      console.error('nop')
+      console.error('Failed to impersonate.')
       return
     }
-
-    console.log('YEAH')
   }
 
 </script>
