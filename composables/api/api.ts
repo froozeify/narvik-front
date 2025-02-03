@@ -114,8 +114,8 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
   try {
     const data = await useApi<PagedCollection<T>>(resource, {
 
-      onResponse({ response }) {
-        hubUrl = extractHubURL(response);
+      onResponse(ctxt) {
+        hubUrl = extractHubURL(ctxt.response);
       },
     });
 
