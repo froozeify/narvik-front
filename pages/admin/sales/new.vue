@@ -124,7 +124,7 @@
         quantity: item.quantity
       }
 
-      if (isNaN(Number(key))) {
+      if (item.item['@id']) {
         payload.item = item.item['@id']
       } else {
         payload.itemName = item.item.name
