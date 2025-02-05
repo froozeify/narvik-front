@@ -8,7 +8,7 @@
 
   const isDark = isDarkMode()
 
-  const { selectedProfile } = storeToRefs(selfStore)
+  const { selectedProfile, user } = storeToRefs(selfStore)
 
   // const, to avoid it being reactive and login back user
   const isAdmin = selfStore.isAdmin()
@@ -96,7 +96,7 @@
           <UButton
             variant="ghost"
             color="gray"
-            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? selectedProfile?.displayName : 'Pointeuse') : undefined">
+            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? (selectedProfile?.displayName ?? user?.fullName) : 'Pointeuse') : undefined">
             <template #trailing>
               <UAvatar v-if="!isBadger"
                        size="xs"

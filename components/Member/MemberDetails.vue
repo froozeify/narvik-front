@@ -20,9 +20,6 @@ import { ArcElement, CategoryScale, Chart as ChartJS, Colors, DoughnutController
 import {Doughnut} from 'vue-chartjs'
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeasonQuery";
-import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
-import SeasonSelectModal from "~/components/Season/SeasonSelectModal.vue";
-import type {Season} from "~/types/api/item/season";
 import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
@@ -36,6 +33,10 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
     memberId: {
       type: String,
       required: false
+    },
+    self: {
+      type: Boolean,
+      default: false
     }
   });
 
