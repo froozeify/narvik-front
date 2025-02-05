@@ -387,6 +387,12 @@ function formatError(error: NuxtError<ItemError>): NuxtError<ItemError> {
   // We try setting the message based on the api error response
   if (error.data?.description) {
     error.message = error.data.description
+    return error
+  }
+
+  if (error.data?.detail) {
+    error.message = error.data.detail
+    return error
   }
 
   return error

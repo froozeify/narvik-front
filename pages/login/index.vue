@@ -63,13 +63,21 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
           <UInput v-model="state.password" type="password" />
         </UFormGroup>
 
-        <div class="flex justify-between">
-          <UButton type="submit" :loading="isLoading">
+        <div class="flex justify-end !-mt-0 ">
+          <UButton class="text-xs" v-if="notificationsModule && notificationsModule['enabled']" variant="link" @click="navigateTo('login/password-reset')">
+            Mot de passe oublié
+          </UButton>
+        </div>
+
+        <div class="flex flex-col justify-center gap-4">
+          <UButton block type="submit" :loading="isLoading">
             Connexion
           </UButton>
 
-          <UButton v-if="notificationsModule && notificationsModule['enabled']" variant="ghost" @click="navigateTo('login/password-reset')">
-            Mot de passe oublié
+          <UDivider label="Ou" />
+
+          <UButton block :disabled="isLoading" variant="soft" to="login/register">
+            S'enregistrer
           </UButton>
         </div>
       </UForm>

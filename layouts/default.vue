@@ -4,7 +4,7 @@
 <template>
   <div>
     <main class="min-h-full h-screen flex justify-center items-center">
-      <div class="container m-auto p-12 md:max-w-screen-md">
+      <div class="container m-auto p-4 md:p-12 md:max-w-screen-md">
         <slot/>
       </div>
     </main>
