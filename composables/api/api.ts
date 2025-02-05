@@ -35,6 +35,10 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
     if (selfStore.selectedProfile?.id) {
       overloadedOptions.headers.Profile = `${selfStore.selectedProfile.id}`
     }
+
+    if (selfStore.impersonatedUser) {
+      overloadedOptions.headers['X-Switch-User'] = selfStore.impersonatedUser
+    }
   }
 
   overloadedOptions = mergician({

@@ -20,6 +20,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   const selectedProfile: Ref<LinkedProfile | undefined> = ref(undefined)
 
   const isImpersonating = ref(false)
+  const impersonatedUser: Ref<string | undefined> = ref(undefined)
 
   const appConfigStore = useAppConfigStore()
 
@@ -213,10 +214,33 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     return true
   }
 
+  async function impersonateUser(userImpersonated: User) {
+    if (!isSuperAdmin()) return false
+
+    selectedProfile.value = undefined
+    member.value = undefined
+    user.value = userImpersonated
+    impersonatedUser.value = userImpersonated.email
+    await refresh()
+    isImpersonating.value = true
+
+    navigateTo('/') // We always send to the homepage
+
+    return true
+  }
+
+
   async function stopImpersonation() {
     selectedProfile.value = undefined
+    impersonatedUser.value = undefined
     isImpersonating.value = false
     await refresh()
+
+    if (isSuperAdmin()) {
+      navigateTo('/super-admin')
+    } else {
+      navigateTo('/admin')
+    }
   }
 
   async function loadProfileImage() {
@@ -319,7 +343,9 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     selectedProfile,
 
     isImpersonating,
+    impersonatedUser,
     impersonateClub,
+    impersonateUser,
     stopImpersonation,
 
     refresh,

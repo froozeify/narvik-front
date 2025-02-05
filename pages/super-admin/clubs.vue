@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-  import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
-  import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
   import type {FormError} from "#ui/types";
   import ClubQuery from "~/composables/api/query/ClubQuery";
   import type {Club, WriteClub} from "~/types/api/item/club";
@@ -256,13 +254,13 @@
         <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Activé" name="sale">
+              <UFormGroup label="Activé" name="isActivated">
                 <UToggle v-model="selectedItem.isActivated" />
               </UFormGroup>
               <UFormGroup label="Nom" name="name" required>
                 <UInput v-model="selectedItem.name" />
               </UFormGroup>
-              <UFormGroup label="Vente" name="sale">
+              <UFormGroup label="Vente" name="salesEnabled">
                 <UToggle v-model="selectedItem.salesEnabled" />
               </UFormGroup>
               <UFormGroup label="Commentaire" :error="selectedItem.comment ? (selectedItem.comment.length > 249 && 'Longueur maximum atteinte (250)') : ''">
