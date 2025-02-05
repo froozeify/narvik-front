@@ -18,10 +18,12 @@ const totalMembers: Ref<number> = ref(0);
 
 const query = ref('');
 const onlyCurrentSeason = ref(true);
+const onlyWithLicence = ref(true);
 
 
 const members: Ref<Member[]> = ref([]);
 const memberQuery = new MemberQuery();
+const createMemberModal = ref(false)
 
 getMembers();
 
@@ -47,7 +49,6 @@ function getMembers() {
   const urlParams = new URLSearchParams({
     page: page.value.toString(),
     itemsPerPage: itemsPerPage.value.toString(),
-    'exists[licence]': 'true',
   });
 
   urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
@@ -59,6 +60,10 @@ function getMembers() {
 
   if (onlyCurrentSeason.value) {
     urlParams.append('currentSeason[memberSeasons.season]', 'true');
+  }
+
+  if (onlyWithLicence.value) {
+    urlParams.append('exists[licence]', 'true');
   }
 
   memberQuery.getAll(urlParams).then(value => {
@@ -90,29 +95,44 @@ function queryUpdated() {
   }, 800);
 }
 
-function rowClicked(row: Member) {
-  navigateTo(`/admin/members/${convertUuidToUrlUuid(row.uuid)}`)
+function displayMemberPage(member: Member) {
+  navigateTo(`/admin/members/${convertUuidToUrlUuid(member.uuid)}`)
 }
-
 
 </script>
 
 <template>
-  <div>
-    <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700 items-center">
-      <UInput
-          v-model="query"
-          @update:model-value="queryUpdated()"
-          placeholder="Rechercher..."  />
-      <div class="flex-1"></div>
+  <div class="flex flex-col gap-4">
+    <UCard>
+      <div class="flex gap-2 flex-col flex-wrap sm:flex-row">
+        <div class="flex flex-col justify-center">
+          <UInput
+            v-model="query"
+            @update:model-value="queryUpdated()"
+            placeholder="Rechercher..."  />
+        </div>
+        <div class="flex-1"></div>
 
-      <div class="inline-flex">
-        <span class="mr-4 text-sm">Saison actuelle</span>
-        <UToggle v-model="onlyCurrentSeason" @update:model-value="page = 1; getMembers()" />
+        <div class="flex gap-2 flex-col">
+          <UCheckbox label="Saison actuelle" v-model="onlyCurrentSeason" @change="page = 1; getMembers()" />
+          <UCheckbox label="Licence" v-model="onlyWithLicence" @change="page = 1; getMembers()" />
+
+          <!--        <UFormGroup label="Licence">-->
+          <!--          <UToggle v-model="onlyWithLicence" @update:model-value="page = 1; getMembers()" />-->
+          <!--        </UFormGroup>-->
+        </div>
       </div>
-    </div>
+    </UCard>
 
-    <UTable
+    <UCard>
+      <div class="flex gap-2 flex-col flex-wrap sm:flex-row">
+        <div class="flex-1"></div>
+        <div class="flex justify-end">
+          <UButton @click="createMemberModal = true" icon="i-heroicons-plus"></UButton>
+        </div>
+      </div>
+
+      <UTable
         :loading="isLoading"
         class="w-full"
         v-model:sort="sort"
@@ -120,20 +140,30 @@ function rowClicked(row: Member) {
         @update:sort="getMembers()"
         :columns="columns"
         :rows="members"
-        @select="rowClicked">
-      <template #empty-state>
-        <div class="flex flex-col items-center justify-center py-6 gap-3">
-          <span class="italic text-sm">Aucun membres trouvés.</span>
-        </div>
-      </template>
+        @select="displayMemberPage">
+        <template #empty-state>
+          <div class="flex flex-col items-center justify-center py-6 gap-3">
+            <span class="italic text-sm">Aucun membres trouvés.</span>
+          </div>
+        </template>
 
-    </UTable>
+      </UTable>
 
-    <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMembers()" />
-      <UPagination v-model="page" @update:model-value="getMembers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMembers" />
-    </div>
+      <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+        <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMembers()" />
+        <UPagination v-model="page" @update:model-value="getMembers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMembers" />
+      </div>
+    </UCard>
   </div>
+
+  <UModal
+    v-model="createMemberModal">
+    <UCard>
+      <MemberForm
+        @updated="(value) => {createMemberModal = false; displayMemberPage(value) }"
+      />
+    </UCard>
+  </UModal>
 </template>
 
 <style scoped lang="scss">

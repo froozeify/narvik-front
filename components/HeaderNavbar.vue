@@ -76,7 +76,7 @@
       <div class="flex gap-4 flex-shrink-0">
         <NuxtLink to="/" class="flex align-middle">
           <UTooltip text="Accueil">
-            <NuxtImg v-if="selectedProfile?.club?.settings.logoBase64" :src="selectedProfile.club.settings.logoBase64" class="w-7 object-contain"/>
+            <NuxtImg v-if="selectedProfile?.club?.settings?.logoBase64" :src="selectedProfile.club.settings.logoBase64" class="w-7 object-contain"/>
             <NuxtImg v-else :src="siteLogo" class="w-7 object-contain"/>
           </UTooltip>
         </NuxtLink>

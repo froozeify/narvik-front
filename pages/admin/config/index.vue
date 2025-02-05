@@ -252,7 +252,7 @@ async function deleteLogo() {
 
     <UCard class="md:col-span-2">
       <div class="text-xl font-bold mb-4">Logo</div>
-      <div v-if="selectedProfile?.club.settings.logoBase64" class="mt-4 flex justify-center">
+      <div v-if="selectedProfile?.club?.settings?.logoBase64" class="mt-4 flex justify-center">
         <NuxtImg :src="selectedProfile.club.settings.logoBase64" class="w-48" />
       </div>
 

@@ -22,6 +22,7 @@ useHead({
     <footer class="print:hidden mb-4">
       <FooterCopyright />
     </footer>
+    <UModals />
     <UNotifications />
   </div>
 </template>

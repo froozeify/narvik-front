@@ -68,7 +68,7 @@ async function onError(event: FormErrorEvent) {
 
 // Api Query
 
-async function updateItem() {
+async function submitItem() {
   isUpdating.value = true
   const isCreate = !item.value.uuid
 
@@ -109,7 +109,7 @@ async function updateItem() {
 </script>
 
 <template>
-  <UForm class="flex gap-2 flex-col" :state="item" :validate="validate" @submit="updateItem" @error="onError">
+  <UForm class="flex gap-2 flex-col" :state="item" :validate="validate" @submit="submitItem" @error="onError">
     <div class="flex justify-between">
       <UFormGroup label="Genre" name="gender">
         <USelect v-model="item.gender" :options="[{name: 'Homme', value: 'M'}, {name: 'Femme', value: 'F'}]" option-attribute="name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
