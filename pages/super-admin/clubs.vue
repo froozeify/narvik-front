@@ -33,10 +33,10 @@
   const searchQuery: Ref<string> = ref('')
 
   // Side menu visible
-  const isVisible = ref(false);
+  const isSideVisible = ref(false);
   // We watch the selected item so we close the side menu if unselected
   watch(selectedItem, (value, oldValue) => {
-    isVisible.value = value !== undefined
+    isSideVisible.value = value !== undefined
   })
 
   let inputTimer: NodeJS.Timeout;
@@ -104,7 +104,7 @@
 
   function rowClicked(row: Club) {
     selectedItem.value = {...row} // We make a shallow clone
-    isVisible.value = true
+    isSideVisible.value = true
   }
 
   async function createItem() {
@@ -114,6 +114,7 @@
       salesEnabled: true
     }
     selectedItem.value = item
+    isSideVisible.value = true
   }
 
   async function updateItem(item: WriteClub) {
@@ -193,11 +194,10 @@
       return
     }
   }
-
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedItem = undefined;" :has-side-content="isVisible" :mobile-side-title="selectedItem?.name" tabindex="-1">
+  <GenericLayoutContentWithSlideover v-model="isSideVisible" tabindex="-1">
     <template #main>
       <UCard>
         <div>
@@ -264,6 +264,8 @@
 
     <template #side>
       <template v-if="selectedItem">
+        <UButton v-if="selectedItem.uuid" class="mb-4" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
+
         <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
             <div class="flex gap-2 flex-col relative">
@@ -298,8 +300,6 @@
 
           </UCard>
 
-          <UButton v-if="selectedItem.uuid" color="green" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
-
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
           <UButton
@@ -320,5 +320,5 @@
 
       </template>
     </template>
-  </GenericLayoutContentWithStickySide>
+  </GenericLayoutContentWithSlideover>
 </template>

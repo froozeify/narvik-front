@@ -254,6 +254,10 @@ async function impersonate(user: User) {
 
     <template #side>
       <template v-if="selectedItem">
+        <UButton v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">
+          Impersonifier
+        </UButton>
+
         <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate"
                class="flex flex-col gap-4">
           <UCard>
@@ -274,10 +278,6 @@ async function impersonate(user: User) {
             </div>
 
           </UCard>
-
-          <UButton v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin" color="green" block :loading="isLoading" @click="impersonate(selectedItem)">
-            Impersonifier
-          </UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
