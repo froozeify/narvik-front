@@ -39,3 +39,22 @@ export function pathsMatch(paths: string[], path: string): boolean {
   });
   return pathMatched;
 }
+
+export function formatErrorFromApiResponse(response: object): object {
+  if (!('data' in response)) {
+    return response
+  }
+
+  // We try setting the message based on the api error response
+  if ('description' in response.data) {
+    response.message = response.data.description
+    return response
+  }
+
+  if ('detail' in response.data) {
+    response.message = response.data.detail
+    return response
+  }
+
+  return response
+}

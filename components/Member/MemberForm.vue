@@ -55,7 +55,6 @@ const validate = (state: Member): FormError[] => {
 
   if (!state.firstname) errors.push({ path: 'firstname', message: 'Champ requis' })
   if (!state.lastname) errors.push({ path: 'lastname', message: 'Champ requis' })
-  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
 
   return errors
 }
@@ -146,7 +145,7 @@ async function submitItem() {
       <UInput v-model="item.firstname" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 
-    <UFormGroup label="Email" name="email" required>
+    <UFormGroup label="Email" name="email">
       <UInput v-model="item.email" type="email" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormGroup>
 

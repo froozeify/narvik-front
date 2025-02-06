@@ -17,7 +17,7 @@ const sort = ref({
 const totalMembers: Ref<number> = ref(0);
 
 const query = ref('');
-const onlyCurrentSeason = ref(true);
+const onlyCurrentSeason = ref(false);
 const onlyWithLicence = ref(true);
 
 

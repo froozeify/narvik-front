@@ -7,7 +7,7 @@ import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/us
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import type {NuxtError} from "#app";
 import type {ItemError} from "~/types/api/itemError";
-import {decodeUrlUuid} from "~/utils/resource";
+import {decodeUrlUuid, formatErrorFromApiResponse} from "~/utils/resource";
 
 export const MIME_TYPE = "application/ld+json";
 export const MIME_TYPE_JSON = "application/json";
@@ -106,7 +106,7 @@ export async function usePostRawJson(path: string, payload?: object) {
     });
 
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError
   }
 
   return {
@@ -135,7 +135,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
     view = data["view"];
     totalItems = data["totalItems"];
   } catch (e) {
-    error = formatError(e as NuxtError<ItemError>)
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -163,7 +163,7 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false, r
 
     retrieved = data as T;
   } catch (e) {
-    error = formatError(e as NuxtError<ItemError>)
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
 
@@ -186,7 +186,7 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
 
     created = data as T;
   } catch (e) {
-    error = formatError(e as NuxtError<ItemError>)
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -211,7 +211,7 @@ export async function useUploadFile(resource: string, payload: FormData, require
 
     created = data as Object;
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError
   }
 
   return {
@@ -236,7 +236,7 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
 
     updated = data as T;
   } catch (e) {
-    error = formatError(e as NuxtError<ItemError>)
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -257,7 +257,7 @@ export async function useGetCsv(path: string) {
       },
     });
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError
   }
 
   return {
@@ -283,7 +283,7 @@ export async function usePost<T>(path: string, payload: object) {
 
     item = data as T;
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError
   }
 
   return {
@@ -306,7 +306,7 @@ export async function usePut(path: string, payload: object) {
       },
     });
   } catch (e) {
-    error = formatError(e as NuxtError<ItemError>)
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -330,7 +330,7 @@ export async function usePatch<T>(path: string, payload: object) {
       },
     });
   } catch (e) {
-    error = formatError(e as NuxtError<ItemError>)
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -355,7 +355,7 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
 
     updated = data as T;
   } catch (e) {
-    error = formatError(e as NuxtError<ItemError>)
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -379,25 +379,10 @@ export async function useDeleteItem(item?: Item | null) {
       method: "DELETE",
     });
   } catch (e) {
-    error = e as Error
+    error = formatErrorFromApiResponse(e as object) as Error
   }
 
   return {
     error,
   };
-}
-
-function formatError(error: NuxtError<ItemError>): NuxtError<ItemError> {
-  // We try setting the message based on the api error response
-  if (error.data?.description) {
-    error.message = error.data.description
-    return error
-  }
-
-  if (error.data?.detail) {
-    error.message = error.data.detail
-    return error
-  }
-
-  return error
 }
