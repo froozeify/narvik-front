@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import type {PropType, Ref} from "vue";
-import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
-import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
-import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
-import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
 import type {FormError, FormErrorEvent} from "#ui/types";
 import type {Member} from "~/types/api/item/clubDependent/member";
 import type {Season} from "~/types/api/item/season";
-import SeasonQuery from "~/composables/api/query/SeasonQuery";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 
 const props = defineProps({

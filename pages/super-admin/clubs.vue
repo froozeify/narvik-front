@@ -34,10 +34,6 @@
 
   // Side menu visible
   const isSideVisible = ref(false);
-  // We watch the selected item so we close the side menu if unselected
-  watch(selectedItem, (value, oldValue) => {
-    isSideVisible.value = value !== undefined
-  })
 
   let inputTimer: NodeJS.Timeout;
   async function searchQueryUpdated() {
@@ -143,6 +139,7 @@
     }
 
     isLoading.value = false
+    isSideVisible.value = false
 
     if (apiError) {
       toast.add({
@@ -193,6 +190,7 @@
       console.error('Failed to impersonate.')
       return
     }
+    navigateTo('/admin')
   }
 </script>
 
@@ -245,7 +243,7 @@
             </template>
 
             <template #renewDate-data="{ row }">
-              {{ formatDateReadable(row.renewDate) }}
+              <p :class="dayjs().isAfter(dayjs(row.renewDate).subtract(14, 'days')) ? 'text-red-500 font-bold' : ''">{{ formatDateReadable(row.renewDate) }}</p>
             </template>
 
             <template #actions-data="{ row }">
@@ -273,11 +271,16 @@
                 <UButton
                   icon="i-heroicons-calendar-days-20-solid"
                   :label="formatDateReadable(selectedItem.renewDate?.toString()) || 'Choisir une date'"
-                  @click="modal.open(ModalClubSelectRenewDate, {
+                  @click="isSideVisible = false; modal.open(ModalClubSelectRenewDate, {
                     item: selectedItem,
                     onSelected(date: Date|undefined) {
                       if (selectedItem) {
                         selectedItem.renewDate = date
+                        if (selectedItem.uuid) {
+                          updateItem(selectedItem)
+                        } else {
+                          isSideVisible = true // We reopen the slide
+                        }
                       }
                     }
                   })"

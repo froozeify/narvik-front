@@ -116,10 +116,6 @@ function displayMemberPage(member: Member) {
         <div class="flex gap-2 flex-col">
           <UCheckbox label="Saison actuelle" v-model="onlyCurrentSeason" @change="page = 1; getMembers()" />
           <UCheckbox label="Licence" v-model="onlyWithLicence" @change="page = 1; getMembers()" />
-
-          <!--        <UFormGroup label="Licence">-->
-          <!--          <UToggle v-model="onlyWithLicence" @update:model-value="page = 1; getMembers()" />-->
-          <!--        </UFormGroup>-->
         </div>
       </div>
     </UCard>

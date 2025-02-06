@@ -205,8 +205,12 @@
       <GenericStatCard
         :title="inventoryItem?.canBeSold ? 'Vente activée' : 'Vente désactivée' "
         :value-class="inventoryItem?.canBeSold ? 'text-green-600' : 'text-red-600'"
-        :value="inventoryItem?.canBeSold ? '✔' : '✖' "
         :loading="isLoading">
+        <template #value>
+          <UIcon
+            :name="inventoryItem?.canBeSold ? 'i-heroicons-check': 'i-heroicons-x-mark'"
+          />
+        </template>
       </GenericStatCard>
     </div>
 

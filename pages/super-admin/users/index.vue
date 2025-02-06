@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import type {FormError} from "#ui/types";
-import ClubQuery from "~/composables/api/query/ClubQuery";
-import type {Club, WriteClub} from "~/types/api/item/club";
 import type {NuxtError} from "#app";
 import {usePaginationValues} from "~/composables/api/list";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {type User, UserRole} from "~/types/api/item/user";
+import {convertUuidToUrlUuid} from "~/utils/resource";
 
 definePageMeta({
   layout: "super-admin"
@@ -31,14 +30,9 @@ const selectedItem: Ref<User | undefined> = ref(undefined)
 const searchQuery: Ref<string> = ref('')
 
 // Side menu visible
-const isVisible = ref(false);
-// We watch the selected item so we close the side menu if unselected
-watch(selectedItem, (value, oldValue) => {
-  isVisible.value = value !== undefined
-})
+const isSideVisible = ref(false);
 
 let inputTimer: NodeJS.Timeout;
-
 async function searchQueryUpdated() {
   clearTimeout(inputTimer);
   inputTimer = setTimeout(async () => {
@@ -62,7 +56,6 @@ const columns = [
   {
     key: 'fullName',
     label: 'Nom',
-    class: 'w-full'
   },
   {
     key: 'email',
@@ -101,7 +94,7 @@ async function getItemsPaginated() {
 
 function rowClicked(row: User) {
   selectedItem.value = {...row} // We make a shallow clone
-  isVisible.value = true
+  isSideVisible.value = true
 }
 
 async function createItem() {
@@ -109,76 +102,7 @@ async function createItem() {
     email: '',
   }
   selectedItem.value = item
-}
-
-async function updateItem(item: User) {
-  isLoading.value = true
-
-  // We recreate the payload so we don't edit the settings, badgerToken, ...
-  let payload: User = {
-    email: item.email,
-    firstname: item.firstname,
-    lastname: item.lastname,
-    accountActivated: item.accountActivated,
-  }
-
-
-  // We verify if it's a creation or an update
-  let error: NuxtError | undefined = undefined
-  if (!item.uuid) {
-    await apiQuery.post(payload).then(value => {
-      error = value.error
-      selectedItem.value = value.created
-    });
-  } else { // Update
-    await apiQuery.patch(item, payload).then(value => {
-      error = value.error
-    });
-  }
-
-  isLoading.value = false
-
-  if (error) {
-    toast.add({
-      color: "red",
-      title: !item.uuid ? "La création a échouée" : "La modification a échouée",
-      description: error.message
-    });
-    return;
-  }
-
-  toast.add({
-    color: "green",
-    title: !item.uuid ? "Utilisateur crée" : "Utilisateur modifié",
-  });
-
-  // We refresh the list
-  await getItemsPaginated();
-}
-
-async function deleteItem() {
-  isLoading.value = true
-  const {error} = await apiQuery.delete(selectedItem.value)
-  isLoading.value = false
-
-  if (error) {
-    toast.add({
-      color: "red",
-      title: "La suppression a échouée",
-      description: error.message
-    });
-    return;
-  }
-
-  selectedItem.value = undefined
-  // We refresh the list
-  await getItemsPaginated();
-}
-
-const validate = (state: any): FormError[] => {
-  const errors = []
-  if (!state.email) errors.push({path: 'email', message: 'Champ requis'})
-  return errors
+  isSideVisible.value = true
 }
 
 async function impersonate(user: User) {
@@ -192,9 +116,7 @@ async function impersonate(user: User) {
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="isVisible = false; selectedItem = undefined;"
-                                      :has-side-content="isVisible" :mobile-side-title="selectedItem?.fullName"
-                                      tabindex="-1">
+  <GenericLayoutContentWithSlideover v-model="isSideVisible" tabindex="-1">
     <template #main>
       <UCard>
         <div>
@@ -239,7 +161,9 @@ async function impersonate(user: User) {
             </template>
 
             <template #actions-data="{ row }">
-
+              <div class="text-right">
+                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+              </div>
             </template>
 
           </UTable>
@@ -253,51 +177,23 @@ async function impersonate(user: User) {
     </template>
 
     <template #side>
-      <template v-if="selectedItem">
+      <div v-if="selectedItem" class="flex flex-col gap-4">
         <UButton v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">
           Impersonifier
         </UButton>
 
-        <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate"
-               class="flex flex-col gap-4">
-          <UCard>
-            <div class="flex gap-2 flex-col">
-              <UFormGroup v-if="selectedItem.role !== UserRole.SuperAdmin" label="Activé" name="accountActivated">
-                <UToggle v-model="selectedItem.accountActivated"/>
-              </UFormGroup>
-              <UFormGroup label="Email" name="email" required>
-                <UInput v-model="selectedItem.email" type="email" />
-              </UFormGroup>
-              <UFormGroup label="Prénom" name="firstname">
-                <UInput v-model="selectedItem.firstname"/>
-              </UFormGroup>
-              <UFormGroup label="Nom" name="lastname">
-                <UInput v-model="selectedItem.lastname"/>
-              </UFormGroup>
-              <GenericItemTimestampInfo :item="selectedItem" />
-            </div>
+        <UButton
+          v-if="selectedItem.uuid"
+          block
+          :to="`/super-admin/users/${convertUuidToUrlUuid(selectedItem.uuid)}`"
+        >
+          Voir en détail
+        </UButton>
 
-          </UCard>
-
-          <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
-
-          <UButton
-            v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin"
-            block
-            color="red"
-            :loading="isLoading"
-            @click="modal.open(ModalDeleteConfirmation, {
-              onDelete() {
-                modal.close()
-                deleteItem()
-              }
-            })"
-          >
-            Supprimer
-          </UButton>
-        </UForm>
-
-      </template>
+        <UCard>
+          <UserForm :item="selectedItem" @updated="(value) => {selectedItem = value; getItemsPaginated()}" :isList="true" />
+        </UCard>
+      </div>
     </template>
-  </GenericLayoutContentWithStickySide>
+  </GenericLayoutContentWithSlideover>
 </template>

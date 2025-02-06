@@ -3,8 +3,8 @@ import type {LinkedProfile} from "~/types/api/linkedProfile";
 import type {TimestampItem} from "~/types/api/timestampItem";
 
 export enum UserRole {
-  User = 'ROLE_USER',
   SuperAdmin = 'ROLE_SUPER_ADMIN',
+  User = 'ROLE_USER',
 
   Badger = 'ROLE_BADGER',
 }
