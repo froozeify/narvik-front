@@ -21,6 +21,38 @@
 
 <template>
   <div>
+    <div v-if="user" class="w-1/2 mb-4">
+      <UCard class="mr-4">
+        <div class="text-xl font-bold">Mon compte</div>
+        <div class="flex flex-col gap-4 relative">
+
+          <div class="h-24 w-24 aspect-square self-center">
+            <UAvatar
+              class="w-full h-full"
+              size="3xl"
+              :alt="user.fullName"
+              :ui="{
+                rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+              }"
+            />
+          </div>
+
+          <div class="text-center text-2xl font-bold">
+            {{ user.fullName }}
+          </div>
+
+          <div class="flex flex-col justify-center">
+
+            <div class="flex justify-center items-center">
+              <UIcon class="mr-2" name="i-heroicons-at-symbol" />
+              <UButton variant="link" :to="'mailto:' + user.email">{{ user.email }}</UButton>
+            </div>
+          </div>
+
+        </div>
+      </UCard>
+    </div>
+
     <div class="flex flex-col md:flex-row justify-between">
       <div v-if="selectedProfile?.club" class="text-xl font-bold">{{ selectedProfile?.club.name }}</div>
       <div class="flex-1"></div>
@@ -31,6 +63,7 @@
         Changer de profil
       </UButton>
     </div>
+
     <MemberDetails v-if="member" :member="member" />
     <UCard v-else class="text-center">
       <div class="text-xl font-bold">Compte liée à aucun club</div>

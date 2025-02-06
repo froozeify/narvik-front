@@ -25,6 +25,14 @@ export default class MemberQuery extends AbstractClubDependentQuery<Member, Memb
     return usePatch<Member>(`${member["@id"]}/role`, payload)
   }
 
+  async linkWithUser(member: Member, email: String) {
+    let payload = {
+      email: email
+    }
+
+    return usePatch(`${member["@id"]}/link`, payload)
+  }
+
   async search(query: string) {
     return usePost<Member[]>(`${this.getRootUrl()}/-/search`, {query});
   }

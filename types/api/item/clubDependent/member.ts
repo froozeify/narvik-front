@@ -12,6 +12,7 @@ export interface Member extends UuidItem, ClubLinkedItem {
   plainPassword?: string;
 
   role?: ClubRole
+  linkedEmail?: string
 
   email?: string;
   licence?: string;

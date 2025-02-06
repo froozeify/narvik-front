@@ -21,6 +21,8 @@ import {Doughnut} from 'vue-chartjs'
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeasonQuery";
 import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
+import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
+import MemberEditLinkedEmailModal from "~/components/Member/MemberEditLinkedEmailModal.vue";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
@@ -506,7 +508,28 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 
         <div class="flex-1"></div>
 
-        <div class="flex flex-1 justify-between lg:justify-end gap-2">
+        <div>
+          <UButton
+            v-if="isAdmin"
+            icon="i-heroicons-pencil-square"
+            color="orange"
+            @click="modal.open(MemberEditLinkedEmailModal, {
+              member: member,
+              onUpdated() {
+                loadItem()
+              }
+            })"
+          >
+            <template v-if="member.linkedEmail">
+              Changer le compte lié
+            </template>
+            <template v-else>
+              Lier à un compte existant
+            </template>
+          </UButton>
+        </div>
+
+        <div class="flex justify-between lg:justify-end gap-2">
           <UButton
             v-if="isAdmin"
             icon="i-heroicons-pencil-square"
