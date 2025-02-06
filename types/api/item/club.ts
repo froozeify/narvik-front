@@ -1,5 +1,6 @@
 import type {UuidItem} from "~/types/api/uuidItem";
 import type {ClubSetting} from "~/types/api/item/clubDependent/clubSetting";
+import type {TimestampItem} from "~/types/api/timestampItem";
 
 export enum ClubRole {
   Badger = 'CLUB_BADGER',
@@ -26,13 +27,14 @@ export function getAvailableClubRoles() {
   ]
 }
 
-interface _Club extends UuidItem {
+interface _Club extends UuidItem, TimestampItem {
   name: string;
   isActivated: boolean
   salesEnabled: boolean
   badgerToken?: string
   comment?: string
   settings?: ClubSetting
+  renewDate?: Date
 }
 
 export interface Club extends _Club {

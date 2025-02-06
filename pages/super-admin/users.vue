@@ -270,12 +270,7 @@ async function impersonate(user: User) {
               <UFormGroup label="Nom" name="lastname">
                 <UInput v-model="selectedItem.lastname"/>
               </UFormGroup>
-              <UFormGroup label="Créé le">
-                <p class="text-sm">{{ formatDateTimeReadable(selectedItem.createdAt) }}</p>
-              </UFormGroup>
-              <UFormGroup label="Modifié le">
-                <p class="text-sm">{{ formatDateTimeReadable(selectedItem.updatedAt) }}</p>
-              </UFormGroup>
+              <GenericItemTimestampInfo :item="selectedItem" />
             </div>
 
           </UCard>

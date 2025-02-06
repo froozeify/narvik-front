@@ -6,6 +6,10 @@
   import {usePaginationValues} from "~/composables/api/list";
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
   import {useSelfUserStore} from "~/stores/useSelfUser";
+  import {formatDateReadable, formatDateTimeReadable} from "~/utils/date";
+  import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
+  import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
+  import dayjs from "dayjs";
 
   definePageMeta({
     layout: "super-admin"
@@ -47,10 +51,6 @@
   // Table settings
   const page = ref(1);
   const itemsPerPage = ref(30);
-  const sort = ref({
-    column: 'name',
-    direction: 'asc'
-  });
   const columns = [
     {
       key: 'isActivated',
@@ -59,6 +59,14 @@
     {
       key: 'name',
       label: 'Nom',
+    },
+    {
+      key: 'renewDate',
+      label: 'Renouvellement'
+    },
+    {
+      key: 'comment',
+      label: 'Commentaire',
       class: 'w-full'
     },
     {
@@ -81,7 +89,9 @@
       urlParams.append('multiple[name]', searchQuery.value.trim())
     }
 
-    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+    urlParams.append(`order[renewDate]`, 'ASC');
+    urlParams.append(`order[isActivated]`, 'ASC');
+    urlParams.append(`order[name]`, 'ASC');
 
     const { totalItems, items } = await apiQuery.getAll(urlParams)
     apiItems.value = items
@@ -112,6 +122,7 @@
     // We recreate the payload so we don't edit the settings, badgerToken, ...
     let payload: WriteClub = {
       name: item.name,
+      renewDate: item.renewDate,
       salesEnabled: item.salesEnabled,
       isActivated: item.isActivated,
       comment: item.comment
@@ -119,25 +130,24 @@
 
 
     // We verify if it's a creation or an update
-    let error: NuxtError | undefined = undefined
+    let apiError: NuxtError | undefined = undefined
     if (!item.uuid) {
-      await apiQuery.post(payload).then(value => {
-        error = value.error
-        selectedItem.value = value.created
-      });
+      const {error, created} = await apiQuery.post(payload);
+      apiError = error
+      selectedItem.value = created
     } else { // Update
-      await apiQuery.patch(item, payload).then(value => {
-        error = value.error
-      });
+      const {error, updated} = await apiQuery.patch(item, payload);
+      apiError = error
+      selectedItem.value = updated
     }
 
     isLoading.value = false
 
-    if (error) {
+    if (apiError) {
       toast.add({
         color: "red",
         title: !item.uuid ? "La création a échouée" : "La modification a échouée",
-        description: error.message
+        description: apiError.message
       });
       return;
     }
@@ -217,7 +227,6 @@
           <UTable
             class="w-full"
             :loading="isLoading"
-            :sort="sort"
             :columns="columns"
             :rows="apiItems"
             @select="rowClicked">
@@ -233,6 +242,10 @@
 
             <template #name-data="{ row }">
               {{ row.name }}
+            </template>
+
+            <template #renewDate-data="{ row }">
+              {{ formatDateReadable(row.renewDate) }}
             </template>
 
             <template #actions-data="{ row }">
@@ -253,7 +266,21 @@
       <template v-if="selectedItem">
         <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
-            <div class="flex gap-2 flex-col">
+            <div class="flex gap-2 flex-col relative">
+              <UFormGroup label="Date de renouvellement" name="renewDate">
+                <UButton
+                  icon="i-heroicons-calendar-days-20-solid"
+                  :label="formatDateReadable(selectedItem.renewDate?.toString()) || 'Choisir une date'"
+                  @click="modal.open(ModalClubSelectRenewDate, {
+                    item: selectedItem,
+                    onSelected(date: Date|undefined) {
+                      if (selectedItem) {
+                        selectedItem.renewDate = date
+                      }
+                    }
+                  })"
+                />
+              </UFormGroup>
               <UFormGroup label="Activé" name="isActivated">
                 <UToggle v-model="selectedItem.isActivated" />
               </UFormGroup>
@@ -266,6 +293,7 @@
               <UFormGroup label="Commentaire" :error="selectedItem.comment ? (selectedItem.comment.length > 249 && 'Longueur maximum atteinte (250)') : ''">
                 <UTextarea v-model="selectedItem.comment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire"/>
               </UFormGroup>
+              <GenericItemTimestampInfo :item="selectedItem" />
             </div>
 
           </UCard>
