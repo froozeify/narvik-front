@@ -63,13 +63,13 @@
   }
 
   async function deleteUser() {
-    if (!member.value) return;
+    if (!user.value) return;
 
     const { error } = await userQuery.selfDelete()
     if (error) {
       toast.add({
         color: "red",
-        title: "La modification du mot de passe a échoué",
+        title: "La suppression du compte à échoué",
         description: error.message
       })
       return
