@@ -147,7 +147,9 @@ export const useSelfUserStore = defineStore('selfUser', () => {
       if (selectedProfile.value === undefined) {
         selectedProfile.value = retrieved.linkedProfiles[0]
       } else {
-        selectedProfile.value = retrieved.linkedProfiles.find( (profile) => profile.id === selectedProfile.value?.id)
+        if (selectedProfile.value && !selectedProfile.value.id.startsWith('sc-')) {
+          selectedProfile.value = retrieved.linkedProfiles.find( (profile) => profile.id === selectedProfile.value.id)
+        }
       }
 
       // We refresh the club in an async way
@@ -374,6 +376,8 @@ export const useSelfUserStore = defineStore('selfUser', () => {
       // 'member',
       'isImpersonating',
       'selectedProfile.id',
+      'selectedProfile.club.@id',
+      'selectedProfile.club.uuid',
       'selfJwtToken',
     ],
   }
