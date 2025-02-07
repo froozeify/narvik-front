@@ -21,7 +21,6 @@ import {Doughnut} from 'vue-chartjs'
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeasonQuery";
 import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
-import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
 import MemberEditLinkedEmailModal from "~/components/Member/MemberEditLinkedEmailModal.vue";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
@@ -57,13 +56,6 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
   const addMemberPresenceModal = ref(false)
   const selectedPresence: Ref<MemberPresence | undefined> = ref(undefined)
   const memberPresenceModal: Ref<boolean> = ref(false);
-  const updatePasswordModalOpen = ref(false)
-
-  const passwordState = reactive({
-    current: undefined as string|undefined,
-    new: undefined as string|undefined,
-    new2: undefined as string|undefined
-  })
 
   const member: Ref<Member | undefined> = ref(undefined)
   const memberProfileImage: Ref<Image | undefined> = ref(undefined)
@@ -103,7 +95,6 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
     direction: 'desc'
   });
 
-  const userQuery = new UserQuery();
   const memberQuery = new MemberQuery();
   let memberSeasonQuery: MemberSeasonQuery|null = null
 
@@ -171,63 +162,6 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         }
       });
     }
-  }
-
-  async function onUpdatePasswordSubmit() {
-    if (!member.value) return failedPasswordUpdate();
-
-    if ((!isAdmin && (!passwordState.new || passwordState.new.length < 8)) || passwordState.new !== passwordState.new2) {
-      return failedPasswordUpdate("Les mot de passe ne correspondent pas / trop court")
-    }
-
-    // Admin editing a user password
-    if (member.value.email != loggedUsername) {
-      if (!isAdmin) return failedPasswordUpdate("Seul un administrateur peut modifier un mot de passe.");
-
-      let payload: Member = {
-        plainPassword: passwordState.new
-      }
-
-      const { updated, error } = await memberQuery.patch(member.value, payload)
-      if (error) {
-        toast.add({
-          color: "red",
-          title: "Une erreur est arrivé lors de la mise à jour du mot de passe",
-          description: error.message
-        })
-        return;
-      }
-
-      toast.add({
-        color: "green",
-        title: "Mot de passe modifié"
-      })
-      member.value = updated
-      updatePasswordModalOpen.value = false
-    }
-
-    if (!passwordState.current) {
-      return failedPasswordUpdate("Mot de passe actuel non défini")
-    }
-
-    const { error } = await userQuery.selfUpdatePassword(passwordState.current, passwordState.new)
-    if (error) {
-      return failedPasswordUpdate(error.message)
-    }
-
-    updatePasswordModalOpen.value = false
-    toast.add({
-      color: "green",
-      title: "Mot de passe modifié"
-    })
-  }
-
-  function failedPasswordUpdate(explanation?: string) {
-    toast.add({
-      color: "red",
-      title: "La modification du mot de passe a échoué",
-      description: explanation
-    })
   }
 
   function changeMemberRole(close: Function) {
@@ -462,6 +396,28 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
       })
     })
   }
+
+  async function deleteMember() {
+    if (!member.value) return
+
+    const { error } = await memberQuery.delete(member.value)
+
+    if (error) {
+      toast.add({
+        color: "red",
+        title: "La suppression a échouée",
+        description: error.message
+      })
+      isUpdating.value = false
+      return;
+    }
+
+    toast.add({
+      color: "green",
+      title: "Membre supprimé"
+    })
+    navigateTo('/admin/members')
+  }
 </script>
 
 <template>
@@ -547,8 +503,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                 alertDescription: 'Les historiques de présences seront anonymisés et ne pourront être rétablie auprès de ce membre.',
                 alertColor: 'orange',
                 onDelete() {
+                  deleteMember()
                   modal.close()
-                  // deletePaymentMode()
                 }
               })"
           >
@@ -877,30 +833,6 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
             :item="member ? {...member} : undefined"
             @updated="(value) => {itemModalOpen = false; loadItem() }"
           />
-        </UCard>
-      </UModal>
-
-      <UModal
-        v-model="updatePasswordModalOpen">
-        <UCard>
-          <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
-
-            <UFormGroup v-if="member.email == loggedUsername" label="Mot de passe actuel" name="password">
-              <UInput v-model="passwordState.current" type="password" required />
-            </UFormGroup>
-
-            <UFormGroup label="Nouveau mot de passe" name="password">
-              <UInput v-model="passwordState.new" type="password" required />
-            </UFormGroup>
-
-            <UFormGroup label="Confirmation nouveau mot de passe" name="password">
-              <UInput v-model="passwordState.new2" type="password" required />
-            </UFormGroup>
-
-            <UButton type="submit">
-              Changer le mot de passe
-            </UButton>
-          </UForm>
         </UCard>
       </UModal>
 
