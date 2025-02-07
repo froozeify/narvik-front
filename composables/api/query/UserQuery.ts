@@ -1,5 +1,7 @@
 import type {Member} from "~/types/api/item/clubDependent/member";
 import {
+  useDelete,
+  useDeleteItem,
   useFetchItem,
   useFetchList,
   useGetCsv,
@@ -50,6 +52,10 @@ export default class UserQuery extends AbstractQuery<User, User> {
 
   async selfUpdatePassword(currentPassword: string, newPassword: string) {
     return usePut('/self/update-password', {current: currentPassword, new: newPassword});
+  }
+
+  async selfDelete() {
+    return useDelete('/self');
   }
 
 }

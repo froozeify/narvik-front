@@ -365,7 +365,7 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
 }
 
 export async function useDeleteItem(item?: Item | null) {
-  let error: Error | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   if (!item || !item["@id"]) {
     error = new Error("No item found. Please reload");
@@ -379,6 +379,27 @@ export async function useDeleteItem(item?: Item | null) {
       method: "DELETE",
     });
   } catch (e) {
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
+  }
+
+  return {
+    error,
+  };
+}
+
+export async function useDelete(path: string, payload?: object) {
+  let error: Error | undefined = undefined;
+
+  try {
+    await useApi(path, {
+      method: "DELETE",
+      body: payload,
+      headers: {
+        Accept: MIME_TYPE,
+        "Content-Type": MIME_TYPE_JSON,
+      },
+    });
+  } catch (e) {
     error = formatErrorFromApiResponse(e as object) as Error
   }
 
@@ -386,3 +407,4 @@ export async function useDeleteItem(item?: Item | null) {
     error,
   };
 }
+
