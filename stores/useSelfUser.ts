@@ -148,7 +148,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
         selectedProfile.value = retrieved.linkedProfiles[0]
       } else {
         if (selectedProfile.value && !selectedProfile.value.id.startsWith('sc-')) {
-          selectedProfile.value = retrieved.linkedProfiles.find( (profile) => profile.id === selectedProfile.value.id)
+          selectedProfile.value = retrieved.linkedProfiles.find( (profile) => profile.id === selectedProfile.value?.id)
         }
       }
 
