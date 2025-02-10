@@ -22,7 +22,6 @@
   const isAdmin = selfStore.isAdmin()
 
   const { member, user, selectedProfile } = storeToRefs(selfStore)
-  const loggedUsername = member.value?.email
 
   const updatePasswordModalOpen = ref(false)
   const passwordState = reactive({

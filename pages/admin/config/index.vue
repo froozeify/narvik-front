@@ -95,14 +95,16 @@ async function controlShootingUpdated() {
 }
 
 async function ignoredActivitiesDaysUpdated() {
-  if (!selectedProfile.value?.club.settings || !configState.excludedActivitiesFromOpeningDays) return;
+  console.log('call')
+  if (!selectedProfile.value?.club.settings) return;
 
   const uris: string[] = []
-  for (const excludedActivity of configState.excludedActivitiesFromOpeningDays) {
-    uris.push(`${activityQuery.getRootUrl()}/${excludedActivity}`)
+  if (configState.excludedActivitiesFromOpeningDays) {
+    for (const excludedActivity of configState.excludedActivitiesFromOpeningDays) {
+      uris.push(`${activityQuery.getRootUrl()}/${excludedActivity}`)
+    }
   }
 
-  if (uris.length == 0) return;
   const payload: WriteClubSetting = {
     excludedActivitiesFromOpeningDays: uris
   }
