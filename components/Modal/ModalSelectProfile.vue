@@ -9,7 +9,7 @@ const { user, member, selectedProfile } = storeToRefs(selfStore)
 
 const selectedProfileId: Ref<string|undefined> = ref(selectedProfile.value?.id)
 
-function applyProfile() {
+async function applyProfile() {
   if (!selectedProfileId.value || !user.value?.linkedProfiles) return
 
   const foundProfile = user.value.linkedProfiles.find( (profile) => profile.id === selectedProfileId.value)
@@ -18,9 +18,9 @@ function applyProfile() {
     selectedProfile.value = foundProfile
   }
 
-  selfStore.refresh()
+  await selfStore.refresh()
+  await useModal().close()
   emit('selected')
-  useModal().close()
 }
 
 </script>

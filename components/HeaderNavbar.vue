@@ -2,6 +2,9 @@
   import {useSelfUserStore} from "~/stores/useSelfUser";
   import {useAppConfigStore} from "~/stores/useAppConfig";
   import {isDarkMode, isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
+  import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
+
+  const modal = useModal()
 
   const selfStore = useSelfUserStore();
   const appConfigStore = useAppConfigStore();
@@ -34,6 +37,17 @@
         }
       },
       to: !isBadger ? "/self" : ''
+    }, {
+      label: 'Changer de profil',
+      icon: 'i-heroicons-arrow-path-rounded-square',
+      class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? '' : 'hidden',
+      click: () => {
+        modal.open(ModalSelectProfile, {
+          onSelected() {
+            navigateTo('/self')
+          }
+        })
+      }
     }], [{
       slot: 'darkMode',
       label: 'Thème',
