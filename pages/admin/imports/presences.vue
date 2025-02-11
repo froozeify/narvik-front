@@ -20,7 +20,6 @@
 
   const memberPresenceQuery = new MemberPresenceQuery()
 
-
   async function getFileObject(event: any) {
     const formData = getFileFormDataFromUInputChangeEvent(event);
 
@@ -47,6 +46,8 @@
 
 
     <UCard>
+      <MetricAdminImportBatches />
+
       <UAlert
         icon="i-heroicons-megaphone"
         color="orange"
@@ -77,7 +78,11 @@ member.licence,date,activities.0.name,activities.1.name
 
       <pre v-if="apiUploadResponse" class="mb-4 w-full text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">{{apiUploadResponse}}</pre>
 
-      <UButton target="_blank" to="https://narvik.pages.dev/frontend/docs/import/narvik.html">Documentation</UButton>
+      <div class="flex gap-2">
+        <UButton target="_blank" to="https://narvik.pages.dev/frontend/docs/import/narvik.html">Documentation</UButton>
+        <div class="flex-1"></div>
+        <UButton variant="ghost" to="/admin/imports/cerbere">Import depuis cerbère</UButton>
+      </div>
 
     </UCard>
 

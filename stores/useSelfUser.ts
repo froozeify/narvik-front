@@ -181,19 +181,22 @@ export const useSelfUserStore = defineStore('selfUser', () => {
       const { retrieved: retrievedClub } = await clubQuery.getCurrentClub()
       if (retrievedClub) {
         selectedProfile.value.club = retrievedClub
+        await refreshSelectedClubSettings()
+      }
+    }
+  }
 
-        if (retrievedClub.settings?.uuid) {
-          const clubSettingQuery = new ClubSettingQuery()
-          const { retrieved: clubSettings } = await clubSettingQuery.get(retrievedClub.settings.uuid)
-          if (clubSettings) {
-            selectedProfile.value.club.settings = clubSettings
+  async function refreshSelectedClubSettings() {
+    if (selectedProfile.value?.club.settings?.uuid) {
+      const clubSettingQuery = new ClubSettingQuery()
+      const { retrieved: clubSettings } = await clubSettingQuery.get(selectedProfile.value.club.settings.uuid)
+      if (clubSettings) {
+        selectedProfile.value.club.settings = clubSettings
 
-            // We load the club logo
-            const image = await loadClubLogo()
-            if (image) {
-              selectedProfile.value.club.settings.logoBase64 = image
-            }
-          }
+        // We load the club logo
+        const image = await loadClubLogo()
+        if (image) {
+          selectedProfile.value.club.settings.logoBase64 = image
         }
       }
     }
@@ -352,6 +355,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
 
     refresh,
     refreshSelectedClub,
+    refreshSelectedClubSettings,
     logout,
 
     isLogged,

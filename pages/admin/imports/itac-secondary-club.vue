@@ -30,17 +30,6 @@
   const memberQuery = new MemberQuery()
   const memberPresenceQuery = new MemberPresenceQuery()
 
-  const importBatchesMetric: Ref<number | undefined> = ref(undefined)
-  const lastImportDate: Ref<Date | undefined> = ref(undefined)
-
-  getMetrics();
-
-  function getMetrics() {
-    selfStore.refreshSelectedClub()
-    importBatchesMetric.value = selectedProfile?.club.settings.itacSecondaryImportRemaining
-    lastImportDate.value = selectedProfile?.club.settings.itacSecondaryImportDate
-  }
-
   async function getFileObject(event: any) {
     const formData = getFileFormDataFromUInputChangeEvent(event);
 
@@ -56,7 +45,7 @@
       return displayFileErrorToast(error.message)
     }
 
-    getMetrics()
+    selfStore.refreshSelectedClubSettings()
     displayFileSuccessToast();
   }
 
@@ -72,7 +61,7 @@
       return
     }
 
-    getMetrics()
+    selfStore.refreshSelectedClubSettings()
 
     toast.add({
       title: "Présences migrées",
@@ -80,37 +69,17 @@
     })
   }
 
-  let refreshInterval: NodeJS.Timeout
-  onMounted(() => {
-    refreshInterval = setInterval(() => {
-      getMetrics()
-    }, 5000)
-  })
-
-  onUnmounted(() => {
-    if (refreshInterval) {
-      clearInterval(refreshInterval)
-    }
-  })
-
 </script>
 
 <template>
   <div>
 
-    <UAlert v-if="importBatchesMetric && importBatchesMetric > 0"
-        class="mb-4"
-        variant="subtle"
-        icon="i-heroicons-exclamation-triangle"
-        color="yellow"
-        title="Des imports sont déjà en cours"
-        :description="'Il y a ' + importBatchesMetric + ' batches d\'import en cours' "
-      />
+    <MetricAdminImportBatches />
 
     <UCard>
-      <UAlert v-if="lastImportDate"
-              :title="'Dernier import effectué le ' + formatDateReadable(lastImportDate.toString())"
-              :color="dayjs(lastImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'red' : 'green' "
+      <UAlert v-if="selfStore.selectedProfile?.club.settings.itacSecondaryImportDate"
+              :title="'Dernier import effectué le ' + formatDateReadable(selfStore.selectedProfile.club.settings.itacSecondaryImportDate.toString())"
+              :color="dayjs(selfStore.selectedProfile.club.settings.itacSecondaryImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'red' : 'green' "
       />
       <UAlert v-else
               title="Aucun import effectué"
@@ -133,7 +102,7 @@
 
       <UButton target="_blank" to="https://narvik.pages.dev/frontend/docs/import/itac.html#import-des-membres-club-secondaire">Documentation</UButton>
 
-      <UButton @click="migrateExternal()" color="green" class="mx-4" :disabled="(importBatchesMetric && importBatchesMetric > 0)">Migration présence externe vers présence membres</UButton>
+      <UButton @click="migrateExternal()" color="green" class="mx-4" :disabled="((selfStore.selectedProfile?.club.settings.itacSecondaryImportRemaining && selfStore.selectedProfile.club.settings.itacSecondaryImportRemaining) ?? 0) > 0">Migration présence externe vers présence membres</UButton>
 
     </UCard>
 
