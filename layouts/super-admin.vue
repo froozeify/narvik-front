@@ -37,6 +37,11 @@
       icon: 'i-heroicons-users',
       to: '/super-admin/users'
     },
+    {
+      label: 'Saisons',
+      icon: 'i-heroicons-calendar-date-range',
+      to: '/super-admin/seasons'
+    },
   ]
 
   let links: GroupedNavigationLinks[] = [
