@@ -22,6 +22,11 @@ const memberSelected = ref();
 const foundMembers: Ref<Member[]> = ref([])
 const query: Ref<string|undefined> = ref(undefined)
 
+// Camera detection setup
+
+const cameraPreview = ref(false)
+const cameraIsPresent = verifyCameraIsPresent()
+
 watch(query, (value) => {
   search(value)
 })
@@ -106,13 +111,36 @@ function rowClicked(row: Member) {
   <div class="flex flex-col justify-start px-4 py-4 rounded-lg divide-y divide-gray-200 dark:divide-gray-800 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 min-h-96">
 
     <UFormGroup label="Nom / Licence">
+      <GenericBarcodeReader
+        class="mb-4"
+        v-model="cameraPreview"
+        @decoded="(value) => {query = value}"
+      />
+
       <UInput
           class="mb-4"
           v-model="query"
           :loading="searching"
           placeholder="Nom / Licence"
           trailing
-      />
+          :ui="{ icon: { trailing: { pointer: '' } } }"
+      >
+        <template #trailing v-if="cameraIsPresent || query">
+          <UIcon
+            v-if="cameraIsPresent"
+            class="cursor-pointer"
+            name="i-heroicons-qr-code"
+            @click="cameraPreview = true"
+          />
+
+          <UIcon
+            v-if="query"
+            class="cursor-pointer"
+            name="i-heroicons-x-mark"
+            @click="query = '';"
+          />
+        </template>
+      </UInput>
     </UFormGroup>
 
     <UTable
