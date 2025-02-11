@@ -42,6 +42,11 @@
       icon: 'i-heroicons-calendar-date-range',
       to: '/super-admin/seasons'
     },
+    {
+      label: 'Catégories d\'âge',
+      icon: 'i-heroicons-cake',
+      to: '/super-admin/age-categories'
+    },
   ]
 
   let links: GroupedNavigationLinks[] = [
