@@ -119,7 +119,7 @@
     // We recreate the payload so we don't edit the settings, badgerToken, ...
     let payload: WriteClub = {
       name: item.name,
-      renewDate: item.renewDate,
+      renewDate: item.renewDate ?? null,
       salesEnabled: item.salesEnabled,
       isActivated: item.isActivated,
       comment: item.comment

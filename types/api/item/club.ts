@@ -1,5 +1,5 @@
 import type {UuidItem} from "~/types/api/uuidItem";
-import type {ClubSetting} from "~/types/api/item/clubDependent/clubSetting";
+import type {ClubSetting} from "~/types/api/item/clubDependent/ClubSetting";
 import type {TimestampItem} from "~/types/api/timestampItem";
 
 export enum ClubRole {
@@ -34,7 +34,7 @@ interface _Club extends UuidItem, TimestampItem {
   badgerToken?: string
   comment?: string
   settings?: ClubSetting
-  renewDate?: Date
+  renewDate?: Date|null
 }
 
 export interface Club extends _Club {
