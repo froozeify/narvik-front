@@ -224,7 +224,7 @@ function fullNameClicked() {
           </div>
           <div class="flex justify-center flex-wrap gap-2">
             <UBadge
-                v-if="member.currentSeason && member.currentSeason.ageCategory.code"
+                v-if="member.currentSeason && member.currentSeason.ageCategory"
                 variant="subtle"
                 color="amber"
                 :ui="{ rounded: 'rounded-full' }">
@@ -258,11 +258,11 @@ function fullNameClicked() {
             {{ member.licence }}
           </div>
           <div v-if="member.lastControlShooting" class="text-center text-xl">
-            Dernier tir de contrôle : {{ formatDateReadable(member.lastControlShooting) }}
+            Dernier tir de contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
           </div>
           <div class="flex gap-4 justify-center flex-wrap">
             <UButton
-                v-for="activity in memberPresence?.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
+                v-for="activity in memberPresence?.activities?.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
                 variant="soft"
                 :ui="{ rounded: 'rounded-full' }"
             >

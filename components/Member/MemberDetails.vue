@@ -12,8 +12,7 @@ import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPre
 import {usePaginationValues} from "~/composables/api/list";
 import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
-import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
-import UserQuery from "~/composables/api/query/UserQuery";
+import type {MemberSeason, MemberSeasonWrite} from "~/types/api/item/clubDependent/memberSeason";
 import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
 
 import { ArcElement, CategoryScale, Chart as ChartJS, Colors, DoughnutController, Legend, LinearScale, Title, Tooltip } from 'chart.js'
@@ -343,15 +342,19 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
     }
   }
 
-  async function addMemberSeason(seasonIri: String, isSecondary: boolean = false) {
+  async function addMemberSeason(seasonIri: string, isSecondary: boolean = false, ageCategory: string|undefined = undefined) {
     if (!memberSeasonQuery || !member.value) {
       return
     }
 
-    const memberSeason: MemberSeason = {
+    const memberSeason: MemberSeasonWrite = {
       member: member.value["@id"],
       season: seasonIri,
       isSecondaryClub: isSecondary
+    }
+
+    if (ageCategory) {
+      memberSeason.ageCategory = ageCategory
     }
 
     memberSeasonQuery.post(memberSeason).then(async ({error}) => {
@@ -622,7 +625,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         </UCard>
       </div>
 
-      <div class="flex basis-full lg:basis-1/3">
+      <div class="flex basis-full lg:basis-1/2">
         <UCard
           class="flex-1"
           :ui="{
@@ -636,8 +639,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
               <div class="flex-1"></div>
               <UButton
                 @click="modal.open(MemberSeasonSelectModal, {
-                  onSelected(seasonIri: String, isSecondary: boolean) {
-                    addMemberSeason(seasonIri, isSecondary)
+                  onSelected(seasonIri: String, isSecondary: boolean, ageCategory: string|undefined) {
+                    addMemberSeason(seasonIri, isSecondary, ageCategory)
                   }
                 })"
               >
@@ -656,6 +659,10 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                 {
                   key: 'isSecondaryClub',
                   label: 'Club secondaire',
+                },
+                {
+                  key: 'ageCategory.name',
+                  label: 'Catégorie'
                 },
                 {
                   key: 'actions'

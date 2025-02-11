@@ -1,8 +1,8 @@
 import type {Member} from "~/types/api/item/clubDependent/member";
-import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
+import type {MemberSeason, MemberSeasonWrite} from "~/types/api/item/clubDependent/memberSeason";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
-export default class MemberSeasonQuery extends AbstractClubDependentQuery<MemberSeason, MemberSeason> {
+export default class MemberSeasonQuery extends AbstractClubDependentQuery<MemberSeason, MemberSeasonWrite> {
   rootPath = "seasons";
   protected activeMember: Member;
 
@@ -19,7 +19,7 @@ export default class MemberSeasonQuery extends AbstractClubDependentQuery<Member
     return this.activeMember["@id"]
   }
 
-  protected override getRootUrl(): string {
+  public override getRootUrl(): string {
     return `${this.getActiveMemberIri()}/${this.rootPath}` ;
   }
 }

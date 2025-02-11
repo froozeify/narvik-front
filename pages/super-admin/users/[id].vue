@@ -1,17 +1,8 @@
 <script setup lang="ts">
-import {formatMonetary} from "~/utils/string";
-import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
-import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
-import {formatDateReadable, formatDateTimeReadable} from "~/utils/date";
 import {useSelfUserStore} from "~/stores/useSelfUser";
-import dayjs from "dayjs";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
-import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
-import {useSaleStore} from "~/stores/useSaleStore";
-import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
 import {type User, UserRole} from "~/types/api/item/user";
 import UserQuery from "~/composables/api/query/UserQuery";
-import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
 
 definePageMeta({
     layout: "super-admin"
