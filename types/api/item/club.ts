@@ -35,6 +35,10 @@ interface _Club extends UuidItem, TimestampItem {
   comment?: string
   settings?: ClubSetting
   renewDate?: Date|null
+  website?: string
+  contactName?: string
+  contactEmail?: string
+  contactPhone?: string
 }
 
 export interface Club extends _Club {

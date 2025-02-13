@@ -122,7 +122,11 @@
       renewDate: item.renewDate ?? null,
       salesEnabled: item.salesEnabled,
       isActivated: item.isActivated,
-      comment: item.comment
+      comment: item.comment,
+      website: item.website,
+      contactName: item.contactName,
+      contactEmail: item.contactEmail,
+      contactPhone: item.contactPhone
     }
 
 
@@ -298,6 +302,23 @@
               <UFormGroup label="Commentaire" :error="selectedItem.comment ? (selectedItem.comment.length > 249 && 'Longueur maximum atteinte (250)') : ''">
                 <UTextarea v-model="selectedItem.comment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire"/>
               </UFormGroup>
+
+              <UFormGroup label="Site" name="website">
+                <UInput v-model="selectedItem.website" type="url" />
+              </UFormGroup>
+
+              <UDivider label="Contact" />
+
+              <UFormGroup label="Nom" name="contactName">
+                <UInput v-model="selectedItem.contactName" />
+              </UFormGroup>
+              <UFormGroup label="Email" name="contactEmail">
+                <UInput v-model="selectedItem.contactEmail" type="email" />
+              </UFormGroup>
+              <UFormGroup label="Téléphone" name="contactPhone">
+                <UInput v-model="selectedItem.contactPhone" type="tel" />
+              </UFormGroup>
+
               <GenericItemTimestampInfo :item="selectedItem" />
             </div>
 
