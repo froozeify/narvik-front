@@ -59,11 +59,6 @@
       to: '/admin/imports/itac'
     },
     {
-      label: 'Club secondaire',
-      icon: 'i-heroicons-user-plus',
-      to: '/admin/imports/itac-secondary-club'
-    },
-    {
       label: 'Photos',
       icon: 'i-heroicons-photo',
       to: '/admin/imports/photos'
