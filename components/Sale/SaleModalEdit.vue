@@ -58,7 +58,7 @@ async function updateSale() {
 
   if (paymentModeValue.value) {
     const paymentModeQuery = new SalePaymentModeQuery()
-    payload.paymentMode = `/${paymentModeQuery.rootPath}/${paymentModeValue.value}`;
+    payload.paymentMode = `${paymentModeQuery.getRootUrl()}/${paymentModeValue.value}`;
   }
 
   if (payload.comment?.trim().length === 0) {
