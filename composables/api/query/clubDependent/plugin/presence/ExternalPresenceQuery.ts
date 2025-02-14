@@ -7,21 +7,6 @@ import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDe
 export default class ExternalPresenceQuery extends AbstractClubDependentQuery<ExternalPresence, ExternalPresence> {
   rootPath = "external-presences";
 
-  async getAllCsv(urlParams?: URLSearchParams) {
-    let url = `${this.getRootUrl()}.csv`;
-
-    if (!urlParams) {
-      urlParams = new URLSearchParams()
-    }
-    if (!urlParams.has('pagination')) {
-      urlParams.append('pagination', 'false')
-    }
-
-    url += '?' + urlParams.toString()
-
-    return useGetCsv(url)
-  }
-
   async getPresentToday(): Promise<FetchAllData<ExternalPresence>> {
     return useFetchList<ExternalPresence>(this.getRootUrl() + "/-/today");
   }

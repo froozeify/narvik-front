@@ -49,19 +49,10 @@
       label: 'Moyen de paiements',
       icon: 'i-heroicons-credit-card',
       to: '/admin/sales/payment-modes'
-    }
-  ]
-
-  const importSection = [
-    {
-      label: 'Ventes',
-      icon: 'i-heroicons-receipt-refund',
+    },{
+      label: 'Imports',
+      icon: 'i-heroicons-arrow-down-on-square-stack',
       to: '/admin/sales/import'
-    },
-    {
-      label: 'Inventaire',
-      icon: 'i-heroicons-calculator',
-      to: '/admin/inventories/import'
     }
   ]
 
@@ -78,9 +69,6 @@
     links.push({
       title: 'Gestion',
       links: inventorySection
-    }, {
-      title: 'Import',
-      links: importSection
     })
   }
 

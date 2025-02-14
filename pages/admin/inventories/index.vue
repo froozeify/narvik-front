@@ -4,8 +4,9 @@
   import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
   import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
   import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
-  import {verifyCameraIsPresent} from "~/utils/browser";
+  import {createBrowserCsvDownload, verifyCameraIsPresent} from "~/utils/browser";
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
+  import {formatDateInput} from "~/utils/date";
 
   definePageMeta({
     layout: "pos"
@@ -39,6 +40,7 @@
 
   const apiItems: Ref<InventoryItem[]> = ref([])
   const isLoading = ref(true);
+  const isDownloadingCsv = ref(false)
   const totalApiItems = ref(0)
   const selectedItem: Ref<InventoryItem | undefined> = ref(undefined)
 
@@ -140,12 +142,35 @@
     page.value = 1
     getItemsPaginated()
   }
+
+  async function downloadCsv() {
+    isDownloadingCsv.value = true
+
+    const urlParams = new URLSearchParams({
+      pagination: 'false',
+    });
+
+    if (searchQuery.value) {
+      urlParams.append(`multiple[name, barcode]`, searchQuery.value);
+    }
+
+    // We make the search
+    const { data } = await apiQuery.getAllCsv(urlParams)
+    isDownloadingCsv.value = false
+    createBrowserCsvDownload('inventory-items.csv', data)
+  }
 </script>
 
 <template>
   <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = undefined;" :has-side-content="selectedItem !== undefined" :mobile-side-title="selectedItem?.name" tabindex="-1">
     <template #main>
       <UCard>
+        <div class="flex mb-2">
+          <div class="flex-1"></div>
+          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
+            CSV
+          </UButton>
+        </div>
         <div class="flex gap-2 flex-col flex-wrap sm:flex-row">
           <GenericBarcodeReader
             v-model="cameraPreview"

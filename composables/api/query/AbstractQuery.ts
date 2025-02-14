@@ -1,4 +1,4 @@
-import {useCreateItem, useDeleteItem, useFetchItem, useFetchList, usePatchItem} from "~/composables/api/api";
+import {useCreateItem, useDeleteItem, useFetchItem, useFetchList, useGetCsv, usePatchItem} from "~/composables/api/api";
 import type {FetchAllData, FetchItemData} from "~/types/api/api";
 import type {Item} from "~/types/api/item";
 import {useSelfUserStore} from "~/stores/useSelfUser";
@@ -31,6 +31,21 @@ export abstract class AbstractQuery<R, W> {
 		}
 		return useFetchList<R>(url);
 	}
+
+  async getAllCsv(urlParams?: URLSearchParams) {
+    let url = `${this.getRootUrl()}.csv`;
+
+    if (!urlParams) {
+      urlParams = new URLSearchParams()
+    }
+    if (!urlParams.has('pagination')) {
+      urlParams.append('pagination', 'false')
+    }
+
+    url += '?' + urlParams.toString()
+
+    return useGetCsv(url)
+  }
 
 	async post(payload: Item) {
 		return useCreateItem<W>(this.getRootUrl(), payload)
