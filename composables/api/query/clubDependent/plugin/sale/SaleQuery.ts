@@ -1,6 +1,6 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
-import {useGetCsv} from "~/composables/api/api";
+import {useGetCsv, useUploadFile} from "~/composables/api/api";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
 export default class SaleQuery extends AbstractClubDependentQuery<Sale, Sale> {
@@ -19,5 +19,9 @@ export default class SaleQuery extends AbstractClubDependentQuery<Sale, Sale> {
     url += '?' + urlParams.toString()
 
     return useGetCsv(url)
+  }
+
+  async importFromCsv(formData: FormData) {
+    return useUploadFile(this.getRootUrl() + "/-/from-csv", formData)
   }
 }

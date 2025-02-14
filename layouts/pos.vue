@@ -52,10 +52,23 @@
     }
   ]
 
+  const importSection = [
+    {
+      label: 'Ventes',
+      icon: 'i-heroicons-receipt-refund',
+      to: '/admin/sales/import'
+    },
+    {
+      label: 'Inventaire',
+      icon: 'i-heroicons-calculator',
+      to: '/admin/inventories/import'
+    }
+  ]
+
   let links: GroupedNavigationLinks[] = [
     {
       links: salesSection
-    },{
+    }, {
       title: 'Historique',
       links: historySection
     }
@@ -65,6 +78,9 @@
     links.push({
       title: 'Gestion',
       links: inventorySection
+    }, {
+      title: 'Import',
+      links: importSection
     })
   }
 
