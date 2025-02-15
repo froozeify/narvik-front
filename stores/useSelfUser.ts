@@ -1,6 +1,6 @@
 import {type Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
-import {MIME_TYPE_JSON} from "~/composables/api/api";
+import {MIME_TYPE_JSON, usePostRawJson} from "~/composables/api/api";
 import {JwtToken} from "~/types/jwtTokens";
 import type {Ref} from "vue";
 import ImageQuery from "~/composables/api/query/ImageQuery";
@@ -97,26 +97,25 @@ export const useSelfUserStore = defineStore('selfUser', () => {
       return null;
     }
 
-    try {
-      const data = await $localApi("auth/token/refresh", {
-        method: "POST",
-        headers: {
-          Accept: MIME_TYPE_JSON,
-          'content-type': 'application/x-www-form-urlencoded',
-        },
-        body: `refresh_token=${jwtToken.value.refresh.token}`
-      });
-      return setJwtSelfJwtTokenFromApiResponse(data);
-    } catch (e) {
-      return null;
+    const { data, error } = await usePostRawJson("token", {
+      grant_type: "refresh_token",
+      refresh_token: jwtToken.value.refresh.token
+    });
+
+    if (error) {
+      displayJwtError("An error occured when refreshing the session.")
+      logJwtError(error.message, false)
+      return null
     }
+
+    return setJwtSelfJwtTokenFromApiResponse(data);
   }
 
   function setJwtSelfJwtTokenFromApiResponse(data: any): JwtToken {
     const jwtToken = new JwtToken();
     jwtToken.access = {
       date: new Date(Date.now() + (3480 * 1000)), // Expires in 1h - 2mn (to get some room on the token expiration),
-      token: data.token
+      token: data.access_token
     }
 
     jwtToken.refresh = {

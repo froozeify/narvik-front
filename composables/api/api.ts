@@ -56,12 +56,18 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
     overloadedOptions.body = options.body
   }
 
+
+  if (!overloadedOptions?.headers?.Authorization) {
+    overloadedOptions.headers.Authorization = `Basic ${useRuntimeConfig().public.clientAuth}`
+  }
+
   return await $localApi<T>(path, overloadedOptions);
 }
 
 export async function useLoginUser(email: string, password: string) {
-  const { data, error } = await usePostRawJson("auth", {
-    email: email,
+  const { data, error } = await usePostRawJson("token", {
+    grant_type: 'password',
+    username: email,
     password: password
   });
 
@@ -92,6 +98,8 @@ export async function useLoginBadger(clubId: string, loginToken: string) {
 
 
 
+
+
 export async function usePostRawJson(path: string, payload?: object) {
   let data: any | undefined = undefined;
   let error: NuxtError | undefined = undefined;
@@ -101,6 +109,7 @@ export async function usePostRawJson(path: string, payload?: object) {
       method: "POST",
       headers: {
         Accept: MIME_TYPE_JSON,
+        Authorization: `Basic ${useRuntimeConfig().public.clientAuth}`
       },
       body: payload
     });

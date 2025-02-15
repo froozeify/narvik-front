@@ -40,7 +40,13 @@ export function pathsMatch(paths: string[], path: string): boolean {
   return pathMatched;
 }
 
-export function formatErrorFromApiResponse(response: object): object {
+export function formatErrorFromApiResponse(response: any): object {
+  if (typeof response === 'string') {
+    return {
+      message: response
+    }
+  }
+
   if (!('data' in response)) {
     return response
   }

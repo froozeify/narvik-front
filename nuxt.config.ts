@@ -42,13 +42,14 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      clientVersion: pkg.version
+      clientVersion: pkg.version,
+      clientAuth: process.env.CLIENT_AUTH
     },
 
     apiParty: {
       endpoints: {
         localApi: {
-          url: 'http://php'
+          url: 'http://php',
         }
       }
     }
