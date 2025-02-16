@@ -58,7 +58,7 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
 
 
   if (!overloadedOptions?.headers?.Authorization) {
-    overloadedOptions.headers.Authorization = `Basic ${useRuntimeConfig().public.clientAuth}`
+    overloadedOptions.headers.Authorization = `Basic ${btoa(useRuntimeConfig().public.clientId + ':' + useRuntimeConfig().public.clientSecret) }`
   }
 
   return await $localApi<T>(path, overloadedOptions);
@@ -109,7 +109,7 @@ export async function usePostRawJson(path: string, payload?: object) {
       method: "POST",
       headers: {
         Accept: MIME_TYPE_JSON,
-        Authorization: `Basic ${useRuntimeConfig().public.clientAuth}`
+        Authorization: `Basic ${btoa(useRuntimeConfig().public.clientId + ':' + useRuntimeConfig().public.clientSecret) }`
       },
       body: payload
     });

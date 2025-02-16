@@ -32,8 +32,8 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
   if (error) {
     toast.add({
       color: "red",
-      title: error.statusCode === 401 ? "Erreur de connexion" : "Trop de tentative",
-      description: error.statusCode === 401 ? 'Mauvais email/mot de passe' : 'Veuillez réessayer dans 15 minutes.'
+      title: error.statusCode === 400 ? "Erreur de connexion" : "Trop de tentative",
+      description: error.statusCode === 400 ? 'Mauvais email/mot de passe' : 'Veuillez réessayer dans 5 minutes.'
     })
     console.error(error)
     isLoading.value = false

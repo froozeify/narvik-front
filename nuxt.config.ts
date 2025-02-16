@@ -43,7 +43,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       clientVersion: pkg.version,
-      clientAuth: process.env.CLIENT_AUTH
+      clientId: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
     },
 
     apiParty: {
