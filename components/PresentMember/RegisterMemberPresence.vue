@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/api/item/activity";
+import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import type {PropType, Ref} from "vue";
-import type {Member} from "~/types/api/item/member";
+import type {Member} from "~/types/api/item/clubDependent/member";
 import type {FormSubmitEvent} from "#ui/types";
-import type {MemberPresence} from "~/types/api/item/memberPresence";
-import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
+import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
 import {formatDateInput, formatDateReadable} from "~/utils/date";
 
 const props = defineProps({
@@ -41,7 +41,7 @@ const selectedDate: Ref<Date|null> = ref(null);
 
 const state = reactive({
   member: props.member,
-  activities: []
+  activities: [] as Array<Activity>
 })
 
 if (props.memberPresence) {
@@ -51,10 +51,8 @@ if (props.memberPresence) {
     selectedDate.value = new Date(props.memberPresence.date)
   }
   props.memberPresence.activities?.forEach(actvt => {
-    if (!actvt.isEnabled) {
-      state.activities[actvt.id] = false
-    } else {
-      state.activities[actvt.id] = true
+    if (actvt.isEnabled) {
+      state.activities.push(actvt)
     }
   });
 }
@@ -76,14 +74,14 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     activities: []
   }
   if (props.member) {
-    memberPresence.member = `/members/${props.member.id}`
+    memberPresence.member = props.member["@id"]
   } else if (props.memberPresence) {
     delete memberPresence.member // We remove the member key since we only update the activities (PATCH request)
   }
 
-  event.data.activities.forEach( (checked: boolean, actvt: string) => {
-    if (checked) {
-      memberPresence.activities.push(activityQuery.rootPath + "/" + actvt)
+  event.data.activities.forEach( (actvt: Activity) => {
+    if (actvt["@id"]) {
+      memberPresence.activities.push(actvt["@id"])
     }
   })
 
@@ -160,8 +158,9 @@ async function onSubmit(event: FormSubmitEvent<any>) {
             <UCheckbox
                 class="w-full"
                 v-for="activity in activities"
-                v-model="state.activities[activity.id]"
-                :name="'actvt-' + activity.id"
+                v-model="state.activities"
+                :value="activity"
+                :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
           </div>
         </div>

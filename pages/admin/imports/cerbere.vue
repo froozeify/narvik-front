@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+  import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
   import MetricQuery from "~/composables/api/query/MetricQuery";
   import type {Metric} from "~/types/api/item/metric";
   import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
@@ -50,17 +50,11 @@
 
 <template>
   <div>
-    <UAlert v-if="importBatchesMetric && importBatchesMetric.value > 0"
-            class="mb-4"
-            variant="subtle"
-            icon="i-heroicons-exclamation-triangle"
-            color="yellow"
-            title="Des imports sont déjà en cours"
-            :description="'Il y a ' + importBatchesMetric.value + ' batches d\'import en cours' "
-    />
+    <MetricAdminImportBatches />
 
     <UCard>
       <UAlert
+          icon="i-heroicons-megaphone"
           class="mb-4"
           title="L'import ne doit être fait qu'une fois l'import des membres effectué."
           description="Dans le cas contraire, les présences seront enregistrées comme externe."

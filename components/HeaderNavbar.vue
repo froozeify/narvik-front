@@ -1,31 +1,29 @@
 <script setup lang="ts">
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
-  import type {Image} from "~/types/api/item/image";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
   import {useAppConfigStore} from "~/stores/useAppConfig";
-  import {isDesktop, watchBreakpoint} from "~/utils/browser";
+  import {isDarkMode, isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
+  import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
 
-  const colorMode = useColorMode()
-  const selfStore = useSelfMemberStore();
+  const modal = useModal()
+
+  const selfStore = useSelfUserStore();
   const appConfigStore = useAppConfigStore();
 
-  const isDark = computed({
-    get() {
-      return colorMode.value === 'dark'
-    },
-    set() {
-      colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-    }
-  });
+  const isDark = isDarkMode()
+
+  const { selectedProfile, user } = storeToRefs(selfStore)
 
   // const, to avoid it being reactive and login back user
   const isAdmin = selfStore.isAdmin()
   const isBadger = selfStore.isBadger()
-  const isSupervisor = selfStore.hasSupervisorRole()
+  const isSupervisor = computed(() => {
+    return selfStore.hasSupervisorRole() && selectedProfile.value
+  })
 
   const isDesktopDisplay = isDesktop()
   const isTabletDisplay = isTablet()
 
-  const siteLogo: Ref<Image | null> = appConfigStore.getLogo()
+  const siteLogo: Ref<string> = appConfigStore.getLogo()
 
   const rightMenu = [
     [{
@@ -33,9 +31,23 @@
       avatar: {
         icon: 'i-heroicons-user',
         size: 'xs',
-        src: selfStore.member?.profileImageBase64
+        src: selfStore.member?.profileImageBase64,
+        ui: {
+          rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+        }
       },
       to: !isBadger ? "/self" : ''
+    }, {
+      label: 'Changer de profil',
+      icon: 'i-heroicons-arrow-path-rounded-square',
+      class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? '' : 'hidden',
+      click: () => {
+        modal.open(ModalSelectProfile, {
+          onSelected() {
+            navigateTo('/self')
+          }
+        })
+      }
     }], [{
       slot: 'darkMode',
       label: 'Thème',
@@ -50,6 +62,16 @@
       }
     }]
   ]
+
+  if (selfStore.isSuperAdmin()) {
+    rightMenu.unshift([
+      {
+        label: 'Administration global',
+        icon: 'i-heroicons-building-library',
+        to: "/super-admin"
+      }
+    ]);
+  }
 
   onMounted(() => {
     watchBreakpoint()
@@ -66,13 +88,12 @@
     class="backdrop-blur -mb-px sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-16 print:hidden">
     <nav class="container mx-auto p-4 flex justify-between h-full overflow-y-auto">
       <div class="flex gap-4 flex-shrink-0">
-        <div>
-          <NuxtLink v-if="siteLogo" to="/" class="flex align-middle">
-            <UTooltip text="Accueil">
-              <img :src="siteLogo.base64" class="w-7"/>
-            </UTooltip>
-          </NuxtLink>
-        </div>
+        <NuxtLink to="/" class="flex align-middle">
+          <UTooltip text="Accueil">
+            <NuxtImg v-if="selectedProfile?.club?.settings?.logoBase64" :src="selectedProfile.club.settings.logoBase64" class="w-7 object-contain"/>
+            <NuxtImg v-else :src="siteLogo" class="w-7 object-contain"/>
+          </UTooltip>
+        </NuxtLink>
         <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="gray">Accueil</UButton>
         <div v-if="isSupervisor">
           <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
@@ -82,11 +103,14 @@
         <div v-if="isSupervisor">
           <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton>
         </div>
+        <div v-if="selfStore.isImpersonating">
+          <UButton color="orange" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
+        </div>
         <UDropdown :items="rightMenu">
           <UButton
             variant="ghost"
             color="gray"
-            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? selfStore.member?.fullName : 'Pointeuse') : undefined">
+            :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? (selectedProfile?.displayName ?? user?.fullName) : 'Pointeuse') : undefined">
             <template #trailing>
               <UAvatar v-if="!isBadger"
                        size="xs"

@@ -3,12 +3,19 @@ import pkg from './package.json'
 
 export default defineNuxtConfig({
   devtools: {enabled: true},
+  devServer: {
+    https: true,
+    host: "0.0.0.0" // Expose to local network
+  },
+
   ssr: false,
 
   modules: [
     '@nuxt/ui',
     '@pinia/nuxt',
-    'nuxt-api-party'
+    'pinia-plugin-persistedstate/nuxt',
+    '@nuxt/image',
+    'nuxt-api-party',
   ],
 
   ui: {
@@ -19,21 +26,31 @@ export default defineNuxtConfig({
     '~/assets/css/main.scss'
   ],
 
+  piniaPluginPersistedstate: {
+    storage: 'localStorage',
+    key: 'narvik_%id',
+  },
+
   app: {
     head: {
       titleTemplate: 'Narvik',
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      ]
     }
   },
 
   runtimeConfig: {
     public: {
-      clientVersion: pkg.version
+      clientVersion: pkg.version,
+      clientId: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
     },
 
     apiParty: {
       endpoints: {
         localApi: {
-          url: 'http://php'
+          url: 'http://php',
         }
       }
     }

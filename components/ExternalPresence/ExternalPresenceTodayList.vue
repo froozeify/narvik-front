@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
 
 const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)

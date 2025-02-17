@@ -1,10 +1,11 @@
 <script setup lang="ts">
-  import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
-  import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
+  import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
+  import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
   import {usePaginationValues} from "~/composables/api/list";
-  import type {Member} from "~/types/api/item/member";
+  import type {Member} from "~/types/api/item/clubDependent/member";
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
   import type {FormError} from "#ui/types";
+  import {convertUuidToUrlUuid} from "~/utils/resource";
 
   definePageMeta({
     layout: "pos"
@@ -109,7 +110,7 @@
 
     // We verify if it's a creation or an update
     let error: Error | undefined = undefined
-    if (!category.id) {
+    if (!category.uuid) {
       await apiQuery.post(payload).then(value => {
         error = value.error
         selectedCategory.value = value.created
@@ -125,7 +126,7 @@
     if (error) {
       toast.add({
         color: "red",
-        title: !category.id ? "La création a échouée" : "La modification a échouée",
+        title: !category.uuid ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
       return;
@@ -133,7 +134,7 @@
 
     toast.add({
       color: "green",
-      title: !category.id ? "Catégorie créée" : "Catégorie modifiée",
+      title: !category.uuid ? "Catégorie créée" : "Catégorie modifiée",
     });
 
     // We refresh the list
@@ -222,12 +223,12 @@
 
           </UCard>
 
-          <UButton v-if="selectedCategory.id" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + selectedCategory.id">Voir les articles</UButton>
+          <UButton v-if="selectedCategory.uuid" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
           <UButton
-            v-if="selectedCategory.id"
+            v-if="selectedCategory.uuid"
             block
             color="red"
             :loading="isLoading"

@@ -12,9 +12,7 @@ useHead({
 
 <template>
   <div>
-    <UCard>
-      <MemberList />
-    </UCard>
+    <MemberList />
   </div>
 </template>
 

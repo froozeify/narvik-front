@@ -1,6 +1,7 @@
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
-import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
+import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
 import dayjs from "dayjs";
+import {defineStore} from "pinia";
 
 export const usePresenceStore = defineStore('presence', () => {
 	const selectedDate: Ref<Date|null> = ref(null)

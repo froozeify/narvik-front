@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
+import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
 import {usePaginationValues} from "~/composables/api/list";
-import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
-import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
+import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
 import type {FormError} from "#ui/types";
 import {UModals} from "#components";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
@@ -117,7 +117,7 @@ definePageMeta({
 
     // We verify if it's a creation or an update
     let error: Error | null = null
-    if (!paymentMode.id) {
+    if (!paymentMode.uuid) {
       await apiQuery.post(payload).then(value => {
         error = value.error
         selectedPaymentMode.value = value.created
@@ -133,7 +133,7 @@ definePageMeta({
     if (error) {
       toast.add({
         color: "red",
-        title: !paymentMode.id ? "La création a échouée" : "La modification a échouée",
+        title: !paymentMode.uuid ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
       return;
@@ -141,7 +141,7 @@ definePageMeta({
 
     toast.add({
       color: "green",
-      title: !paymentMode.id ? "Moyen de paiement crée" : "Moyen de paiement modifié",
+      title: !paymentMode.uuid ? "Moyen de paiement crée" : "Moyen de paiement modifié",
     });
 
     // We refresh the list
@@ -264,7 +264,7 @@ definePageMeta({
         </UForm>
 
         <UButton
-          v-if="selectedPaymentMode.id"
+          v-if="selectedPaymentMode.uuid"
           block
           color="red"
           :loading="isLoading"

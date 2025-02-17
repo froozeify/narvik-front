@@ -1,5 +1,6 @@
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
-import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
+import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
+import {defineStore} from "pinia";
 
 export const useExternalPresenceStore = defineStore('externalPresence', () => {
 	const isRefreshing = ref(false)

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type {PropType} from "vue";
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExternalPresence.vue";
-import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
+import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 
 const toast = useToast()
 
@@ -18,7 +19,7 @@ const emit = defineEmits([
   'close'
 ])
 
-const selfStore = useSelfMemberStore()
+const selfStore = useSelfUserStore()
 const isSupervisor = selfStore.hasSupervisorRole()
 const isBadger = selfStore.isBadger()
 

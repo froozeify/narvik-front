@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import {decodeUrlUuid} from "~/utils/resource";
+
   definePageMeta({
     layout: "admin"
   });
@@ -8,11 +10,11 @@
   })
 
   const route = useRoute()
-  const memberId = route.params.id;
+  const memberId = decodeUrlUuid(route.params.id.toString());
 </script>
 
 <template>
-  <MemberDetails :member-id="memberId.toString()" />
+  <MemberDetails :member-id="memberId" />
 </template>
 
 <style scoped lang="scss">

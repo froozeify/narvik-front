@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/api/item/activity";
+import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import type {PropType, Ref} from "vue";
 import type {FormSubmitEvent} from "#ui/types";
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
-import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
+import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
 import SearchMember from "~/components/Member/SearchMember.vue";
-import type {Member} from "~/types/api/item/member";
-import MemberQuery from "~/composables/api/query/MemberQuery";
+import type {Member} from "~/types/api/item/clubDependent/member";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 
 const props = defineProps({
   externalPresence: {
@@ -26,7 +27,7 @@ const emit = defineEmits([
 const toast = useToast()
 
 const externalPresenceQuery = new ExternalPresenceQuery();
-const selfStore = useSelfMemberStore()
+const selfStore = useSelfUserStore()
 
 const isSupervisor = selfStore.hasSupervisorRole()
 const isBadger = selfStore.isBadger()
@@ -42,7 +43,7 @@ const state = reactive({
   licence: undefined as string|undefined,
   firstname: undefined as string|undefined,
   lastname: undefined as string|undefined,
-  activities: []
+  activities: [] as Array<Activity>
 })
 
 watch(state, async (value) => {
@@ -65,10 +66,8 @@ if (props.externalPresence) {
 
   state.activities = []
   props.externalPresence.activities?.forEach(actvt => {
-    if (!actvt.isEnabled) {
-      state.activities[actvt.id] = false
-    } else {
-      state.activities[actvt.id] = true
+    if (actvt.isEnabled) {
+      state.activities.push(actvt)
     }
   });
 }
@@ -92,9 +91,9 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     activities: []
   }
 
-  event.data.activities.forEach( (checked: boolean, actvt: string) => {
-    if (checked) {
-      externalPresence.activities.push(activityQuery.rootPath + "/" + actvt)
+  event.data.activities.forEach( (actvt: Activity) => {
+    if (actvt["@id"]) {
+      externalPresence.activities.push(actvt["@id"])
     }
   })
 
@@ -195,8 +194,9 @@ function presenceCanceled() {
             <UCheckbox
                 class="w-full"
                 v-for="activity in activities"
-                v-model="state.activities[activity.id]"
-                :name="'actvt-' + activity.id"
+                v-model="state.activities"
+                :value="activity"
+                :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
           </div>
         </div>

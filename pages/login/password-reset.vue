@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type {FormError} from '#ui/types'
-import type {Image} from "~/types/api/item/image";
 import {useAppConfigStore} from "~/stores/useAppConfig";
-import MemberQuery from "~/composables/api/query/MemberQuery";
+import UserQuery from "~/composables/api/query/UserQuery";
+import {isMobile, isTablet, watchBreakpoint} from "~/utils/browser";
 
 const toast = useToast()
 const isLoading = ref(false)
@@ -14,9 +14,15 @@ const state = reactive({
 })
 
 const appConfigStore = useAppConfigStore();
-const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
+const siteLogo: Ref<string> = appConfigStore.getLogo()
 
-const memberQuery = new MemberQuery()
+const userQuery = new UserQuery()
+
+const isMobileDisplay = isMobile()
+const isHorizontal = ref(false)
+watchEffect(() => {
+  isHorizontal.value = !isMobileDisplay.value
+})
 
 const selected = ref(0)
 const items = [{
@@ -43,7 +49,7 @@ async function resetPassword() {
   }
 
   isLoading.value = true
-  const { error } = await memberQuery.passwordReset(state.email, state.password, state.securityCode)
+  const { error } = await userQuery.passwordReset(state.email, state.password, state.securityCode)
   isLoading.value = false
 
   if (error) {
@@ -68,7 +74,7 @@ async function initiatePasswordReset() {
   }
 
   isLoading.value = true
-  const { error } = await memberQuery.passwordResetInitialise(state.email)
+  const { error } = await userQuery.passwordResetInitialise(state.email)
   isLoading.value = false
 
   if (error) {
@@ -87,12 +93,21 @@ async function initiatePasswordReset() {
 
   selected.value = 1
 }
+
+onMounted(() => {
+  watchBreakpoint()
+  window.addEventListener('resize', watchBreakpoint)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', watchBreakpoint)
+})
 </script>
 
 <template>
   <div>
     <div v-if="siteLogo" class="h-24 flex justify-center mb-4">
-      <img :src="siteLogo.base64" class="h-full" />
+      <NuxtImg :src="siteLogo" class="h-full" />
     </div>
 
     <div>
@@ -101,7 +116,7 @@ async function initiatePasswordReset() {
 
     <UCard>
 
-      <UTabs v-model="selected" :items="items">
+      <UTabs v-model="selected" :items="items" :orientation="isHorizontal ? 'horizontal' : 'vertical'">
         <template #item="{ item }">
           <div v-if="item.key === 'initial'">
             <UForm :state="state" class="space-y-4" @submit="initiatePasswordReset">

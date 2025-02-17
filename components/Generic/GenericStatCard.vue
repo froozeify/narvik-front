@@ -121,7 +121,7 @@ const topRightIcon = computed( () => {
         </p>
       </slot>
 
-      <p :class="valueClass">{{ props.value }}</p>
+      <p :class="valueClass"><slot name="value">{{ props.value }}</slot></p>
       <UTooltip v-if="props.tooltip" :text="props.tooltip" class="w-full justify-center">
         <p class="text-lg text-center">{{ props.title }}</p>
       </UTooltip>

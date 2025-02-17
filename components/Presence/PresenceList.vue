@@ -61,7 +61,6 @@
 
       <template #external-presences>
         <UCard class="bg-orange-50 dark:bg-orange-950">
-          <div class="text-xl font-bold mb-4">Présences externe</div>
           <ExternalPresenceList :list-only="props.listOnly"/>
         </UCard>
       </template>

@@ -73,3 +73,15 @@ export function isTablet() {
 export function isDesktop() {
   return checkIsDevice(['2xl', 'xl'])
 }
+
+export function isDarkMode() {
+  const colorMode = useColorMode()
+  return computed({
+    get() {
+      return colorMode.value === 'dark'
+    },
+    set() {
+      colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+    }
+  });
+}

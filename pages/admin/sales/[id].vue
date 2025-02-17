@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import {formatMonetary} from "~/utils/string";
-import type {Sale} from "~/types/api/item/sale";
-import SaleQuery from "~/composables/api/query/SaleQuery";
+import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
+import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import dayjs from "dayjs";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
 import {useSaleStore} from "~/stores/useSaleStore";
+import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
 
 definePageMeta({
     layout: "pos"
@@ -18,13 +19,13 @@ definePageMeta({
   })
 
   const saleStore = useSaleStore()
-  const selfStore = useSelfMemberStore()
+  const selfStore = useSelfUserStore()
   const isAdmin = selfStore.isAdmin()
 
   const toast = useToast()
   const modal = useModal()
   const route = useRoute()
-  const itemId = route.params.id;
+  const itemId = decodeUrlUuid(route.params.id.toString());
 
   const isLoading = ref(true)
 
@@ -221,7 +222,7 @@ definePageMeta({
 
         <template #item-data="{ row }">
           <UButton v-if="row.item"
-             :to="'/admin/inventories/items/' + row.item.id"
+             :to="'/admin/inventories/items/' + convertUuidToUrlUuid(row.item.uuid)"
              variant="soft"
              :ui="{ rounded: 'rounded-full' }">
             Voir l'article

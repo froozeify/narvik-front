@@ -1,13 +1,13 @@
 <script setup lang="ts">
 
 import type {PropType} from "vue";
-import type {Sale} from "~/types/api/item/sale";
+import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
 import type {FormError} from "#ui/types";
-import SaleQuery from "~/composables/api/query/SaleQuery";
+import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
 import {formatDateTimeReadable} from "~/utils/date";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useSaleStore} from "~/stores/useSaleStore";
-import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
+import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
 
 const props = defineProps(
   {
@@ -21,7 +21,7 @@ const props = defineProps(
 const toast = useToast()
 const modal = useModal()
 
-const selfStore = useSelfMemberStore();
+const selfStore = useSelfUserStore();
 const saleStore = useSaleStore()
 const isAdmin = selfStore.isAdmin();
 
@@ -29,7 +29,7 @@ const isLoading = ref(false)
 
 const saleQuery = new SaleQuery()
 const sale: Sale = {...props.sale}
-const paymentModeValue = ref(sale.paymentMode?.id?.toString())
+const paymentModeValue = ref(sale.paymentMode?.uuid)
 
 if (saleStore.paymentModes.length < 1) {
   saleStore.getPaymentModes()
@@ -58,7 +58,7 @@ async function updateSale() {
 
   if (paymentModeValue.value) {
     const paymentModeQuery = new SalePaymentModeQuery()
-    payload.paymentMode = `/${paymentModeQuery.rootPath}/${paymentModeValue.value}`;
+    payload.paymentMode = `${paymentModeQuery.getRootUrl()}/${paymentModeValue.value}`;
   }
 
   if (payload.comment?.trim().length === 0) {
@@ -116,7 +116,7 @@ async function updateSale() {
       </UFormGroup>
 
       <UFormGroup label="Moyen de paiement" name="paymentMode">
-        <USelect v-model="paymentModeValue" :options="saleStore.paymentModes" option-attribute="name" value-attribute="id" />
+        <USelect v-model="paymentModeValue" :options="saleStore.paymentModes" option-attribute="name" value-attribute="uuid" />
       </UFormGroup>
 
       <UFormGroup label="Commentaire" name="comment">

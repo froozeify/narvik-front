@@ -1,22 +1,24 @@
 <script setup lang="ts">
 import type {PropType} from "vue";
-import type {MemberPresence} from "~/types/api/item/memberPresence";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import clipboard from "clipboardy";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
 import type {Image} from "~/types/api/item/image";
 import ImageQuery from "~/composables/api/query/ImageQuery";
-import MemberQuery from "~/composables/api/query/MemberQuery";
-import type {Member} from "~/types/api/item/member";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
+import type {Member} from "~/types/api/item/clubDependent/member";
 import {formatDateReadable} from "~/utils/date";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 
 import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
 import { Doughnut } from 'vue-chartjs'
-import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
+import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
+import {convertUuidToUrlUuid} from "~/utils/resource";
+
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 const toast = useToast()
-const selfStore = useSelfMemberStore()
+const selfStore = useSelfUserStore()
 const isAdmin = selfStore.isAdmin()
 const isSupervisor = selfStore.hasSupervisorRole()
 const isBadger = selfStore.isBadger()
@@ -59,15 +61,15 @@ const chartOptions = ref({
 
 const updateMemberPresenceModalOpen = ref(false);
 
-if (memberPresence.value && memberPresence.value.member?.id) {
+if (memberPresence.value && memberPresence.value.member?.uuid) {
   // We request the real member datas
-  memberQuery.get(memberPresence.value.member.id).then(memberResponse => {
+  memberQuery.get(memberPresence.value.member.uuid).then(memberResponse => {
     if (memberResponse.retrieved) {
       member.value = memberResponse.retrieved
 
       // We load the profile image
-      if (memberResponse.retrieved.profileImage) {
-        imageQuery.get(memberResponse.retrieved.profileImage).then(profileImage => {
+      if (memberResponse.retrieved.profileImage?.privateUrl) {
+        imageQuery.getFromUrl(memberResponse.retrieved.profileImage.privateUrl).then(profileImage => {
           if (profileImage.retrieved) {
             memberProfileImage.value = profileImage.retrieved
           }
@@ -78,7 +80,7 @@ if (memberPresence.value && memberPresence.value.member?.id) {
 }
 
 function loadPresenceHistory() {
-  if (!member.value || !member.value.id) return;
+  if (!member.value || !member.value.uuid) return;
 
   // We load the member stats
   const presenceUrlParams = new URLSearchParams({
@@ -87,7 +89,7 @@ function loadPresenceHistory() {
   });
 
   isLoadingPresences.value = true
-  memberQuery.presences(member.value.id, presenceUrlParams).then(presencesResponse => {
+  memberQuery.presences(member.value.uuid, presenceUrlParams).then(presencesResponse => {
     isLoadingPresences.value = false
     if (presencesResponse.items.length > 0) {
       memberPresences.value = presencesResponse.items
@@ -148,7 +150,7 @@ async function copyLicence() {
 
 function fullNameClicked() {
   if (selfStore.hasSupervisorRole() && member.value) {
-    navigateTo(`/admin/members/${member.value.id}`)
+    navigateTo(`/admin/members/${convertUuidToUrlUuid(member.value.uuid)}`)
   }
 }
 
@@ -205,8 +207,15 @@ function fullNameClicked() {
         </div>
 
         <div class="mx-auto my-0 h-24 w-24 aspect-square">
-          <img class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800" v-if="memberProfileImage" :src="memberProfileImage.base64" />
-          <USkeleton v-else class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+          <UAvatar
+            class="w-full h-full"
+            size="3xl"
+            :src="memberProfileImage?.base64"
+            :alt="member.fullName"
+            :ui="{
+              rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+            }"
+          />
         </div>
 
         <div class="space-y-4 w-full my-4">
@@ -215,7 +224,7 @@ function fullNameClicked() {
           </div>
           <div class="flex justify-center flex-wrap gap-2">
             <UBadge
-                v-if="member.currentSeason && member.currentSeason.ageCategory.code"
+                v-if="member.currentSeason && member.currentSeason.ageCategory"
                 variant="subtle"
                 color="amber"
                 :ui="{ rounded: 'rounded-full' }">
@@ -249,11 +258,11 @@ function fullNameClicked() {
             {{ member.licence }}
           </div>
           <div v-if="member.lastControlShooting" class="text-center text-xl">
-            Dernier tir de contrôle : {{ formatDateReadable(member.lastControlShooting) }}
+            Dernier tir de contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
           </div>
           <div class="flex gap-4 justify-center flex-wrap">
             <UButton
-                v-for="activity in memberPresence?.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
+                v-for="activity in memberPresence?.activities?.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
                 variant="soft"
                 :ui="{ rounded: 'rounded-full' }"
             >

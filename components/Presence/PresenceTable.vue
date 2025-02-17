@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type {MemberPresence} from "~/types/api/item/memberPresence";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import type {PropType} from "vue";
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
+import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {usePaginationValues} from "~/composables/api/list";
 import {formatDateReadable} from "~/utils/date";
 
@@ -92,6 +92,9 @@ const columns = [
 ]
 
 function rowClicked(row: MemberPresence|ExternalPresence) {
+  if (!props.isExternalPresences && !row.member) {
+    return;
+  }
   emit('rowClicked', row)
 }
 
@@ -138,7 +141,7 @@ function emitPaginate() {
         {{ row.licence }}
       </template>
       <template v-else>
-        {{ row.member.licence }}
+        {{ row.member?.licence }}
       </template>
     </template>
 
@@ -147,7 +150,7 @@ function emitPaginate() {
         {{ row.fullName }}
       </template>
       <template v-else>
-        <div class="flex flex-wrap gap-2">
+        <div v-if="row.member" class="flex flex-wrap gap-2">
           <UBadge v-if="row.member.currentSeason && row.member.currentSeason.isSecondaryClub"
             variant="subtle"
             color="green"
@@ -157,12 +160,13 @@ function emitPaginate() {
 
           <p class="inline-flex items-center w-full">{{ row.member.fullName }}</p>
         </div>
+        <p v-else class="italic">Membre supprimé</p>
       </template>
     </template>
 
     <template #activities-data="{row}">
       <div class="flex flex-1 flex-wrap gap-2">
-        <template v-if="!props.isExternalPresences">
+        <template v-if="!props.isExternalPresences && row.member">
           <div v-if="row.member.blacklisted" class="basis-full">
             <UButton
               color="black"
