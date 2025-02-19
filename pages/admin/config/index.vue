@@ -31,7 +31,7 @@ const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.b
 
 const configState = reactive({
   selectedControlShootingActivity: selectedProfile.value?.club.settings.controlShootingActivity?.uuid,
-  excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays.map((a: Activity) => a.uuid)
+  excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays?.map((a: Activity) => a.uuid)
 })
 const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
 
