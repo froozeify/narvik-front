@@ -76,6 +76,7 @@
     <UCard>
       <p>L'import ce fait grâce au fichier csv exporté depuis l'historique de présence.</p>
       <p>Celui-ci doit obligatoirement être au format csv.</p>
+      <p>Une fois le fichier envoyé, l'import est effectué en tâche de fond et peux prendre un certain temps.</p>
 
       <div class="grid grid-cols-11 my-4">
         <div class="col-span-5 space-y-2">
