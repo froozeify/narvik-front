@@ -23,4 +23,8 @@ export default class ClubQuery extends AbstractQuery<Club, WriteClub> {
   async getCurrentClub(useCache: boolean = false) {
     return useFetchItem<Club>(this.getCurrentClubPath(), useCache, true);
   }
+
+  async generateBadger() {
+    return usePatch<Club>(`${this.getCurrentClubPath()}/generate-badger`, {})
+  }
 }

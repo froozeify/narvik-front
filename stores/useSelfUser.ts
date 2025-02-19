@@ -213,6 +213,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
 
     selectedProfile.value = fakeProfile
     await refresh()
+    await refreshSelectedClubSettings()
     isImpersonating.value = true
 
     return true

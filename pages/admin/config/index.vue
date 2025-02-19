@@ -1,14 +1,14 @@
 <script setup lang="ts">
 
-import type {GlobalSetting} from "~/types/api/item/globalSetting";
 import clipboard from "clipboardy";
 import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import {useSelfUserStore} from "~/stores/useSelfUser";
-import {useAppConfigStore} from "~/stores/useAppConfig";
 import {convertUuidToUrlUuid} from "~/utils/resource";
 import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
+import ClubModalGenerateBadger from "~/components/Club/ClubModalGenerateBadger.vue";
+import type {Club} from "~/types/api/item/club";
 
 definePageMeta({
   layout: "admin"
@@ -19,6 +19,7 @@ useHead({
 })
 
 const toast = useToast()
+const modal = useModal()
 
 const selfStore = useSelfUserStore();
 const { selectedProfile } = storeToRefs(selfStore)
@@ -30,7 +31,7 @@ const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.b
 
 const configState = reactive({
   selectedControlShootingActivity: selectedProfile.value?.club.settings.controlShootingActivity?.uuid,
-  excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays.map((a: Activity) => a.uuid)
+  excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays?.map((a: Activity) => a.uuid)
 })
 const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
 
@@ -95,7 +96,6 @@ async function controlShootingUpdated() {
 }
 
 async function ignoredActivitiesDaysUpdated() {
-  console.log('call')
   if (!selectedProfile.value?.club.settings) return;
 
   const uris: string[] = []
@@ -184,31 +184,36 @@ async function deleteLogo() {
   <div class="grid gap-4 md:grid-cols-4">
     <UCard class="md:col-span-4">
       <div class="text-xl font-bold mb-4">Lien de connexion badger</div>
-      <div>A mettre en favoris sur l'ordinateur accessible publiquement.</div>
-      <div>Ce lien permet d'être automatiquement connecté en tant que badgeuse (accès seulement à la liste de présence).</div>
-      <div>Le lien peut être déposé directement dans la barre personnelle pour le marquer en favoris.</div>
-      <div v-if="!badgerSetting" class="mt-4">
+      <p>A mettre en favoris sur l'ordinateur accessible publiquement.</p>
+      <p>Ce lien permet d'être automatiquement connecté en tant que badgeuse (accès seulement à la liste de présence).</p>
+      <p>Le lien peut être déposé directement dans la barre personnelle pour le marquer en favoris.</p>
+
+      <UButton
+        class="my-4"
+        @click="modal.open(ClubModalGenerateBadger, {
+            onGenerated(newClub: Club) {
+              modal.close()
+              badgerSetting = newClub.badgerToken
+              selfStore.refreshSelectedClub()
+            }
+          })"
+      >
+        Générer un nouveau lien
+      </UButton>
+
+      <div v-if="!badgerSetting">
         <UAlert
-                class="mt-4"
-                icon="i-heroicons-exclamation-triangle"
-                color="red"
-                title="Token de connexion non défini"
-                description="Si cette affichage ne change pas au bout de quelques minutes, il se peut que le script de post-installation n'a pas été exécuté."
+          icon="i-heroicons-exclamation-triangle"
+          color="yellow"
+          title="Lien de connexion non généré."
         />
       </div>
       <div v-else
-         class="break-words cursor-pointer mt-4"
+         class="break-words cursor-pointer"
          @click.prevent="copyBadgerLink"
         >
 
-        <UAlert v-if="!badgerSetting"
-                class="mb-4"
-                icon="i-heroicons-exclamation-triangle"
-                color="red"
-                title="Token de connexion non défini"
-                description="Cela peut arriver lorsque le script de post-installation n'a pas été exécuté."
-        />
-        <a v-else :href="getBadgerLoginPath()"
+        <a :href="getBadgerLoginPath()"
            class="focus:outline-none disabled:cursor-not-allowed disabled:opacity-75 flex-shrink-0 font-medium rounded-md text-sm gap-x-1.5 px-2.5 py-1.5 shadow-sm text-white dark:text-gray-900 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-500 dark:bg-yellow-400 dark:hover:bg-yellow-500 dark:disabled:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500 dark:focus-visible:outline-yellow-400 flex justify-center"
         >
           Gestion de présence
