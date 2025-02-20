@@ -6,6 +6,8 @@
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
   import type {FormError} from "#ui/types";
   import {convertUuidToUrlUuid} from "~/utils/resource";
+  import type {NuxtError} from "#app";
+  import type {ItemError} from "~/types/api/itemError";
 
   definePageMeta({
     layout: "pos"
@@ -105,20 +107,22 @@
   async function updateCategory(category: InventoryCategory) {
     isLoading.value = true
     let payload: InventoryCategory = {
-      name: category.name
+      name: category.name,
+    }
+
+    if (category.weight) {
+      payload.weight = category.weight
     }
 
     // We verify if it's a creation or an update
-    let error: Error | undefined = undefined
+    let error: NuxtError<ItemError> | undefined = undefined
     if (!category.uuid) {
-      await apiQuery.post(payload).then(value => {
-        error = value.error
-        selectedCategory.value = value.created
-      });
+      let { created, error: errorMessage } = await apiQuery.post(payload);
+      error = errorMessage
+      selectedCategory.value = created
     } else { // Update
-      await apiQuery.patch(category, payload).then(value => {
-        error = value.error
-      });
+      let { error: errorMessage } = await apiQuery.patch(category, payload);
+      error = errorMessage
     }
 
     isLoading.value = false
@@ -198,7 +202,10 @@
             </template>
 
             <template #actions-data="{ row }">
-              <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+              <div class="flex items-center gap-1">
+                <p class="text-xs">{{ row.weight }}</p>
+                <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+              </div>
             </template>
 
           </UTable>
@@ -218,6 +225,9 @@
             <div class="flex gap-2 flex-col">
               <UFormGroup label="Nom" name="name">
                 <UInput v-model="selectedCategory.name" />
+              </UFormGroup>
+              <UFormGroup label="Poids dans la liste" name="weight">
+                <UInput type="number" v-model="selectedCategory.weight" />
               </UFormGroup>
             </div>
 

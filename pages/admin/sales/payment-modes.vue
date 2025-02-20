@@ -6,6 +6,8 @@ import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/s
 import type {FormError} from "#ui/types";
 import {UModals} from "#components";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+import type {NuxtError} from "#app";
+import type {ItemError} from "~/types/api/itemError";
 
 definePageMeta({
     layout: "pos"
@@ -115,17 +117,19 @@ definePageMeta({
       icon: paymentMode.icon
     }
 
+    if (paymentMode.weight) {
+      payload.weight = paymentMode.weight
+    }
+
     // We verify if it's a creation or an update
-    let error: Error | null = null
+    let error: NuxtError<ItemError> | undefined = undefined
     if (!paymentMode.uuid) {
-      await apiQuery.post(payload).then(value => {
-        error = value.error
-        selectedPaymentMode.value = value.created
-      });
+      let { created, error: errorMessage } = await apiQuery.post(payload);
+      error = errorMessage
+      selectedPaymentMode.value = created
     } else { // Update
-      await apiQuery.patch(paymentMode, payload).then(value => {
-        error = value.error
-      });
+      let { error: errorMessage } = await apiQuery.patch(paymentMode, payload);
+      error = errorMessage
     }
 
     isLoading.value = false
@@ -212,7 +216,10 @@ definePageMeta({
             </template>
 
             <template #actions-data="{ row }">
-              <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+              <div class="flex items-center gap-1">
+                <p class="text-xs">{{ row.weight }}</p>
+                <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+              </div>
             </template>
 
           </UTable>
@@ -255,6 +262,10 @@ definePageMeta({
 
                 <UInput v-model="selectedPaymentMode.icon" />
 
+              </UFormGroup>
+
+              <UFormGroup label="Poids dans la liste" name="weight">
+                <UInput type="number" v-model="selectedPaymentMode.weight" />
               </UFormGroup>
             </div>
 
