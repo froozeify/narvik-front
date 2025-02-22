@@ -239,6 +239,14 @@ function fullNameClicked() {
               </UButton>
             </div>
 
+            <div v-if="member.medicalCertificateExpiration && member.medicalCertificateStatus !== 'valid'" class="basis-full text-center">
+              <UButton
+                :color="member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
+                :ui="{ rounded: 'rounded-full' }">
+                Certificat médical : {{ formatDateReadable(member.medicalCertificateExpiration.toString()) }}
+              </UButton>
+            </div>
+
             <UButton
               v-if="!member.currentSeason"
               color="red"

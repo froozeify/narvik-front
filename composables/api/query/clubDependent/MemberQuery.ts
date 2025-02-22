@@ -37,6 +37,10 @@ export default class MemberQuery extends AbstractClubDependentQuery<Member, Memb
     return usePost<Member[]>(`${this.getRootUrl()}/-/search`, {query});
   }
 
+  async importFromEden(formData: FormData) {
+    return useUploadFile(this.getRootUrl() + "/-/from-eden", formData)
+  }
+
   async importFromItac(formData: FormData) {
     return useUploadFile(this.getRootUrl() + "/-/from-itac", formData)
   }

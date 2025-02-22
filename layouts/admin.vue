@@ -56,7 +56,7 @@
     {
       label: 'Membres',
       icon: 'i-heroicons-users',
-      to: '/admin/imports/itac'
+      to: '/admin/imports/members'
     },
     {
       label: 'Photos',

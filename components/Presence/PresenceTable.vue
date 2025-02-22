@@ -183,6 +183,14 @@ function emitPaginate() {
             </UButton>
           </div>
 
+          <div v-if="row.member.medicalCertificateExpiration && row.member.medicalCertificateStatus !== 'valid'" class="basis-full">
+            <UButton
+              :color="row.member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
+              :ui="{ rounded: 'rounded-full' }">
+              Certificat médical : {{ formatDateReadable(row.member.medicalCertificateExpiration.toString()) }}
+            </UButton>
+          </div>
+
           <div v-if="new Date((new Date()).setFullYear((new Date().getFullYear() - 1))) > new Date(row.member.lastControlShooting)"
                class="basis-full">
             <UButton

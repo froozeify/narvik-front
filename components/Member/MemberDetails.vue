@@ -571,6 +571,14 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                   Saison non renouvelée
                 </UButton>
               </div>
+
+              <div v-if="member.medicalCertificateExpiration && member.medicalCertificateStatus !== 'valid'">
+                <UButton
+                  :color="member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
+                  :ui="{ rounded: 'rounded-full' }">
+                  Certificat médical : {{ formatDateReadable(member.medicalCertificateExpiration.toString()) }}
+                </UButton>
+              </div>
             </div>
 
             <div class="grid lg:grid-cols-2 text-sm">

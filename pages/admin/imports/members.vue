@@ -86,6 +86,24 @@
       color: "green"
     })
   }
+
+  async function importFromEden(event: any) {
+    const formData = getFileFormDataFromUInputChangeEvent(event);
+
+    if (!formData) {
+      return;
+    }
+
+    fileUploading.value = true
+    const {created, error} = await memberQuery.importFromEden(formData)
+    fileUploading.value = false
+
+    if (error) {
+      return displayFileErrorToast(error.message)
+    }
+
+    displayFileSuccessToast();
+  }
 </script>
 
 <template>
@@ -154,10 +172,32 @@
     </UCard>
 
 
-    <UCard>
+    <UCard class="my-4">
+      <p class="font-bold">Certificat médicaux</p>
+      <p>Pour le moment itac n'exporte pas la date de validité du certificat médical.</p>
+      <p>Pour ce faire vous devais télécharger le fichier excel fourni par eden.</p>
 
+      <UInput
+        class="my-2"
+        :loading="fileUploading"
+        :disabled="fileUploading"
+        type="file"
+        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        icon="i-heroicons-document-text"
+        v-model="state.file"
+        @change="importFromEden"
+      />
 
+      <p class="my-2">Example</p>
 
+      <pre class=" w-full text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
+N° licence | Date d'expiration
+01234578   | 11.11.2024</pre>
+
+      <div class="flex gap-2 mt-4">
+        <UButton target="_blank" to="https://narvik.pages.dev/frontend/docs/import/eden.html#import-des-certificats-medicaux">Documentation</UButton>
+        <div class="flex-1"></div>
+      </div>
     </UCard>
 
   </div>
