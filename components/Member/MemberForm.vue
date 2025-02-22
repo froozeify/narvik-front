@@ -118,15 +118,27 @@ async function submitItem() {
       </UFormGroup>
     </div>
 
-    <UFormGroup label="Date de naissance" name="birthday">
-      <UPopover :popper="{ placement: 'bottom-start' }">
-        <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.birthday?.toString()) || 'Choisir une date'" />
+    <div class="flex justify-between">
+      <UFormGroup label="Date de naissance" name="birthday">
+        <UPopover :popper="{ placement: 'bottom-start' }">
+          <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.birthday?.toString()) || 'Choisir une date'" />
 
-        <template #panel="{ close }">
-          <GenericDatePicker v-model="item.birthday" mode="date" @close="close" />
-        </template>
-      </UPopover>
-    </UFormGroup>
+          <template #panel="{ close }">
+            <GenericDatePicker v-model="item.birthday" mode="date" @close="close" />
+          </template>
+        </UPopover>
+      </UFormGroup>
+
+      <UFormGroup label="Certificat médical" name="medicalCertificateExpiration">
+        <UPopover :popper="{ placement: 'bottom-start' }">
+          <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.medicalCertificateExpiration?.toString()) || 'Choisir une date'" />
+
+          <template #panel="{ close }">
+            <GenericDatePicker v-model="item.medicalCertificateExpiration" mode="date" @close="close" />
+          </template>
+        </UPopover>
+      </UFormGroup>
+    </div>
 
     <UFormGroup label="Licence" name="licence">
       <UInput v-model="item.licence" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />

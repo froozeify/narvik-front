@@ -14,6 +14,9 @@ export interface Member extends UuidItem, ClubLinkedItem {
   role?: ClubRole
   linkedEmail?: string
 
+  medicalCertificateExpiration?: Date|null;
+  medicalCertificateStatus?: string
+
   email?: string;
   licence?: string;
   firstname?: string;
