@@ -74,7 +74,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
         // We are already refreshing we wait
         await delay(100)
         // Taking to long to refresh we are in timeout
-        if (delayedCalled > 100) { // 10 seconds
+        if (delayedCalled > 300) { // 30 seconds
           return displayJwtError("Taking too long to refresh the token.", true);
         }
         return enhanceJwtTokenDefined(++delayedCalled);
