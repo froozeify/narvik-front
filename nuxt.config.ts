@@ -43,8 +43,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       clientVersion: pkg.version,
-      clientId: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
+      clientId: '', // can be overridden by NUXT_PUBLIC_CLIENT_ID environment variable
+      clientSecret: '', // can be overridden by NUXT_PUBLIC_CLIENT_SECRET environment variable
     },
 
     apiParty: {
