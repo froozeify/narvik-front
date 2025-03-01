@@ -45,6 +45,9 @@ export default defineNuxtConfig({
       clientVersion: pkg.version,
       clientId: '', // can be overridden by NUXT_PUBLIC_CLIENT_ID environment variable
       clientSecret: '', // can be overridden by NUXT_PUBLIC_CLIENT_SECRET environment variable
+
+      badgerClientId: '', // can be overridden by NUXT_PUBLIC_BADGER_CLIENT_ID environment variable
+      badgerClientSecret: '', // can be overridden by NUXT_PUBLIC_BADGER_CLIENT_SECRET environment variable
     },
 
     apiParty: {
