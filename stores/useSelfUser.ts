@@ -56,7 +56,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     return ref(null)
   }
 
-  async function enhanceJwtTokenDefined(delayedCalled: number = 0) {
+  async function enhanceJwtTokenDefined(delayedCalled: number = 0, bigFail: number = 0) {
     const jwtToken = getSelfJwtToken()
 
     if (!jwtToken || !jwtToken.value) {
@@ -74,18 +74,26 @@ export const useSelfUserStore = defineStore('selfUser', () => {
         // We are already refreshing we wait
         await delay(100)
         // Taking to long to refresh we are in timeout
-        if (delayedCalled > 300) { // 30 seconds
-          return displayJwtError("Taking too long to refresh the token.", true);
+        if (delayedCalled > 100) { // 10 seconds
+          isRefreshingJwtToken.value = false
+
+          if (bigFail > 5) {
+            return displayJwtError("Trop de tentative de connexion, veuillez-vous reconnecter.", true);
+          }
+
+          displayJwtError("Taking too long to refresh the token.", false);
+          return enhanceJwtTokenDefined(++delayedCalled, ++bigFail)
         }
-        return enhanceJwtTokenDefined(++delayedCalled);
+        return enhanceJwtTokenDefined(++delayedCalled, bigFail);
       }
 
       isRefreshingJwtToken.value = true
       const newJwtToken = await useRefreshAccessToken(jwtToken)
-      if (!newJwtToken || !jwtToken.value) {
-        return logJwtError('An error occurred when refreshing the token.')
-      }
       isRefreshingJwtToken.value = false
+
+      if (!newJwtToken || !jwtToken.value) {
+        return displayJwtError('An error occurred when refreshing the token.')
+      }
     }
 
     return jwtToken;
