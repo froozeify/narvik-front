@@ -16,6 +16,14 @@ export const MIME_TYPE_CSV = "text/csv"
 
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data"
 
+function getBasicAuthorization(isBadger: boolean = false): string {
+  let bearer = useRuntimeConfig().public.clientId + ':' + useRuntimeConfig().public.clientSecret
+  if (isBadger || useSelfUserStore().selfJwtToken?.isBadger) {
+    bearer = useRuntimeConfig().public.badgerClientId + ':' + useRuntimeConfig().public.badgerClientSecret
+  }
+  return `Basic ${btoa(bearer)}`
+}
+
 async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLogin: boolean = true) {
   let overloadedOptions = {}
 
@@ -58,7 +66,7 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
 
 
   if (!overloadedOptions?.headers?.Authorization) {
-    overloadedOptions.headers.Authorization = `Basic ${btoa(useRuntimeConfig().public.clientId + ':' + useRuntimeConfig().public.clientSecret) }`
+    overloadedOptions.headers.Authorization = getBasicAuthorization()
   }
 
   return await $localApi<T>(path, overloadedOptions);
@@ -85,10 +93,10 @@ export async function useLoginBadger(clubId: string, loginToken: string) {
   const { data } = await usePostRawJson("auth/bdg", {
     token: loginToken,
     club: decodeUrlUuid(clubId)
-  });
+  }, true);
 
   const selfStore = useSelfUserStore()
-  selfStore.setJwtSelfJwtTokenFromApiResponse(data)
+  selfStore.setJwtSelfJwtTokenFromApiResponse(data, true)
 
   await selfStore.refresh()
 
@@ -100,7 +108,7 @@ export async function useLoginBadger(clubId: string, loginToken: string) {
 
 
 
-export async function usePostRawJson(path: string, payload?: object) {
+export async function usePostRawJson(path: string, payload?: object, isBadger: boolean = false) {
   let data: any | undefined = undefined;
   let error: NuxtError | undefined = undefined;
 
@@ -109,7 +117,7 @@ export async function usePostRawJson(path: string, payload?: object) {
       method: "POST",
       headers: {
         Accept: MIME_TYPE_JSON,
-        Authorization: `Basic ${btoa(useRuntimeConfig().public.clientId + ':' + useRuntimeConfig().public.clientSecret) }`
+        Authorization: getBasicAuthorization(isBadger)
       },
       body: payload
     });

@@ -108,7 +108,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     const { data, error } = await usePostRawJson("token", {
       grant_type: "refresh_token",
       refresh_token: jwtToken.value.refresh.token
-    });
+    }, jwtToken.value.isBadger);
 
     if (error) {
       displayJwtError("An error occured when refreshing the session.")
@@ -116,11 +116,12 @@ export const useSelfUserStore = defineStore('selfUser', () => {
       return null
     }
 
-    return setJwtSelfJwtTokenFromApiResponse(data);
+    return setJwtSelfJwtTokenFromApiResponse(data, jwtToken.value.isBadger);
   }
 
-  function setJwtSelfJwtTokenFromApiResponse(data: any): JwtToken {
-    const jwtToken = new JwtToken();
+  function setJwtSelfJwtTokenFromApiResponse(data: any, isBadger: boolean = false): JwtToken {
+    const jwtToken = new JwtToken(isBadger);
+
     jwtToken.access = {
       date: new Date(Date.now() + (3480 * 1000)), // Expires in 1h - 2mn (to get some room on the token expiration),
       token: data.access_token
