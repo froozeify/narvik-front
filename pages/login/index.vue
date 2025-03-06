@@ -10,7 +10,7 @@ const isLoading = ref(false)
 
 const state = reactive({
   email: undefined,
-  password: undefined,
+  password: undefined
 })
 
 const appConfigStore = useAppConfigStore();
