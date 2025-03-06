@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     'pinia-plugin-persistedstate/nuxt',
     '@nuxt/image',
     'nuxt-api-party',
+    '@nuxtjs/turnstile',
   ],
 
   ui: {
@@ -48,6 +49,8 @@ export default defineNuxtConfig({
 
       badgerClientId: '', // can be overridden by NUXT_PUBLIC_BADGER_CLIENT_ID environment variable
       badgerClientSecret: '', // can be overridden by NUXT_PUBLIC_BADGER_CLIENT_SECRET environment variable
+
+      clientTurnstile: false
     },
 
     apiParty: {
@@ -57,6 +60,11 @@ export default defineNuxtConfig({
         }
       }
     }
+  },
+
+  turnstile: {
+    siteKey: '',
+    addValidateEndpoint: false
   },
 
   compatibilityDate: '2024-07-15',

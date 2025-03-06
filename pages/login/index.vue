@@ -14,6 +14,7 @@ const state = reactive({
 })
 
 const appConfigStore = useAppConfigStore();
+
 const selfStore = useSelfUserStore();
 const siteLogo: Ref<string> = appConfigStore.getLogo()
 const notificationsModule = appConfigStore.getModuleConfig('notifications')

@@ -12,7 +12,9 @@
   },
   "devDependencies": {
     "@nuxt/image": "1.9.0",
+    "@nuxt/scripts": "^0.10.0",
     "@nuxt/ui": "^2.21.0",
+    "@nuxtjs/turnstile": "0.9.12",
     "chart.js": "^4.4.7",
     "jwt-decode": "^4.0.0",
     "mergician": "^2.0.2",
