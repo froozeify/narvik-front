@@ -56,7 +56,7 @@
           @change="getFileObject"
       />
 
-      <UButton target="_blank" to="https://narvik.pages.dev/frontend/docs/import/itac.html#import-des-photos">Documentation</UButton>
+      <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/itac.html#import-des-photos">Documentation</UButton>
 
     </UCard>
   </div>

@@ -164,7 +164,7 @@
       </div>
 
       <div class="flex gap-2">
-        <UButton target="_blank" to="https://narvik.pages.dev/frontend/docs/import/itac.html#import-des-membres">Documentation</UButton>
+        <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/itac.html#import-des-membres">Documentation</UButton>
         <div class="flex-1"></div>
         <UButton @click="migrateExternal()" variant="ghost" color="green" :disabled="((selfStore.selectedProfile?.club.settings.itacSecondaryImportRemaining && selfStore.selectedProfile.club.settings.itacSecondaryImportRemaining) ?? 0) > 0">Migration présence externe vers présence membres</UButton>
       </div>
@@ -195,7 +195,7 @@ N° licence | Date d'expiration
 01234578   | 11.11.2024</pre>
 
       <div class="flex gap-2 mt-4">
-        <UButton target="_blank" to="https://narvik.pages.dev/frontend/docs/import/eden.html#import-des-certificats-medicaux">Documentation</UButton>
+        <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/eden.html#import-des-certificats-medicaux">Documentation</UButton>
         <div class="flex-1"></div>
       </div>
     </UCard>
