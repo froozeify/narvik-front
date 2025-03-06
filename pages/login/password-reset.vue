@@ -3,15 +3,20 @@ import type {FormError} from '#ui/types'
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {isMobile, isTablet, watchBreakpoint} from "~/utils/browser";
+import type {NuxtTurnstile} from "#components";
 
 const toast = useToast()
 const isLoading = ref(false)
 
 const state = reactive({
+  turnstileToken: undefined,
   email: undefined,
   password: undefined,
   securityCode: undefined,
 })
+
+const turnstile = ref<InstanceType<typeof NuxtTurnstile>>()
+const requireTurnstile = useRuntimeConfig().public.clientTurnstile
 
 const appConfigStore = useAppConfigStore();
 const siteLogo: Ref<string> = appConfigStore.getLogo()
@@ -73,9 +78,15 @@ async function initiatePasswordReset() {
     return
   }
 
+  if (requireTurnstile && !state.turnstileToken) {
+    turnstile.value?.reset()
+    return
+  }
+
   isLoading.value = true
-  const { error } = await userQuery.passwordResetInitialise(state.email)
+  const { error } = await userQuery.passwordResetInitialise(state.email, state.turnstileToken)
   isLoading.value = false
+  turnstile.value?.reset()
 
   if (error) {
     toast.add({
@@ -123,6 +134,8 @@ onBeforeUnmount(() => {
               <UFormGroup label="Email" name="email">
                 <UInput v-model="state.email" type="email" />
               </UFormGroup>
+
+              <NuxtTurnstile v-if="requireTurnstile" v-model="state.turnstileToken" />
 
               <UButton type="submit" :loading="isLoading">
                 Valider

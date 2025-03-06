@@ -16,9 +16,10 @@ import type {User} from "~/types/api/item/user";
 export default class UserQuery extends AbstractQuery<User, User> {
   rootPath = "users";
 
-  async registerInitialise(email: string) {
+  async registerInitialise(email: string, turnstileToken: string|undefined = undefined) {
     return usePostRawJson(`${this.rootPath}/-/initiate-register`, {
-      email: email
+      email: email,
+      token: turnstileToken
     });
   }
 
@@ -32,9 +33,10 @@ export default class UserQuery extends AbstractQuery<User, User> {
     });
   }
 
-  async passwordResetInitialise(email: string) {
+  async passwordResetInitialise(email: string, turnstileToken: string|undefined = undefined) {
     return usePostRawJson(`${this.rootPath}/-/initiate-reset-password`, {
-      email: email
+      email: email,
+      token: turnstileToken
     });
   }
 

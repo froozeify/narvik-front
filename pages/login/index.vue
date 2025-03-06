@@ -15,14 +15,9 @@ const state = reactive({
 })
 
 const appConfigStore = useAppConfigStore();
-<<<<<<< HEAD
-const hasTurnstile = useRuntimeConfig().public.clientTurnstile
 
-const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
-=======
 const selfStore = useSelfUserStore();
 const siteLogo: Ref<string> = appConfigStore.getLogo()
->>>>>>> main
 const notificationsModule = appConfigStore.getModuleConfig('notifications')
 
 const validate = (state: any): FormError[] => {
@@ -91,12 +86,6 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
           <UInput v-model="state.password" type="password" />
         </UFormGroup>
 
-<<<<<<< HEAD
-        <NuxtTurnstile v-show="hasTurnstile" v-model="state.turnstile" />
-
-        <div class="flex justify-between">
-          <UButton type="submit" :loading="isLoading">
-=======
         <div class="flex justify-end !-mt-0 ">
           <UButton class="text-xs" v-if="notificationsModule && notificationsModule['enabled']" variant="link" @click="navigateTo('login/password-reset')">
             Mot de passe oublié
@@ -105,7 +94,6 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
 
         <div class="flex flex-col justify-center gap-4">
           <UButton block type="submit" :loading="isLoading">
->>>>>>> main
             Connexion
           </UButton>
 

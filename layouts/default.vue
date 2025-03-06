@@ -4,7 +4,7 @@ import FooterCopyright from "~/components/FooterCopyright.vue";
 
 <template>
   <div>
-    <main class="min-h-full h-screen flex justify-center items-center">
+    <main class="min-h-full h-full flex justify-center items-center">
       <div class="container m-auto p-4 md:p-12 md:max-w-screen-md">
         <slot/>
       </div>
