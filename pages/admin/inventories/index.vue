@@ -1,10 +1,12 @@
 <script setup lang="ts">
   import {usePaginationValues} from "~/composables/api/list";
-  import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-  import type {InventoryItem} from "~/types/api/item/inventoryItem";
-  import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
-  import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
-  import {verifyCameraIsPresent} from "~/utils/browser";
+  import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
+  import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
+  import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
+  import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
+  import {createBrowserCsvDownload, verifyCameraIsPresent} from "~/utils/browser";
+  import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
+  import {formatDateInput} from "~/utils/date";
 
   definePageMeta({
     layout: "pos"
@@ -26,8 +28,8 @@
     categories.value = value.items
 
     // Filter is apply on a category
-    if (!isNaN(queryParams.category)) {
-      const matchedCategory = value.items.find( (category) => category.id == queryParams.category)
+    if (queryParams.category !== undefined) {
+      const matchedCategory = value.items.find( (category) => category.uuid == decodeUrlUuid(queryParams.category?.toString()))
       if (matchedCategory) {
         filteredCategories.value.push(matchedCategory)
         useRouter().replace(useRouter().currentRoute.value.path) // We remove the param from the url
@@ -38,6 +40,7 @@
 
   const apiItems: Ref<InventoryItem[]> = ref([])
   const isLoading = ref(true);
+  const isDownloadingCsv = ref(false)
   const totalApiItems = ref(0)
   const selectedItem: Ref<InventoryItem | undefined> = ref(undefined)
 
@@ -95,8 +98,8 @@
 
     if (filteredCategories.value.length > 0) {
       filteredCategories.value.forEach(filteredCategory => {
-        if (!filteredCategory.id) return;
-        urlParams.append('category.id[]', filteredCategory.id.toString())
+        if (!filteredCategory.uuid) return;
+        urlParams.append('category.uuid[]', filteredCategory.uuid)
       })
     }
 
@@ -139,12 +142,35 @@
     page.value = 1
     getItemsPaginated()
   }
+
+  async function downloadCsv() {
+    isDownloadingCsv.value = true
+
+    const urlParams = new URLSearchParams({
+      pagination: 'false',
+    });
+
+    if (searchQuery.value) {
+      urlParams.append(`multiple[name, barcode]`, searchQuery.value);
+    }
+
+    // We make the search
+    const { data } = await apiQuery.getAllCsv(urlParams)
+    isDownloadingCsv.value = false
+    createBrowserCsvDownload('inventory-items.csv', data)
+  }
 </script>
 
 <template>
   <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = undefined;" :has-side-content="selectedItem !== undefined" :mobile-side-title="selectedItem?.name" tabindex="-1">
     <template #main>
       <UCard>
+        <div class="flex mb-2">
+          <div class="flex-1"></div>
+          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
+            CSV
+          </UButton>
+        </div>
         <div class="flex gap-2 flex-col flex-wrap sm:flex-row">
           <GenericBarcodeReader
             v-model="cameraPreview"
@@ -260,7 +286,7 @@
           </UButton>
         </UCard>
 
-        <UButton block :to="'/admin/inventories/items/' + selectedItem.id">Voir en détail</UButton>
+        <UButton block :to="'/admin/inventories/items/' + convertUuidToUrlUuid(selectedItem.uuid)">Voir en détail</UButton>
       </template>
     </template>
 

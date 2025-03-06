@@ -1,6 +1,5 @@
 <script setup lang="ts">
-  import {useSetSiteFavicon} from "~/composables/image";
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
   import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
 
   useHead({
@@ -9,9 +8,7 @@
     }
   });
 
-  useSetSiteFavicon()
-
-  const selfStore = useSelfMemberStore()
+  const selfStore = useSelfUserStore()
 
   const isAdmin = selfStore.isAdmin()
   const isSupervisor = selfStore.hasSupervisorRole()
@@ -34,11 +31,6 @@
       label: 'Activités',
       icon: 'i-heroicons-rocket-launch',
       to: '/admin/config/activities'
-    },
-    {
-      label: 'Email',
-      icon: 'i-heroicons-envelope',
-      to: '/admin/config/email'
     }
   ]
 
@@ -64,12 +56,7 @@
     {
       label: 'Membres',
       icon: 'i-heroicons-users',
-      to: '/admin/imports/itac'
-    },
-    {
-      label: 'Club secondaire',
-      icon: 'i-heroicons-user-plus',
-      to: '/admin/imports/itac-secondary-club'
+      to: '/admin/imports/members'
     },
     {
       label: 'Photos',
@@ -108,6 +95,15 @@
 
 <template>
   <GenericLayoutAdmin :links="links">
+    <UAlert
+      v-if="!selfStore.selectedProfile?.club.isActivated"
+      class="mb-4"
+      icon="i-heroicons-link-slash"
+      color="red"
+      variant="subtle"
+      title="Lecture seule. Club non activé."
+      description="Le club n'est pas activé, aucune modification ne sera possible. Veuillez contacter le support pour plus d'information."
+    />
     <slot></slot>
   </GenericLayoutAdmin>
 </template>

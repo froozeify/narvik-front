@@ -1,6 +1,5 @@
 <script setup lang="ts">
-  import {useSetSiteFavicon} from "~/composables/image";
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
   import FooterCopyright from "~/components/FooterCopyright.vue";
   import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
 
@@ -10,9 +9,7 @@
     }
   });
 
-  useSetSiteFavicon()
-
-  const selfStore = useSelfMemberStore()
+  const selfStore = useSelfUserStore()
   const isAdmin = selfStore.isAdmin()
   const isSupervisor = selfStore.hasSupervisorRole()
 
@@ -52,13 +49,17 @@
       label: 'Moyen de paiements',
       icon: 'i-heroicons-credit-card',
       to: '/admin/sales/payment-modes'
+    },{
+      label: 'Imports',
+      icon: 'i-heroicons-arrow-down-on-square-stack',
+      to: '/admin/sales/import'
     }
   ]
 
   let links: GroupedNavigationLinks[] = [
     {
       links: salesSection
-    },{
+    }, {
       title: 'Historique',
       links: historySection
     }
@@ -75,6 +76,15 @@
 
 <template>
   <GenericLayoutAdmin :links="links">
+    <UAlert
+      v-if="!selfStore.selectedProfile?.club.salesEnabled"
+      class="mb-4"
+      icon="i-heroicons-link-slash"
+      color="red"
+      variant="subtle"
+      title="Lecture seule. Plugin non activé."
+      description="Pour pouvoir l'utiliser veuillez contacter le support."
+    />
     <slot/>
   </GenericLayoutAdmin>
 </template>

@@ -4,7 +4,7 @@ import {useFetchItem, usePost, useUploadFile} from "~/composables/api/api";
 import type {FetchItemData} from "~/types/api/api";
 import type {SmtpConfig} from "~/types/api/smtp";
 
-export default class GlobalSettingQuery extends AbstractQuery<GlobalSetting> {
+export default class GlobalSettingQuery extends AbstractQuery<GlobalSetting, GlobalSetting> {
     rootPath = "global-settings";
 
     async importLogo(formData: FormData) {

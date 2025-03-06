@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {formatMonetary} from "~/utils/string";
 import {formatDateRangeReadable, formatDateTimeReadable} from "~/utils/date";
-import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
 import {useSaleStore} from "~/stores/useSaleStore";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import {convertUuidToUrlUuid} from "~/utils/resource";
 
 const props = defineProps({
     perItem: {
@@ -13,7 +14,7 @@ const props = defineProps({
     },
   })
 
-  const selfStore = useSelfMemberStore()
+  const selfStore = useSelfUserStore()
   const saleStore = useSaleStore()
   const { selectedRange, isLoading, lastRefreshDate, sales, paymentModes } = storeToRefs(saleStore)
 
@@ -190,7 +191,7 @@ const props = defineProps({
 
           <template #id-data="{ row }">
             <UButton
-              :to="'/admin/sales/' + row.id"
+              :to="'/admin/sales/' + convertUuidToUrlUuid(row.uuid)"
               variant="soft"
               :ui="{ rounded: 'rounded-full' }">
               Voir le détail

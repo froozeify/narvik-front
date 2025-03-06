@@ -3,7 +3,7 @@ import type {FormError, FormSubmitEvent} from '#ui/types'
 import {useLoginUser} from "~/composables/api/api";
 import type {Image} from "~/types/api/item/image";
 import {useAppConfigStore} from "~/stores/useAppConfig";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 
 const toast = useToast()
 const isLoading = ref(false)
@@ -15,9 +15,14 @@ const state = reactive({
 })
 
 const appConfigStore = useAppConfigStore();
+<<<<<<< HEAD
 const hasTurnstile = useRuntimeConfig().public.clientTurnstile
 
 const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
+=======
+const selfStore = useSelfUserStore();
+const siteLogo: Ref<string> = appConfigStore.getLogo()
+>>>>>>> main
 const notificationsModule = appConfigStore.getModuleConfig('notifications')
 
 const validate = (state: any): FormError[] => {
@@ -55,28 +60,17 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
   if (error) {
     toast.add({
       color: "red",
-      title: error.statusCode === 401 ? "Erreur de connexion" : "Trop de tentative",
-      description: error.statusCode === 401 ? 'Mauvais email/mot de passe' : 'Veuillez réessayer dans 15 minutes.'
+      title: error.statusCode === 400 ? "Erreur de connexion" : "Trop de tentative",
+      description: error.statusCode === 400 ? 'Mauvais email/mot de passe' : 'Veuillez réessayer dans 5 minutes.'
     })
     console.error(error)
     isLoading.value = false
     return;
   }
 
-  try {
-    const selfStore = useSelfMemberStore();
-    await selfStore.refresh();
-  } catch (e) {
-    toast.add({
-      color: "red",
-      title: "Erreur de connexion"
-    })
-    console.error(e)
-    isLoading.value = false
-    return;
+  if (selfStore.isSuperAdmin()) {
+    navigateTo('/super-admin');
   }
-
-  isLoading.value = false
   navigateTo('/');
 }
 </script>
@@ -84,7 +78,7 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
 <template>
   <div>
     <div v-if="siteLogo" class="h-24 flex justify-center mb-4">
-      <img :src="siteLogo.base64" class="h-full" />
+      <NuxtImg :src="siteLogo" class="h-full" />
     </div>
 
     <UCard>
@@ -97,15 +91,28 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
           <UInput v-model="state.password" type="password" />
         </UFormGroup>
 
+<<<<<<< HEAD
         <NuxtTurnstile v-show="hasTurnstile" v-model="state.turnstile" />
 
         <div class="flex justify-between">
           <UButton type="submit" :loading="isLoading">
+=======
+        <div class="flex justify-end !-mt-0 ">
+          <UButton class="text-xs" v-if="notificationsModule && notificationsModule['enabled']" variant="link" @click="navigateTo('login/password-reset')">
+            Mot de passe oublié
+          </UButton>
+        </div>
+
+        <div class="flex flex-col justify-center gap-4">
+          <UButton block type="submit" :loading="isLoading">
+>>>>>>> main
             Connexion
           </UButton>
 
-          <UButton v-if="notificationsModule && notificationsModule['enabled']" variant="ghost" @click="navigateTo('login/password-reset')">
-            Mot de passe oublié
+          <UDivider label="Ou" />
+
+          <UButton block :disabled="isLoading" variant="soft" to="login/register">
+            S'enregistrer
           </UButton>
         </div>
       </UForm>

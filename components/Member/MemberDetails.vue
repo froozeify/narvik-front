@@ -1,22 +1,28 @@
 <script setup lang="ts">
-  import type {PropType} from "vue";
-  import {getAvailableMemberRoles, type Member} from "~/types/api/item/member";
-  import MemberQuery from "~/composables/api/query/MemberQuery";
-  import type {Image} from "~/types/api/item/image";
-  import ImageQuery from "~/composables/api/query/ImageQuery";
-  import type {MemberPresence} from "~/types/api/item/memberPresence";
-  import MemberPresenceQuery from "~/composables/api/query/MemberPresenceQuery";
-  import { formatDate, formatDateReadable } from "~/utils/date"
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+import type {PropType} from "vue";
+import {type Member} from "~/types/api/item/clubDependent/member";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
+import type {Image} from "~/types/api/item/image";
+import ImageQuery from "~/composables/api/query/ImageQuery";
+import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
+import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
+import {formatDate, formatDateReadable} from "~/utils/date"
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
+import {usePaginationValues} from "~/composables/api/list";
+import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
+import type {MemberSeason, MemberSeasonWrite} from "~/types/api/item/clubDependent/memberSeason";
+import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
 
-  import { Chart as ChartJS, Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors } from 'chart.js'
-  import { Doughnut } from 'vue-chartjs'
-  import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
-  import {usePaginationValues} from "~/composables/api/list";
-  import ActivityQuery from "~/composables/api/query/ActivityQuery";
-  import type {Activity} from "~/types/api/item/activity";
-  import type {MemberSeason} from "~/types/api/item/memberSeason";
-  ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
+import { ArcElement, CategoryScale, Chart as ChartJS, Colors, DoughnutController, Legend, LinearScale, Title, Tooltip } from 'chart.js'
+import {Doughnut} from 'vue-chartjs'
+import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeasonQuery";
+import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
+import MemberEditLinkedEmailModal from "~/components/Member/MemberEditLinkedEmailModal.vue";
+
+ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
 
   const props = defineProps({
@@ -27,33 +33,35 @@
     memberId: {
       type: String,
       required: false
+    },
+    self: {
+      type: Boolean,
+      default: false
     }
   });
 
   // Default var setting
 
   const toast = useToast()
-  const selfStore = useSelfMemberStore();
+  const modal = useModal()
+
+  const selfStore = useSelfUserStore();
 
   const loggedUsername = selfStore.member?.email
+  const isSuperAdmin = selfStore.isSuperAdmin();
   const isAdmin = selfStore.isAdmin();
   const isSupervisor = selfStore.hasSupervisorRole();
 
   const addMemberPresenceModal = ref(false)
   const selectedPresence: Ref<MemberPresence | undefined> = ref(undefined)
   const memberPresenceModal: Ref<boolean> = ref(false);
-  const updatePasswordModalOpen = ref(false)
-
-  const passwordState = reactive({
-    current: undefined as string|undefined,
-    new: undefined as string|undefined,
-    new2: undefined as string|undefined
-  })
 
   const member: Ref<Member | undefined> = ref(undefined)
   const memberProfileImage: Ref<Image | undefined> = ref(undefined)
   const memberPresences: Ref<MemberPresence[]> = ref([])
   const totalMemberPresences = computed(() => memberPresences.value.length)
+
+  const isLoadingMemberSeasons = ref(false)
   const memberSeasons: Ref<MemberSeason[]> = ref([])
 
   const isLoadingMemberPresencesPaginated = ref(false)
@@ -61,6 +69,8 @@
   const totalMemberPresencesPaginated = ref(0)
 
   const isDownloadingCsv = ref(false)
+  const itemModalOpen = ref(false)
+
 
   const chartData: Ref<object|undefined> = ref(undefined)
   const chartOptions = ref({
@@ -68,6 +78,15 @@
     maintainAspectRatio: false,
   })
 
+  // Season table
+  const seasonPage = ref(1)
+  const seasonItemsPerPage = ref(5);
+  const memberSeasonRows = computed(() => {
+    return memberSeasons.value.slice((seasonPage.value - 1) * seasonItemsPerPage.value, (seasonPage.value) * seasonItemsPerPage.value)
+  })
+
+  // Presences table
+  const isUpdating = ref(false);
   const page = ref(1);
   const itemsPerPage = ref(10);
   const sort = ref({
@@ -75,9 +94,9 @@
     direction: 'desc'
   });
 
-  const isUpdating = ref(false);
-
   const memberQuery = new MemberQuery();
+  let memberSeasonQuery: MemberSeasonQuery|null = null
+
   const memberPresenceQuery = new MemberPresenceQuery();
   const imageQuery = new ImageQuery();
 
@@ -93,13 +112,15 @@
   })
 
   const selectedNewRole: Ref<string | undefined> = ref(undefined);
-  const availableRoles = getAvailableMemberRoles()
+  const availableRoles = getAvailableClubRoles()
 
   watch(member, (newValue, oldValue) => {
     if (newValue) {
       if (member.value) {
-        if (member.value.profileImage) {
-          imageQuery.get(member.value.profileImage).then(imageResponse => {
+        memberSeasonQuery = new MemberSeasonQuery(member.value)
+
+        if (member.value.profileImage?.privateUrl) {
+          imageQuery.getFromUrl(member.value.profileImage.privateUrl).then(imageResponse => {
             memberProfileImage.value = imageResponse.retrieved
           })
         }
@@ -113,121 +134,39 @@
   })
 
   // Main logic
-  if (props.member) {
-    member.value = props.member
-  } else {
-    if (!props.memberId) {
-      throw new Error("memberId prop should be defined")
-    }
+  loadItem()
 
-    memberQuery.get(props.memberId).then(value => {
-      if (value.error) {
-        toast.add({
-          color: "red",
-          title: "Une erreur s'est produite",
-          description: value.error.message || value.error.toString()
-        })
-
-        navigateTo('/admin/members')
-        return;
+  function loadItem() {
+    if (props.member) {
+      member.value = props.member
+    } else {
+      if (!props.memberId) {
+        throw new Error("memberId prop should be defined")
       }
 
-      if (value.retrieved) {
-        member.value = value.retrieved
-      }
-    });
-  }
+      memberQuery.get(props.memberId).then(value => {
+        if (value.error) {
+          toast.add({
+            color: "red",
+            title: "Une erreur s'est produite",
+            description: value.error.message || value.error.toString()
+          })
 
-  async function onUpdatePasswordSubmit() {
-    if (!member.value) return failedPasswordUpdate();
+          navigateTo('/admin/members')
+          return;
+        }
 
-    if ((!isAdmin && (!passwordState.new || passwordState.new.length < 8)) || passwordState.new !== passwordState.new2) {
-      return failedPasswordUpdate("Les mot de passe ne correspondent pas / trop court")
+        if (value.retrieved) {
+          member.value = value.retrieved
+        }
+      });
     }
-
-    // Admin editing a user password
-    if (member.value.email != loggedUsername) {
-      if (!isAdmin) return failedPasswordUpdate("Seul un administrateur peut modifier un mot de passe.");
-
-      let payload: Member = {
-        plainPassword: passwordState.new
-      }
-
-      const { updated, error } = await memberQuery.patch(member.value, payload)
-      if (error) {
-        toast.add({
-          color: "red",
-          title: "Une erreur est arrivé lors de la mise à jour du mot de passe",
-          description: error.message
-        })
-        return;
-      }
-
-      toast.add({
-        color: "green",
-        title: "Mot de passe modifié"
-      })
-      member.value = updated
-      updatePasswordModalOpen.value = false
-    }
-
-    if (!passwordState.current) {
-      return failedPasswordUpdate("Mot de passe actuel non défini")
-    }
-
-    const { error } = await memberQuery.selfUpdatePassword(passwordState.current, passwordState.new)
-    if (error) {
-      return failedPasswordUpdate(error.message)
-    }
-
-    updatePasswordModalOpen.value = false
-    toast.add({
-      color: "green",
-      title: "Mot de passe modifié"
-    })
-  }
-
-  function failedPasswordUpdate(explanation?: string) {
-    toast.add({
-      color: "red",
-      title: "La modification du mot de passe a échoué",
-      description: explanation
-    })
-  }
-
-  function activateMemberAccount(activated: boolean, close: Function) {
-    if (!isAdmin || !member.value) return;
-
-    let payload: Member = {
-      accountActivated: activated
-    }
-    memberQuery.patch(member.value, payload).then(({updated, error}) => {
-      if (error) {
-        toast.add({
-          color: "red",
-          title: activated ? "L'activation a échoué" : "La désactivation a échoué",
-          description: error.message
-        })
-        return;
-      }
-
-      toast.add({
-        color: "green",
-        title: activated ? "Compte activé" : "Compté désactivé"
-      })
-      member.value = updated
-      close();
-    });
-
   }
 
   function changeMemberRole(close: Function) {
-    if (!isAdmin || !member.value) return;
+    if (!isAdmin || !member.value || !selectedNewRole.value) return;
 
-    let payload: Member = {
-      role: selectedNewRole.value
-    }
-    memberQuery.patch(member.value, payload).then(({updated, error}) => {
+    memberQuery.updateRole(member.value, selectedNewRole.value as ClubRole).then(({updated, error}) => {
       if (error) {
         toast.add({
           color: "red",
@@ -241,14 +180,20 @@
         color: "green",
         title: "Rôle modifié"
       })
-      member.value = updated
+
+      if (member.value && updated) {
+        member.value.role = updated.role
+      }
+
       close();
     });
   }
 
   async function getMemberSeasons() {
-    if (!member.value || !member.value.id) return;
-    const { error, items } = await memberQuery.seasons(member.value.id)
+    if (!member.value || !member.value.uuid) return;
+    isLoadingMemberSeasons.value = true
+    const { error, items } = await memberQuery.seasons(member.value.uuid)
+    isLoadingMemberSeasons.value = false
     if (error) {
       return
     }
@@ -256,7 +201,7 @@
   }
 
   async function getMemberPresences() {
-    if (!member.value || !member.value.id) return;
+    if (!member.value || !member.value.uuid) return;
 
     await getMemberSeasons()
 
@@ -265,7 +210,7 @@
       'date[after]': new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().slice(0, 10)
     });
 
-    const { totalItems, items } = await memberQuery.presences(member.value.id, presenceUrlParams)
+    const { totalItems, items } = await memberQuery.presences(member.value.uuid, presenceUrlParams)
     if (totalItems && totalItems > 0) {
       memberPresences.value = items
 
@@ -301,7 +246,7 @@
   }
 
   async function getMemberPresencesPaginated() {
-    if (!member.value || !member.value.id) return;
+    if (!member.value || !member.value.uuid) return;
     isLoadingMemberPresencesPaginated.value = true
 
     const urlParams = new URLSearchParams({
@@ -315,13 +260,13 @@
 
     if (filteredActivities.value.length > 0) {
       filteredActivities.value.forEach(filteredActivity => {
-        if (!filteredActivity.id) return;
-        urlParams.append('activities.id[]', filteredActivity.id.toString())
+        if (!filteredActivity.uuid) return;
+        urlParams.append('activities.uuid[]', filteredActivity.uuid)
       })
     }
 
     // We make the search
-    const { totalItems, items } = await memberQuery.presences(member.value.id, urlParams)
+    const { totalItems, items } = await memberQuery.presences(member.value.uuid, urlParams)
     memberPresencesPaginated.value = items
     if (totalItems) {
       totalMemberPresencesPaginated.value = totalItems
@@ -330,7 +275,7 @@
     isLoadingMemberPresencesPaginated.value = false
   }
 
-  async function deleteRow(memberPresence: MemberPresence, close: Function) {
+  async function deleteRow(memberPresence: MemberPresence) {
     isUpdating.value = true
 
     memberPresenceQuery.delete(memberPresence).then(async ({error}) => {
@@ -338,7 +283,7 @@
         toast.add({
           color: "red",
           title: "La suppression a échouée",
-          description: error
+          description: error.message
         })
         isUpdating.value = false
         return;
@@ -352,7 +297,6 @@
         title: "Présence supprimée"
       })
 
-      close();
       isUpdating.value = false
     })
   }
@@ -363,7 +307,7 @@
   }
 
   async function downloadCsv() {
-    if (!member.value || !member.value.id) return;
+    if (!member.value || !member.value.uuid) return;
     isDownloadingCsv.value = true
 
     const urlParams = new URLSearchParams({
@@ -375,13 +319,13 @@
 
     if (filteredActivities.value.length > 0) {
       filteredActivities.value.forEach(filteredActivity => {
-        if (!filteredActivity.id) return;
-        urlParams.append('activities.id[]', filteredActivity.id.toString())
+        if (!filteredActivity.uuid) return;
+        urlParams.append('activities.uuid[]', filteredActivity.uuid)
       })
     }
 
     // We make the search
-    const { data } = await memberQuery.presencesCsv(member.value.id, urlParams)
+    const { data } = await memberQuery.presencesCsv(member.value.uuid, urlParams)
     isDownloadingCsv.value = false
     // We download in the browser
     const filename = `${member.value.licence}-presences.csv`
@@ -398,202 +342,430 @@
     }
   }
 
+  async function addMemberSeason(seasonIri: string, isSecondary: boolean = false, ageCategory: string|undefined = undefined) {
+    if (!memberSeasonQuery || !member.value) {
+      return
+    }
+
+    const memberSeason: MemberSeasonWrite = {
+      member: member.value["@id"],
+      season: seasonIri,
+      isSecondaryClub: isSecondary
+    }
+
+    if (ageCategory) {
+      memberSeason.ageCategory = ageCategory
+    }
+
+    memberSeasonQuery.post(memberSeason).then(async ({error}) => {
+      if (error) {
+        toast.add({
+          color: "red",
+          title: "L'ajout a échoué",
+          description: error.message
+        })
+        return;
+      }
+
+      loadItem()
+
+      toast.add({
+        color: "green",
+        title: "Saison ajoutée"
+      })
+    })
+  }
+
+  async function deleteMemberSeason(memberSeason: MemberSeason) {
+    if (!memberSeasonQuery) {
+      return
+    }
+
+    memberSeasonQuery.delete(memberSeason).then(async ({error}) => {
+      if (error) {
+        toast.add({
+          color: "red",
+          title: "La suppression a échouée",
+          description: error.message
+        })
+        return;
+      }
+
+      await getMemberSeasons()
+
+      toast.add({
+        color: "green",
+        title: "Saison supprimée"
+      })
+    })
+  }
+
+  async function deleteMember() {
+    if (!member.value) return
+
+    const { error } = await memberQuery.delete(member.value)
+
+    if (error) {
+      toast.add({
+        color: "red",
+        title: "La suppression a échouée",
+        description: error.message
+      })
+      isUpdating.value = false
+      return;
+    }
+
+    toast.add({
+      color: "green",
+      title: "Membre supprimé"
+    })
+    navigateTo('/admin/members')
+  }
 </script>
 
 <template>
-  <div>
-    <UCard v-if="!member">
-      <div class="mx-auto my-0 h-24 w-24 aspect-square">
-        <USkeleton class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
-      </div>
+  <div class="flex flex-col lg:flex-row lg:flex-wrap gap-4">
+    <div class="flex-1 flex flex-col lg:flex-row gap-2">
+      <UTooltip v-if="isSupervisor" text="Liste des membres" class="">
+        <UButton
+          to="/admin/members"
+          icon="i-heroicons-arrow-left"
+          size="xs"
+          variant="ghost"
+        />
+      </UTooltip>
 
-      <div class="space-y-4 w-full mt-4">
-        <div v-for="w in ['w-52 h-8', 'w-36 h-4', 'w-48 h-4']" class="flex justify-center">
-          <USkeleton :class="w" />
-        </div>
-        <div class="flex gap-4 justify-center flex-wrap">
-          <USkeleton v-for="i in (Math.floor(Math.random()*6) + 2)" class="w-14 h-4" />
-        </div>
-
-      </div>
-    </UCard>
-
-    <UCard v-else>
-
-      <div class="flex flex-col gap-4 relative">
-        <div class="flex gap-4">
-          <UTooltip v-if="isSupervisor" text="Liste des membres" class="">
-            <UButton
-                to="/admin/members"
-                icon="i-heroicons-arrow-left"
-                size="xs"
-                variant="ghost"
-            />
-          </UTooltip>
-
-          <UButton v-if="member.accountActivated"
-            @click="updatePasswordModalOpen = true"
-          >
-            Changer le mot de passe
+      <!-- Admin && not current account -->
+      <template v-if="member">
+        <UPopover overlay v-if="isSuperAdmin || (isAdmin && member.email != loggedUsername)">
+          <UButton color="violet">
+            Modifier les permissions
           </UButton>
-          <!-- Admin && not current account -->
-          <template v-if="isAdmin && member.email != loggedUsername">
-            <UPopover v-if="member.accountActivated" overlay>
-              <UButton color="violet">
-                Modifier les permissions
+
+          <template #panel="{ close }">
+            <div class="p-4 w-56 flex flex-col gap-4">
+              <div class="text-center text-lg font-bold">Nouveau rôle souhaité</div>
+
+              <USelect
+                v-model="selectedNewRole"
+                :options="availableRoles"
+                option-attribute="text"
+                value-attribute="value"
+                placeholder="Aucun rôle de défini" />
+
+              <UButton
+                @click="changeMemberRole(close)"
+                color="purple"
+                class="mx-auto"
+              >
+                Modifier
               </UButton>
-
-              <template #panel="{ close }">
-                <div class="p-4 w-56 flex flex-col gap-4">
-                  <div class="text-center text-lg font-bold">Nouveau rôle souhaité</div>
-
-                  <USelect
-                      v-model="selectedNewRole"
-                      :options="availableRoles"
-                      option-attribute="text"
-                      value-attribute="value"
-                      placeholder="Aucun rôle de défini" />
-
-                  <UButton
-                      @click="changeMemberRole(close)"
-                      color="purple"
-                      class="mx-auto"
-                  >
-                    Modifier
-                  </UButton>
-                </div>
-              </template>
-
-            </UPopover>
-
-            <UPopover overlay>
-              <UButton color="yellow">
-                {{ !member.accountActivated ? 'Activer' : 'Désactiver' }} le compte
-              </UButton>
-
-              <template #panel="{ close }">
-                <div class="p-4 w-56 flex flex-col gap-4">
-                  <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
-
-                  <UButton
-                           @click="activateMemberAccount(!member.accountActivated, close)"
-                           color="yellow"
-                           class="mx-auto"
-                  >
-                    {{ !member.accountActivated ? 'Activer' : 'Désactiver' }}
-                  </UButton>
-                </div>
-              </template>
-
-            </UPopover>
+            </div>
           </template>
 
-        </div>
+        </UPopover>
 
-        <div class="h-24 w-24 aspect-square self-center">
-          <img class="rounded-full w-full h-full object-contain bg-gray-100 dark:bg-gray-800" v-if="memberProfileImage" :src="memberProfileImage.base64" />
-          <USkeleton v-else class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
-        </div>
+        <div class="flex-1"></div>
 
-        <div class="flex items-center justify-center flex-wrap gap-1">
-          <div v-if="!member.currentSeason" class="basis-full text-center">
-            <UButton
-              color="red"
-              :ui="{ rounded: 'rounded-full' }">
-              Saison non renouvelée
-            </UButton>
-          </div>
-
+        <div>
           <UButton
-            v-for="memberSeason in memberSeasons"
-            :ui="{ rounded: 'rounded-full' }">
-              {{ memberSeason.season.name}}
+            v-if="isAdmin"
+            icon="i-heroicons-pencil-square"
+            color="orange"
+            @click="modal.open(MemberEditLinkedEmailModal, {
+              member: member,
+              onUpdated() {
+                loadItem()
+              }
+            })"
+          >
+            <template v-if="member.linkedEmail">
+              Changer le compte lié
+            </template>
+            <template v-else>
+              Lier à un compte existant
+            </template>
           </UButton>
         </div>
 
-        <div class="grid grid-cols-2">
-          <div class="flex items-center">
-            {{ member.lastname }} {{ member.firstname }}
-          </div>
+        <div class="flex justify-between lg:justify-end gap-2">
+          <UButton
+            v-if="isAdmin"
+            icon="i-heroicons-pencil-square"
+            color="yellow"
+            @click="itemModalOpen = true"
+          >
+            Modifier
+          </UButton>
 
-          <div class="flex items-center">
-            <UIcon class="mr-2" name="i-heroicons-phone" />
-            <template v-if="member.mobilePhone">
-              <UButton variant="link" :to="'tel:' + member.mobilePhone">{{ member.mobilePhone.match(/.{1,2}/g).join(' ') }}</UButton>
-            </template>
-            <template v-else>
-              <UButton variant="link" disabled>Non défini</UButton>
-            </template>
-          </div>
-
-          <div class="flex items-center">
-            <UIcon class="mr-2" name="i-heroicons-identification" />
-            <p>{{ member.licence }}</p>
-          </div>
-
-          <div class="flex items-center">
-            <UIcon class="mr-2" name="i-heroicons-at-symbol" />
-            <UButton variant="link" :to="'mailto:' + member.email">{{ member.email }}</UButton>
-          </div>
-
-          <div>
-            Dernier tir de contrôle : {{ formatDateReadable(member.lastControlShooting) }}
-          </div>
-
+          <UButton
+            v-if="member.uuid && (isSuperAdmin || (isAdmin && member.email != loggedUsername))"
+            icon="i-heroicons-trash"
+            color="red"
+            @click="modal.open(ModalDeleteConfirmation, {
+                alertDescription: 'Les historiques de présences seront anonymisés et ne pourront être rétablie auprès de ce membre.',
+                alertColor: 'orange',
+                onDelete() {
+                  deleteMember()
+                  modal.close()
+                }
+              })"
+          >
+            Supprimer
+          </UButton>
         </div>
+      </template>
 
+    </div>
+    <div class="flex flex-col lg:flex-row lg:flex-wrap gap-4">
+
+      <div class="flex-grow">
+        <UCard v-if="!member">
+          <div class="mx-auto my-0 h-24 w-24 aspect-square">
+            <USkeleton class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+          </div>
+
+          <div class="space-y-4 w-full mt-4">
+            <div v-for="w in ['w-52 h-8', 'w-36 h-4', 'w-48 h-4']" class="flex justify-center">
+              <USkeleton :class="w" />
+            </div>
+            <div class="flex gap-4 justify-center flex-wrap">
+              <USkeleton v-for="i in (Math.floor(Math.random()*6) + 2)" class="w-14 h-4" />
+            </div>
+
+          </div>
+        </UCard>
+
+        <UCard v-else class="h-full">
+          <div class="flex flex-col gap-4 relative">
+
+            <div class="h-24 w-24 aspect-square self-center">
+              <UAvatar
+                class="w-full h-full"
+                size="3xl"
+                :src="memberProfileImage?.base64"
+                :alt="member.fullName"
+                :ui="{
+                  rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+                }"
+              />
+            </div>
+
+            <div class="text-center text-2xl font-bold">
+              {{ member.fullName }}
+            </div>
+
+            <div class="flex flex-col items-center justify-center flex-wrap gap-1">
+              <div v-if="member.blacklisted">
+                <UButton
+                  color="black"
+                  :ui="{ rounded: 'rounded-full' }">
+                  Blacklisté
+                </UButton>
+              </div>
+
+              <div v-if="!member.currentSeason">
+                <UButton
+                  color="red"
+                  :ui="{ rounded: 'rounded-full' }">
+                  Saison non renouvelée
+                </UButton>
+              </div>
+
+              <div v-if="member.medicalCertificateExpiration && member.medicalCertificateStatus !== 'valid'">
+                <UButton
+                  :color="member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
+                  :ui="{ rounded: 'rounded-full' }">
+                  Certificat médical : {{ formatDateReadable(member.medicalCertificateExpiration.toString()) }}
+                </UButton>
+              </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 text-sm">
+              <div v-if="member.lastControlShooting" class="col-span-2 flex items-center">
+                Dernier contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
+              </div>
+
+              <div class="flex items-center">
+                <UIcon class="mr-4" name="i-heroicons-identification" />
+                <p class="text-sm">{{ member.licence }}</p>
+              </div>
+
+              <div class="flex items-center">
+                <UIcon class="mr-2" name="i-heroicons-at-symbol" />
+                <UButton variant="link" :to="'mailto:' + member.email">{{ member.email }}</UButton>
+              </div>
+
+              <div class="flex items-center">
+                <UIcon class="mr-2" name="i-heroicons-phone" />
+                <template v-if="member.phone">
+                  <UButton variant="link" :to="'tel:' + member.phone">{{ member.phone.match(/.{1,2}/g).join(' ') }}</UButton>
+                </template>
+                <template v-else>
+                  <UButton variant="link" disabled>Non défini</UButton>
+                </template>
+              </div>
+
+              <div class="flex items-center">
+                <UIcon class="mr-2" name="i-heroicons-phone" />
+                <template v-if="member.mobilePhone">
+                  <UButton variant="link" :to="'tel:' + member.mobilePhone">{{ member.mobilePhone.match(/.{1,2}/g).join(' ') }}</UButton>
+                </template>
+                <template v-else>
+                  <UButton variant="link" disabled>Non défini</UButton>
+                </template>
+              </div>
+
+              <UDivider label="Adresse" class="lg:col-span-2 mt-4" />
+
+              <div class="lg:col-span-2">
+                <p>{{ member.postal1 }}</p>
+                <p>{{ member.postal2 }}</p>
+                <p>{{ member.postal3 }}</p>
+                <p>{{ member.zipCode }} {{ member.city }}</p>
+                <p>{{ member.country }}</p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </UCard>
       </div>
 
-    </UCard>
+      <div class="flex basis-full lg:basis-1/2">
+        <UCard
+          class="flex-1"
+          :ui="{
+            body: {
+              padding: 'h-full'
+            }
+          }"
+        >
+          <div class="flex flex-col h-full">
+            <div v-if="isSupervisor" class="flex gap-4">
+              <div class="flex-1"></div>
+              <UButton
+                @click="modal.open(MemberSeasonSelectModal, {
+                  onSelected(seasonIri: String, isSecondary: boolean, ageCategory: string|undefined) {
+                    addMemberSeason(seasonIri, isSecondary, ageCategory)
+                  }
+                })"
+              >
+                Ajouter une saison
+              </UButton>
+            </div>
 
-    <div class="my-4">
-      <UCard v-if="totalMemberPresences > 0">
+            <UTable
+              class="flex-1"
+              :columns="[
+                {
+                  key: 'season.name',
+                  label: 'Saison',
+                  class: 'w-full'
+                },
+                {
+                  key: 'isSecondaryClub',
+                  label: 'Club secondaire',
+                },
+                {
+                  key: 'ageCategory.name',
+                  label: 'Catégorie'
+                },
+                {
+                  key: 'actions'
+                }
+              ]"
+              :loading="isLoadingMemberSeasons"
+              :rows="memberSeasonRows"
+            >
 
-        <div class="text-lg">{{ totalMemberPresences }} présences ces 12 derniers mois</div>
+              <template #empty-state>
+                <div class="flex flex-col items-center justify-center py-6 gap-3">
+                  <span class="italic text-sm">Aucune saisons enregistrée</span>
+                </div>
+              </template>
 
-        <div class="h-96 mt-4">
-          <Doughnut
+              <template #actions-data="{row}" >
+                <div v-if="isSupervisor" class="flex gap-4">
+                  <UButton
+                    icon="i-heroicons-trash"
+                    color="red"
+                    @click="modal.open(ModalDeleteConfirmation, {
+                      alertTitle: `Suppression de la saison ${row.season.name} pour ${member?.fullName}`,
+                      alertColor: 'orange',
+                      onDelete() {
+                        modal.close()
+                        deleteMemberSeason(row)
+                      }
+                    })"
+                  >
+                  </UButton>
+                </div>
+              </template>
+
+              <template #isSecondaryClub-data="{ row }">
+                <UToggle :model-value="row.isSecondaryClub" />
+              </template>
+            </UTable>
+
+            <div class="flex flex-wrap justify-end gap-4 px-3">
+              <UPagination v-model="seasonPage" :page-count="parseInt(seasonItemsPerPage.toString())" :total="memberSeasons.length" />
+            </div>
+
+          </div>
+        </UCard>
+      </div>
+
+      <div class="basis-full">
+        <UCard v-if="totalMemberPresences > 0">
+
+          <div class="text-xl font-bold">{{ totalMemberPresences }} présences ces 12 derniers mois</div>
+
+          <div class="h-96 mt-4">
+            <Doughnut
               :data="chartData"
               :options="chartOptions"
-          />
-        </div>
-      </UCard>
-      <UCard v-else>
-        <i class="text-lg">Aucune présences ces 12 derniers mois</i>
-      </UCard>
-    </div>
+            />
+          </div>
+        </UCard>
+        <UCard v-else>
+          <i class="text-lg">Aucune présences ces 12 derniers mois</i>
+        </UCard>
+      </div>
 
-    <div>
-      <UCard>
-        <div v-if="isSupervisor" class="flex gap-4">
-          <USelectMenu
-            class="w-44"
-            v-model="filteredActivities"
-            :options="activities"
-            option-attribute="name"
-            multiple
-          >
-            <template #label>
+      <div class="basis-full">
+        <UCard>
+          <div class="flex flex-col">
+            <div v-if="isSupervisor" class="flex flex-col-reverse lg:flex-row gap-4">
+              <USelectMenu
+                class="w-44"
+                v-model="filteredActivities"
+                :options="activities"
+                option-attribute="name"
+                multiple
+              >
+                <template #label>
               <span v-if="filteredActivities.length" class="truncate">
                 {{ filteredActivities.map(fa => fa.name).join(', ') }}
               </span>
-              <span v-else>Activités</span>
-            </template>
-          </USelectMenu>
+                  <span v-else>Activités</span>
+                </template>
+              </USelectMenu>
 
-          <div class="flex-1"></div>
-          <UButton @click="addMemberPresenceModal = true" >
-            Ajouter une activité
-          </UButton>
+              <div class="flex-1"></div>
+              <UButton @click="addMemberPresenceModal = true" >
+                Ajouter une activité
+              </UButton>
 
-          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
-            CSV
-          </UButton>
-        </div>
+              <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
+                CSV
+              </UButton>
+            </div>
 
-        <UTable
-            :loading="isLoadingMemberPresencesPaginated"
-            :columns="[
+            <UTable
+              :loading="isLoadingMemberPresencesPaginated"
+              :columns="[
               {
                 key: 'date',
                 label: 'Date',
@@ -608,112 +780,97 @@
                 key: 'actions'
               }
             ]"
-            v-model:sort="sort"
-            sort-mode="manual"
-            @update:sort="getMemberPresencesPaginated()"
-            :rows="memberPresencesPaginated"
-        >
+              v-model:sort="sort"
+              sort-mode="manual"
+              @update:sort="getMemberPresencesPaginated()"
+              :rows="memberPresencesPaginated"
+            >
 
-          <template #empty-state>
-            <div class="flex flex-col items-center justify-center py-6 gap-3">
-              <span class="italic text-sm">Aucune présence enregistrée</span>
+              <template #empty-state>
+                <div class="flex flex-col items-center justify-center py-6 gap-3">
+                  <span class="italic text-sm">Aucune présence enregistrée</span>
+                </div>
+              </template>
+
+              <template #date-data="{row}">
+                {{ formatDate(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
+              </template>
+
+              <template #activities-data="{row}">
+                <div v-if="row.activities.length == 0">
+                  <i>Aucune activités déclarées</i>
+                </div>
+
+                <div class="flex flex-1 flex-wrap gap-4">
+                  <UButton
+                    v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
+                    variant="soft"
+                    :ui="{ rounded: 'rounded-full' }">
+                    {{ activity.name }}
+                  </UButton>
+                </div>
+              </template>
+
+              <template #actions-data="{row}" >
+                <div v-if="isSupervisor" class="flex gap-4">
+                  <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
+
+                  <UButton
+                    color="red"
+                    label="Supprimer"
+                    @click="modal.open(ModalDeleteConfirmation, {
+                    title: `Présence du ${formatDateReadable(row.date)}`,
+                    alertTitle: 'La suppression de la présence sera définitive.',
+                    alertColor: 'orange',
+                    onDelete() {
+                      modal.close()
+                      deleteRow(row)
+                    }
+                  })"
+                  />
+                </div>
+              </template>
+
+            </UTable>
+
+            <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+              <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMemberPresencesPaginated()" />
+              <UPagination v-model="page" @update:model-value="getMemberPresencesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMemberPresencesPaginated" />
             </div>
-          </template>
+          </div>
+        </UCard>
+      </div>
 
-          <template #date-data="{row}">
-            {{ formatDate(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
-          </template>
+      <UModal
+        v-model="itemModalOpen">
+        <UCard>
+          <MemberForm
+            :item="member ? {...member} : undefined"
+            @updated="(value) => {itemModalOpen = false; loadItem() }"
+          />
+        </UCard>
+      </UModal>
 
-          <template #activities-data="{row}">
-            <div v-if="row.activities.length == 0">
-              <i>Aucune activités déclarées</i>
-            </div>
+      <UModal v-model="addMemberPresenceModal">
+        <RegisterMemberPresence
+          :member="member"
+          :date-editable="true"
+          @canceled="addMemberPresenceModal = false"
+          @registered="addMemberPresenceModal = false; getMemberPresences()"
+        />
+      </UModal>
 
-            <div class="flex flex-1 flex-wrap gap-4">
-              <UButton
-                  v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-                  variant="soft"
-                  :ui="{ rounded: 'rounded-full' }">
-                {{ activity.name }}
-              </UButton>
-            </div>
-          </template>
-
-          <template #actions-data="{row}" >
-            <div v-if="isSupervisor" class="flex gap-4">
-              <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
-
-              <UPopover overlay>
-                <UButton color="red" label="Supprimer" />
-
-                <template #panel="{ close }">
-                  <div class="p-4 w-[42rem] flex flex-col">
-                    <div class="text-center text-lg font-bold">Présence du {{ formatDateReadable(row.date) }}</div>
-                    <UAlert
-                        class="my-4"
-                        color="orange"
-                        variant="soft"
-                        title="La suppression de la présence sera définitive."
-                    />
-                    <UButton class="mx-auto" color="red" label="Valider la suppression" :disabled="isUpdating" @click="deleteRow(row, close);" />
-                  </div>
-                </template>
-              </UPopover>
-            </div>
-          </template>
-
-        </UTable>
-
-        <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-          <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMemberPresencesPaginated()" />
-          <UPagination v-model="page" @update:model-value="getMemberPresencesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMemberPresencesPaginated" />
-        </div>
-      </UCard>
-    </div>
-
-    <UModal
-        v-model="updatePasswordModalOpen">
-      <UCard>
-        <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
-
-          <UFormGroup v-if="member.email == loggedUsername" label="Mot de passe actuel" name="password">
-            <UInput v-model="passwordState.current" type="password" required />
-          </UFormGroup>
-
-          <UFormGroup label="Nouveau mot de passe" name="password">
-            <UInput v-model="passwordState.new" type="password" required />
-          </UFormGroup>
-
-          <UFormGroup label="Confirmation nouveau mot de passe" name="password">
-            <UInput v-model="passwordState.new2" type="password" required />
-          </UFormGroup>
-
-          <UButton type="submit">
-            Changer le mot de passe
-          </UButton>
-        </UForm>
-      </UCard>
-    </UModal>
-
-    <UModal v-model="addMemberPresenceModal">
-      <RegisterMemberPresence
-        :member="member"
-        :date-editable="true"
-        @canceled="addMemberPresenceModal = false"
-        @registered="addMemberPresenceModal = false; getMemberPresences()"
-      />
-    </UModal>
-
-    <UModal
+      <UModal
         v-model="memberPresenceModal">
-      <RegisterMemberPresence
+        <RegisterMemberPresence
           :member-presence="selectedPresence"
           :date-editable="true"
           @canceled="memberPresenceModal = false"
           @registered="presenceUpdated"
-      />
-    </UModal>
+        />
+      </UModal>
 
+    </div>
   </div>
 </template>
 

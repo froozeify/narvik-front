@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type {PropType, Ref} from "vue";
-import type {InventoryItem} from "~/types/api/item/inventoryItem";
-import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
-import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
+import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
+import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
+import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
+import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
 import type {FormError, FormErrorEvent} from "#ui/types";
 
 const props = defineProps({
@@ -79,7 +79,7 @@ function onDecoded(value: string) {
 
 async function updateItem() {
   isUpdating.value = true
-  const isCreate = !item.value.id
+  const isCreate = !item.value.uuid
 
   if (item.value.category) {
     item.value.category = item.value.category["@id"]
@@ -236,7 +236,7 @@ async function getCategories() {
       class="mt-2"
       :loading="isUpdating"
     >
-      <template v-if="item.id">
+      <template v-if="item.uuid">
         Modifier
       </template>
       <template v-else>

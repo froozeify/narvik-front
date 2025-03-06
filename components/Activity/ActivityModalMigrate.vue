@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import type {PropType} from "vue";
-import type {Activity} from "~/types/api/item/activity";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 
 const props = defineProps(
   {
@@ -33,7 +33,7 @@ const migrationTarget: Ref<string|undefined> = ref(undefined)
     />
 
     <UFormGroup class="mb-4" label="Activité cible">
-      <USelect required v-model="migrationTarget" :options="props.activities" option-attribute="name" value-attribute="id" />
+      <USelect required v-model="migrationTarget" :options="props.activities" option-attribute="name" value-attribute="uuid" />
     </UFormGroup>
 
     <template #actions>

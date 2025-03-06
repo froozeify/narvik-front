@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-  import MemberQuery from "~/composables/api/query/MemberQuery";
-  import type {Member} from "~/types/api/item/member";
-  import {useSelfMemberStore} from "~/stores/useSelfMember";
+  import type {Member} from "~/types/api/item/clubDependent/member";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
+  import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+  import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
+  import UserQuery from "~/composables/api/query/UserQuery";
 
   definePageMeta({
     layout: "member"
@@ -11,25 +13,175 @@
     title: "Mes informations"
   })
 
+  const modal = useModal()
   const toast = useToast()
-  const selfStore = useSelfMemberStore()
 
-  const memberQuery = new MemberQuery()
-  const self: Ref<Member | undefined> = ref(selfStore.member)
+  const userQuery = new UserQuery();
 
-  // We force a refresh for the display
-  memberQuery.self().then(value => {
-    if (value.retrieved && value.retrieved) {
-      self.value = value.retrieved;
-    } else {
-      // No information on self, we force logout
-      selfStore.logout();
-    }
+  const selfStore = useSelfUserStore()
+  const isAdmin = selfStore.isAdmin()
+
+  const { member, user, selectedProfile } = storeToRefs(selfStore)
+
+  const updatePasswordModalOpen = ref(false)
+  const passwordState = reactive({
+    current: undefined as string|undefined,
+    new: undefined as string|undefined,
+    new2: undefined as string|undefined
   })
+
+  async function onUpdatePasswordSubmit() {
+    if (!user.value) return failedPasswordUpdate();
+
+    if ((!isAdmin && (!passwordState.new || passwordState.new.length < 8)) || passwordState.new !== passwordState.new2) {
+      return failedPasswordUpdate("Les mot de passe ne correspondent pas / trop court")
+    }
+
+    if (!passwordState.current) {
+      return failedPasswordUpdate("Mot de passe actuel non défini")
+    }
+
+    const { error } = await userQuery.selfUpdatePassword(passwordState.current, passwordState.new)
+    if (error) {
+      return failedPasswordUpdate(error.message)
+    }
+
+    updatePasswordModalOpen.value = false
+    toast.add({
+      color: "green",
+      title: "Mot de passe modifié"
+    })
+  }
+
+  function failedPasswordUpdate(explanation?: string) {
+    toast.add({
+      color: "red",
+      title: "La modification du mot de passe a échoué",
+      description: explanation
+    })
+  }
+
+  async function deleteUser() {
+    if (!user.value) return;
+
+    const { error } = await userQuery.selfDelete()
+    if (error) {
+      toast.add({
+        color: "red",
+        title: "La suppression du compte à échoué",
+        description: error.message
+      })
+      return
+    }
+
+    toast.add({
+      color: "green",
+      title: "Compte supprimé"
+    })
+    selfStore.logout()
+  }
+
 </script>
 
 <template>
   <div>
-    <MemberDetails v-if="self" :member="self" />
+    <div v-if="user" class="mb-4">
+      <div class="flex flex-col md:flex-row justify-between mb-4 gap-2">
+        <div class="text-3xl font-bold">Mon compte</div>
+        <div class="flex-1"></div>
+
+        <UButton icon="i-heroicons-lock-closed" @click="updatePasswordModalOpen = true" >
+          Changer le mot de passe
+        </UButton>
+
+        <UButton
+          icon="i-heroicons-trash"
+          color="red"
+          @click="modal.open(ModalDeleteConfirmation, {
+                alertTitle: 'Seul le compte sera supprimé.',
+                alertDescription: 'Pour supprimer les enregistrements liée au club (présences, fiche membre), veuillez faire une demande auprès du club.',
+                alertColor: 'orange',
+                onDelete() {
+                  deleteUser()
+                  modal.close()
+                }
+              })"
+        >
+          Supprimer
+        </UButton>
+      </div>
+
+      <UCard>
+        <div class="flex flex-col gap-4 relative">
+
+          <div class="h-24 w-24 aspect-square self-center">
+            <UAvatar
+              class="w-full h-full"
+              size="3xl"
+              :alt="user.fullName"
+              :ui="{
+                rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+              }"
+            />
+          </div>
+
+          <div class="text-center text-2xl font-bold">
+            {{ user.fullName }}
+          </div>
+
+          <div class="flex flex-col justify-center">
+
+            <div class="flex justify-center items-center">
+              <UIcon class="mr-2" name="i-heroicons-at-symbol" />
+              <UButton variant="link" :to="'mailto:' + user.email">{{ user.email }}</UButton>
+            </div>
+          </div>
+
+        </div>
+      </UCard>
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between mb-4">
+      <div v-if="selectedProfile?.club" class="text-3xl font-bold">{{ selectedProfile?.club.name }}</div>
+      <div class="flex-1"></div>
+      <UButton
+        v-if="(user?.linkedProfiles?.length ?? 0) > 1"
+        color="yellow"
+        @click="modal.open(ModalSelectProfile)">
+        Changer de profil
+      </UButton>
+    </div>
+
+    <MemberDetails v-if="member" :member="member" />
+    <UCard v-else class="text-center">
+      <div class="text-xl font-bold">Compte liée à aucun club</div>
+      <p>Veuillez vous assurer que l'adresse mail du compte correspond à celle enregistré auprès de votre club.</p>
+      <p>Si ce n'est pas le cas, veuillez le signaler à votre club pour que celui-ci modifie le compte lié.</p>
+    </UCard>
+
+    <UModal
+      v-if="user"
+      v-model="updatePasswordModalOpen">
+      <UCard>
+        <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
+
+          <UFormGroup label="Mot de passe actuel" name="password">
+            <UInput v-model="passwordState.current" type="password" required />
+          </UFormGroup>
+
+          <UFormGroup label="Nouveau mot de passe" name="password">
+            <UInput v-model="passwordState.new" type="password" required />
+          </UFormGroup>
+
+          <UFormGroup label="Confirmation nouveau mot de passe" name="password">
+            <UInput v-model="passwordState.new2" type="password" required />
+          </UFormGroup>
+
+          <UButton type="submit">
+            Changer le mot de passe
+          </UButton>
+        </UForm>
+      </UCard>
+    </UModal>
   </div>
 </template>

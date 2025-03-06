@@ -1,14 +1,14 @@
 <script setup lang="ts">
 
-import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
-import type {GlobalSetting} from "~/types/api/item/globalSetting";
 import clipboard from "clipboardy";
-import ActivityQuery from "~/composables/api/query/ActivityQuery";
-import type {Activity} from "~/types/api/item/activity";
-import type {Image} from "~/types/api/item/image";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
-import {useAppConfigStore} from "~/stores/useAppConfig";
-import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
+import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
+import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import {convertUuidToUrlUuid} from "~/utils/resource";
+import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting";
+import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
+import ClubModalGenerateBadger from "~/components/Club/ClubModalGenerateBadger.vue";
+import type {Club} from "~/types/api/item/club";
 
 definePageMeta({
   layout: "admin"
@@ -19,38 +19,21 @@ useHead({
 })
 
 const toast = useToast()
+const modal = useModal()
 
-const globalSettingQuery = new GlobalSettingQuery();
+const selfStore = useSelfUserStore();
+const { selectedProfile } = storeToRefs(selfStore)
+
+const clubSettingQuery = new ClubSettingQuery();
 const activityQuery = new ActivityQuery();
 
-const badgerSetting: Ref<GlobalSetting | undefined> = ref(undefined);
-globalSettingQuery.get("BADGER_TOKEN").then(value =>  {
-  badgerSetting.value = value.retrieved
-})
+const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.badgerToken);
 
-const controlShootingSetting: Ref<GlobalSetting | undefined> = ref(undefined);
-const selectedControlShootingActivityValue: Ref<string | undefined> = ref(undefined);
+const configState = reactive({
+  selectedControlShootingActivity: selectedProfile.value?.club.settings.controlShootingActivity?.uuid,
+  excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays?.map((a: Activity) => a.uuid)
+})
 const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
-
-const ignoredActivitiesOpeningStatsSetting: Ref<GlobalSetting | undefined> = ref(undefined);
-const excludedActivitiesFromCount: Ref<string[]> = ref([]);
-
-globalSettingQuery.get("CONTROL_SHOOTING_ACTIVITY_ID").then(value => {
-  controlShootingSetting.value = value.retrieved
-  if (controlShootingSetting.value && controlShootingSetting.value.value) {
-    getActivity(controlShootingSetting.value.value).then(actvt => {
-      selectedControlShootingActivity.value = actvt
-      selectedControlShootingActivityValue.value = actvt?.id?.toString()
-    })
-  }
-})
-
-globalSettingQuery.get("IGNORED_ACTIVITIES_OPENING_STATS").then(value => {
-  ignoredActivitiesOpeningStatsSetting.value = value.retrieved
-  if (ignoredActivitiesOpeningStatsSetting.value && ignoredActivitiesOpeningStatsSetting.value.value) {
-    excludedActivitiesFromCount.value = JSON.parse(ignoredActivitiesOpeningStatsSetting.value.value)
-  }
-})
 
 const activities: Ref<Activity[] | undefined> = ref(undefined);
 activityQuery.getAll().then(value => {
@@ -62,15 +45,18 @@ const state = reactive({
   file: undefined
 })
 
-const selfStore = useSelfMemberStore();
-const appConfigStore = useAppConfigStore();
+function getBadgerLoginPath(): string|undefined {
+  if (!badgerSetting.value || !selectedProfile.value) {
+    return undefined
+  }
 
-const siteLogo: Ref<Image|null> = appConfigStore.getLogo()
+  return `/login/bdg/${convertUuidToUrlUuid(selectedProfile.value.club.uuid)}/${badgerSetting.value}`
+}
 
 function copyBadgerLink() {
-  if (!badgerSetting.value) return;
+  if (!getBadgerLoginPath()) return;
 
-  clipboard.write(window.location.origin + '/login/bdg/' + badgerSetting.value.value)
+  clipboard.write(window.location.origin + getBadgerLoginPath())
   toast.add({
     title: 'URL Copiée',
     color: "green"
@@ -78,18 +64,19 @@ function copyBadgerLink() {
 }
 
 async function controlShootingUpdated() {
-  if (selectedControlShootingActivityValue.value) {
-    const activity = await getActivity(selectedControlShootingActivityValue.value);
-    selectedControlShootingActivity.value = activity
+  if (!selectedProfile.value?.club.settings) return;
+
+  if (configState.selectedControlShootingActivity) {
+    selectedControlShootingActivity.value = await getActivity(configState.selectedControlShootingActivity)
   }
 
-  if (!controlShootingSetting.value || !selectedControlShootingActivity.value) return;
+  if (!selectedControlShootingActivity.value) return;
 
-  const payload: GlobalSetting = {
-    value: selectedControlShootingActivity.value.id?.toString()
+  const payload: WriteClubSetting = {
+    controlShootingActivity: selectedControlShootingActivity.value["@id"]
   }
 
-  let { updated, error } = await globalSettingQuery.patch(controlShootingSetting.value, payload);
+  let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
 
   if (error) {
     toast.add({
@@ -99,6 +86,8 @@ async function controlShootingUpdated() {
     });
     return;
   }
+
+  selfStore.refreshSelectedClub().then()
 
   toast.add({
     color: "green",
@@ -107,13 +96,20 @@ async function controlShootingUpdated() {
 }
 
 async function ignoredActivitiesDaysUpdated() {
-  if (!ignoredActivitiesOpeningStatsSetting.value || !excludedActivitiesFromCount.value) return;
+  if (!selectedProfile.value?.club.settings) return;
 
-  const payload: GlobalSetting = {
-    value: JSON.stringify(excludedActivitiesFromCount.value)
+  const uris: string[] = []
+  if (configState.excludedActivitiesFromOpeningDays) {
+    for (const excludedActivity of configState.excludedActivitiesFromOpeningDays) {
+      uris.push(`${activityQuery.getRootUrl()}/${excludedActivity}`)
+    }
   }
 
-  let { updated, error } = await globalSettingQuery.patch(ignoredActivitiesOpeningStatsSetting.value, payload);
+  const payload: WriteClubSetting = {
+    excludedActivitiesFromOpeningDays: uris
+  }
+
+  let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
 
   if (error) {
     toast.add({
@@ -123,6 +119,8 @@ async function ignoredActivitiesDaysUpdated() {
     });
     return;
   }
+
+  selfStore.refreshSelectedClub().then()
 
   toast.add({
     color: "green",
@@ -136,6 +134,8 @@ async function getActivity(id: string) {
 }
 
 async function uploadLogo(event) {
+  if (!selectedProfile.value?.club.settings) return;
+
   const formData = getFileFormDataFromUInputChangeEvent(event);
 
   if (!formData) {
@@ -143,7 +143,7 @@ async function uploadLogo(event) {
   }
 
   logoUploading.value = true
-  const { created, error } = await globalSettingQuery.importLogo(formData)
+  const { created, error } = await clubSettingQuery.importLogo(selectedProfile.value.club.settings, formData)
   logoUploading.value = false
 
   if (error) {
@@ -151,16 +151,17 @@ async function uploadLogo(event) {
   }
 
   displayFileSuccessToast('Logo envoyé')
-  await appConfigStore.refresh()
-  siteLogo.value = appConfigStore.getLogo(false).value
+  await selfStore.refreshSelectedClub()
 }
 
 async function deleteLogo() {
+  if (!selectedProfile.value?.club.settings) return;
+
   logoUploading.value = true
 
   const formData = new FormData()
 
-  const { created, error } = await globalSettingQuery.importLogo(formData)
+  const { created, error } = await clubSettingQuery.importLogo(selectedProfile.value.club.settings, formData)
   logoUploading.value = false
 
   if (error) {
@@ -172,48 +173,47 @@ async function deleteLogo() {
     return
   }
 
-  await appConfigStore.refresh()
-  siteLogo.value = appConfigStore.getLogo(false).value
-  toast.add({
-    title: "Logo supprimé",
-    color: "green"
-  })
-
+  await selfStore.refreshSelectedClub()
+  displayFileSuccessToast('Logo supprimé')
 }
 
 
 </script>
 
 <template>
-  <div class="grid gap-4 md:grid-cols-3">
-    <UCard class="md:col-span-3">
+  <div class="grid gap-4 md:grid-cols-4">
+    <UCard class="md:col-span-4">
       <div class="text-xl font-bold mb-4">Lien de connexion badger</div>
-      <div>A mettre en favoris sur l'ordinateur accessible publiquement.</div>
-      <div>Ce lien permet d'être automatiquement connecté en tant que badgeuse (accès seulement à la liste de présence).</div>
-      <div>Le lien peut être déposé directement dans la barre personnelle pour le marquer en favoris.</div>
-      <div v-if="!badgerSetting" class="mt-4">
+      <p>A mettre en favoris sur l'ordinateur accessible publiquement.</p>
+      <p>Ce lien permet d'être automatiquement connecté en tant que badgeuse (accès seulement à la liste de présence).</p>
+      <p>Le lien peut être déposé directement dans la barre personnelle pour le marquer en favoris.</p>
+
+      <UButton
+        class="my-4"
+        @click="modal.open(ClubModalGenerateBadger, {
+            onGenerated(newClub: Club) {
+              modal.close()
+              badgerSetting = newClub.badgerToken
+              selfStore.refreshSelectedClub()
+            }
+          })"
+      >
+        Générer un nouveau lien
+      </UButton>
+
+      <div v-if="!badgerSetting">
         <UAlert
-                class="mt-4"
-                icon="i-heroicons-exclamation-triangle"
-                color="red"
-                title="Token de connexion non défini"
-                description="Si cette affichage ne change pas au bout de quelques minutes, il se peut que le script de post-installation n'a pas été exécuté."
+          icon="i-heroicons-exclamation-triangle"
+          color="yellow"
+          title="Lien de connexion non généré."
         />
       </div>
       <div v-else
-         class="break-words cursor-pointer mt-4"
+         class="break-words cursor-pointer"
          @click.prevent="copyBadgerLink"
         >
 
-        <UAlert v-if="!badgerSetting.value"
-                class="mb-4"
-                icon="i-heroicons-exclamation-triangle"
-                color="red"
-                title="Token de connexion non défini"
-                description="Cela peut arriver lorsque le script de post-installation n'a pas été exécuté."
-        />
-
-        <a v-else :href="'/login/bdg/' + badgerSetting.value"
+        <a :href="getBadgerLoginPath()"
            class="focus:outline-none disabled:cursor-not-allowed disabled:opacity-75 flex-shrink-0 font-medium rounded-md text-sm gap-x-1.5 px-2.5 py-1.5 shadow-sm text-white dark:text-gray-900 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-500 dark:bg-yellow-400 dark:hover:bg-yellow-500 dark:disabled:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500 dark:focus-visible:outline-yellow-400 flex justify-center"
         >
           Gestion de présence
@@ -221,40 +221,21 @@ async function deleteLogo() {
       </div>
     </UCard>
 
-    <div>
+    <div class="md:col-span-2">
       <UCard class="h-fit">
-        <div class="text-xl font-bold mb-4">Activité correspondant au tir de contrôle</div>
-        <div v-if="!controlShootingSetting" class="mt-4">
-          <USkeleton class="h-4 w-full" />
-        </div>
-        <div v-else>
-          <USelect
-            v-model="selectedControlShootingActivityValue"
-            @change="controlShootingUpdated"
-            :options="activities"
-            option-attribute="name"
-            value-attribute="id"
-            placeholder="Tir de contrôle non défini" />
-        </div>
-      </UCard>
-
-      <UCard class="h-fit mt-4">
         <div class="text-xl font-bold mb-4">Activités exclus du compte des jours ouverts</div>
-        <div v-if="!ignoredActivitiesOpeningStatsSetting" class="mt-4">
-          <USkeleton class="h-4 w-full" />
-        </div>
-        <div v-else>
+        <div>
           <USelectMenu
-            v-model="excludedActivitiesFromCount"
+            v-model="configState.excludedActivitiesFromOpeningDays"
             @change="ignoredActivitiesDaysUpdated"
             :options="activities"
             option-attribute="name"
-            value-attribute="id"
+            value-attribute="uuid"
             multiple
           >
             <template #label>
-              <span v-if="excludedActivitiesFromCount && activities && excludedActivitiesFromCount.length" class="truncate">
-                {{ activities.filter(a => (a.id && excludedActivitiesFromCount?.includes(a.id)) ).map(a => a.name).join(', ') }}
+              <span v-if="configState.excludedActivitiesFromOpeningDays && activities && configState.excludedActivitiesFromOpeningDays.length" class="truncate">
+                {{ activities.filter(a => (a.uuid && configState.excludedActivitiesFromOpeningDays?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
               </span>
               <span v-else>Aucune activités exclus</span>
             </template>
@@ -262,12 +243,24 @@ async function deleteLogo() {
         </div>
       </UCard>
 
+      <UCard class="h-fit mt-4">
+        <div class="text-xl font-bold mb-4">Activité correspondante au contrôle</div>
+        <div>
+          <USelect
+            v-model="configState.selectedControlShootingActivity"
+            @change="controlShootingUpdated"
+            :options="activities"
+            option-attribute="name"
+            value-attribute="uuid"
+            placeholder="Aucun contrôle défini" />
+        </div>
+      </UCard>
     </div>
 
-    <UCard>
+    <UCard class="md:col-span-2">
       <div class="text-xl font-bold mb-4">Logo</div>
-      <div v-if="siteLogo" class="mt-4 flex justify-center">
-        <img :src="siteLogo.base64" class="w-48" />
+      <div v-if="selectedProfile?.club?.settings?.logoBase64" class="mt-4 flex justify-center">
+        <NuxtImg :src="selectedProfile.club.settings.logoBase64" class="w-48" />
       </div>
 
       <UInput
@@ -280,7 +273,7 @@ async function deleteLogo() {
           @change="uploadLogo"
       />
 
-      <UPopover overlay v-if="siteLogo">
+      <UPopover overlay v-if="selectedProfile?.club.settings.logo">
         <UButton color="red">
           Supprimer le logo
         </UButton>

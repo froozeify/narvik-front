@@ -1,10 +1,13 @@
 <script setup lang="ts">
-  import InventoryCategoryQuery from "~/composables/api/query/InventoryCategoryQuery";
-  import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
+  import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
+  import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
   import {usePaginationValues} from "~/composables/api/list";
-  import type {Member} from "~/types/api/item/member";
+  import type {Member} from "~/types/api/item/clubDependent/member";
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
   import type {FormError} from "#ui/types";
+  import {convertUuidToUrlUuid} from "~/utils/resource";
+  import type {NuxtError} from "#app";
+  import type {ItemError} from "~/types/api/itemError";
 
   definePageMeta({
     layout: "pos"
@@ -104,20 +107,22 @@
   async function updateCategory(category: InventoryCategory) {
     isLoading.value = true
     let payload: InventoryCategory = {
-      name: category.name
+      name: category.name,
+    }
+
+    if (category.weight) {
+      payload.weight = category.weight
     }
 
     // We verify if it's a creation or an update
-    let error: Error | undefined = undefined
-    if (!category.id) {
-      await apiQuery.post(payload).then(value => {
-        error = value.error
-        selectedCategory.value = value.created
-      });
+    let error: NuxtError<ItemError> | undefined = undefined
+    if (!category.uuid) {
+      let { created, error: errorMessage } = await apiQuery.post(payload);
+      error = errorMessage
+      selectedCategory.value = created
     } else { // Update
-      await apiQuery.patch(category, payload).then(value => {
-        error = value.error
-      });
+      let { error: errorMessage } = await apiQuery.patch(category, payload);
+      error = errorMessage
     }
 
     isLoading.value = false
@@ -125,7 +130,7 @@
     if (error) {
       toast.add({
         color: "red",
-        title: !category.id ? "La création a échouée" : "La modification a échouée",
+        title: !category.uuid ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
       return;
@@ -133,7 +138,7 @@
 
     toast.add({
       color: "green",
-      title: !category.id ? "Catégorie créée" : "Catégorie modifiée",
+      title: !category.uuid ? "Catégorie créée" : "Catégorie modifiée",
     });
 
     // We refresh the list
@@ -197,7 +202,10 @@
             </template>
 
             <template #actions-data="{ row }">
-              <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+              <div class="flex items-center gap-1">
+                <p class="text-xs">{{ row.weight }}</p>
+                <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+              </div>
             </template>
 
           </UTable>
@@ -218,16 +226,19 @@
               <UFormGroup label="Nom" name="name">
                 <UInput v-model="selectedCategory.name" />
               </UFormGroup>
+              <UFormGroup label="Poids dans la liste" name="weight">
+                <UInput type="number" v-model="selectedCategory.weight" />
+              </UFormGroup>
             </div>
 
           </UCard>
 
-          <UButton v-if="selectedCategory.id" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + selectedCategory.id">Voir les articles</UButton>
+          <UButton v-if="selectedCategory.uuid" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
           <UButton
-            v-if="selectedCategory.id"
+            v-if="selectedCategory.uuid"
             block
             color="red"
             :loading="isLoading"

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-  import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-  import type {InventoryItem} from "~/types/api/item/inventoryItem";
-  import type {InventoryItemHistory} from "~/types/api/item/inventoryItemHistory";
+  import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
+  import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
+  import type {InventoryItemHistory} from "~/types/api/item/clubDependent/plugin/sale/inventoryItemHistory";
 
   import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors } from 'chart.js'
   import { Line } from 'vue-chartjs'
   import {formatMonetary} from "~/utils/string";
+  import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors)
 
   definePageMeta({
@@ -16,7 +17,7 @@
 
   const toast = useToast()
   const route = useRoute()
-  const itemId = route.params.id;
+  const itemId = decodeUrlUuid(route.params.id.toString());
 
   const inventoryItemModalOpen = ref(false)
 
@@ -66,7 +67,7 @@
 
   async function loadHistories(itemId: string) {
     // We load the history
-    const { items, error } = await itemQuery.histories(itemId.toString())
+    const { items, error } = await itemQuery.histories(itemId)
 
     if (error) {
       inventoryItemHistories.value = []
@@ -142,7 +143,7 @@
         {{ inventoryItem?.name }}
 
         <UButton v-if="inventoryItem?.category"
-           :to="'/admin/inventories?category=' + inventoryItem.category.id"
+           :to="'/admin/inventories?category=' + convertUuidToUrlUuid(inventoryItem.category.uuid)"
            variant="soft"
            :ui="{ rounded: 'rounded-full' }">
           {{ inventoryItem.category.name }}
@@ -204,8 +205,12 @@
       <GenericStatCard
         :title="inventoryItem?.canBeSold ? 'Vente activée' : 'Vente désactivée' "
         :value-class="inventoryItem?.canBeSold ? 'text-green-600' : 'text-red-600'"
-        :value="inventoryItem?.canBeSold ? '✔' : '✖' "
         :loading="isLoading">
+        <template #value>
+          <UIcon
+            :name="inventoryItem?.canBeSold ? 'i-heroicons-check': 'i-heroicons-x-mark'"
+          />
+        </template>
       </GenericStatCard>
     </div>
 

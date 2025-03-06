@@ -4,8 +4,10 @@ import type {View} from "~/types/api/view";
 import type {Item} from "~/types/api/item";
 import {mergician} from 'mergician';
 import type {UseApiDataOptions} from "nuxt-api-party/dist/runtime/composables/useApiData";
-import {useSelfMemberStore} from "~/stores/useSelfMember";
+import {useSelfUserStore} from "~/stores/useSelfUser";
 import type {NuxtError} from "#app";
+import type {ItemError} from "~/types/api/itemError";
+import {decodeUrlUuid, formatErrorFromApiResponse} from "~/utils/resource";
 
 export const MIME_TYPE = "application/ld+json";
 export const MIME_TYPE_JSON = "application/json";
@@ -14,11 +16,19 @@ export const MIME_TYPE_CSV = "text/csv"
 
 const CONTENT_TYPE_FORM_DATA = "multipart/form-data"
 
+function getBasicAuthorization(isBadger: boolean = false): string {
+  let bearer = useRuntimeConfig().public.clientId + ':' + useRuntimeConfig().public.clientSecret
+  if (isBadger || useSelfUserStore().selfJwtToken?.isBadger) {
+    bearer = useRuntimeConfig().public.badgerClientId + ':' + useRuntimeConfig().public.badgerClientSecret
+  }
+  return `Basic ${btoa(bearer)}`
+}
+
 async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLogin: boolean = true) {
   let overloadedOptions = {}
 
   if (requireLogin) {
-    const selfStore = useSelfMemberStore()
+    const selfStore = useSelfUserStore()
     const jwtToken = await selfStore.enhanceJwtTokenDefined();
     // We throw an error if at this point we still don't have an access token
     if (!jwtToken.value || !jwtToken.value.access) {
@@ -29,6 +39,14 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
         Authorization: `Bearer ${jwtToken.value?.access?.token}`
       }
     }, options);
+
+    if (selfStore.selectedProfile?.id) {
+      overloadedOptions.headers.Profile = `${selfStore.selectedProfile.id}`
+    }
+
+    if (selfStore.impersonatedUser) {
+      overloadedOptions.headers['X-Switch-User'] = selfStore.impersonatedUser
+    }
   }
 
   overloadedOptions = mergician({
@@ -46,28 +64,41 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLog
     overloadedOptions.body = options.body
   }
 
+
+  if (!overloadedOptions?.headers?.Authorization) {
+    overloadedOptions.headers.Authorization = getBasicAuthorization()
+  }
+
   return await $localApi<T>(path, overloadedOptions);
 }
 
 export async function useLoginUser(email: string, password: string) {
-  const { data, error } = await usePostRawJson("auth", {
-    email: email,
+  const { data, error } = await usePostRawJson("token", {
+    grant_type: 'password',
+    username: email,
     password: password
   });
 
   if (data) {
-    const selfStore = useSelfMemberStore()
+    const selfStore = useSelfUserStore()
     selfStore.setJwtSelfJwtTokenFromApiResponse(data)
+
+    await selfStore.refresh()
   }
 
   return { error };
 }
 
-export async function useLoginBadger(loginToken: string) {
-  const { data } = await usePostRawJson("auth/bdg/" + loginToken);
+export async function useLoginBadger(clubId: string, loginToken: string) {
+  const { data } = await usePostRawJson("auth/bdg", {
+    token: loginToken,
+    club: decodeUrlUuid(clubId)
+  }, true);
 
-  const selfStore = useSelfMemberStore()
-  selfStore.setJwtSelfJwtTokenFromApiResponse(data)
+  const selfStore = useSelfUserStore()
+  selfStore.setJwtSelfJwtTokenFromApiResponse(data, true)
+
+  await selfStore.refresh()
 
   return true;
 }
@@ -75,7 +106,9 @@ export async function useLoginBadger(loginToken: string) {
 
 
 
-export async function usePostRawJson(path: string, payload?: object) {
+
+
+export async function usePostRawJson(path: string, payload?: object, isBadger: boolean = false) {
   let data: any | undefined = undefined;
   let error: NuxtError | undefined = undefined;
 
@@ -84,12 +117,13 @@ export async function usePostRawJson(path: string, payload?: object) {
       method: "POST",
       headers: {
         Accept: MIME_TYPE_JSON,
+        Authorization: getBasicAuthorization(isBadger)
       },
       body: payload
     });
 
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError
   }
 
   return {
@@ -104,21 +138,21 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
   let totalItems: number | undefined = undefined;
   let view: View | undefined = undefined;
   let hubUrl: URL | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi<PagedCollection<T>>(resource, {
 
-      onResponse({ response }) {
-        hubUrl = extractHubURL(response);
+      onResponse(ctxt) {
+        hubUrl = extractHubURL(ctxt.response);
       },
     });
 
-    items = data["hydra:member"];
-    view = data["hydra:view"];
-    totalItems = data["hydra:totalItems"];
+    items = data["member"];
+    view = data["view"];
+    totalItems = data["totalItems"];
   } catch (e) {
-    error = e as NuxtError;
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -133,7 +167,7 @@ export async function useFetchList<T>(resource: string): Promise<FetchAllData<T>
 export async function useFetchItem<T>(path: string, useCache: boolean = false, requireLogin: boolean = true): Promise<FetchItemData<T>> {
   let retrieved: T | undefined = undefined;
   let hubUrl: URL | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi<T>(path, {
@@ -146,7 +180,7 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false, r
 
     retrieved = data as T;
   } catch (e) {
-    error = e as NuxtError;
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
 
@@ -159,7 +193,7 @@ export async function useFetchItem<T>(path: string, useCache: boolean = false, r
 
 export async function useCreateItem<T>(resource: string, payload: Item) {
   let created: T | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi<T>(resource, {
@@ -169,7 +203,7 @@ export async function useCreateItem<T>(resource: string, payload: Item) {
 
     created = data as T;
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -194,7 +228,7 @@ export async function useUploadFile(resource: string, payload: FormData, require
 
     created = data as Object;
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError
   }
 
   return {
@@ -205,7 +239,7 @@ export async function useUploadFile(resource: string, payload: FormData, require
 
 export async function useUpdateItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi<T>(item["@id"] ?? "", {
@@ -219,7 +253,7 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
 
     updated = data as T;
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -240,7 +274,7 @@ export async function useGetCsv(path: string) {
       },
     });
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError
   }
 
   return {
@@ -266,7 +300,7 @@ export async function usePost<T>(path: string, payload: object) {
 
     item = data as T;
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError
   }
 
   return {
@@ -277,7 +311,7 @@ export async function usePost<T>(path: string, payload: object) {
 
 export async function usePut(path: string, payload: object) {
   let updated: object | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     updated = await useApi<object>(path, {
@@ -289,7 +323,7 @@ export async function usePut(path: string, payload: object) {
       },
     });
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -299,9 +333,32 @@ export async function usePut(path: string, payload: object) {
 }
 
 
+export async function usePatch<T>(path: string, payload: object) {
+  let updated: T | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
+
+  try {
+    updated = await useApi<T>(path, {
+      method: "PATCH",
+      body: payload,
+      headers: {
+        Accept: MIME_TYPE,
+        "Content-Type": MIME_TYPE_JSON_PATCH,
+      },
+    });
+  } catch (e) {
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
+  }
+
+  return {
+    updated,
+    error,
+  };
+}
+
 export async function usePatchItem<T>(item: Item, payload: Item) {
   let updated: T | undefined = undefined;
-  let error: NuxtError | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   try {
     const data = await useApi(item["@id"] ?? "", {
@@ -315,7 +372,7 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
 
     updated = data as T;
   } catch (e) {
-    error = e as NuxtError
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
@@ -325,7 +382,7 @@ export async function usePatchItem<T>(item: Item, payload: Item) {
 }
 
 export async function useDeleteItem(item?: Item | null) {
-  let error: Error | undefined = undefined;
+  let error: NuxtError<ItemError> | undefined = undefined;
 
   if (!item || !item["@id"]) {
     error = new Error("No item found. Please reload");
@@ -339,10 +396,32 @@ export async function useDeleteItem(item?: Item | null) {
       method: "DELETE",
     });
   } catch (e) {
-    error = e as Error
+    error = formatErrorFromApiResponse(e as object) as NuxtError<ItemError>
   }
 
   return {
     error,
   };
 }
+
+export async function useDelete(path: string, payload?: object) {
+  let error: Error | undefined = undefined;
+
+  try {
+    await useApi(path, {
+      method: "DELETE",
+      body: payload,
+      headers: {
+        Accept: MIME_TYPE,
+        "Content-Type": MIME_TYPE_JSON,
+      },
+    });
+  } catch (e) {
+    error = formatErrorFromApiResponse(e as object) as Error
+  }
+
+  return {
+    error,
+  };
+}
+

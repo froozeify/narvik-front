@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import {usePresenceStore} from "~/stores/usePresenceStore";
-  import type {ExternalPresence} from "~/types/api/item/externalPresence";
-  import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
+  import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
+  import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
   import {formatDateInput} from "~/utils/date";
   import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
+  import {useSelfUserStore} from "~/stores/useSelfUser";
+  import {createBrowserCsvDownload} from "~/utils/browser";
 
   const props = defineProps({
     listOnly: {
@@ -14,10 +16,18 @@
   });
 
   const toast = useToast();
+
+
+
   const isLoading = ref(true);
+  const isDownloadingCsv = ref(false)
 
   const presenceStore = usePresenceStore()
+  const selfStore = useSelfUserStore()
+
   const { selectedRange, searchQuery } = storeToRefs(presenceStore)
+
+  const isAdmin = selfStore.isAdmin()
 
   const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)
   const modalOpen: Ref<boolean> = ref(false);
@@ -99,10 +109,62 @@
     getPresences()
   }
 
+  async function downloadCsv() {
+    isDownloadingCsv.value = true
+
+    const urlParams = new URLSearchParams({
+      pagination: 'false',
+    });
+
+    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+
+    if (selectedRange.value) {
+      const formattedStartDate = formatDateInput(selectedRange.value.start.toString())
+      const formattedEndDate = formatDateInput(selectedRange.value.end.toString())
+      if (formattedStartDate) {
+        urlParams.append(`date[after]`, formattedStartDate);
+
+        if (formattedEndDate) {
+          urlParams.append(`date[before]`, formattedEndDate);
+        } else {
+          urlParams.append(`date[before]`, formattedStartDate);
+        }
+      }
+    } else {
+      isDownloadingCsv.value = false
+      toast.add({
+        color: "red",
+        title: "Date non définie.",
+        description: "Veuillez sélectionner une date afin de pouvoir télécharger le csv."
+      })
+      return;
+    }
+
+    if (searchQuery.value) {
+      urlParams.append(`multiple[firstname, lastname, licence]`, searchQuery.value);
+    }
+
+    // We make the search
+    const { data } = await presenceQuery.getAllCsv(urlParams)
+    isDownloadingCsv.value = false
+    createBrowserCsvDownload('external-presences.csv', data)
+  }
+
 </script>
 
 <template>
   <div>
+    <div class="flex flex-wrap items-center gap-4">
+      <div class="text-xl font-bold mb-4">Présences externe</div>
+
+      <div class="flex-1"></div>
+
+      <template v-if="isAdmin">
+        <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv" :disabled="!selectedRange">
+          CSV
+        </UButton>
+      </template>
+    </div>
 
     <PresenceTable
       :is-external-presences="true"

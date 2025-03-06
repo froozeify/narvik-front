@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import type {InventoryCategory} from "~/types/api/item/inventoryCategory";
+import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
 import {usePaginationValues} from "~/composables/api/list";
-import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
-import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
+import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
 import type {FormError} from "#ui/types";
 import {UModals} from "#components";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+import type {NuxtError} from "#app";
+import type {ItemError} from "~/types/api/itemError";
 
 definePageMeta({
     layout: "pos"
@@ -115,17 +117,19 @@ definePageMeta({
       icon: paymentMode.icon
     }
 
+    if (paymentMode.weight) {
+      payload.weight = paymentMode.weight
+    }
+
     // We verify if it's a creation or an update
-    let error: Error | null = null
-    if (!paymentMode.id) {
-      await apiQuery.post(payload).then(value => {
-        error = value.error
-        selectedPaymentMode.value = value.created
-      });
+    let error: NuxtError<ItemError> | undefined = undefined
+    if (!paymentMode.uuid) {
+      let { created, error: errorMessage } = await apiQuery.post(payload);
+      error = errorMessage
+      selectedPaymentMode.value = created
     } else { // Update
-      await apiQuery.patch(paymentMode, payload).then(value => {
-        error = value.error
-      });
+      let { error: errorMessage } = await apiQuery.patch(paymentMode, payload);
+      error = errorMessage
     }
 
     isLoading.value = false
@@ -133,7 +137,7 @@ definePageMeta({
     if (error) {
       toast.add({
         color: "red",
-        title: !paymentMode.id ? "La création a échouée" : "La modification a échouée",
+        title: !paymentMode.uuid ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
       return;
@@ -141,7 +145,7 @@ definePageMeta({
 
     toast.add({
       color: "green",
-      title: !paymentMode.id ? "Moyen de paiement crée" : "Moyen de paiement modifié",
+      title: !paymentMode.uuid ? "Moyen de paiement crée" : "Moyen de paiement modifié",
     });
 
     // We refresh the list
@@ -212,7 +216,10 @@ definePageMeta({
             </template>
 
             <template #actions-data="{ row }">
-              <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+              <div class="flex items-center gap-1">
+                <p class="text-xs">{{ row.weight }}</p>
+                <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+              </div>
             </template>
 
           </UTable>
@@ -256,6 +263,10 @@ definePageMeta({
                 <UInput v-model="selectedPaymentMode.icon" />
 
               </UFormGroup>
+
+              <UFormGroup label="Poids dans la liste" name="weight">
+                <UInput type="number" v-model="selectedPaymentMode.weight" />
+              </UFormGroup>
             </div>
 
           </UCard>
@@ -264,7 +275,7 @@ definePageMeta({
         </UForm>
 
         <UButton
-          v-if="selectedPaymentMode.id"
+          v-if="selectedPaymentMode.uuid"
           block
           color="red"
           :loading="isLoading"

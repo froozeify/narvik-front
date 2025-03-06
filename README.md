@@ -1,11 +1,11 @@
 # Narvik - Front
 
-Page du projet : https://narvik.pages.dev/frontend/
+Page du projet : https://docs.narvik.app/frontend/
 
 ## Documentations
 
 0. [Développement](docs/0.README.md)
-1. [Documentation utilisateur](https://narvik.pages.dev/frontend/)
+1. [Documentation utilisateur](https://docs.narvik.app/frontend/)
 
 
 ## License

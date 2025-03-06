@@ -1,15 +1,16 @@
 <script setup lang="ts">
-  import InventoryItemQuery from "~/composables/api/query/InventoryItemQuery";
-  import SalePaymentModeQuery from "~/composables/api/query/SalePaymentModeQuery";
-  import type {InventoryItem} from "~/types/api/item/inventoryItem";
+  import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
+  import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
+  import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
   import {formatMonetary} from "~/utils/string";
-  import SaleQuery from "~/composables/api/query/SaleQuery";
-  import type {Sale} from "~/types/api/item/sale";
-  import type {SalePurchasedItem} from "~/types/api/item/salePurchasedItem";
+  import SaleQuery from "~/composables/api/query/clubDependent/plugin/sale/SaleQuery";
+  import type {Sale} from "~/types/api/item/clubDependent/plugin/sale/sale";
+  import type {SalePurchasedItem} from "~/types/api/item/clubDependent/plugin/sale/salePurchasedItem";
   import {useSaleStore} from "~/stores/useSaleStore";
   import {useCartStore} from "~/stores/useCartStore";
   import {formatDate} from "~/utils/date";
   import dayjs from "dayjs";
+  import {convertUuidToUrlUuid} from "~/utils/resource";
 
   definePageMeta({
     layout: "pos"
@@ -80,7 +81,7 @@
     inventoryItemsLoading.value = inventoryItemsLoading.value.concat(items)
 
     // We load the next page
-    if (view &&view["hydra:next"]) {
+    if (view &&view["next"]) {
       await loadItems(page + 1)
       return;
     }
@@ -123,7 +124,7 @@
         quantity: item.quantity
       }
 
-      if (Number(key) > 0) {
+      if (item.item['@id']) {
         payload.item = item.item['@id']
       } else {
         payload.itemName = item.item.name
@@ -161,7 +162,7 @@
     cartStore.emptyCart()
     saleStore.shouldRefreshSales = true
 
-    navigateTo('/admin/sales/' + created.id)
+    navigateTo('/admin/sales/' + convertUuidToUrlUuid(created.uuid))
   }
 
   // We load the page content
@@ -291,13 +292,13 @@
         <div class="mt-4">
           <div class="flex text-xs align-center mt-1">
             <div class="flex-1"></div>
-            <UButton v-if="cart.size > 0" size="xs" @click="cartStore.emptyCart()">Vider le panier</UButton>
+            <UButton v-if="cart.length > 0" size="xs" @click="cartStore.emptyCart()">Vider le panier</UButton>
           </div>
-          <div v-if="cart.size < 1" class="text-center">
+          <div v-if="cart.length < 1" class="text-center">
             <i>Aucun articles</i>
           </div>
           <div class="overflow-y-auto max-h-[25vh] mt-2">
-            <div v-for="[id , cartItem] in cart" class="flex items-center gap-2 mb-1">
+            <div v-for="cartItem in cart" class="flex items-center gap-2 mb-1">
               <GenericStackedUpDown @changed="modifier => { cartStore.addToCart(cartItem.item, modifier) }" />
 
               <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ cartItem.quantity }}</div>
@@ -330,7 +331,7 @@
           <div class="flex flex-wrap gap-2">
             <UButton
               v-for="paymentMode in paymentModes"
-              :variant="selectedPaymentMode?.id == paymentMode.id ? 'solid' : 'soft'"
+              :variant="selectedPaymentMode?.uuid == paymentMode.uuid ? 'solid' : 'soft'"
               class="basis-[calc(50%-0.25rem)]">
               <div class="flex items-center w-full" @click="selectedPaymentMode = selectedPaymentMode === paymentMode ? null : paymentMode">
                 <UIcon :name="'i-heroicons-' + paymentMode.icon" />

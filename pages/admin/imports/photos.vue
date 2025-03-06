@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import MemberQuery from "~/composables/api/query/MemberQuery";
+  import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
   import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
 
   definePageMeta({
@@ -43,6 +43,7 @@
     <UCard>
       <p>L'import ce fait grâce au zip généré par itac.</p>
       <p>Celui-ci doit obligatoirement être au format zip.</p>
+      <p>Chaque image doit être nommé avec le numéro de licence de la personne.</p>
 
       <UInput
           :loading="fileUploading"
@@ -55,7 +56,7 @@
           @change="getFileObject"
       />
 
-      <UButton target="_blank" to="https://narvik.pages.dev/frontend/docs/import/itac.html#import-des-photos">Documentation</UButton>
+      <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/itac.html#import-des-photos">Documentation</UButton>
 
     </UCard>
   </div>

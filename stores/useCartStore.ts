@@ -1,14 +1,17 @@
-import type {ExternalPresence} from "~/types/api/item/externalPresence";
-import ExternalPresenceQuery from "~/composables/api/query/ExternalPresenceQuery";
-import dayjs from "dayjs";
-import type {InventoryItem} from "~/types/api/item/inventoryItem";
-import type {SalePaymentMode} from "~/types/api/item/salePaymentMode";
+import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
+import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
 import type {FormError} from "#ui/types";
+import {defineStore} from "pinia";
+
+interface CartItem {
+  item: InventoryItem,
+  quantity: number
+}
 
 export const useCartStore = defineStore('cart', () => {
   const searchQuery: Ref<string> = ref('')
 
-  const cart: Ref<Map<string, {item: InventoryItem, quantity: number}>> = ref(new Map())
+  const cart: Ref<CartItem[]> = ref([])
   const cartTotalItems = computed( () => {
     let total: number = 0
     cart.value.forEach( item => {
@@ -35,29 +38,37 @@ export const useCartStore = defineStore('cart', () => {
 
   // Cart management
   function addToCart(item: InventoryItem, modifier: number = 1) {
-    if (!item.id) {
+    if (!item.uuid) {
       return
     }
 
     searchQuery.value = '' // Since the item has been added to the cart, we revert to empty search
 
-    let cartItem = cart.value.get(item.id.toString())
+    const itemIndex = cart.value.findIndex((cartItem) => cartItem.item.uuid === item.uuid)
 
-    if (!cartItem) {
+    let cartItem: CartItem | undefined = undefined
+
+    if (itemIndex < 0) {
       cartItem = { quantity: modifier, item: item }
     } else {
+      cartItem = cart.value[itemIndex]
       cartItem.quantity += modifier
     }
 
     if (cartItem.quantity <= 0) {
-      cart.value.delete(item.id.toString())
+      cart.value = cart.value.filter(cartItem => cartItem.item.uuid !== item.uuid)
     } else {
-      cart.value.set(item.id.toString(), cartItem)
+      // New item
+      if (itemIndex < 0) {
+        cart.value.push(cartItem)
+      } else {
+        cart.value[itemIndex] = cartItem
+      }
     }
   }
 
   function emptyCart() {
-    cart.value.clear()
+    cart.value = []
     searchQuery.value = ''
     selectedPaymentMode.value = undefined
     cartComment.value = ''
@@ -82,7 +93,7 @@ export const useCartStore = defineStore('cart', () => {
 
     // Negative ID, Backend know it's not a real item
     const item: InventoryItem = {
-      id: - Math.floor(Math.random() * 200000),
+      uuid: Number(- Math.floor(Math.random() * 200000)).toString(),
       name: customItemForm.name,
       sellingPrice: parseFloat(customItemForm.sellingPrice.replace(',', '.')).toFixed(2),
     }
@@ -116,4 +127,15 @@ export const useCartStore = defineStore('cart', () => {
     addCustomItemToCart,
     closeCustomItemModal,
 	}
+}, {
+  persist: {
+    // We only save those attributes
+    pick: [
+      'cart',
+      'cartTotalItems',
+      'cartTotalPrice',
+      'cartComment',
+      'selectedPaymentMode',
+    ],
+  }
 })

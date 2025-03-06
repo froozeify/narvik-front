@@ -1,11 +1,16 @@
 export class JwtToken {
-	public access?: JwtAccessToken;
-	public refresh?: JwtRefreshToken;
+  constructor(isBadger: boolean) {
+    this.isBadger = isBadger;
+  }
+
+  public isBadger: boolean
+  public access?: JwtAccessToken;
+  public refresh?: JwtRefreshToken;
 }
 
 interface _Token {
-	token: string,
-	date: Date
+  token: string,
+  date: Date
 }
 
 export interface JwtAccessToken extends _Token {

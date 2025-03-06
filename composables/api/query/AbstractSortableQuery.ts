@@ -1,10 +1,10 @@
-import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import {usePut} from "~/composables/api/api";
 import type {Item} from "~/types/api/item";
+import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
 
-export abstract class AbstractSortableQuery<T> extends AbstractQuery<T> {
+export abstract class AbstractSortableQuery<R, W> extends AbstractClubDependentQuery<R, W> {
 
   async move(item: Item, direction: string) {
-    return usePut(this.rootPath + "/" + item.id + "/move", {direction: direction});
+    return usePut(item["@id"] + "/move", {direction: direction});
   }
 }
