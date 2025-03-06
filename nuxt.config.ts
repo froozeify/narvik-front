@@ -64,7 +64,7 @@ export default defineNuxtConfig({
 
   turnstile: {
     siteKey: '',
-    addValidateEndpoint: true
+    addValidateEndpoint: false
   },
 
   compatibilityDate: '2024-07-15',
