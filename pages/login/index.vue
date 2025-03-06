@@ -11,7 +11,6 @@ const isLoading = ref(false)
 const state = reactive({
   email: undefined,
   password: undefined,
-  turnstile: undefined,
 })
 
 const appConfigStore = useAppConfigStore();
@@ -29,27 +28,6 @@ const validate = (state: any): FormError[] => {
 
 async function onSubmit(event: FormSubmitEvent<{email: string, password: string}>) {
   isLoading.value = true
-
-  // We validate the token
-  if (hasTurnstile) {
-    try {
-      // We validate the captcha
-      await $fetch('/_turnstile/validate', {
-        method: 'POST',
-        body: {
-          token: state.turnstile,
-        }
-      })
-    } catch (e) {
-      toast.add({
-        color: "red",
-        title: "Captcha invalide",
-      })
-      console.error(e)
-      isLoading.value = false
-      return;
-    }
-  }
 
   const { error } = await useLoginUser(event.data.email, event.data.password);
   if (error) {
