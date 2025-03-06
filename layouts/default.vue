@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import FooterCopyright from "~/components/FooterCopyright.vue";
 </script>
 
 <template>
@@ -8,6 +9,9 @@
         <slot/>
       </div>
     </main>
+    <footer class="print:hidden mb-4">
+      <FooterCopyright :display-version="false" />
+    </footer>
     <UNotifications />
   </div>
 </template>
