@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     'pinia-plugin-persistedstate/nuxt',
     '@nuxt/image',
     'nuxt-api-party',
+    '@nuxtjs/turnstile',
   ],
 
   ui: {
@@ -59,6 +60,11 @@ export default defineNuxtConfig({
         }
       }
     }
+  },
+
+  turnstile: {
+    siteKey: '',
+    addValidateEndpoint: true
   },
 
   compatibilityDate: '2024-07-15',
