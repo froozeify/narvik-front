@@ -141,7 +141,10 @@ function keyPressHandler(ev: KeyboardEvent) {
   }
 
   openAddPresenceModal()
-  searchQuery.value = searchQuery.value + ev.key
+  // Fix for chrome duplicating text but shouldn't
+  if (navigator.userAgent.match(/firefox|fxios/i)) {
+    searchQuery.value = searchQuery.value + ev.key
+  }
 }
 
 onMounted(() => {
