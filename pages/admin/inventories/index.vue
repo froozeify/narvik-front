@@ -18,6 +18,8 @@
 
   const queryParams = useRoute().query
 
+  const isSideVisible = ref(false)
+
   const apiQuery = new InventoryItemQuery()
   const itemCategoryQuery = new InventoryCategoryQuery()
 
@@ -74,6 +76,10 @@
       key: 'name',
       label: 'Nom',
       sortable: true,
+    },
+    {
+      key: 'description',
+      label: 'Description',
       class: 'w-full'
     },
     {
@@ -84,6 +90,7 @@
 
   function rowClicked(row: object) {
     selectedItem.value = {...row} // We make a shallow clone
+    isSideVisible.value = true
   }
 
   // We get the data from the api on first page load
@@ -132,6 +139,13 @@
   // InventoryItemModal
   const inventoryItemModalOpen = ref(false)
 
+  function onItemUpdated(value: InventoryItem) {
+    selectedItem.value = value
+    inventoryItemModalOpen.value = false
+    isSideVisible.value = false
+    getItemsPaginated()
+  }
+
   // Camera detection setup
 
   const cameraPreview = ref(false)
@@ -162,7 +176,7 @@
 </script>
 
 <template>
-  <GenericLayoutContentWithStickySide @keyup.esc="selectedItem = undefined;" :has-side-content="selectedItem !== undefined" :mobile-side-title="selectedItem?.name" tabindex="-1">
+  <GenericLayoutContentWithSlideover v-model="isSideVisible" tabindex="-1">
     <template #main>
       <UCard>
         <div class="flex mb-2">
@@ -275,22 +289,21 @@
 
     <template #side>
       <template v-if="selectedItem">
+        <UButton block class="mb-4" :to="'/admin/inventories/items/' + convertUuidToUrlUuid(selectedItem.uuid)">Voir en détail</UButton>
+
+
         <UCard class="overflow-y-auto">
-          <InventoryItemForm :item="selectedItem" :view-only="true" />
-          <UButton
-            class="mt-4"
-            block
-            @click="inventoryItemModalOpen = true"
-          >
-            Modifier
-          </UButton>
+          <InventoryItemForm
+            :item="selectedItem"
+            :categories="categories"
+            @updated="onItemUpdated"
+          />
         </UCard>
 
-        <UButton block :to="'/admin/inventories/items/' + convertUuidToUrlUuid(selectedItem.uuid)">Voir en détail</UButton>
       </template>
     </template>
 
-  </GenericLayoutContentWithStickySide>
+  </GenericLayoutContentWithSlideover>
 
   <UModal
     v-model="inventoryItemModalOpen">
@@ -298,7 +311,7 @@
       <InventoryItemForm
         :item="selectedItem ? {...selectedItem} : undefined"
         :categories="categories"
-        @updated="(value) => {selectedItem = value; inventoryItemModalOpen = false; getItemsPaginated() }"
+        @updated="onItemUpdated"
       />
     </UCard>
   </UModal>

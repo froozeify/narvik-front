@@ -517,9 +517,9 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
       </template>
 
     </div>
-    <div class="flex flex-col lg:flex-row lg:flex-wrap gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-9 gap-4 w-full">
 
-      <div class="flex-grow">
+      <div class="lg:col-span-5">
         <UCard v-if="!member">
           <div class="mx-auto my-0 h-24 w-24 aspect-square">
             <USkeleton class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
@@ -581,44 +581,19 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
               </div>
             </div>
 
-            <div class="grid lg:grid-cols-2 text-sm">
-              <div v-if="member.lastControlShooting" class="col-span-2 flex items-center">
+            <div class="grid grid-cols-1 xl:grid-cols-2 text-sm gap-2">
+              <div v-if="member.lastControlShooting" class="xl:col-span-2 flex items-center">
                 Dernier contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
               </div>
 
-              <div class="flex items-center">
-                <UIcon class="mr-4" name="i-heroicons-identification" />
-                <p class="text-sm">{{ member.licence }}</p>
-              </div>
+              <MemberDetailsPersonnalInfo icon="i-heroicons-identification" :label="member.licence" />
+              <MemberDetailsPersonnalInfo icon="i-heroicons-at-symbol" :label="member.email" :to="'mailto:' + member.email" />
+              <MemberDetailsPersonnalInfo icon="i-heroicons-phone" :label="member.phone?.match(/.{1,2}/g)?.join(' ')" :to="member.phone ? 'tel:' + member.phone : undefined" />
+              <MemberDetailsPersonnalInfo icon="i-heroicons-phone" :label="member.mobilePhone?.match(/.{1,2}/g)?.join(' ')" :to="member.mobilePhone ? 'tel:' + member.mobilePhone : undefined" />
 
-              <div class="flex items-center">
-                <UIcon class="mr-2" name="i-heroicons-at-symbol" />
-                <UButton variant="link" :to="'mailto:' + member.email">{{ member.email }}</UButton>
-              </div>
+              <UDivider label="Adresse" class="xl:col-span-2" />
 
-              <div class="flex items-center">
-                <UIcon class="mr-2" name="i-heroicons-phone" />
-                <template v-if="member.phone">
-                  <UButton variant="link" :to="'tel:' + member.phone">{{ member.phone.match(/.{1,2}/g).join(' ') }}</UButton>
-                </template>
-                <template v-else>
-                  <UButton variant="link" disabled>Non défini</UButton>
-                </template>
-              </div>
-
-              <div class="flex items-center">
-                <UIcon class="mr-2" name="i-heroicons-phone" />
-                <template v-if="member.mobilePhone">
-                  <UButton variant="link" :to="'tel:' + member.mobilePhone">{{ member.mobilePhone.match(/.{1,2}/g).join(' ') }}</UButton>
-                </template>
-                <template v-else>
-                  <UButton variant="link" disabled>Non défini</UButton>
-                </template>
-              </div>
-
-              <UDivider label="Adresse" class="lg:col-span-2 mt-4" />
-
-              <div class="lg:col-span-2">
+              <div class="xl:col-span-2">
                 <p>{{ member.postal1 }}</p>
                 <p>{{ member.postal2 }}</p>
                 <p>{{ member.postal3 }}</p>
@@ -633,15 +608,8 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         </UCard>
       </div>
 
-      <div class="flex basis-full lg:basis-1/2">
-        <UCard
-          class="flex-1"
-          :ui="{
-            body: {
-              padding: 'h-full'
-            }
-          }"
-        >
+      <div class="lg:col-span-4">
+        <UCard>
           <div class="flex flex-col h-full">
             <div v-if="isSupervisor" class="flex gap-4">
               <div class="flex-1"></div>
@@ -717,7 +685,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         </UCard>
       </div>
 
-      <div class="basis-full">
+      <div class="lg:col-span-9">
         <UCard v-if="totalMemberPresences > 0">
 
           <div class="text-xl font-bold">{{ totalMemberPresences }} présences ces 12 derniers mois</div>
@@ -734,7 +702,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
         </UCard>
       </div>
 
-      <div class="basis-full">
+      <div class="lg:col-span-9">
         <UCard>
           <div class="flex flex-col">
             <div v-if="isSupervisor" class="flex flex-col-reverse lg:flex-row gap-4">
