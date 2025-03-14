@@ -165,7 +165,7 @@ function presenceCanceled() {
 
     <div v-else>
       <div v-if="state.lastname" class="text-2xl">Enregistrement pour <b>{{ state.lastname }} {{ state.firstname }}</b></div>
-      <div v-else class="text-2xl">Enregistrement tireur externe</div>
+      <div v-else class="text-2xl">Enregistrement utilisateur externe</div>
 
       <UForm :state="state" @submit="onSubmit" class="mt-4">
         <UInput
