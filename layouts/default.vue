@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import FooterCopyright from "~/components/FooterCopyright.vue";
+
+useSeoMeta({
+  description: 'Narvik est une plateforme en ligne permettant de simplifier la gestion d\'une association'
+})
+
 </script>
 
 <template>
