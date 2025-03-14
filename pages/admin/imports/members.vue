@@ -188,7 +188,7 @@
         @change="importFromEden"
       />
 
-      <p class="my-2">Example</p>
+      <p class="my-2">Exemple</p>
 
       <pre class=" w-full text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
 N° licence | Date d'expiration

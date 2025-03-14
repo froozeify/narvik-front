@@ -47,20 +47,28 @@ export function formatErrorFromApiResponse(response: any): object {
     }
   }
 
-  if (!('data' in response)) {
-    return response
+  try {
+    if (!('data' in response)) {
+      return response
+    }
+
+    // We try setting the message based on the api error response
+    if ('description' in response.data) {
+      response.message = response.data.description
+      return response
+    }
+
+    if ('detail' in response.data) {
+      response.message = response.data.detail
+      return response
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      message: `Unknown exception`
+    }
   }
 
-  // We try setting the message based on the api error response
-  if ('description' in response.data) {
-    response.message = response.data.description
-    return response
-  }
-
-  if ('detail' in response.data) {
-    response.message = response.data.detail
-    return response
-  }
 
   return response
 }

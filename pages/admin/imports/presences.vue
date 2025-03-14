@@ -92,7 +92,7 @@
             @change="importMemberPresences"
           />
 
-          <p class="">Example</p>
+          <p class="">Exemple</p>
 
           <pre class=" w-full text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
 member.licence,date,activities.0.name,activities.1.name
@@ -117,7 +117,7 @@ member.licence,date,activities.0.name,activities.1.name
             @change="importExternalPresences"
           />
 
-          <p class="">Example</p>
+          <p class="">Exemple</p>
 
           <pre class=" w-full text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
 licence,firstname,lastname,date,activities.0.name,activities.1.name

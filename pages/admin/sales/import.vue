@@ -88,7 +88,7 @@
             @change="importInventoriesFromCsv"
           />
 
-          <p class="">Example</p>
+          <p class="">Exemple</p>
 
           <pre class=" w-full text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
 name,description,purchasePrice,canBeSold,sellingPrice,sellingQuantity,category.name
@@ -112,7 +112,7 @@ Cible C50,,1.47,1,14.31,1,Cibles
             @change="importSalesFromCsv"
           />
 
-          <p class="">Example</p>
+          <p class="">Exemple</p>
 
           <pre class=" w-full text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
 seller.licence,paymentMode.name,price,comment,item.0.name,item.0.category,item.0.price,item.0.quantity,uuid,createdAt

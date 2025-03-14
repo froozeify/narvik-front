@@ -43,7 +43,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   // User not logged, we redirect him to login page
   if (!selfStore.isLogged()) {
-    return navigateTo("/login");
+    return navigateTo("/login", { redirectCode:  401});
   }
 
   if (to.fullPath === "/") {
