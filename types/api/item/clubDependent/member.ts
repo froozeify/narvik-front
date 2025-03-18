@@ -24,7 +24,6 @@ export interface Member extends UuidItem, ClubLinkedItem {
   fullName?: string;
   gender?: string;
   birthday?: Date;
-  handisport?: boolean;
   blacklisted?: boolean;
   postal1?: string;
   postal2?: string;

@@ -109,10 +109,6 @@ async function submitItem() {
         <USelect v-model="item.gender" :options="[{name: 'Homme', value: 'M'}, {name: 'Femme', value: 'F'}]" option-attribute="name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
       </UFormGroup>
 
-      <UFormGroup label="Handisport">
-        <UToggle v-model="item.handisport" :disabled="props.viewOnly" />
-      </UFormGroup>
-
       <UFormGroup label="Blacklisté">
         <UToggle v-model="item.blacklisted" :disabled="props.viewOnly" />
       </UFormGroup>
