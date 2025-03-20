@@ -219,7 +219,7 @@ getActivities()
           <UButton class="mt-4" block type="submit" :loading="isLoading">Enregistrer</UButton>
         </UForm>
 
-        <UButton v-if="selectedActivity.uuid && !selectedActivity.isEnabled"
+        <UButton v-if="selectedActivity.uuid"
           block
           color="red"
           :loading="isLoading"
@@ -234,7 +234,7 @@ getActivities()
           Supprimer
         </UButton>
 
-        <UButton v-if="selectedActivity.uuid && !selectedActivity.isEnabled"
+        <UButton v-if="selectedActivity.uuid"
                  block
                  color="orange"
                  :loading="isLoading"
