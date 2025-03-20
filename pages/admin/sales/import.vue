@@ -124,7 +124,7 @@ seller.licence,paymentMode.name,price,comment,item.0.name,item.0.category,item.0
       <pre v-if="apiUploadResponse" class="mb-4 w-full text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">{{apiUploadResponse}}</pre>
 
       <div class="flex gap-2">
-        <UButton class="mt-4" target="_blank" to="https://docs.narvik.app/frontend/docs/pos/import.html">Documentation</UButton>
+        <UButton class="mt-4" target="_blank" to="https://docs.narvik.app/frontend/docs/import/narvik-pos.html">Documentation</UButton>
       </div>
 
     </UCard>

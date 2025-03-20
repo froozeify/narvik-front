@@ -75,7 +75,7 @@
           @change="getFileObject"
       />
 
-      <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/cerbère.html">Documentation</UButton>
+      <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-cerbere.html">Documentation</UButton>
 
     </UCard>
   </div>
