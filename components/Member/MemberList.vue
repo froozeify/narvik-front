@@ -18,6 +18,8 @@ const totalMembers: Ref<number> = ref(0);
 
 const query = ref('');
 const onlyCurrentSeason = ref(false);
+const onlySeasonNotRenewed = ref(false);
+const onlyPreviousSeason = ref(false);
 const onlyWithLicence = ref(true);
 
 
@@ -40,6 +42,10 @@ const columns = [
   {
     key: 'firstname',
     label: 'Prénom'
+  },
+  {
+    key: 'status',
+    label: 'Statut'
   }
 ]
 
@@ -60,6 +66,14 @@ function getMembers() {
 
   if (onlyCurrentSeason.value) {
     urlParams.append('currentSeason[memberSeasons.season]', 'true');
+  }
+
+  if (onlyPreviousSeason.value) {
+    urlParams.append('previousSeason[memberSeasons.season]', 'true');
+  }
+
+  if (onlySeasonNotRenewed.value) {
+    urlParams.append('seasonNotRenewed[memberSeasons.season]', 'true');
   }
 
   if (onlyWithLicence.value) {
@@ -105,6 +119,7 @@ function displayMemberPage(member: Member) {
   <div class="flex flex-col gap-4">
     <UCard>
       <div class="flex gap-2 flex-col flex-wrap sm:flex-row">
+
         <div class="flex flex-col justify-center">
           <UInput
             v-model="query"
@@ -113,8 +128,10 @@ function displayMemberPage(member: Member) {
         </div>
         <div class="flex-1"></div>
 
-        <div class="flex gap-2 flex-col">
-          <UCheckbox label="Saison actuelle" v-model="onlyCurrentSeason" @change="page = 1; getMembers()" />
+        <div class="grid grid-cols-2 gap-2 gap-x-4">
+          <UCheckbox label="Saison actuelle" v-model="onlyCurrentSeason" @change="onlySeasonNotRenewed = false; onlyPreviousSeason = false; page = 1; getMembers()" />
+          <UCheckbox label="Non renouvelée" v-model="onlySeasonNotRenewed" @change="onlyCurrentSeason = false; page = 1; getMembers()" />
+          <UCheckbox label="Saison précédente" v-model="onlyPreviousSeason" @change="onlyCurrentSeason = false; page = 1; getMembers()" />
           <UCheckbox label="Licence" v-model="onlyWithLicence" @change="page = 1; getMembers()" />
         </div>
       </div>
@@ -122,6 +139,7 @@ function displayMemberPage(member: Member) {
 
     <UCard>
       <div class="flex gap-2 flex-col flex-wrap sm:flex-row">
+        <div class="text-xl font-bold">Membres ({{ totalMembers }})</div>
         <div class="flex-1"></div>
         <div class="flex justify-end">
           <UButton @click="createMemberModal = true" icon="i-heroicons-plus"></UButton>
@@ -141,6 +159,10 @@ function displayMemberPage(member: Member) {
           <div class="flex flex-col items-center justify-center py-6 gap-3">
             <span class="italic text-sm">Aucun membres trouvés.</span>
           </div>
+        </template>
+
+        <template #status-data="{ row }">
+          <i v-if="!row.currentSeason">Saison non renouvelée</i>
         </template>
 
       </UTable>
