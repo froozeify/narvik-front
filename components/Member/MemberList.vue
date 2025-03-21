@@ -138,7 +138,7 @@ function displayMemberPage(member: Member) {
     </UCard>
 
     <UCard>
-      <div class="flex gap-2 flex-col flex-wrap sm:flex-row">
+      <div class="flex gap-2 flex-row flex-wrap">
         <div class="text-xl font-bold">Membres ({{ totalMembers }})</div>
         <div class="flex-1"></div>
         <div class="flex justify-end">
