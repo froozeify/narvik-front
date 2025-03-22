@@ -9,7 +9,6 @@ import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExte
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {useSelfUserStore} from "~/stores/useSelfUser";
-import type {TablePaginateInterface} from "~/components/Presence/PresenceTable.vue";
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
