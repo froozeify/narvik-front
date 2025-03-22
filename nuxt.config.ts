@@ -2,6 +2,11 @@
 import pkg from './package.json'
 
 export default defineNuxtConfig({
+  compatibilityDate: '2024-07-15',
+  future: {
+    compatibilityVersion: 4
+  },
+
   devtools: {enabled: true},
   devServer: {
     https: true,
@@ -66,6 +71,4 @@ export default defineNuxtConfig({
     siteKey: '',
     addValidateEndpoint: false
   },
-
-  compatibilityDate: '2024-07-15',
 })
