@@ -196,7 +196,7 @@ function emitPaginate() {
             <UButton
                 color="red"
                 :ui="{ rounded: 'rounded-full' }">
-              Dernier tir de contrôle : {{ formatDateReadable(row.member.lastControlShooting) }}
+              Dernier contrôle : {{ formatDateReadable(row.member.lastControlShooting) }}
             </UButton>
           </div>
         </template>

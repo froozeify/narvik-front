@@ -219,7 +219,7 @@ function fullNameClicked() {
         </div>
 
         <div class="space-y-4 w-full my-4">
-          <div class="text-center text-2xl font-bold" @click="fullNameClicked">
+          <div class="text-center text-2xl font-bold cursor-pointer" @click="fullNameClicked">
             {{ member.fullName }}
           </div>
           <div class="flex justify-center flex-wrap gap-2">
@@ -266,7 +266,7 @@ function fullNameClicked() {
             {{ member.licence }}
           </div>
           <div v-if="member.lastControlShooting" class="text-center text-xl">
-            Dernier tir de contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
+            Dernier contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
           </div>
           <div class="flex gap-4 justify-center flex-wrap">
             <UButton

@@ -46,6 +46,10 @@ const columns = [
   {
     key: 'status',
     label: 'Statut'
+  },
+  {
+    key: 'actions',
+    label: 'Actions'
   }
 ]
 
@@ -163,6 +167,10 @@ function displayMemberPage(member: Member) {
 
         <template #status-data="{ row }">
           <i v-if="!row.currentSeason">Saison non renouvelée</i>
+        </template>
+
+        <template #actions-data="{ row }">
+          <UButton :to="`/admin/members/${convertUuidToUrlUuid(row.uuid)}`">Détail</UButton>
         </template>
 
       </UTable>
