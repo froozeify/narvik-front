@@ -17,7 +17,6 @@ useSeoMeta({
     <footer class="print:hidden mb-4">
       <FooterCopyright :display-version="false" />
     </footer>
-    <UNotifications />
   </div>
 </template>
 

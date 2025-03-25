@@ -4,7 +4,6 @@ import {usePaginationValues} from "~/composables/api/list";
 import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
 import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
 import type {FormError} from "#ui/types";
-import {UModals} from "#components";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import type {NuxtError} from "#app";
 import type {ItemError} from "~/types/api/itemError";
