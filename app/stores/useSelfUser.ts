@@ -13,6 +13,7 @@ import {UserRole} from "~/types/api/item/user";
 import {type Club, ClubRole} from "~/types/api/item/club";
 import ClubQuery from "~/composables/api/query/ClubQuery";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
+import ModalLegalsAcceptance from "~/components/Modal/ModalLegalsAcceptance.vue";
 
 export const useSelfUserStore = defineStore('selfUser', () => {
   const member: Ref<Member | undefined> = ref(undefined)
@@ -299,6 +300,16 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     navigateTo('/login')
   }
 
+  function isLegalsAccepted() {
+    // We check the user accepted the latest legals conditions
+    if (isLogged() && !isBadger()) {
+      if (dayjs().isBefore(dayjs(useRuntimeConfig().public.legalsLastUpdate))) {
+        return false
+      }
+    }
+    return true
+  }
+
   function isLogged(): boolean {
     const selfToken = getSelfJwtToken();
 
@@ -366,6 +377,8 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     refreshSelectedClub,
     refreshSelectedClubSettings,
     logout,
+
+    isLegalsAccepted,
 
     isLogged,
     isSuperAdmin,

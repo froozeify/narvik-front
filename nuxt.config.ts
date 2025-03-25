@@ -55,7 +55,9 @@ export default defineNuxtConfig({
       badgerClientId: '', // can be overridden by NUXT_PUBLIC_BADGER_CLIENT_ID environment variable
       badgerClientSecret: '', // can be overridden by NUXT_PUBLIC_BADGER_CLIENT_SECRET environment variable
 
-      clientTurnstile: false
+      clientTurnstile: false,
+
+      legalsLastUpdate: '2025-03-24'
     },
 
     apiParty: {
