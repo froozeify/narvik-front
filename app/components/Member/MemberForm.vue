@@ -120,7 +120,13 @@ async function submitItem() {
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.birthday?.toString()) || 'Choisir une date'" />
 
           <template #panel="{ close }">
-            <GenericDatePicker v-model="item.birthday" mode="date" @close="close" />
+            <div>
+              <div class="p-2 text-xs text-center">
+                <p>Vous pouvez cliquer sur l'année</p>
+                <p>afin de changer celle-ci</p>
+              </div>
+              <GenericDatePicker class="!w-full" v-model="item.birthday" mode="date" @close="close" />
+            </div>
           </template>
         </UPopover>
       </UFormGroup>

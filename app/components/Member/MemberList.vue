@@ -3,7 +3,8 @@
 import type {Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {usePaginationValues} from "~/composables/api/list";
-import {convertUuidToUrlUuid} from "~/utils/resource";
+import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
+import {ClubRole, getAvailableClubRoles} from "../../types/api/item/club";
 
 const toast = useToast();
 const isLoading = ref(true);
@@ -167,6 +168,7 @@ function displayMemberPage(member: Member) {
 
         <template #status-data="{ row }">
           <i v-if="!row.currentSeason">Saison non renouvelée</i>
+          <p v-if="row.role && row.role !== ClubRole.Member">{{ getAvailableClubRoles().find((role) => role.value === row.role)?.text }}</p>
         </template>
 
         <template #actions-data="{ row }">
