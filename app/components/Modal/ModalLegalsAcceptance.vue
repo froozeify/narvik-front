@@ -7,6 +7,7 @@ const emit = defineEmits(['accepted', 'cancel'])
 const toast = useToast();
 const runtimeConfig = useRuntimeConfig()
 const selfStore = useSelfUserStore()
+const isAdmin = selfStore.isAdmin()
 const isLoading = ref(false)
 
 async function accept() {
@@ -39,7 +40,12 @@ async function accept() {
   <ModalWithActions title="Mise à jour des conditions légales">
     <slot>
       <div>
-        Merci de bien vouloir lire et accepter les <ULink class="underline" target="_blank" to="https://about.narvik.app/cgv">Conditions Générales de Vente</ULink>, la <ULink class="underline" target="_blank" to="https://about.narvik.app/rgpd">Politique de confidentialité</ULink> ainsi que les <ULink class="underline" target="_blank" to="https://about.narvik.app/cgu">Conditions Générales d’Utilisation</ULink> (CGU).
+        Merci de bien vouloir lire et accepter
+        <template v-if="isAdmin">
+          les <ULink class="underline" target="_blank" to="https://about.narvik.app/cgv">Conditions Générales de Vente</ULink>,
+        </template>
+
+        la <ULink class="underline" target="_blank" to="https://about.narvik.app/rgpd">Politique de confidentialité</ULink> ainsi que les <ULink class="underline" target="_blank" to="https://about.narvik.app/cgu">Conditions Générales d’Utilisation</ULink> (CGU).
       </div>
     </slot>
 
