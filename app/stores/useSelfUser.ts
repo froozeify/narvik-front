@@ -301,11 +301,17 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   }
 
   function isLegalsAccepted() {
+    if (!isLogged()) {
+      return true
+    }
+
     // We check the user accepted the latest legals conditions
-    if (isLogged() && !isBadger()) {
-      if (dayjs().isBefore(dayjs(useRuntimeConfig().public.legalsLastUpdate))) {
+    if (!isBadger()) {
+      if (!user.value?.legalsAccepted) {
         return false
       }
+
+      return !user.value.legalsExpired
     }
     return true
   }

@@ -1,16 +1,30 @@
 <script setup lang="ts">
 import {useSelfUserStore} from "~/stores/useSelfUser";
+import UserQuery from "~/composables/api/query/UserQuery";
 
 const emit = defineEmits(['accepted', 'cancel'])
 
+const toast = useToast();
 const runtimeConfig = useRuntimeConfig()
 const selfStore = useSelfUserStore()
-const { user } = storeToRefs(selfStore)
 const isLoading = ref(false)
 
 async function accept() {
+  const userQuery = new UserQuery()
+
   isLoading.value = true
-  // TODO: Make api patch with the current day to flag as accepted
+  const { error } = await userQuery.selfLegalsAccepted()
+
+  if (error) {
+    toast.add({
+      color: "red",
+      title: "L'enregistrement a échoué",
+      description: error?.message
+    });
+
+    isLoading.value = false
+    return
+  }
 
   await selfStore.refresh()
 
@@ -27,7 +41,6 @@ async function accept() {
       <div>
         Merci de bien vouloir lire et accepter les <ULink class="underline" target="_blank" to="https://about.narvik.app/cgv">Conditions Générales de Vente</ULink>, la <ULink class="underline" target="_blank" to="https://about.narvik.app/rgpd">Politique de confidentialité</ULink> ainsi que les <ULink class="underline" target="_blank" to="https://about.narvik.app/cgu">Conditions Générales d’Utilisation</ULink> (CGU).
       </div>
-      <div class="text-right font-bold text-xs">Dernière mise à jour le {{ formatDate(runtimeConfig.public.legalsLastUpdate) }}</div>
     </slot>
 
     <template #cancel>
