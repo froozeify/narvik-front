@@ -4,6 +4,7 @@ import type {FormError, FormErrorEvent} from "#ui/types";
 import type {Member} from "~/types/api/item/clubDependent/member";
 import type {Season} from "~/types/api/item/season";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
+import dayjs from "dayjs";
 
 const props = defineProps({
   item: {
@@ -35,6 +36,13 @@ const isUpdating = ref(false)
 
 const toast = useToast()
 const memberQuery = new MemberQuery()
+
+const memberAge = computed(() => {
+  if (item.value.birthday) {
+    return dayjs().diff(dayjs(item.value.birthday), 'year')
+  }
+  return 0
+})
 
 function getDefaultItem() {
   const item: Member = {
@@ -141,6 +149,12 @@ async function submitItem() {
         </UPopover>
       </UFormGroup>
     </div>
+    <UAlert v-if="memberAge < 18" icon="i-heroicons-exclamation-triangle" color="red" variant="subtle" title="Consentement recueil des données (RGPD)">
+      <template #description>
+        <p v-if="memberAge < 15">-15 ans, le consentement pour le recueil doit être effectué auprès des parents.</p>
+        <p v-if="memberAge === 0 || memberAge >= 15">15-18 ans, le consentement pour le recueil doit être effectué auprès de l'enfant.</p>
+      </template>
+    </UAlert>
 
     <UFormGroup label="Licence" name="licence">
       <UInput v-model="item.licence" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
