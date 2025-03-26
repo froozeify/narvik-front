@@ -14,7 +14,8 @@ const state = reactive({
   email: undefined,
   password: undefined,
   firstname: undefined,
-  lastname: undefined
+  lastname: undefined,
+  legals: undefined,
 })
 
 const turnstile = ref<InstanceType<typeof NuxtTurnstile>>()
@@ -49,6 +50,7 @@ const validate = (state: any): FormError[] => {
   if (!state.password || state.password.length < 8) errors.push({ path: 'password', message: 'Champ requis (8 caractères minimum)' })
   if (!state.firstname) errors.push({ path: 'firstname', message: 'Champ requis' })
   if (!state.lastname) errors.push({ path: 'lastname', message: 'Champ requis' })
+  if (!state.legals) errors.push({ path: 'legals', message: 'Vous devez accepter les conditions légales' })
   return errors
 }
 
@@ -173,6 +175,10 @@ onBeforeUnmount(() => {
 
               <UFormGroup label="Nom" name="lastname">
                 <UInput v-model="state.lastname" />
+              </UFormGroup>
+
+              <UFormGroup required name="legals">
+                <UCheckbox required v-model="state.legals"  label="J'accepte les Conditions Générales d'Utilisation, les Conditions Générales de Vente et la Politique de confidentialité " />
               </UFormGroup>
 
               <div class="flex justify-between">
