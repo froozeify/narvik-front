@@ -45,7 +45,7 @@ async function accept() {
           les <ULink class="underline" target="_blank" to="https://about.narvik.app/documents-legaux/cgv">Conditions Générales de Vente</ULink>,
         </template>
 
-        la <ULink class="underline" target="_blank" to="https://about.narvik.app/documents-legaux/rgpd">Politique de confidentialité</ULink> ainsi que les <ULink class="underline" target="_blank" to="https://about.narvik.app/documents-legaux/cgu">Conditions Générales d’Utilisation</ULink> (CGU).
+        la <ULink class="underline" target="_blank" to="https://about.narvik.app/documents-legaux/rgpd">Politique de confidentialité</ULink> ainsi que les <ULink class="underline" target="_blank" to="https://about.narvik.app/documents-legaux/cgu">Conditions Générales d’Utilisation</ULink>.
       </div>
     </slot>
 

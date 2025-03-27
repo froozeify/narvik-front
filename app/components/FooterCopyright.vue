@@ -39,6 +39,10 @@
     {
       label: 'Conditions Générales d’Utilisation',
       to: 'https://about.narvik.app/documents-legaux/cgu'
+    },
+    {
+      label: 'Mentions légales',
+      to: 'https://about.narvik.app/documents-legaux/mentions-legales'
     }
   ]
 </script>
