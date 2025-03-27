@@ -34,11 +34,11 @@
   const externalLinks: externalLink[] = [
     {
       label: 'Politique de confidentialité',
-      to: 'https://about.narvik.app/rgpd'
+      to: 'https://about.narvik.app/documents-legaux/rgpd'
     },
     {
       label: 'Conditions Générales d’Utilisation',
-      to: 'https://about.narvik.app/cgu'
+      to: 'https://about.narvik.app/documents-legaux/cgu'
     }
   ]
 </script>
