@@ -4,7 +4,7 @@ import {
   useDeleteItem,
   useFetchItem,
   useFetchList,
-  useGetCsv,
+  useGetCsv, usePatch,
   usePost,
   usePostRawJson,
   usePut,
@@ -50,6 +50,10 @@ export default class UserQuery extends AbstractQuery<User, User> {
 
   async self() {
     return useFetchItem<User>('/self');
+  }
+
+  async selfLegalsAccepted() {
+    return usePatch('/self/legals-accepted', { });
   }
 
   async selfUpdatePassword(currentPassword: string, newPassword: string) {

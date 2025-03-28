@@ -4,6 +4,7 @@ import {useLoginUser} from "~/composables/api/api";
 import type {Image} from "~/types/api/item/image";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import {useSelfUserStore} from "~/stores/useSelfUser";
+import ModalLegalsAcceptance from "~/components/Modal/ModalLegalsAcceptance.vue";
 
 const toast = useToast()
 const isLoading = ref(false)
@@ -41,6 +42,22 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
     return;
   }
 
+  if (!selfStore.isLegalsAccepted()) {
+    useModal().open(ModalLegalsAcceptance, {
+      preventClose: true,
+      onAccepted() {
+        redirectSuccessLogin()
+      },
+      onCancel() {
+        isLoading.value = false
+      }
+    })
+  } else {
+    redirectSuccessLogin()
+  }
+}
+
+function redirectSuccessLogin() {
   if (selfStore.isSuperAdmin()) {
     navigateTo('/super-admin');
   }

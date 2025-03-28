@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import {useSelfUserStore} from "~/stores/useSelfUser";
   import type {GroupedNavigationLinks} from "~/types/groupedNavigationLinks";
+  import dayjs from "dayjs";
+  import {formatDateReadable} from "~/utils/date";
 
   useHead({
     titleTemplate: (titleChunk) => {
@@ -20,6 +22,13 @@
       to: '/admin'
     }
   ]
+  if (isAdmin) {
+    globalSection.push({
+      label: 'Abonnement',
+      icon: 'i-heroicons-credit-card',
+      to: '/admin/subscription'
+    })
+  }
 
   const configsSection = [
     {
@@ -103,6 +112,15 @@
       variant="subtle"
       title="Lecture seule. Club non activé."
       description="Le club n'est pas activé, aucune modification ne sera possible. Veuillez contacter le support pour plus d'information."
+    />
+    <UAlert
+      v-if="isAdmin && selfStore.selectedProfile?.club.renewDate && dayjs().add(14, 'days').isAfter(selfStore.selectedProfile.club.renewDate)"
+      class="mb-4"
+      icon="i-heroicons-credit-card"
+      color="orange"
+      variant="subtle"
+      title="Votre abonnement se termine bientôt."
+      :description="`Veuillez penser à le renouveler avant le ${formatDateReadable(selfStore.selectedProfile.club.renewDate.toString())}.`"
     />
     <slot></slot>
   </GenericLayoutAdmin>

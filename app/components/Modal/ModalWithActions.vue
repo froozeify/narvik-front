@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const emit = defineEmits(['cancel'])
+
 const props = defineProps(
   {
     title: {
@@ -16,10 +18,12 @@ const props = defineProps(
         <div class="text-xl font-bold text-center">{{ props.title }}</div>
         <slot></slot>
 
-        <div class="flex gap-2 justify-between sm:justify-end">
-          <UButton color="gray" variant="ghost" @click="useModal().close()">
-            Annuler
-          </UButton>
+        <div class="flex gap-2 justify-between sm:justify-end flex-wrap">
+          <slot name="cancel">
+            <UButton color="gray" variant="ghost" @click="useModal().close(); emit('cancel')">
+              Annuler
+            </UButton>
+          </slot>
 
           <slot name="actions"></slot>
         </div>

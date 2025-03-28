@@ -33,8 +33,16 @@
 
   const externalLinks: externalLink[] = [
     {
-      label: 'Documentation',
-      to: 'https://docs.narvik.app/frontend/'
+      label: 'Politique de confidentialité',
+      to: 'https://about.narvik.app/documents-legaux/rgpd'
+    },
+    {
+      label: 'Conditions Générales d’Utilisation',
+      to: 'https://about.narvik.app/documents-legaux/cgu'
+    },
+    {
+      label: 'Mentions légales',
+      to: 'https://about.narvik.app/documents-legaux/mentions-legales'
     }
   ]
 </script>
@@ -42,14 +50,11 @@
 <template>
   <div class="transition flex flex-row justify-center flex-wrap opacity-10 hover:opacity-30 gap-y-1 gap-x-4 text-xs print:hidden">
     <div class="basis-full flex flex-wrap justify-center gap-2">
-      <template v-for="(val, index) in externalLinks">
-        <span v-if="index !== 0"> - </span>
-        <NuxtLink :to="val.to" target="_blank" >{{ val.label }}</NuxtLink>
-      </template>
+        <NuxtLink to="https://docs.narvik.app/frontend" target="_blank" >Documentation</NuxtLink>
     </div>
 
-    <div v-if="props.displayVersion" class="basis-full flex flex-wrap justify-center gap-2">
-      <template v-for="(val, index) in versions">
+    <div class="basis-full flex flex-wrap justify-center gap-2">
+      <template v-for="(val, index) in externalLinks">
         <span v-if="index !== 0"> - </span>
         <NuxtLink :to="val.to" target="_blank" >{{ val.label }}</NuxtLink>
       </template>
@@ -59,6 +64,13 @@
       <span class="underline">À propos de Narvik</span> -
       <span >© 2024 - {{ dayjs().year() }}. Tous droits réservés</span>
     </a>
+
+    <div v-if="props.displayVersion" class="basis-full flex flex-wrap justify-center gap-2">
+      <template v-for="(val, index) in versions">
+        <span v-if="index !== 0"> - </span>
+        <NuxtLink :to="val.to" target="_blank" >{{ val.label }}</NuxtLink>
+      </template>
+    </div>
 
   </div>
 </template>

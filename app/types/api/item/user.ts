@@ -19,5 +19,8 @@ export interface User extends UuidItem, TimestampItem {
   lastname?: string;
   fullName?: string;
 
+  legalsExpired: boolean
+  legalsAccepted?: Date|null
+
   linkedProfiles?: LinkedProfile[]
 }
