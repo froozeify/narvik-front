@@ -5,6 +5,7 @@ import {useSelfUserStore} from "~/stores/useSelfUser";
 
 export abstract class AbstractQuery<R, W> {
 	protected abstract rootPath: string;
+	public clubPath: string | undefined = undefined;
 
   protected getRootUrl(): string {
     return this.rootPath;
@@ -12,6 +13,12 @@ export abstract class AbstractQuery<R, W> {
 
   protected getCurrentClubPath(): string {
     const selfStore = useSelfUserStore()
+
+    if (selfStore.isSuperAdmin()) {
+      if (this.clubPath) {
+        return this.clubPath;
+      }
+    }
 
     const profile = selfStore.selectedProfile
     if (profile === undefined || !profile.club["@id"]) {

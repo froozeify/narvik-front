@@ -10,6 +10,7 @@
   import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
   import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
   import dayjs from "dayjs";
+  import {convertUuidToUrlUuid} from "~/utils/resource";
 
   definePageMeta({
     layout: "super-admin"
@@ -251,7 +252,9 @@
             </template>
 
             <template #actions-data="{ row }">
-
+              <div class="text-right">
+                <UButton variant="soft" :to="`/super-admin/clubs/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+              </div>
             </template>
 
           </UTable>
@@ -265,8 +268,15 @@
     </template>
 
     <template #side>
-      <template v-if="selectedItem">
-        <UButton v-if="selectedItem.uuid" class="mb-4" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
+      <div v-if="selectedItem" class="flex flex-col gap-4">
+        <UButton v-if="selectedItem.uuid" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
+        <UButton
+          v-if="selectedItem.uuid"
+          block
+          :to="`/super-admin/clubs/${convertUuidToUrlUuid(selectedItem.uuid)}`"
+        >
+          Voir en détail
+        </UButton>
 
         <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
@@ -342,7 +352,7 @@
           </UButton>
         </UForm>
 
-      </template>
+      </div>
     </template>
   </GenericLayoutContentWithSlideover>
 </template>
