@@ -17,6 +17,10 @@ help: ## Outputs this help screen
 build-prod:
 	@docker build --pull --no-cache -t benoitvignal/narvik-front:latest -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o` -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o` -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o` --target run .
 
+build-cloud-prod:
+	@docker buildx build . --builder cloud-benoitvignal-narvik-cloud --pull --no-cache -t benoitvignal/narvik-front:latest -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o` -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o` -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o` --target run
+
+
 push-build-prod:
 	@docker image push benoitvignal/narvik-front:latest
 	@docker image push benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o`
