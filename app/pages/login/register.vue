@@ -192,7 +192,7 @@ onBeforeUnmount(() => {
       </UTabs>
 
       <div class="text-xs mt-2">
-        En cliquant sur Créer le compte, je déclare avoir pris connaissance de notre <ULink class="underline" target="_blank" to="https://about.narvik.app/documents-legaux/rgpd">Politique de confidentialité</ULink> ainsi que de nos <ULink class="underline" target="_blank" to="https://about.narvik.app/documents-legaux/cgu">Conditions Générales d’Utilisation</ULink> (CGU).
+        En cliquant sur Créer le compte, je déclare avoir pris connaissance de notre <ContentLink target="_blank" to="https://about.narvik.app/documents-legaux/rgpd">Politique de confidentialité</ContentLink> ainsi que de nos <ContentLink target="_blank" to="https://about.narvik.app/documents-legaux/cgu">Conditions Générales d’Utilisation</ContentLink> (CGU).
       </div>
     </UCard>
   </div>

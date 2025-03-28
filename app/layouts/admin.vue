@@ -22,6 +22,13 @@
       to: '/admin'
     }
   ]
+  if (isAdmin) {
+    globalSection.push({
+      label: 'Abonnement',
+      icon: 'i-heroicons-credit-card',
+      to: '/admin/subscription'
+    })
+  }
 
   const configsSection = [
     {
@@ -113,7 +120,7 @@
       color="orange"
       variant="subtle"
       title="Votre abonnement se termine bientôt."
-      :description="`Veuillez penser à le renouveler avant le ${formatDateReadable(selfStore.selectedProfile.club.renewDate)}.`"
+      :description="`Veuillez penser à le renouveler avant le ${formatDateReadable(selfStore.selectedProfile.club.renewDate.toString())}.`"
     />
     <slot></slot>
   </GenericLayoutAdmin>
