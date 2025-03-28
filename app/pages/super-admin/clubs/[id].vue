@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
-import type {Club} from "~/types/api/item/club";
+import type {Club, WriteClub} from "~/types/api/item/club";
 import ClubQuery from "~/composables/api/query/ClubQuery";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
 import ImageQuery from "~/composables/api/query/ImageQuery";
 import {formatDateReadable} from "~/utils/date";
 import dayjs from "dayjs";
+import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
 
 definePageMeta({
     layout: "super-admin"
@@ -184,7 +185,22 @@ definePageMeta({
             </div>
 
             <div v-if="club.renewDate" class="text-center text-lg">
-              Renouvellement : <span :class="dayjs().isAfter(dayjs(club.renewDate).subtract(14, 'days')) ? 'text-red-500 font-bold' : ''">{{ formatDateReadable(club.renewDate.toString()) }}</span>
+              Renouvellement le 
+              <UButton icon="i-heroicons-calendar-days-20-solid"
+                       :color="dayjs().isAfter(dayjs(club.renewDate).subtract(14, 'days')) ? 'red' : 'primary'"
+                       :label="formatDateReadable(club.renewDate?.toString()) || 'Choisir une date'"
+                       @click="modal.open(ModalClubSelectRenewDate, {
+                  item: club,
+                  async onSelected(date: Date|undefined) {
+                    if (!club) {
+                      return
+                    }
+                    let payload: WriteClub = { renewDate: date }
+                    await clubQuery.patch(club, payload)
+                    await loadItem()
+                  }
+                })"
+              />
             </div>
 
             <div class="flex flex-col justify-center">
@@ -233,7 +249,7 @@ definePageMeta({
   <UModal
     v-model="itemModalOpen">
     <UCard>
-      <UserForm
+      <ClubForm
         :item="club ? {...club} : undefined"
         @updated="(value) => {itemModalOpen = false; loadItem() }"
       />
