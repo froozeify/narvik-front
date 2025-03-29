@@ -185,7 +185,7 @@ definePageMeta({
             </div>
 
             <div v-if="club.renewDate" class="text-center text-lg">
-              Renouvellement le 
+              Renouvellement le
               <UButton icon="i-heroicons-calendar-days-20-solid"
                        :color="dayjs().isAfter(dayjs(club.renewDate).subtract(14, 'days')) ? 'red' : 'primary'"
                        :label="formatDateReadable(club.renewDate?.toString()) || 'Choisir une date'"
