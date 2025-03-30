@@ -7,6 +7,12 @@ import type {FormSubmitEvent} from "#ui/types";
 import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
 import {formatDateInput, formatDateReadable} from "~/utils/date";
+import {
+  ClubRole,
+  getAvailableClubRole,
+  hasClubSupervisorRole,
+  isClubAdmin
+} from "~/types/api/item/club";
 
 const props = defineProps({
   member: {
@@ -40,8 +46,8 @@ const activities: Ref<Activity[]> = ref([])
 const selectedDate: Ref<Date|null> = ref(null);
 
 const state = reactive({
-  member: props.member,
-  activities: [] as Array<Activity>
+  member: props.member as Member|undefined,
+  activities: [] as Array<Activity>,
 })
 
 if (props.memberPresence) {
@@ -51,9 +57,7 @@ if (props.memberPresence) {
     selectedDate.value = new Date(props.memberPresence.date)
   }
   props.memberPresence.activities?.forEach(actvt => {
-    if (actvt.isEnabled) {
       state.activities.push(actvt)
-    }
   });
 }
 
@@ -64,6 +68,18 @@ activityQuery.getAll().then(value => {
       .filter((actvt) => actvt.isEnabled) // We don't display the disabled activities
       .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
 });
+
+
+const activitiesMember = computed(() => {
+  return activities.value.filter((actvt) => actvt.isEnabled && (!actvt.visibility || actvt.visibility === ClubRole.Member))
+})
+const activitiesSupervisor = computed(() => {
+  return activities.value.filter((actvt) => actvt.isEnabled && actvt.visibility === ClubRole.Supervisor)
+})
+const activitiesAdmin = computed(() => {
+  return activities.value.filter((actvt) => actvt.isEnabled && actvt.visibility === ClubRole.Admin)
+})
+
 
 async function onSubmit(event: FormSubmitEvent<any>) {
   isSubmitting.value = true;
@@ -157,11 +173,36 @@ async function onSubmit(event: FormSubmitEvent<any>) {
           <div class="grid grid-cols-2 gap-2 gap-y-2 ">
             <UCheckbox
                 class="w-full"
-                v-for="activity in activities"
+                v-for="activity in activitiesMember"
                 v-model="state.activities"
                 :value="activity"
                 :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
+
+            <template v-if="activitiesSupervisor.length > 0 && hasClubSupervisorRole(state.member?.role)">
+              <UDivider class="col-span-2" :label="getAvailableClubRole(ClubRole.Supervisor).text" />
+
+              <UCheckbox
+                class="w-full"
+                v-for="activitySupervisor in activitiesSupervisor"
+                v-model="state.activities"
+                :value="activitySupervisor"
+                :name="'actvts-' + activitySupervisor.uuid"
+                :label="activitySupervisor.name" />
+            </template>
+
+            <template v-if="activitiesAdmin.length > 0 && isClubAdmin(state.member?.role)">
+              <UDivider class="col-span-2" :label="getAvailableClubRole(ClubRole.Admin).text" />
+
+              <UCheckbox
+                class="w-full"
+                v-for="activityAdmin in activitiesAdmin"
+                v-model="state.activities"
+                :value="activityAdmin"
+                :name="'actvta-' + activityAdmin.uuid"
+                :label="activityAdmin.name" />
+            </template>
+
           </div>
         </div>
 
