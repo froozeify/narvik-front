@@ -26,6 +26,18 @@ export function getAvailableClubRoles() {
     },
   ]
 }
+export function getAvailableClubRole(role: ClubRole) {
+  return getAvailableClubRoles().find((rolef) => rolef.value === role) ?? { text: 'Non trouvé', value: ClubRole.Member }
+}
+
+export function isClubAdmin(role: ClubRole|undefined): boolean {
+  if (!role) return false
+  return role === ClubRole.Admin
+}
+export function hasClubSupervisorRole(role: ClubRole|undefined): boolean {
+  if (!role) return false
+  return role === ClubRole.Supervisor || isClubAdmin(role)
+}
 
 interface _Club extends UuidItem, TimestampItem {
   name: string;
