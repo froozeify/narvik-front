@@ -8,117 +8,156 @@ import ImageQuery from "~/composables/api/query/ImageQuery";
 import {formatDateReadable} from "~/utils/date";
 import dayjs from "dayjs";
 import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
+import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
+import {convertUuidToUrlUuid} from "~/utils/resource";
+import {usePaginationValues} from "~/composables/api/list";
+import UserQuery from "~/composables/api/query/UserQuery";
+import type {User} from "~/types/api/item/user";
 
 definePageMeta({
-    layout: "super-admin"
-  })
+  layout: "super-admin"
+})
 
-  useHead({
-    title: "Détail club"
-  })
+useHead({
+  title: "Détail club"
+})
 
+const toast = useToast()
+const modal = useModal()
+const route = useRoute()
 
-  const toast = useToast()
-  const modal = useModal()
-  const route = useRoute()
+const selfStore = useSelfUserStore()
 
-  const selfStore = useSelfUserStore()
+const itemId = decodeUrlUuid(route.params.id?.toString());
 
-  const itemId = decodeUrlUuid(route.params.id.toString());
+const isLoading = ref(true)
+const isUsersLoading = ref(true)
+const itemModalOpen = ref(false)
 
-  const isLoading = ref(true)
-  const itemModalOpen = ref(false)
+const club: Ref<Club | undefined> = ref(undefined)
+const userClubs: Ref<User[]> = ref([])
 
-  const club: Ref<Club | undefined> = ref(undefined)
+const clubQuery = new ClubQuery()
+const userQuery = new UserQuery()
 
-  const clubQuery = new ClubQuery()
+// Table settings
+const page = ref(1);
+const itemsPerPage = ref(10);
+const totalUsers = ref(0)
+const sort = ref({
+  column: 'lastname',
+  direction: 'asc'
+});
+const columns = [
+  {
+    key: 'accountActivated',
+    label: 'Activé',
+  },
+  {
+    key: 'fullName',
+    label: 'Nom',
+  },
+  {
+    key: 'email',
+    label: 'Email',
+  },
+  {
+    key: 'actions',
+  }
+]
 
-  const columns = [
-    {
-      key: 'displayName',
-      label: 'Nom',
-      class: 'w-full',
-    },
-    {
-      key: 'club.name',
-      label: 'Club'
-    },
-    {
-      key: 'role',
-      label: 'Rôle'
-    }
-  ]
+async function loadItem() {
+  isLoading.value = true
+  const { retrieved, error } = await clubQuery.get(itemId)
+  isLoading.value = false
 
-  async function loadItem() {
-    isLoading.value = true
-    const { retrieved, error } = await clubQuery.get(itemId)
-    isLoading.value = false
+  if (!retrieved || error) {
+    toast.add({
+      color: "red",
+      title: "Club non trouvé",
+    })
 
-    if (!retrieved || error) {
-      toast.add({
-        color: "red",
-        title: "Club non trouvé",
-      })
-
-      navigateTo('/super-admin/clubs')
-      return
-    }
-
-    club.value = retrieved
-    await loadClubSettings()
+    navigateTo('/super-admin/clubs')
+    return
   }
 
-  async function loadClubSettings() {
-    if (!club.value) return
+  club.value = retrieved
+  await loadClubSettings()
+}
 
-    if (club.value.settings?.uuid) {
-      const clubSettingQuery = new ClubSettingQuery()
-      clubSettingQuery.clubPath = club.value["@id"] // We define the club path since we are a super admin
+async function loadClubSettings() {
+  if (!club.value) return
 
-      const { retrieved: clubSettings } = await clubSettingQuery.get(club.value.settings.uuid)
-      if (clubSettings) {
-        club.value.settings = clubSettings
+  if (club.value.settings?.uuid) {
+    const clubSettingQuery = new ClubSettingQuery()
+    clubSettingQuery.clubPath = club.value["@id"] // We define the club path since we are a super admin
 
-        // We load the club logo
-        const image = await loadClubLogo()
-        if (image) {
-          club.value.settings.logoBase64 = image
-        }
+    const { retrieved: clubSettings } = await clubSettingQuery.get(club.value.settings.uuid)
+    if (clubSettings) {
+      club.value.settings = clubSettings
+
+      // We load the club logo
+      const image = await loadClubLogo()
+      if (image) {
+        club.value.settings.logoBase64 = image
       }
     }
   }
+}
 
-  async function loadClubLogo() {
-    if (!club.value?.settings.logo?.publicUrl) return null;
-    const imageQuery = new ImageQuery();
-    const { retrieved } = await imageQuery.getFromUrl(club.value.settings.logo.publicUrl);
+async function loadClubLogo() {
+  if (!club.value?.settings.logo?.publicUrl) return null;
+  const imageQuery = new ImageQuery();
+  const { retrieved } = await imageQuery.getFromUrl(club.value.settings.logo.publicUrl);
 
-    if (!retrieved || !retrieved.base64) return null
+  if (!retrieved || !retrieved.base64) return null
 
-    return retrieved.base64
+  return retrieved.base64
+}
+
+async function deleteClub() {
+  if (!club.value) {
+    return
   }
 
-  async function deleteClub() {
-    if (!club.value) {
-      return
-    }
+  const { error } = await clubQuery.delete(club.value)
 
-    const { error } = await clubQuery.delete(club.value)
+  if (error) {
+    toast.add({
+      color: "red",
+      title: "La suppression a échouée",
+      description: error.message
+    })
 
-    if (error) {
-      toast.add({
-        color: "red",
-        title: "La suppression a échouée",
-        description: error.message
-      })
+    return
+  }
+  navigateTo('/super-admin/clubs')
+}
 
-      return
-    }
-    navigateTo('/super-admin/clubs')
+async function loadClubUsers() {
+  isUsersLoading.value = true
+
+  const urlParams = new URLSearchParams({
+    page: page.value.toString(),
+    itemsPerPage: itemsPerPage.value.toString(),
+  });
+
+  urlParams.append(`order[accountActivated]`, 'DESC');
+  urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+  urlParams.append(`memberships.member.club.uuid`, itemId);
+
+  const {totalItems, items} = await userQuery.getAll(urlParams)
+  userClubs.value = items
+  if (totalItems) {
+    totalUsers.value = totalItems
   }
 
-  // Main code
-  loadItem()
+  isUsersLoading.value = false
+}
+
+// Main code
+loadItem()
+loadClubUsers()
 </script>
 
 <template>
@@ -163,9 +202,8 @@ definePageMeta({
         />
       </div>
     </div>
-    <div class="flex flex-col lg:flex-row lg:flex-wrap gap-4">
-      <div class="flex-1">
-        <UCard class="h-full">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <UCard class="h-full">
           <div class="flex flex-col gap-4 relative">
 
             <div class="h-24 w-24 aspect-square self-center">
@@ -229,20 +267,51 @@ definePageMeta({
           </div>
 
       </UCard>
-      </div>
 
-      <div class="flex basis-full lg:basis-1/2">
-        <UCard
-          class="flex-1"
-          :ui="{
-            body: {
-              padding: 'h-full'
-            }
-          }"
-        >
-          <ClubSubscriptionList :item="club" />
-        </UCard>
-      </div>
+      <UCard
+        class="flex-1"
+        :ui="{
+          body: {
+            padding: 'h-full'
+          }
+        }"
+      >
+        <ClubSubscriptionList :item="club" />
+      </UCard>
+    </div>
+    <div>
+      <GenericCard title="Utilisateurs">
+        <p>Compte avec un mail de connexion liée.</p>
+        <div>
+          <UTable
+            class="w-full"
+            :loading="isUsersLoading"
+            :columns="columns"
+            :rows="userClubs">
+            <template #empty-state>
+              <div class="flex flex-col items-center justify-center py-6 gap-3">
+                <span class="italic text-sm">Aucun utilisateurs.</span>
+              </div>
+            </template>
+
+            <template #accountActivated-data="{ row }">
+              <UToggle :model-value="row.accountActivated" />
+            </template>
+
+            <template #actions-data="{ row }">
+              <div class="text-right">
+                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+              </div>
+            </template>
+
+          </UTable>
+
+          <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="loadClubUsers()"/>
+            <UPagination v-model="page" @update:model-value="loadClubUsers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalUsers"/>
+          </div>
+        </div>
+      </GenericCard>
     </div>
   </div>
 
