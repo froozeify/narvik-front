@@ -175,15 +175,13 @@ definePageMeta({
       </GenericStatCard>
     </div>
 
-    <UCard v-if="sale?.comment">
-      <div class="text-xl font-bold mb-2">Commentaire</div>
+    <GenericCard v-if="sale?.comment" title="Commentaire">
       <div class="whitespace-pre-line">
         {{ sale.comment }}
       </div>
-    </UCard>
+    </GenericCard>
 
-    <UCard>
-      <div class="text-xl font-bold">Articles achetés</div>
+    <GenericCard title="Articles achetés">
       <UTable
         class="w-full"
         :loading="isLoading"
@@ -233,7 +231,7 @@ definePageMeta({
         </template>
 
       </UTable>
-    </UCard>
+    </GenericCard>
   </div>
 </template>
 

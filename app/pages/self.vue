@@ -153,11 +153,10 @@
     </div>
 
     <MemberDetails v-if="member" :member="member" />
-    <UCard v-else class="text-center">
-      <div class="text-xl font-bold">Compte liée à aucun club</div>
+    <GenericCard v-else class="text-center" title="Compte liée à aucun club">
       <p>Veuillez vous assurer que l'adresse mail du compte correspond à celle enregistré auprès de votre club.</p>
       <p>Si ce n'est pas le cas, veuillez le signaler à votre club pour que celui-ci modifie le compte lié.</p>
-    </UCard>
+    </GenericCard>
 
     <UModal
       v-if="user"

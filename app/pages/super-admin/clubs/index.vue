@@ -10,6 +10,7 @@
   import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
   import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
   import dayjs from "dayjs";
+  import {convertUuidToUrlUuid} from "~/utils/resource";
 
   definePageMeta({
     layout: "super-admin"
@@ -113,81 +114,6 @@
     isSideVisible.value = true
   }
 
-  async function updateItem(item: WriteClub) {
-    isLoading.value = true
-
-    // We recreate the payload so we don't edit the settings, badgerToken, ...
-    let payload: WriteClub = {
-      name: item.name,
-      renewDate: item.renewDate ?? null,
-      salesEnabled: item.salesEnabled,
-      isActivated: item.isActivated,
-      comment: item.comment,
-      website: item.website,
-      contactName: item.contactName,
-      contactEmail: item.contactEmail,
-      contactPhone: item.contactPhone
-    }
-
-
-    // We verify if it's a creation or an update
-    let apiError: NuxtError | undefined = undefined
-    if (!item.uuid) {
-      const {error, created} = await apiQuery.post(payload);
-      apiError = error
-      selectedItem.value = created
-    } else { // Update
-      const {error, updated} = await apiQuery.patch(item, payload);
-      apiError = error
-      selectedItem.value = updated
-    }
-
-    isLoading.value = false
-    isSideVisible.value = false
-
-    if (apiError) {
-      toast.add({
-        color: "red",
-        title: !item.uuid ? "La création a échouée" : "La modification a échouée",
-        description: apiError.message
-      });
-      return;
-    }
-
-    toast.add({
-      color: "green",
-      title: !item.uuid ? "Club crée" : "Club modifié",
-    });
-
-    // We refresh the list
-    await getItemsPaginated();
-  }
-
-  async function deleteItem() {
-    isLoading.value = true
-    const { error } = await apiQuery.delete(selectedItem.value)
-    isLoading.value = false
-
-    if (error) {
-      toast.add({
-        color: "red",
-        title: "La suppression a échouée",
-        description: error.message
-      });
-      return;
-    }
-
-    selectedItem.value = undefined
-    // We refresh the list
-    await getItemsPaginated();
-  }
-
-  const validate = (state: any): FormError[] => {
-    const errors = []
-    if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
-    return errors
-  }
-
   async function impersonate(club: Club) {
     const impersonated = await selfStore.impersonateClub(club)
     if (!impersonated) {
@@ -251,7 +177,9 @@
             </template>
 
             <template #actions-data="{ row }">
-
+              <div class="text-right">
+                <UButton variant="soft" :to="`/super-admin/clubs/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+              </div>
             </template>
 
           </UTable>
@@ -265,84 +193,21 @@
     </template>
 
     <template #side>
-      <template v-if="selectedItem">
-        <UButton v-if="selectedItem.uuid" class="mb-4" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
+      <div v-if="selectedItem" class="flex flex-col gap-4">
+        <UButton v-if="selectedItem.uuid" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
+        <UButton
+          v-if="selectedItem.uuid"
+          block
+          :to="`/super-admin/clubs/${convertUuidToUrlUuid(selectedItem.uuid)}`"
+        >
+          Voir en détail
+        </UButton>
 
-        <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate" class="flex flex-col gap-4">
-          <UCard>
-            <div class="flex gap-2 flex-col relative">
-              <UFormGroup label="Date de renouvellement" name="renewDate">
-                <UButton
-                  icon="i-heroicons-calendar-days-20-solid"
-                  :label="formatDateReadable(selectedItem.renewDate?.toString()) || 'Choisir une date'"
-                  @click="isSideVisible = false; modal.open(ModalClubSelectRenewDate, {
-                    item: selectedItem,
-                    onSelected(date: Date|undefined) {
-                      if (selectedItem) {
-                        selectedItem.renewDate = date
-                        if (selectedItem.uuid) {
-                          updateItem(selectedItem)
-                        } else {
-                          isSideVisible = true // We reopen the slide
-                        }
-                      }
-                    }
-                  })"
-                />
-              </UFormGroup>
-              <UFormGroup label="Activé" name="isActivated">
-                <UToggle v-model="selectedItem.isActivated" />
-              </UFormGroup>
-              <UFormGroup label="Nom" name="name" required>
-                <UInput v-model="selectedItem.name" />
-              </UFormGroup>
-              <UFormGroup label="Vente" name="salesEnabled">
-                <UToggle v-model="selectedItem.salesEnabled" />
-              </UFormGroup>
-              <UFormGroup label="Commentaire" :error="selectedItem.comment ? (selectedItem.comment.length > 249 && 'Longueur maximum atteinte (250)') : ''">
-                <UTextarea v-model="selectedItem.comment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire"/>
-              </UFormGroup>
+        <UCard>
+          <ClubForm :item="selectedItem" @updated="(value) => {selectedItem = value; getItemsPaginated()}" :isList="true" />
+        </UCard>
 
-              <UFormGroup label="Site" name="website">
-                <UInput v-model="selectedItem.website" type="url" />
-              </UFormGroup>
-
-              <UDivider label="Contact" />
-
-              <UFormGroup label="Nom" name="contactName">
-                <UInput v-model="selectedItem.contactName" />
-              </UFormGroup>
-              <UFormGroup label="Email" name="contactEmail">
-                <UInput v-model="selectedItem.contactEmail" type="email" />
-              </UFormGroup>
-              <UFormGroup label="Téléphone" name="contactPhone">
-                <UInput v-model="selectedItem.contactPhone" type="tel" />
-              </UFormGroup>
-
-              <GenericItemTimestampInfo :item="selectedItem" />
-            </div>
-
-          </UCard>
-
-          <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
-
-          <UButton
-            v-if="selectedItem.uuid"
-            block
-            color="red"
-            :loading="isLoading"
-            @click="modal.open(ModalDeleteConfirmation, {
-              onDelete() {
-                modal.close()
-                deleteItem()
-              }
-            })"
-          >
-            Supprimer
-          </UButton>
-        </UForm>
-
-      </template>
+      </div>
     </template>
   </GenericLayoutContentWithSlideover>
 </template>

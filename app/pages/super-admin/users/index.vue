@@ -81,6 +81,7 @@ async function getItemsPaginated() {
    urlParams.append('multiple[firstname, lastname, email]', searchQuery.value.trim())
   }
 
+  urlParams.append(`order[accountActivated]`, 'DESC');
   urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
 
   const {totalItems, items} = await apiQuery.getAll(urlParams)
@@ -147,6 +148,7 @@ async function impersonate(user: User) {
             class="w-full"
             :loading="isLoading"
             :sort="sort"
+            sort-mode="manual"
             :columns="columns"
             :rows="apiItems"
             @select="rowClicked">

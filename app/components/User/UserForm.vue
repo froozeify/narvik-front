@@ -119,6 +119,10 @@ async function submitItem() {
       <UFormGroup label="Prénom" name="firstname">
         <UInput v-model="item.firstname" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'" />
       </UFormGroup>
+
+      <UFormGroup v-if="item.legalsAccepted" label="Legals accepté le">
+        <p class="text-sm">{{ formatDateTimeReadable(item.legalsAccepted?.toString()) }}</p>
+      </UFormGroup>
       <GenericItemTimestampInfo :item="item" />
     </div>
 

@@ -182,8 +182,7 @@ async function deleteLogo() {
 
 <template>
   <div class="grid gap-4 md:grid-cols-4">
-    <UCard class="md:col-span-4">
-      <div class="text-xl font-bold mb-4">Lien de connexion badger</div>
+    <GenericCard class="md:col-span-4" title="Lien de connexion badger">
       <p>A mettre en favoris sur l'ordinateur accessible publiquement.</p>
       <p>Ce lien permet d'être automatiquement connecté en tant que badgeuse (accès seulement à la liste de présence).</p>
       <p>Le lien peut être déposé directement dans la barre personnelle pour le marquer en favoris.</p>
@@ -219,11 +218,10 @@ async function deleteLogo() {
           Gestion de présence
         </a>
       </div>
-    </UCard>
+    </GenericCard>
 
     <div class="md:col-span-2">
-      <UCard class="h-fit">
-        <div class="text-xl font-bold mb-4">Activités exclus du compte des jours ouverts</div>
+      <GenericCard class="h-fit" title="Activités exclus du compte des jours ouverts">
         <div>
           <USelectMenu
             v-model="configState.excludedActivitiesFromOpeningDays"
@@ -241,10 +239,9 @@ async function deleteLogo() {
             </template>
           </USelectMenu>
         </div>
-      </UCard>
+      </GenericCard>
 
-      <UCard class="h-fit mt-4">
-        <div class="text-xl font-bold mb-4">Activité correspondante au contrôle</div>
+      <GenericCard class="h-fit mt-4" title="Activité correspondante au contrôle">
         <div>
           <USelect
             v-model="configState.selectedControlShootingActivity"
@@ -254,11 +251,10 @@ async function deleteLogo() {
             value-attribute="uuid"
             placeholder="Aucun contrôle défini" />
         </div>
-      </UCard>
+      </GenericCard>
     </div>
 
-    <UCard class="md:col-span-2">
-      <div class="text-xl font-bold mb-4">Logo</div>
+    <GenericCard class="md:col-span-2" title="Logo">
       <div v-if="selectedProfile?.club?.settings?.logoBase64" class="mt-4 flex justify-center">
         <NuxtImg :src="selectedProfile.club.settings.logoBase64" class="w-48" />
       </div>
@@ -290,7 +286,7 @@ async function deleteLogo() {
 
       </UPopover>
 
-    </UCard>
+    </GenericCard>
   </div>
 </template>
 
