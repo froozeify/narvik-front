@@ -67,7 +67,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     // Access token is expired
     if (!jwtToken.value.access || !jwtToken.value.access.token || (jwtToken.value.access && dayjs(jwtToken.value.access?.date).isBefore() )) {
       if (!(jwtToken.value.refresh && jwtToken.value.refresh.token)) {
-        return logJwtError("No refresh access token.")
+        return logJwtError("No refresh access token.", false)
       }
 
       // Already refreshing
@@ -379,6 +379,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
     impersonateUser,
     stopImpersonation,
 
+    delay,
     refresh,
     refreshSelectedClub,
     refreshSelectedClubSettings,

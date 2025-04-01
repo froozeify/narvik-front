@@ -24,19 +24,28 @@ function getBasicAuthorization(isBadger: boolean = false): string {
   return `Basic ${btoa(bearer)}`
 }
 
-async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLogin: boolean = true) {
+async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLogin: boolean = true, retry: number = 0) {
   let overloadedOptions = {}
 
   if (requireLogin) {
     const selfStore = useSelfUserStore()
     const jwtToken = await selfStore.enhanceJwtTokenDefined();
     // We throw an error if at this point we still don't have an access token
-    if (!jwtToken.value || !jwtToken.value.access) {
-      selfStore.logJwtError("No access token.")
+    if (!jwtToken.value?.access?.token) {
+      retry++;
+
+      if (retry > 5) {
+        selfStore.logJwtError(`No access token. All retry failed`)
+        throw new Error('No access token found')
+      }
+
+      selfStore.logJwtError(`No access token. Retrying ${retry}/5`, false)
+      await selfStore.delay(200)
+      return useApi<T>(path, options, requireLogin, retry)
     }
     overloadedOptions = mergician({
       headers: {
-        Authorization: `Bearer ${jwtToken.value?.access?.token}`
+        Authorization: `Bearer ${jwtToken.value.access.token}`
       }
     }, options);
 

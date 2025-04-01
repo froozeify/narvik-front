@@ -7,10 +7,10 @@ import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/prese
 import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
-import SearchMember from "~/components/Member/SearchMember.vue";
 import type {Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {useSelfUserStore} from "~/stores/useSelfUser";
+import {ClubRole} from "~/types/api/item/club";
 
 const props = defineProps({
   externalPresence: {
@@ -76,7 +76,7 @@ const activityQuery = new ActivityQuery();
 activityQuery.getAll().then(value => {
   isLoading.value = false;
   activities.value = value.items
-      .filter((actvt) => actvt.isEnabled) // We don't display the disabled activities
+      .filter((actvt) => actvt.isEnabled && (!actvt.visibility || actvt.visibility === ClubRole.Member)) // We don't display the disabled activities
       .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
 });
 

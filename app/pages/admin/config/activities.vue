@@ -4,6 +4,7 @@ import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/acti
 import type {FormError} from "#ui/types";
 import ActivityModalDelete from "~/components/Activity/ActivityModalDelete.vue";
 import ActivityModalMigrate from "~/components/Activity/ActivityModalMigrate.vue";
+import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
 
 definePageMeta({
   layout: "admin"
@@ -28,6 +29,8 @@ watch(selectedActivity, (value, oldValue) => {
 
 const activityQuery = new ActivityQuery();
 
+const availableRoles = getAvailableClubRoles()
+
 const columns = [
   {
     key: 'enabled',
@@ -39,8 +42,13 @@ const columns = [
     class: 'w-full'
   },
   {
+    key: 'visibility',
+    label: 'Visibilité',
+  },
+  {
     key: 'actions',
-  }]
+  }
+]
 
 async function getActivities() {
   isLoading.value = true
@@ -79,7 +87,8 @@ async function updateActivity(activity: Activity) {
 
   let payload: Activity = {
     name: activity.name,
-    isEnabled: activity.isEnabled
+    isEnabled: activity.isEnabled,
+    visibility: activity.visibility
   }
 
   // We verify if it's a creation or an update
@@ -195,6 +204,9 @@ getActivities()
             <template #enabled-data="{ row }">
               <UToggle :model-value="row.isEnabled" />
             </template>
+            <template #visibility-data="{ row }">
+              {{ getAvailableClubRoles().find((role) => role.value === row.visibility)?.text ?? 'Par défaut - Membre' }}
+            </template>
           </UTable>
         </div>
       </UCard>
@@ -211,6 +223,15 @@ getActivities()
 
               <UFormGroup label="Nom" name="name">
                 <UInput v-model="selectedActivity.name"/>
+              </UFormGroup>
+
+              <UFormGroup label="Visibilité" name="visibility">
+                <USelect
+                  v-model="selectedActivity.visibility as string"
+                  :options="availableRoles"
+                  option-attribute="text"
+                  value-attribute="value"
+                  :placeholder="`Par défaut - Membre`" />
               </UFormGroup>
             </div>
 
