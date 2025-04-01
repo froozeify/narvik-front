@@ -258,7 +258,7 @@
           </template>
 
           <template #quantity-data="{ row }">
-            <p v-if="row.quantity" :class="row.quantityAlert && row.quantity <= row.quantityAlert ? 'font-bold text-red-600' : ''">
+            <p v-if="row.quantity || row.quantity === 0" :class="row.quantityAlert && row.quantity <= row.quantityAlert ? 'font-bold text-red-600' : ''">
               {{ row.quantity }}
             </p>
             <i v-else>Non définie</i>

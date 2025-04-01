@@ -236,7 +236,7 @@
                 <div v-if="item.sellingQuantity && item.sellingQuantity != 1" class="text-xs font-bold">Vendu par {{ item.sellingQuantity }}</div>
                 <div v-if="item.description" class="text-xs print:hidden">{{ item.description }}</div>
               </div>
-              <div v-if="item.quantityAlert && item.quantity && item.quantity <= item.quantityAlert"
+              <div v-if="item.quantityAlert && (item.quantity || item.quantity === 0) && item.quantity <= item.quantityAlert"
                    class="print:hidden text-xs font-bold text-red-600">
                 Stock restant : {{ item.quantity }}
               </div>
