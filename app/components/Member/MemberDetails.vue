@@ -21,6 +21,7 @@ import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.
 import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeasonQuery";
 import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
 import MemberEditLinkedEmailModal from "~/components/Member/MemberEditLinkedEmailModal.vue";
+import clipboard from "clipboardy";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
@@ -586,7 +587,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
                 Dernier contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
               </div>
 
-              <MemberDetailsPersonnalInfo icon="i-heroicons-identification" :label="member.licence" />
+              <MemberDetailsPersonnalInfo icon="i-heroicons-identification" :label="member.licence" to="#" @click.prevent="clipboard.write(member.licence ?? '');toast.add({title: 'Licence copiée', color: 'green'});" />
               <MemberDetailsPersonnalInfo icon="i-heroicons-at-symbol" :label="member.email" :to="'mailto:' + member.email" />
               <MemberDetailsPersonnalInfo icon="i-heroicons-phone" :label="member.phone?.match(/.{1,2}/g)?.join(' ')" :to="member.phone ? 'tel:' + member.phone : undefined" />
               <MemberDetailsPersonnalInfo icon="i-heroicons-phone" :label="member.mobilePhone?.match(/.{1,2}/g)?.join(' ')" :to="member.mobilePhone ? 'tel:' + member.mobilePhone : undefined" />

@@ -148,12 +148,6 @@ async function copyLicence() {
   }
 }
 
-function fullNameClicked() {
-  if (selfStore.hasSupervisorRole() && member.value) {
-    navigateTo(`/admin/members/${convertUuidToUrlUuid(member.value.uuid)}`)
-  }
-}
-
 </script>
 
 <template>
@@ -219,8 +213,14 @@ function fullNameClicked() {
         </div>
 
         <div class="space-y-4 w-full my-4">
-          <div class="text-center text-2xl font-bold cursor-pointer" @click="fullNameClicked">
-            {{ member.fullName }}
+          <div class="text-center text-2xl font-bold">
+            <ContentLink v-if="isSupervisor" class="!text-black" :to="`/admin/members/${convertUuidToUrlUuid(member.uuid)}`">
+              {{ member.fullName }}
+            </ContentLink>
+
+            <template v-else>
+              {{ member.fullName }}
+            </template>
           </div>
           <div class="flex justify-center flex-wrap gap-2">
             <UBadge
@@ -261,7 +261,7 @@ function fullNameClicked() {
               Club secondaire
             </UBadge>
           </div>
-          <div class="flex items-center justify-center text-xl cursor-pointer select-none" @click="copyLicence">
+          <div class="flex items-center justify-center text-xl cursor-pointer" @click="copyLicence">
             <UIcon class="mr-2" name="i-heroicons-identification" />
             {{ member.licence }}
           </div>
