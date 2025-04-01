@@ -12,7 +12,7 @@ const props = defineProps({
 
 <template>
   <UCard>
-    <div v-if="props.title" class="text-xl font-bold mb-4">{{ props.title }}</div>
+    <div v-if="props.title" class="text-xl font-bold mb-2">{{ props.title }}</div>
     <slot />
   </UCard>
 </template>
