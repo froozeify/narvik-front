@@ -686,20 +686,17 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
       </div>
 
       <div class="lg:col-span-9">
-        <UCard v-if="totalMemberPresences > 0">
-
-          <div class="text-xl font-bold">{{ totalMemberPresences }} présences ces 12 derniers mois</div>
-
-          <div class="h-96 mt-4">
+        <GenericCard v-if="totalMemberPresences > 0" :title="`${totalMemberPresences} présences ces 12 derniers mois`">
+          <div class="h-96 mt-2">
             <Doughnut
               :data="chartData"
               :options="chartOptions"
             />
           </div>
-        </UCard>
-        <UCard v-else>
+        </GenericCard>
+        <GenericCard v-else>
           <i class="text-lg">Aucune présences ces 12 derniers mois</i>
-        </UCard>
+        </GenericCard>
       </div>
 
       <div class="lg:col-span-9">

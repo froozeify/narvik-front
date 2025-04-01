@@ -271,14 +271,13 @@ function parseGetActivities(value: FetchItemData<Metric>) {
         </GenericStatCard>
       </div>
 
-      <UCard v-if="chartData" class="mt-4">
-        <div class="text-xl font-bold">Statistiques d'activités réalisées (membres)</div>
-        <div class="my-4 text-sm">Les données sont basées sur la même période (en partant du 1er janvier au jour actuel)</div>
+      <GenericCard v-if="chartData" class="mt-4" title="Statistiques d'activités réalisées (membres)">
+        <div class="mb-4 text-sm">Les données sont basées sur la même période (en partant du 1er janvier au jour actuel)</div>
         <Bar
           :data="chartData"
           :options="chartOptions"
         />
-      </UCard>
+      </GenericCard>
     </div>
   </div>
 </template>

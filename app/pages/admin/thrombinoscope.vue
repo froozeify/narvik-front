@@ -80,9 +80,7 @@
 
 <template>
   <div>
-    <UCard class="print:ring-0 print:shadow-none print:!bg-transparent">
-      <div class="text-xl font-bold mb-4">Trombinoscope pour la saison actuelle ({{totalMembers}} membres)</div>
-
+    <GenericCard class="print:ring-0 print:shadow-none print:!bg-transparent" :title="`Trombinoscope pour la saison actuelle (${totalMembers} membres)`">
       <UProgress
         v-if="isLoading"
         class="mb-4"
@@ -154,7 +152,7 @@
         </template>
       </div>
 
-    </UCard>
+    </GenericCard>
   </div>
 </template>
 

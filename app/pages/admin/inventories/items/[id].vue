@@ -214,13 +214,12 @@
       </GenericStatCard>
     </div>
 
-    <UCard v-if="chartData">
-      <div class="text-xl font-bold">Historique des prix de ventes/achats</div>
+    <GenericCard v-if="chartData" title="Historique des prix de ventes/achats">
       <Line
         :data="chartData"
         :options="chartOptions"
       />
-    </UCard>
+    </GenericCard>
   </div>
 
   <UModal

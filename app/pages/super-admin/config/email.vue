@@ -117,8 +117,7 @@ async function testSmtp() {
 <template>
   <GenericLayoutContentWithStickySide mobile-side-title="Tester la configuration">
     <template #main>
-      <UCard>
-        <div class="text-xl font-bold mb-4">Configuration SMTP</div>
+      <GenericCard title="Configuration SMTP">
 
         <UButton
           color="blue"
@@ -173,12 +172,11 @@ async function testSmtp() {
           </UButton>
         </UForm>
 
-      </UCard>
+      </GenericCard>
     </template>
 
     <template #side>
-      <UCard>
-        <div class="text-xl font-bold mb-4">Tester la configuration SMTP</div>
+      <GenericCard title="Tester la configuration SMTP">
         <UFormGroup label="Adresse mail" name="testEmail">
           <UInput v-model="testEmail" type="email" />
         </UFormGroup>
@@ -193,7 +191,7 @@ async function testSmtp() {
         >
           Envoyer le mail
         </UButton>
-      </UCard>
+      </GenericCard>
     </template>
   </GenericLayoutContentWithStickySide>
 </template>
