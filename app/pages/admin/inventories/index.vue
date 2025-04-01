@@ -88,7 +88,7 @@
     }
   ]
 
-  function rowClicked(row: object) {
+  function rowClicked(row: InventoryItem) {
     selectedItem.value = {...row} // We make a shallow clone
     isSideVisible.value = true
   }
@@ -134,6 +134,11 @@
     }
 
     isLoading.value = false
+
+    if (totalApiItems.value === 1) {
+      rowClicked(apiItems.value.at(0) as InventoryItem)
+    }
+
   }
 
   // InventoryItemModal
