@@ -4,6 +4,7 @@ import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.
 import {type User, UserRole} from "~/types/api/item/user";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {getAvailableClubRole} from "~/types/api/item/club";
+import {convertUuidToUrlUuid} from "~/utils/resource";
 
 definePageMeta({
   layout: "super-admin"
@@ -42,7 +43,7 @@ const columns = [
     class: 'w-full',
   },
   {
-    key: 'club.name',
+    key: 'club',
     label: 'Club'
   },
   {
@@ -213,6 +214,10 @@ loadUser()
                 <div class="flex flex-col items-center justify-center py-6 gap-3">
                   <span class="italic text-sm">Aucun profil</span>
                 </div>
+              </template>
+
+              <template #club-data="{ row }">
+                <ContentLink :to="`/super-admin/clubs/${convertUuidToUrlUuid(row.club.uuid)}`">{{ row.club.name }}</ContentLink>
               </template>
 
               <template #role-data="{ row }">
