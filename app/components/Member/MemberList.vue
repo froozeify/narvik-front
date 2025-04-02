@@ -54,7 +54,7 @@ const columns = [
   }
 ]
 
-function getMembers() {
+async function getMembers() {
   isLoading.value = true;
 
   const urlParams = new URLSearchParams({
@@ -85,24 +85,22 @@ function getMembers() {
     urlParams.append('exists[licence]', 'true');
   }
 
-  memberQuery.getAll(urlParams).then(value => {
-    isLoading.value = false;
+  const { error, items, totalItems } = await memberQuery.getAll(urlParams);
+  isLoading.value = false;
 
-    if (value.error) {
-      toast.add({
-        color: "error",
-        title: "Une erreur s'est produite",
-        description: value.error.message || value.error.toString()
-      })
-    }
+  if (error) {
+    toast.add({
+      color: "error",
+      title: "Une erreur s'est produite",
+      description: error.message || error.toString()
+    })
+    return
+  }
 
-    if (value.items) {
-      members.value = value.items
-      if (value.totalItems) {
-        totalMembers.value = value.totalItems
-      }
-    }
-  });
+  members.value = items
+  if (totalItems) {
+    totalMembers.value = totalItems
+  }
 }
 
 let inputTimer: NodeJS.Timeout;
