@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@nuxt/ui";
 
 html, body, #__nuxt, #__nuxt > div, #__layout {
 	width: 100%;
