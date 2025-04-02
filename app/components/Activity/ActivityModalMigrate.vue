@@ -2,6 +2,7 @@
 
 import type {PropType} from "vue";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
+import type {SelectItem} from "#ui/components/Select.vue";
 
 const props = defineProps(
   {
@@ -20,6 +21,17 @@ const emit = defineEmits(['migrate'])
 
 const migrationTarget: Ref<string|undefined> = ref(undefined)
 
+const items = computed( () => {
+  const items: SelectItem[] = []
+  props.activities?.forEach(value => {
+    items.push({
+      label: value.name,
+      value: value.uuid
+    })
+  })
+  return items;
+})
+
 </script>
 
 <template>
@@ -27,20 +39,20 @@ const migrationTarget: Ref<string|undefined> = ref(undefined)
 
     <UAlert
       class="my-4"
-      color="yellow"
+      color="warning"
       variant="soft"
       title="Une fois la migration effectuée, l'activité sera supprimée."
     />
 
-    <UFormGroup class="mb-4" label="Activité cible">
-      <USelect required v-model="migrationTarget" :options="props.activities" option-attribute="name" value-attribute="uuid" />
-    </UFormGroup>
+    <UFormField class="mb-4" label="Activité cible">
+      <USelect required v-model="migrationTarget" :items="items" />
+    </UFormField>
 
     <template #actions>
       <UButton
         :disabled="!migrationTarget"
         @click="emit('migrate', migrationTarget)"
-        color="orange"
+        color="warning"
       >
         Migrer
       </UButton>
@@ -48,6 +60,6 @@ const migrationTarget: Ref<string|undefined> = ref(undefined)
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

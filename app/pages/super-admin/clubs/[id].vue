@@ -50,19 +50,19 @@ const sort = ref({
 });
 const columns = [
   {
-    key: 'accountActivated',
-    label: 'Activé',
+    accessorKey: 'accountActivated',
+    header: 'Activé',
   },
   {
-    key: 'fullName',
-    label: 'Nom',
+    accessorKey: 'fullName',
+    header: 'Nom',
   },
   {
-    key: 'email',
-    label: 'Email',
+    accessorKey: 'email',
+    header: 'Email',
   },
   {
-    key: 'actions',
+    accessorKey: 'actions',
   }
 ]
 
@@ -174,7 +174,7 @@ loadClubUsers()
       <div class="flex-1 text-center font-bold text-2xl flex justify-center items-center gap-2 ">
         <p>{{ club.name }}</p>
         <UIcon
-          :class="club.isActivated ? 'text-green-600' : 'text-red-600'"
+          :class="club.isActivated ? 'text-success-600' : 'text-error-600'"
           :name="club.isActivated ? 'i-heroicons-check': 'i-heroicons-x-mark'"
         />
       </div>
@@ -182,7 +182,7 @@ loadClubUsers()
       <div class="flex justify-between gap-2">
         <UButton
           icon="i-heroicons-pencil"
-          color="yellow"
+          color="warning"
           size="xs"
           label="Modifier"
           @click="itemModalOpen = true"
@@ -190,7 +190,7 @@ loadClubUsers()
 
         <UButton
           icon="i-heroicons-trash"
-          color="red"
+          color="error"
           size="xs"
           label="Supprimer"
           @click="modal.open(ModalDeleteConfirmation, {
@@ -259,7 +259,7 @@ loadClubUsers()
               </div>
 
               <div class="flex justify-center mt-4">
-                <UButton color="yellow" @click="selfStore.impersonateClub(club)">Impersonifier</UButton>
+                <UButton color="warning" @click="selfStore.impersonateClub(club)">Impersonifier</UButton>
               </div>
 
             </div>
@@ -287,28 +287,28 @@ loadClubUsers()
             class="w-full"
             :loading="isUsersLoading"
             :columns="columns"
-            :rows="userClubs">
+            :data="userClubs">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucun utilisateurs.</span>
               </div>
             </template>
 
-            <template #accountActivated-data="{ row }">
-              <UToggle :model-value="row.accountActivated" />
+            <template #accountActivated-cell="{ row }">
+              <USwitch :model-value="row.original.accountActivated" />
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="text-right">
-                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.original.uuid)}`">Détails</UButton>
               </div>
             </template>
 
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="loadClubUsers()"/>
-            <UPagination v-model="page" @update:model-value="loadClubUsers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalUsers"/>
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="loadClubUsers()"/>
+            <UPagination v-model:page="page" @update:page="loadClubUsers()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalUsers"/>
           </div>
         </div>
       </GenericCard>
@@ -317,15 +317,17 @@ loadClubUsers()
 
   <UModal
     v-model="itemModalOpen">
-    <UCard>
-      <ClubForm
-        :item="club ? {...club} : undefined"
-        @updated="(value) => {itemModalOpen = false; loadItem() }"
-      />
-    </UCard>
+    <template #content>
+      <UCard>
+        <ClubForm
+          :item="club ? {...club} : undefined"
+          @updated="(value) => {itemModalOpen = false; loadItem() }"
+        />
+      </UCard>
+    </template>
   </UModal>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

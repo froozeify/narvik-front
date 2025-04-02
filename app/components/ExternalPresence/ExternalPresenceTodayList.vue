@@ -45,7 +45,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
         <UTooltip text="Rafraichir">
           <UButton
               icon="i-heroicons-arrow-path"
-              color="gray"
+              color="neutral"
               variant="solid"
               aria-label="Rafraichir"
               :loading="isRefreshing"
@@ -63,23 +63,25 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
       :display-full-date="false"
       :has-pagination="false"
       :is-loading="isRefreshing"
-      accent-color="orange"
+      accent-color="warning"
       @rowClicked="rowClicked"
     />
   </UCard>
 
   <UModal
       v-model="externalPresenceStore.modalOpen">
-    <ExternalPresenceDetails
-        v-if="selectedExternalPresence"
-        :item="selectedExternalPresence"
-        @updated="externalPresenceUpdated"
-        @close="externalPresenceStore.modalOpen = false; selectedExternalPresence = undefined"
-    />
+    <template #content>
+      <ExternalPresenceDetails
+          v-if="selectedExternalPresence"
+          :item="selectedExternalPresence"
+          @updated="externalPresenceUpdated"
+          @close="externalPresenceStore.modalOpen = false; selectedExternalPresence = undefined"
+      />
+    </template>
   </UModal>
 
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

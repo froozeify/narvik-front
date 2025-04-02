@@ -29,12 +29,12 @@ const props = defineProps(
   }
 )
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits<{ delete: [boolean], close: [boolean] }>()
 
 </script>
 
 <template>
-  <ModalWithActions :title="props.title">
+  <ModalWithActions :title="props.title" @close="(state: boolean) => emit('close', state)">
 
     <slot>
       <div>
@@ -53,8 +53,8 @@ const emit = defineEmits(['delete'])
 
     <template #actions>
       <UButton
-        @click="emit('delete')"
-        color="red"
+        @click="emit('delete', true)"
+        color="error"
       >
         Supprimer
       </UButton>
@@ -62,6 +62,6 @@ const emit = defineEmits(['delete'])
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

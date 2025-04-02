@@ -42,12 +42,16 @@
   });
   const columns = [
     {
-      key: 'name',
-      label: 'Nom',
-      class: 'w-full'
+      accessorKey: 'name',
+      header: 'Nom',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      }
     },
     {
-      key: 'actions',
+      accessorKey: 'actions',
     }
   ]
 
@@ -137,7 +141,7 @@
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: !category.uuid ? "Catégorie créée" : "Catégorie modifiée",
     });
 
@@ -189,7 +193,7 @@
             :loading="isLoading"
             :sort="sort"
             :columns="columns"
-            :rows="categories"
+            :data="categories"
             @select="rowClicked">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -197,13 +201,13 @@
               </div>
             </template>
 
-            <template #name-data="{ row }">
-              {{ row.name }}
+            <template #name-cell="{ row }">
+              {{ row.original.name }}
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="flex items-center gap-1">
-                <p class="text-xs">{{ row.weight }}</p>
+                <p class="text-xs">{{ row.original.weight }}</p>
                 <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
               </div>
             </template>
@@ -211,8 +215,8 @@
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getCategoriesPaginated()" />
-            <UPagination v-model="page" @update:model-value="getCategoriesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalCategories" />
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getCategoriesPaginated()" />
+            <UPagination v-model:page="page" @update:page="getCategoriesPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalCategories" />
           </div>
         </div>
       </UCard>
@@ -223,24 +227,24 @@
         <UForm :state="selectedCategory" @submit="updateCategory(selectedCategory)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Nom" name="name">
+              <UFormField label="Nom" name="name">
                 <UInput v-model="selectedCategory.name" />
-              </UFormGroup>
-              <UFormGroup label="Poids dans la liste" name="weight">
+              </UFormField>
+              <UFormField label="Poids dans la liste" name="weight">
                 <UInput type="number" v-model="selectedCategory.weight" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>
 
-          <UButton v-if="selectedCategory.uuid" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
+          <UButton v-if="selectedCategory.uuid" color="success" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
           <UButton
             v-if="selectedCategory.uuid"
             block
-            color="red"
+            color="error"
             :loading="isLoading"
             :disabled="(selectedCategory?.items?.length ?? 0) > 0"
             @click="modal.open(ModalDeleteConfirmation, {
@@ -259,6 +263,6 @@
   </GenericLayoutContentWithStickySide>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

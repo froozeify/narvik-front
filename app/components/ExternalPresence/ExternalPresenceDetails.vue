@@ -55,7 +55,7 @@ async function deletePresence(close: Function) {
       <UButton
         @click="emit('close')"
         icon="i-heroicons-x-circle"
-        color="orange"
+        color="warning"
         variant="ghost"
         size="xs"
       />
@@ -66,7 +66,7 @@ async function deletePresence(close: Function) {
           @click="updateExternalPresenceModalOpen = true"
           icon="i-heroicons-pencil-square"
           size="xs"
-          color="orange"
+          color="warning"
           variant="solid"
           label="Editer"
       />
@@ -76,7 +76,7 @@ async function deletePresence(close: Function) {
           <UButton
               icon="i-heroicons-trash"
               size="xs"
-              color="red"
+              color="error"
               variant="ghost"
           />
 
@@ -86,7 +86,7 @@ async function deletePresence(close: Function) {
 
               <UButton
                   @click="deletePresence(close);"
-                  color="red"
+                  color="error"
                   class="mx-auto"
               >
                 Supprimer
@@ -108,7 +108,7 @@ async function deletePresence(close: Function) {
       <div class="flex gap-4 justify-center flex-wrap">
         <UButton
             v-for="activity in externalPresence?.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-            color="orange"
+            color="warning"
             :ui="{ rounded: 'rounded-full' }"
         >
           {{ activity.name }}
@@ -120,14 +120,16 @@ async function deletePresence(close: Function) {
 
   <UModal
       v-model="updateExternalPresenceModalOpen">
-    <RegisterExternalPresence
-      :external-presence="externalPresence"
-      @registered="presenceUpdated"
-      @canceled="presenceCanceled"
-    />
+    <template #content>
+      <RegisterExternalPresence
+        :external-presence="externalPresence"
+        @registered="presenceUpdated"
+        @canceled="presenceCanceled"
+      />
+    </template>
   </UModal>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

@@ -38,17 +38,21 @@ const passwordState = reactive({
 
 const columns = [
   {
-    key: 'displayName',
-    label: 'Nom',
-    class: 'w-full',
+    accessorKey: 'displayName',
+    header: 'Nom',
+    meta: {
+      class: {
+        th: 'w-full',
+      }
+    }
   },
   {
-    key: 'club',
-    label: 'Club'
+    accessorKey: 'club',
+    header: 'Club'
   },
   {
-    key: 'role',
-    label: 'Rôle'
+    accessorKey: 'role',
+    header: 'Rôle'
   }
 ]
 
@@ -105,7 +109,7 @@ async function onUpdatePasswordSubmit() {
 
   updatePasswordModalOpen.value = false
   toast.add({
-    color: "green",
+    color: "success",
     title: "Mot de passe modifié"
   })
 }
@@ -136,7 +140,7 @@ loadUser()
       <div class="flex-1 text-center font-bold text-2xl flex justify-center items-center gap-2 ">
         <p>{{ user.fullName }}</p>
         <UIcon
-          :class="user.accountActivated ? 'text-green-600' : 'text-red-600'"
+          :class="user.accountActivated ? 'text-success-600' : 'text-error-600'"
           :name="user.accountActivated ? 'i-heroicons-check': 'i-heroicons-x-mark'"
         />
       </div>
@@ -148,7 +152,7 @@ loadUser()
 
         <UButton
           icon="i-heroicons-pencil"
-          color="yellow"
+          color="warning"
           size="xs"
           label="Modifier"
           @click="itemModalOpen = true"
@@ -157,7 +161,7 @@ loadUser()
         <UButton
           v-if="user.role !== UserRole.SuperAdmin"
           icon="i-heroicons-trash"
-          color="red"
+          color="error"
           size="xs"
           label="Supprimer"
           @click="modal.open(ModalDeleteConfirmation, {
@@ -196,7 +200,7 @@ loadUser()
             </div>
 
             <div class="flex justify-center mt-4">
-              <UButton color="yellow" @click="selfStore.impersonateUser(user)">Impersonifier</UButton>
+              <UButton color="warning" @click="selfStore.impersonateUser(user)">Impersonifier</UButton>
             </div>
           </div>
         </div>
@@ -208,7 +212,7 @@ loadUser()
             <UTable
               class="flex-1"
               :columns="columns"
-              :rows="user.linkedProfiles"
+              :data="user.linkedProfiles"
             >
               <template #empty-state>
                 <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -216,12 +220,12 @@ loadUser()
                 </div>
               </template>
 
-              <template #club-data="{ row }">
-                <ContentLink :to="`/super-admin/clubs/${convertUuidToUrlUuid(row.club.uuid)}`">{{ row.club.name }}</ContentLink>
+              <template #club-cell="{ row }">
+                <ContentLink :to="`/super-admin/clubs/${convertUuidToUrlUuid(row.original.club.uuid)}`">{{ row.original.club.name }}</ContentLink>
               </template>
 
-              <template #role-data="{ row }">
-                {{ getAvailableClubRole(row.role).text }}
+              <template #role-cell="{ row }">
+                {{ getAvailableClubRole(row.original.role).text }}
               </template>
             </UTable>
           </div>
@@ -232,35 +236,39 @@ loadUser()
 
   <UModal
     v-model="itemModalOpen">
-    <UCard>
-      <UserForm
-        :item="user ? {...user} : undefined"
-        @updated="(value) => {itemModalOpen = false; loadUser() }"
-      />
-    </UCard>
+    <template #content>
+      <UCard>
+        <UserForm
+          :item="user ? {...user} : undefined"
+          @updated="(value) => {itemModalOpen = false; loadUser() }"
+        />
+      </UCard>
+    </template>
   </UModal>
 
   <UModal
     v-if="user"
     v-model="updatePasswordModalOpen">
-    <UCard>
-      <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
-        <UFormGroup label="Nouveau mot de passe" name="password">
-          <UInput v-model="passwordState.new" type="password" required />
-        </UFormGroup>
+    <template #content>
+      <UCard>
+        <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
+          <UFormField label="Nouveau mot de passe" name="password">
+            <UInput v-model="passwordState.new" type="password" required />
+          </UFormField>
 
-        <UFormGroup label="Confirmation nouveau mot de passe" name="password">
-          <UInput v-model="passwordState.new2" type="password" required />
-        </UFormGroup>
+          <UFormField label="Confirmation nouveau mot de passe" name="password">
+            <UInput v-model="passwordState.new2" type="password" required />
+          </UFormField>
 
-        <UButton type="submit">
-          Changer le mot de passe
-        </UButton>
-      </UForm>
-    </UCard>
+          <UButton type="submit">
+            Changer le mot de passe
+          </UButton>
+        </UForm>
+      </UCard>
+    </template>
   </UModal>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

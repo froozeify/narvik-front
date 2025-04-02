@@ -115,7 +115,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   isSubmitting.value = false;
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error.message
     });
@@ -204,7 +204,7 @@ function presenceCanceled() {
         <UButton :loading="isSubmitting" block type="submit">
           Enregistrer
         </UButton>
-        <UButton class="mt-2" color="red" :loading="isSubmitting" block @click="emit('canceled')">
+        <UButton class="mt-2" color="error" :loading="isSubmitting" block @click="emit('canceled')">
           Annuler
         </UButton>
       </UForm>
@@ -213,10 +213,12 @@ function presenceCanceled() {
 
   <UModal
       v-model="registerMemberPresenceModal">
+    <template #content>
       <RegisterMemberPresence :member="matchedMember" @registered="presenceRegistered" @canceled="presenceCanceled" />
+    </template>
   </UModal>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

@@ -12,14 +12,14 @@ const props = defineProps({
 </script>
 
 <template>
-  <UFormGroup label="Créé le">
+  <UFormField label="Créé le">
     <p class="text-sm">{{ formatDateTimeReadable(props.item.createdAt) }}</p>
-  </UFormGroup>
-  <UFormGroup label="Modifié le">
+  </UFormField>
+  <UFormField label="Modifié le">
     <p class="text-sm">{{ formatDateTimeReadable(props.item.updatedAt) }}</p>
-  </UFormGroup>
+  </UFormField>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

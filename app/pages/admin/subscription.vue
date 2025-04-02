@@ -10,7 +10,6 @@ definePageMeta({
 
 const selfStore = useSelfUserStore()
 
-
 </script>
 
 <template>
@@ -31,14 +30,14 @@ const selfStore = useSelfUserStore()
 
         <div v-if="!selfStore.selectedProfile?.club">
           <UAlert
-            color="red"
+            color="error"
             title="Impossible d'obtenir les informations sur le club."
             description="Veuillez rafraichir la page ou vous reconnecter si cela ne corrige pas le problème."
           />
         </div>
         <div v-else>
           <p>
-            <b>Statut</b> : <span :class="selfStore.selectedProfile.club.isActivated ? '' : 'text-red-500'">{{ selfStore.selectedProfile.club.isActivated ? 'Actif' : 'Non actif' }}</span>
+            <b>Statut</b> : <span :class="selfStore.selectedProfile.club.isActivated ? '' : 'text-error-500'">{{ selfStore.selectedProfile.club.isActivated ? 'Actif' : 'Non actif' }}</span>
           </p>
           <p v-if="selfStore.selectedProfile.club.renewDate">
             <b>Date de renouvellement</b> : {{ formatDateReadable(selfStore.selectedProfile.club.renewDate.toString()) }}

@@ -2,10 +2,9 @@
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import UserQuery from "~/composables/api/query/UserQuery";
 
-const emit = defineEmits(['accepted', 'cancel'])
+const emit = defineEmits(['accepted', 'close'])
 
 const toast = useToast();
-const runtimeConfig = useRuntimeConfig()
 const selfStore = useSelfUserStore()
 const isAdmin = selfStore.isAdmin()
 const isLoading = ref(false)
@@ -18,7 +17,7 @@ async function accept() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error?.message
     });
@@ -31,13 +30,13 @@ async function accept() {
 
   isLoading.value = false
   emit('accepted')
-  await useModal().close()
+  emit('close', true)
 }
 
 </script>
 
 <template>
-  <ModalWithActions title="Mise à jour des conditions légales">
+  <ModalWithActions :dismissible="false" title="Mise à jour des conditions légales">
     <slot>
       <div>
         Merci de bien vouloir lire et accepter
@@ -50,7 +49,7 @@ async function accept() {
     </slot>
 
     <template #cancel>
-      <UButton color="red" variant="ghost" @click="useModal().close(); selfStore.logout(); emit('cancel')">
+      <UButton color="error" variant="ghost" @click="selfStore.logout(); emit('close', false)">
         Refuser et se déconnecter
       </UButton>
     </template>
@@ -59,7 +58,6 @@ async function accept() {
       <UButton
         :loading="isLoading"
         @click="accept"
-        color="green"
       >
         Accepter
       </UButton>
@@ -67,6 +65,6 @@ async function accept() {
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

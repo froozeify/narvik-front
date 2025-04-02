@@ -84,7 +84,7 @@
 
       if (value.error) {
         toast.add({
-          color: "red",
+          color: "error",
           title: "Une erreur s'est produite",
           description: value.error.message || value.error.toString()
         })
@@ -133,7 +133,7 @@
     } else {
       isDownloadingCsv.value = false
       toast.add({
-        color: "red",
+        color: "error",
         title: "Date non définie.",
         description: "Veuillez sélectionner une date afin de pouvoir télécharger le csv."
       })
@@ -160,7 +160,7 @@
       <div class="flex-1"></div>
 
       <template v-if="isAdmin">
-        <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv" :disabled="!selectedRange">
+        <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv" :disabled="!selectedRange">
           CSV
         </UButton>
       </template>
@@ -173,7 +173,7 @@
       :can-sort="true"
       :display-no-data-register="false"
       :is-loading="isLoading"
-      accent-color="orange"
+      accent-color="warning"
       @rowClicked="rowClicked"
       @sort="(object: TableSortInterface) => { sort = object; getPresences() }"
       @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; sort = object.sort; getPresences() }"
@@ -181,16 +181,18 @@
 
     <UModal
         v-model="modalOpen">
-      <ExternalPresenceDetails
-          v-if="selectedExternalPresence"
-          :item="selectedExternalPresence"
-          @updated="externalPresenceUpdated"
-          @close="modalOpen = false; selectedExternalPresence = undefined"
-      />
+      <template #content>
+        <ExternalPresenceDetails
+            v-if="selectedExternalPresence"
+            :item="selectedExternalPresence"
+            @updated="externalPresenceUpdated"
+            @close="modalOpen = false; selectedExternalPresence = undefined"
+        />
+      </template>
     </UModal>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

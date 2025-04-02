@@ -9,6 +9,17 @@ const { user, member, selectedProfile } = storeToRefs(selfStore)
 
 const selectedProfileId: Ref<string|undefined> = ref(selectedProfile.value?.id)
 
+const items = computed( () => {
+  const items: SelectItem[] = []
+  user?.linkedProfiles.forEach(value => {
+    items.push({
+      label: value.displayName,
+      value: value.id
+    })
+  })
+  return items;
+})
+
 async function applyProfile() {
   if (!selectedProfileId.value || !user.value?.linkedProfiles) return
 
@@ -32,9 +43,7 @@ async function applyProfile() {
       <div>
         <USelect
           v-model="selectedProfileId"
-          :options="user?.linkedProfiles"
-          option-attribute="displayName"
-          value-attribute="id"
+          :items="items"
           placeholder="Aucun profil défini" />
       </div>
     </slot>
@@ -42,7 +51,7 @@ async function applyProfile() {
     <template #actions>
       <UButton
         @click="applyProfile"
-        color="yellow"
+        color="warning"
       >
         Changer
       </UButton>
@@ -50,6 +59,6 @@ async function applyProfile() {
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

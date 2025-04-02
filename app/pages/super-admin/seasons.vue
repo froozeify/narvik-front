@@ -37,11 +37,11 @@ definePageMeta({
   const itemsPerPage = ref(30);
   const columns = [
     {
-      key: 'name',
-      label: 'Nom',
+      accessorKey: 'name',
+      header: 'Nom',
     },
     {
-      key: 'actions',
+      accessorKey: 'actions',
     }
   ]
 
@@ -117,7 +117,7 @@ definePageMeta({
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: !item.id ? "Saison créée" : "Saison modifiée",
     });
 
@@ -167,7 +167,7 @@ definePageMeta({
             class="w-full"
             :loading="isLoading"
             :columns="columns"
-            :rows="apiItems"
+            :data="apiItems"
             @select="rowClicked">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -175,19 +175,19 @@ definePageMeta({
               </div>
             </template>
 
-            <template #name-data="{ row }">
-              {{ row.name }}
+            <template #name-cell="{ row }">
+              {{ row.original.name }}
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
 
             </template>
 
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()" />
-            <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="apiTotalItems" />
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getItemsPaginated()" />
+            <UPagination v-model:page="page" @update:page="getItemsPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="apiTotalItems" />
           </div>
         </div>
       </UCard>
@@ -198,9 +198,9 @@ definePageMeta({
         <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
             <div class="flex gap-2 flex-col relative">
-              <UFormGroup label="Nom" name="name" required>
+              <UFormField label="Nom" name="name" required>
                 <UInput v-model="selectedItem.name" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>
@@ -210,7 +210,7 @@ definePageMeta({
           <UButton
             v-if="selectedItem.id"
             block
-            color="red"
+            color="error"
             :loading="isLoading"
             @click="modal.open(ModalDeleteConfirmation, {
               onDelete() {

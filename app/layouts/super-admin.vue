@@ -66,11 +66,11 @@
 </script>
 
 <template>
-  <GenericLayoutAdmin :links="links">
+  <GenericLayoutAdmin :items="links">
     <slot></slot>
   </GenericLayoutAdmin>
 </template>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>

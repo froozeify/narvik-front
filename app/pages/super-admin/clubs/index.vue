@@ -50,24 +50,28 @@
   const itemsPerPage = ref(30);
   const columns = [
     {
-      key: 'isActivated',
-      label: 'Activé'
+      accessorKey: 'isActivated',
+      header: 'Activé'
     },
     {
-      key: 'name',
-      label: 'Nom',
+      accessorKey: 'name',
+      header: 'Nom',
     },
     {
-      key: 'renewDate',
-      label: 'Renouvellement'
+      accessorKey: 'renewDate',
+      header: 'Renouvellement'
     },
     {
-      key: 'comment',
-      label: 'Commentaire',
-      class: 'w-full'
+      accessorKey: 'comment',
+      header: 'Commentaire',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      }
     },
     {
-      key: 'actions',
+      accessorKey: 'actions',
     }
   ]
 
@@ -156,7 +160,7 @@
             class="w-full"
             :loading="isLoading"
             :columns="columns"
-            :rows="apiItems"
+            :data="apiItems"
             @select="rowClicked">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -164,29 +168,29 @@
               </div>
             </template>
 
-            <template #isActivated-data="{ row }">
-              <UToggle :model-value="row.isActivated" />
+            <template #isActivated-cell="{ row }">
+              <USwitch :model-value="row.original.isActivated" />
             </template>
 
-            <template #name-data="{ row }">
-              {{ row.name }}
+            <template #name-cell="{ row }">
+              {{ row.original.name }}
             </template>
 
-            <template #renewDate-data="{ row }">
-              <p :class="dayjs().isAfter(dayjs(row.renewDate).subtract(14, 'days')) ? 'text-red-500 font-bold' : ''">{{ formatDateReadable(row.renewDate) }}</p>
+            <template #renewDate-cell="{ row }">
+              <p :class="dayjs().isAfter(dayjs(row.original.renewDate).subtract(14, 'days')) ? 'text-error-500 font-bold' : ''">{{ formatDateReadable(row.original.renewDate) }}</p>
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="text-right">
-                <UButton variant="soft" :to="`/super-admin/clubs/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+                <UButton variant="soft" :to="`/super-admin/clubs/${convertUuidToUrlUuid(row.original.uuid)}`">Détails</UButton>
               </div>
             </template>
 
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()" />
-            <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="apiTotalItems" />
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getItemsPaginated()" />
+            <UPagination v-model:page="page" @update:page="getItemsPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="apiTotalItems" />
           </div>
         </div>
       </UCard>
@@ -194,7 +198,7 @@
 
     <template #side>
       <div v-if="selectedItem" class="flex flex-col gap-4">
-        <UButton v-if="selectedItem.uuid" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
+        <UButton v-if="selectedItem.uuid" color="warning" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
         <UButton
           v-if="selectedItem.uuid"
           block

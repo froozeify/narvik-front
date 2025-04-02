@@ -18,7 +18,7 @@ const emit = defineEmits(['delete'])
 
     <UAlert
       class="my-4"
-      color="orange"
+      color="warning"
       variant="soft"
       title="La suppression d'une activité, supprimera aussi toutes les activités des membres liées."
       description="Il conseillé de faire un migration à la place."
@@ -27,7 +27,7 @@ const emit = defineEmits(['delete'])
     <template #actions>
       <UButton
         @click="emit('delete')"
-        color="red"
+        color="error"
       >
         Valider la suppression
       </UButton>
@@ -35,6 +35,6 @@ const emit = defineEmits(['delete'])
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

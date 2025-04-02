@@ -143,7 +143,7 @@ async function copyLicence() {
     clipboard.write(props.item.member.licence)
     toast.add({
       title: 'Licence copiée',
-      color: "green"
+      color: "success"
     })
   }
 }
@@ -158,8 +158,8 @@ async function copyLicence() {
           <UButton
             @click="emit('close')"
             icon="i-heroicons-x-circle"
-            color="white"
-            variant="ghost"
+            color="neutral"
+            variant="outline"
             size="xs"
           />
 
@@ -178,7 +178,7 @@ async function copyLicence() {
                 <UButton
                   icon="i-heroicons-trash"
                   size="xs"
-                  color="red"
+                  color="error"
                   variant="ghost"
                 />
 
@@ -188,7 +188,7 @@ async function copyLicence() {
 
                     <UButton
                       @click="deletePresence(close);"
-                      color="red"
+                      color="error"
                       class="mx-auto"
                     >
                       Supprimer
@@ -233,7 +233,7 @@ async function copyLicence() {
 
             <div v-if="member.blacklisted" class="basis-full text-center">
               <UButton
-                color="black"
+                color="neutral"
                 :ui="{ rounded: 'rounded-full' }">
                 Blacklisté
               </UButton>
@@ -241,7 +241,7 @@ async function copyLicence() {
 
             <div v-if="member.medicalCertificateExpiration && member.medicalCertificateStatus !== 'valid'" class="basis-full text-center">
               <UButton
-                :color="member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
+                :color="member.medicalCertificateStatus === 'expired' ? 'error' : 'yellow'"
                 :ui="{ rounded: 'rounded-full' }">
                 Certificat médical : {{ formatDateReadable(member.medicalCertificateExpiration.toString()) }}
               </UButton>
@@ -249,14 +249,14 @@ async function copyLicence() {
 
             <UButton
               v-if="!member.currentSeason"
-              color="red"
+              color="error"
               :ui="{ rounded: 'rounded-full' }">
               Saison non renouvelée
             </UButton>
 
             <UBadge v-if="member.currentSeason && member.currentSeason.isSecondaryClub"
                     variant="subtle"
-                    color="green"
+                    color="success"
                     :ui="{ rounded: 'rounded-full' }">
               Club secondaire
             </UBadge>
@@ -334,16 +334,18 @@ async function copyLicence() {
 
     <UModal
         v-model="updateMemberPresenceModalOpen">
-      <RegisterMemberPresence
-          :member-presence="memberPresence"
-          @registered="presenceUpdated"
-          @canceled="updateMemberPresenceModalOpen = false"
-      />
+      <template #content>
+        <RegisterMemberPresence
+            :member-presence="memberPresence"
+            @registered="presenceUpdated"
+            @canceled="updateMemberPresenceModalOpen = false"
+        />
+      </template>
     </UModal>
   </div>
 
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

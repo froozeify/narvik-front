@@ -103,12 +103,12 @@
 </script>
 
 <template>
-  <GenericLayoutAdmin :links="links">
+  <GenericLayoutAdmin :items="links">
     <UAlert
       v-if="!selfStore.selectedProfile?.club.isActivated"
       class="mb-4"
       icon="i-heroicons-link-slash"
-      color="red"
+      color="error"
       variant="subtle"
       title="Lecture seule. Club non activé."
       description="Le club n'est pas activé, aucune modification ne sera possible. Veuillez contacter le support pour plus d'information."
@@ -117,7 +117,7 @@
       v-if="isAdmin && selfStore.selectedProfile?.club.renewDate && dayjs().add(14, 'days').isAfter(selfStore.selectedProfile.club.renewDate)"
       class="mb-4"
       icon="i-heroicons-credit-card"
-      color="orange"
+      color="warning"
       variant="subtle"
       title="Votre abonnement se termine bientôt."
       :description="`Veuillez penser à le renouveler avant le ${formatDateReadable(selfStore.selectedProfile.club.renewDate.toString())}.`"
@@ -126,6 +126,6 @@
   </GenericLayoutAdmin>
 </template>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>

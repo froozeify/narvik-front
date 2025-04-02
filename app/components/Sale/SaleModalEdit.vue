@@ -31,6 +31,17 @@ const saleQuery = new SaleQuery()
 const sale: Sale = {...props.sale}
 const paymentModeValue = ref(sale.paymentMode?.uuid)
 
+const paymentModesSelect = computed( () => {
+  const items: SelectItem[] = []
+  saleStore.paymentModes.forEach(value => {
+    items.push({
+      label: value.name,
+      value: value.uuid
+    })
+  })
+  return items;
+})
+
 if (saleStore.paymentModes.length < 1) {
   saleStore.getPaymentModes()
 }
@@ -44,7 +55,7 @@ const validate = (state: any): FormError[] => {
 async function updateSale() {
   if (!sale.createdAt) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La date doit être définie",
     });
   }
@@ -71,7 +82,7 @@ async function updateSale() {
 
   if (error || !updated) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error?.message
     });
@@ -84,7 +95,7 @@ async function updateSale() {
   props.sale.paymentMode = updated.paymentMode
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Vente modifiée"
   });
 
@@ -101,7 +112,7 @@ async function updateSale() {
 
     <UForm class="flex gap-2 flex-col" :state="sale" :validate="validate">
 
-      <UFormGroup
+      <UFormField
         v-if="isAdmin"
         label="Date"
         name="createdAt"
@@ -113,20 +124,20 @@ async function updateSale() {
             <GenericDatePicker v-model="sale.createdAt" mode="dateTime" />
           </template>
         </UPopover>
-      </UFormGroup>
+      </UFormField>
 
-      <UFormGroup label="Moyen de paiement" name="paymentMode">
-        <USelect v-model="paymentModeValue" :options="saleStore.paymentModes" option-attribute="name" value-attribute="uuid" />
-      </UFormGroup>
+      <UFormField label="Moyen de paiement" name="paymentMode">
+        <USelect v-model="paymentModeValue" :items="paymentModesSelect" />
+      </UFormField>
 
-      <UFormGroup label="Commentaire" name="comment">
+      <UFormField label="Commentaire" name="comment">
         <UTextarea v-model="sale.comment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente" />
-      </UFormGroup>
+      </UFormField>
     </UForm>
 
     <template #actions>
       <UButton
-        color="yellow"
+        color="warning"
         :loading="isLoading"
         @click="updateSale()"
       >
@@ -136,6 +147,6 @@ async function updateSale() {
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

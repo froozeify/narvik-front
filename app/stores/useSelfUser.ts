@@ -13,7 +13,6 @@ import {UserRole} from "~/types/api/item/user";
 import {type Club, ClubRole} from "~/types/api/item/club";
 import ClubQuery from "~/composables/api/query/ClubQuery";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
-import ModalLegalsAcceptance from "~/components/Modal/ModalLegalsAcceptance.vue";
 
 export const useSelfUserStore = defineStore('selfUser', () => {
   const member: Ref<Member | undefined> = ref(undefined)
@@ -44,7 +43,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   function displayJwtError(description: string, redirect: boolean = true) {
     const toast = useToast()
     toast.add({
-      color: "red",
+      color: "error",
       title: "Erreur d'authentification",
       description: description
     })
@@ -146,6 +145,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   async function refresh() {
     const userQuery = new UserQuery()
     const {retrieved} = await userQuery.self()
+
     if (retrieved) {
       user.value = retrieved
 

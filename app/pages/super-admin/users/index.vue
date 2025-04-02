@@ -50,19 +50,19 @@ const sort = ref({
 });
 const columns = [
   {
-    key: 'accountActivated',
-    label: 'Activé',
+    accessorKey: 'accountActivated',
+    header: 'Activé',
   },
   {
-    key: 'fullName',
-    label: 'Nom',
+    accessorKey: 'fullName',
+    header: 'Nom',
   },
   {
-    key: 'email',
-    label: 'Email',
+    accessorKey: 'email',
+    header: 'Email',
   },
   {
-    key: 'actions',
+    accessorKey: 'actions',
   }
 ]
 
@@ -150,7 +150,7 @@ async function impersonate(user: User) {
             :sort="sort"
             sort-mode="manual"
             :columns="columns"
-            :rows="apiItems"
+            :data="apiItems"
             @select="rowClicked">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -158,21 +158,21 @@ async function impersonate(user: User) {
               </div>
             </template>
 
-            <template #accountActivated-data="{ row }">
-              <UToggle :model-value="row.accountActivated" />
+            <template #accountActivated-cell="{ row }">
+              <USwitch :model-value="row.original.accountActivated" />
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="text-right">
-                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.original.uuid)}`">Détails</UButton>
               </div>
             </template>
 
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()"/>
-            <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="apiTotalItems"/>
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getItemsPaginated()"/>
+            <UPagination v-model:page="page" @update:page="getItemsPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="apiTotalItems"/>
           </div>
         </div>
       </UCard>
@@ -180,7 +180,7 @@ async function impersonate(user: User) {
 
     <template #side>
       <div v-if="selectedItem" class="flex flex-col gap-4">
-        <UButton v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">
+        <UButton v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin" color="warning" block :loading="isLoading" @click="impersonate(selectedItem)">
           Impersonifier
         </UButton>
 

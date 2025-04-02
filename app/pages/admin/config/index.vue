@@ -39,6 +39,16 @@ const activities: Ref<Activity[] | undefined> = ref(undefined);
 activityQuery.getAll().then(value => {
   activities.value = value.items
 })
+const activitiesSelect = computed( () => {
+  const items: SelectItem[] = []
+  activities.forEach(value => {
+    items.push({
+      label: value.name,
+      value: value.uuid
+    })
+  })
+  return items;
+})
 
 const logoUploading = ref(false)
 const state = reactive({
@@ -59,7 +69,7 @@ function copyBadgerLink() {
   clipboard.write(window.location.origin + getBadgerLoginPath())
   toast.add({
     title: 'URL Copiée',
-    color: "green"
+    color: "success"
   })
 }
 
@@ -90,7 +100,7 @@ async function controlShootingUpdated() {
   selfStore.refreshSelectedClub().then()
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Paramètre enregistré"
   });
 }
@@ -123,7 +133,7 @@ async function ignoredActivitiesDaysUpdated() {
   selfStore.refreshSelectedClub().then()
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Paramètre enregistré"
   });
 }
@@ -203,7 +213,7 @@ async function deleteLogo() {
       <div v-if="!badgerSetting">
         <UAlert
           icon="i-heroicons-exclamation-triangle"
-          color="yellow"
+          color="warning"
           title="Lien de connexion non généré."
         />
       </div>
@@ -226,9 +236,7 @@ async function deleteLogo() {
           <USelectMenu
             v-model="configState.excludedActivitiesFromOpeningDays"
             @change="ignoredActivitiesDaysUpdated"
-            :options="activities"
-            option-attribute="name"
-            value-attribute="uuid"
+            :items="activitiesSelect"
             multiple
           >
             <template #label>
@@ -246,9 +254,7 @@ async function deleteLogo() {
           <USelect
             v-model="configState.selectedControlShootingActivity"
             @change="controlShootingUpdated"
-            :options="activities"
-            option-attribute="name"
-            value-attribute="uuid"
+            :options="activitiesSelect"
             placeholder="Aucun contrôle défini" />
         </div>
       </GenericCard>
@@ -270,7 +276,7 @@ async function deleteLogo() {
       />
 
       <UPopover overlay v-if="selectedProfile?.club.settings.logo">
-        <UButton color="red">
+        <UButton color="error">
           Supprimer le logo
         </UButton>
 
@@ -278,7 +284,7 @@ async function deleteLogo() {
           <div class="p-4 w-56 flex flex-col gap-4">
             <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
-            <UButton color="red" @click="deleteLogo" class="mx-auto">
+            <UButton color="error" @click="deleteLogo" class="mx-auto">
               Supprimer le logo
             </UButton>
           </div>
@@ -291,7 +297,7 @@ async function deleteLogo() {
 </template>
 
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>
 

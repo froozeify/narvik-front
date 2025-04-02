@@ -30,23 +30,37 @@ watch(selectedActivity, (value, oldValue) => {
 const activityQuery = new ActivityQuery();
 
 const availableRoles = getAvailableClubRoles()
+const availableRolesSelect = computed( () => {
+  const items: SelectItem[] = []
+  availableRoles.forEach(value => {
+    items.push({
+      label: value.text,
+      value: value.value
+    })
+  })
+  return items;
+})
 
 const columns = [
   {
-    key: 'enabled',
-    label: 'Disponible'
+    accessorKey: 'enabled',
+    header: 'Disponible'
   },
   {
-    key: 'name',
-    label: 'Nom',
-    class: 'w-full'
+    accessorKey: 'name',
+    header: 'Nom',
+    meta: {
+      class: {
+        th: 'w-full',
+      }
+    }
   },
   {
-    key: 'visibility',
-    label: 'Visibilité',
+    accessorKey: 'visibility',
+    header: 'Visibilité',
   },
   {
-    key: 'actions',
+    accessorKey: 'actions',
   }
 ]
 
@@ -114,7 +128,7 @@ async function updateActivity(activity: Activity) {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: !activity.uuid ? "Activité créée" : "Activité modifiée",
   });
 
@@ -138,7 +152,7 @@ async function deleteActivity() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Activité supprimée"
   })
   selectedActivity.value = undefined
@@ -163,7 +177,7 @@ async function migrateActivity(migrationTarget: string) {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Activité migrée"
   })
   await getActivities()
@@ -192,7 +206,7 @@ getActivities()
           <UTable
             :loading="isLoading"
             :columns="columns"
-            :rows="activities"
+            :data="activities"
             @select="rowClicked">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -201,11 +215,11 @@ getActivities()
               </div>
             </template>
 
-            <template #enabled-data="{ row }">
-              <UToggle :model-value="row.isEnabled" />
+            <template #enabled-cell="{ row }">
+              <USwitch :model-value="row.original.isEnabled" />
             </template>
-            <template #visibility-data="{ row }">
-              {{ getAvailableClubRoles().find((role) => role.value === row.visibility)?.text ?? 'Par défaut - Membre' }}
+            <template #visibility-cell="{ row }">
+              {{ getAvailableClubRoles().find((role) => role.value === row.original.visibility)?.text ?? 'Par défaut - Membre' }}
             </template>
           </UTable>
         </div>
@@ -217,22 +231,20 @@ getActivities()
         <UForm :state="selectedActivity" @submit="updateActivity(selectedActivity)" :validate="validate">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Disponible" name="available">
-                <UToggle v-model="selectedActivity.isEnabled"/>
-              </UFormGroup>
+              <UFormField label="Disponible" name="available">
+                <USwitch v-model="selectedActivity.isEnabled"/>
+              </UFormField>
 
-              <UFormGroup label="Nom" name="name">
+              <UFormField label="Nom" name="name">
                 <UInput v-model="selectedActivity.name"/>
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Visibilité" name="visibility">
+              <UFormField label="Visibilité" name="visibility">
                 <USelect
                   v-model="selectedActivity.visibility as string"
-                  :options="availableRoles"
-                  option-attribute="text"
-                  value-attribute="value"
+                  :items="availableRolesSelect"
                   :placeholder="`Par défaut - Membre`" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>
@@ -242,7 +254,7 @@ getActivities()
 
         <UButton v-if="selectedActivity.uuid"
           block
-          color="red"
+          color="error"
           :loading="isLoading"
           @click="modal.open(ActivityModalDelete, {
             title: selectedActivity.name,
@@ -257,7 +269,7 @@ getActivities()
 
         <UButton v-if="selectedActivity.uuid"
                  block
-                 color="orange"
+                 color="warning"
                  :loading="isLoading"
                  @click="modal.open(ActivityModalMigrate, {
                  title: selectedActivity.name,
@@ -276,7 +288,7 @@ getActivities()
 </template>
 
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>
 

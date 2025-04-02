@@ -38,7 +38,7 @@ onUnmounted(() => {
             class="mb-4"
             variant="subtle"
             icon="i-heroicons-exclamation-triangle"
-            color="yellow"
+            color="warning"
             title="Des imports sont en cours"
     >
       <template #description>

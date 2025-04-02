@@ -4,7 +4,7 @@
   import {isDarkMode, isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
   import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
 
-  const modal = useModal()
+  const overlay = useOverlay()
 
   const selfStore = useSelfUserStore();
   const appConfigStore = useAppConfigStore();
@@ -25,7 +25,7 @@
 
   const siteLogo: Ref<string> = appConfigStore.getLogo()
 
-  const rightMenu = [
+  const rightMenu = ref<DropdownMenuItem[][]>([
     [{
       label: !isBadger ? 'Profil' : 'Pointeuse',
       avatar: {
@@ -40,31 +40,33 @@
     }, {
       label: 'Changer de profil',
       icon: 'i-heroicons-arrow-path-rounded-square',
-      class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? '' : 'hidden',
-      click: () => {
-        modal.open(ModalSelectProfile, {
+      class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? 'cursor-pointer' : 'hidden',
+      onSelect: () => {
+        overlay.create(ModalSelectProfile, {
           onSelected() {
             navigateTo('/self')
           }
-        })
+        }).open()
       }
     }], [{
       slot: 'darkMode',
       label: 'Thème',
-      click: () => {
+      class: 'cursor-pointer',
+      onSelect: () => {
         isDark.value = !isDark.value
       }
     }, {
       label: 'Déconnexion',
       icon: 'i-heroicons-arrow-right-start-on-rectangle-20-solid',
-      click: () => {
+      class: 'cursor-pointer',
+      onSelect: () => {
         selfStore.logout()
       }
     }]
-  ]
+  ])
 
   if (selfStore.isSuperAdmin()) {
-    rightMenu.unshift([
+    rightMenu.value.unshift([
       {
         label: 'Administration global',
         icon: 'i-heroicons-building-library',
@@ -85,7 +87,7 @@
 
 <template>
   <header
-    class="backdrop-blur -mb-px sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-16 print:hidden">
+    class="bg-(--ui-bg) sticky top-0 z-50 h-16 print:hidden shadow-sm">
     <nav class="container mx-auto p-4 flex justify-between h-full overflow-y-auto">
       <div class="flex gap-4 flex-shrink-0">
         <NuxtLink to="/" class="flex align-middle">
@@ -94,22 +96,22 @@
             <NuxtImg v-else :src="siteLogo" class="w-7 object-contain"/>
           </UTooltip>
         </NuxtLink>
-        <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="gray">Accueil</UButton>
+        <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="neutral">Accueil</UButton>
         <div v-if="isSupervisor">
-          <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
+          <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="neutral">Vente</UButton>
         </div>
       </div>
       <div class="flex gap-4">
         <div v-if="isSupervisor">
-          <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton>
+          <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="neutral">Administration</UButton>
         </div>
         <div v-if="selfStore.isImpersonating">
-          <UButton color="orange" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
+          <UButton color="warning" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
         </div>
-        <UDropdown :items="rightMenu">
+        <UDropdownMenu :items="rightMenu">
           <UButton
             variant="ghost"
-            color="gray"
+            color="neutral"
             :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? (selectedProfile?.displayName ?? user?.fullName) : 'Pointeuse') : undefined">
             <template #trailing>
               <UAvatar v-if="!isBadger"
@@ -131,13 +133,13 @@
                 {{ isDark ? 'Thème sombre' : 'Thème clair' }}
               </span>
           </template>
-        </UDropdown>
+        </UDropdownMenu>
       </div>
     </nav>
   </header>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 li {
   display: flex;
   align-items: center;

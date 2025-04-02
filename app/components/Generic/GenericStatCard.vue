@@ -31,7 +31,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-    'card-clicked'
+  'card-clicked'
 ])
 
 interface topRight {
@@ -66,9 +66,9 @@ const topRightClass = computed( () => {
   let value = "flex items-center justify-end text-md"
   if (isIncreasing.value != undefined) {
     if (isIncreasing.value) {
-      value += " text-green-500"
+      value += " text-success-500"
     } else {
-      value += " text-red-500"
+      value += " text-error-500"
     }
   }
   return value;
@@ -96,7 +96,12 @@ const topRightIcon = computed( () => {
 </script>
 
 <template>
-  <div class="flex flex-col justify-center px-4 py-4 rounded-lg divide-y divide-gray-200 dark:divide-gray-800 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-neutral-50 dark:bg-gray-900">
+  <UCard
+    class="flex flex-col justify-center shadow"
+    :ui="{
+      body: 'p-4 sm:p-4'
+    }"
+  >
 
     <div v-if="loading" class="flex flex-col items-center h-full">
       <USkeleton class="h-4 w-10 self-end" />
@@ -109,9 +114,11 @@ const topRightIcon = computed( () => {
       <slot name="top">
         <p v-if="props.topRight" :class="topRightClass">
           <template v-if="props.topRight.tooltip">
-            <UTooltip :text="props.topRight.tooltip" class="items-center">
-              <span class="font-bold">{{ props.topRight.value }}</span>
-              <icon v-if="topRightIcon" :name="topRightIcon" class="ml-2"/>
+            <UTooltip :delay-duration="0" :text="props.topRight.tooltip">
+              <div class="items-center">
+                <span class="font-bold">{{ props.topRight.value }}</span>
+                <icon v-if="topRightIcon" :name="topRightIcon" class="ml-2"/>
+              </div>
             </UTooltip>
           </template>
           <template v-else>
@@ -122,15 +129,15 @@ const topRightIcon = computed( () => {
       </slot>
 
       <p :class="valueClass"><slot name="value">{{ props.value }}</slot></p>
-      <UTooltip v-if="props.tooltip" :text="props.tooltip" class="w-full justify-center">
-        <p class="text-lg text-center">{{ props.title }}</p>
+      <UTooltip v-if="props.tooltip" :delay-duration="0" :text="props.tooltip" class="w-full justify-center text-center">
+        <div><p class="text-lg text-center">{{ props.title }}</p></div>
       </UTooltip>
       <p v-else class="text-lg text-center">{{ props.title }}</p>
     </div>
 
-  </div>
+  </UCard>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

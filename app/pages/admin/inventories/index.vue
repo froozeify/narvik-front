@@ -25,6 +25,16 @@
 
   const searchQuery: Ref<string> = ref('')
   const categories: Ref<InventoryCategory[]> = ref([])
+  const categoriesSelect = computed( () => {
+    const items: SelectItem[] = []
+    categories.value.forEach(value => {
+      items.push({
+        label: value.name,
+        value: value
+      })
+    })
+    return items;
+  })
   const filteredCategories: Ref<InventoryCategory[]> = ref([])
   itemCategoryQuery.getAll().then(value => {
     categories.value = value.items
@@ -68,23 +78,27 @@
   });
   const columns = [
     {
-      key: 'quantity',
-      label: 'Quantité en stock',
+      accessorKey: 'quantity',
+      header: 'Quantité en stock',
       sortable: true,
     },
     {
-      key: 'name',
-      label: 'Nom',
+      accessorKey: 'name',
+      header: 'Nom',
       sortable: true,
     },
     {
-      key: 'description',
-      label: 'Description',
-      class: 'w-full'
+      accessorKey: 'description',
+      header: 'Description',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      }
     },
     {
-      key: 'category',
-      label: 'Catégorie'
+      accessorKey: 'category',
+      header: 'Catégorie'
     }
   ]
 
@@ -186,7 +200,7 @@
       <UCard>
         <div class="flex mb-2">
           <div class="flex-1"></div>
-          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
+          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv">
             CSV
           </UButton>
         </div>
@@ -225,8 +239,7 @@
             <USelectMenu
               class="w-44"
               v-model="filteredCategories"
-              :options="categories"
-              option-attribute="name"
+              :items="categoriesSelect"
               multiple
             >
               <template #label>
@@ -250,7 +263,7 @@
           sort-mode="manual"
           @update:sort="getItemsPaginated()"
           :columns="columns"
-          :rows="apiItems"
+          :data="apiItems"
           @select="rowClicked">
           <template #empty-state>
             <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -258,22 +271,22 @@
             </div>
           </template>
 
-          <template #name-data="{ row }">
-            {{ row.name }}
+          <template #name-cell="{ row }">
+            {{ row.original.name }}
           </template>
 
-          <template #quantity-data="{ row }">
-            <p v-if="row.quantity || row.quantity === 0" :class="row.quantityAlert && row.quantity <= row.quantityAlert ? 'font-bold text-red-600' : ''">
-              {{ row.quantity }}
+          <template #quantity-cell="{ row }">
+            <p v-if="row.original.quantity || row.original.quantity === 0" :class="row.original.quantityAlert && row.original.quantity <= row.original.quantityAlert ? 'font-bold text-error-600' : ''">
+              {{ row.original.quantity }}
             </p>
             <i v-else>Non définie</i>
           </template>
 
-          <template #category-data="{ row }">
-            <UButton v-if="row.category"
+          <template #category-cell="{ row }">
+            <UButton v-if="row.original.category"
               variant="soft"
               :ui="{ rounded: 'rounded-full' }">
-              {{ row.category.name }}
+              {{ row.original.category.name }}
             </UButton>
 
             <i v-else>
@@ -285,8 +298,8 @@
         </UTable>
 
         <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-          <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()" />
-          <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalApiItems" />
+          <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getItemsPaginated()" />
+          <UPagination v-model:page="page" @update:page="getItemsPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalApiItems" />
         </div>
 
       </UCard>
@@ -312,17 +325,19 @@
 
   <UModal
     v-model="inventoryItemModalOpen">
-    <UCard>
-      <InventoryItemForm
-        :item="selectedItem ? {...selectedItem} : undefined"
-        :categories="categories"
-        @updated="onItemUpdated"
-      />
-    </UCard>
+    <template #content>
+      <UCard>
+        <InventoryItemForm
+          :item="selectedItem ? {...selectedItem} : undefined"
+          :categories="categories"
+          @updated="onItemUpdated"
+        />
+      </UCard>
+    </template>
   </UModal>
 
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

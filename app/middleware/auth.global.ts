@@ -19,6 +19,9 @@ const supervisorOnlyPaths = [
 ]
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
+  // Middleware is not run on server side
+  if (import.meta.server) return
+
   const selfStore = useSelfUserStore();
   const appConfigStore = useAppConfigStore();
 

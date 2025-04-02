@@ -41,16 +41,20 @@ definePageMeta({
   });
   const columns = [
     {
-      key: 'name',
-      label: 'Nom'
+      accessorKey: 'name',
+      header: 'Nom'
     },
     {
-      key: 'icon',
-      label: 'Icône',
-      class: 'w-full'
+      accessorKey: 'icon',
+      header: 'Icône',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      }
     },
     {
-      key: 'actions',
+      accessorKey: 'actions',
     }
   ]
 
@@ -143,7 +147,7 @@ definePageMeta({
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: !paymentMode.uuid ? "Moyen de paiement crée" : "Moyen de paiement modifié",
     });
 
@@ -197,7 +201,7 @@ definePageMeta({
             :loading="isLoading"
             :sort="sort"
             :columns="columns"
-            :rows="paymentModes"
+            :data="paymentModes"
             @select="rowClicked">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -205,18 +209,18 @@ definePageMeta({
               </div>
             </template>
 
-            <template #name-data="{ row }">
-              {{ row.name }}
+            <template #name-cell="{ row }">
+              {{ row.original.name }}
             </template>
 
 
-            <template #icon-data="{ row }">
-              <UIcon :name="'i-heroicons-' + row.icon" />
+            <template #icon-cell="{ row }">
+              <UIcon :name="'i-heroicons-' + row.original.icon" />
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="flex items-center gap-1">
-                <p class="text-xs">{{ row.weight }}</p>
+                <p class="text-xs">{{ row.original.weight }}</p>
                 <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
               </div>
             </template>
@@ -224,8 +228,8 @@ definePageMeta({
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getPaymentModesPaginated()" />
-            <UPagination v-model="page" @update:model-value="getPaymentModesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalPaymentModes" />
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getPaymentModesPaginated()" />
+            <UPagination v-model:page="page" @update:page="getPaymentModesPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalPaymentModes" />
           </div>
         </div>
       </UCard>
@@ -236,15 +240,15 @@ definePageMeta({
         <UForm :state="selectedPaymentMode" @submit="updatePaymentMode(selectedPaymentMode)" :validate="validate">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Disponible" name="available">
-                <UToggle v-model="selectedPaymentMode.available" />
-              </UFormGroup>
+              <UFormField label="Disponible" name="available">
+                <USwitch v-model="selectedPaymentMode.available" />
+              </UFormField>
 
-              <UFormGroup label="Nom" name="name">
+              <UFormField label="Nom" name="name">
                 <UInput v-model="selectedPaymentMode.name" />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Icône" name="icon">
+              <UFormField label="Icône" name="icon">
 
                 <template #description>
                   <UButton variant="link" to="https://heroicons.com/" target="_blank" :padded="false">Liste des icônes Heroicons</UButton>
@@ -261,11 +265,11 @@ definePageMeta({
 
                 <UInput v-model="selectedPaymentMode.icon" />
 
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Poids dans la liste" name="weight">
+              <UFormField label="Poids dans la liste" name="weight">
                 <UInput type="number" v-model="selectedPaymentMode.weight" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>
@@ -276,7 +280,7 @@ definePageMeta({
         <UButton
           v-if="selectedPaymentMode.uuid"
           block
-          color="red"
+          color="error"
           :loading="isLoading"
           @click="modal.open(ModalDeleteConfirmation, {
             onDelete() {
@@ -293,6 +297,6 @@ definePageMeta({
   </GenericLayoutContentWithStickySide>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

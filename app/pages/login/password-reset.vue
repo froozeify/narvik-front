@@ -66,7 +66,7 @@ async function resetPassword() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Le mot de passe a été modifié avec succès",
   });
 
@@ -98,7 +98,7 @@ async function initiatePasswordReset() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Un code vérification à été envoyé par email",
   });
 
@@ -131,9 +131,9 @@ onBeforeUnmount(() => {
         <template #item="{ item }">
           <div v-if="item.key === 'initial'">
             <UForm :state="state" class="space-y-4" @submit="initiatePasswordReset">
-              <UFormGroup label="Email" name="email">
+              <UFormField label="Email" name="email">
                 <UInput v-model="state.email" type="email" />
-              </UFormGroup>
+              </UFormField>
 
               <NuxtTurnstile v-if="requireTurnstile" v-model="state.turnstileToken" />
 
@@ -145,23 +145,23 @@ onBeforeUnmount(() => {
           <div v-else>
             <UAlert
               icon="i-heroicons-megaphone"
-              color="yellow"
+              color="warning"
               variant="soft"
               title="En cas d'erreur un nouveau code de sécurité sera envoyé."
               description="Seul le dernier code de sécurité reçu est valide."
             />
             <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="resetPassword">
-              <UFormGroup label="Email" name="email">
+              <UFormField label="Email" name="email">
                 <UInput v-model.trim="state.email" type="email" />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Nouveau mot de passe" name="password">
+              <UFormField label="Nouveau mot de passe" name="password">
                 <UInput v-model="state.password" type="password" />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Code de sécurité" name="securityCode">
+              <UFormField label="Code de sécurité" name="securityCode">
                 <UInput v-model.trim="state.securityCode" />
-              </UFormGroup>
+              </UFormField>
 
               <div class="flex justify-between">
                 <UButton type="submit" :loading="isLoading">
@@ -176,6 +176,6 @@ onBeforeUnmount(() => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>

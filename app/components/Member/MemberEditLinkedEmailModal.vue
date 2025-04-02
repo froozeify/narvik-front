@@ -41,7 +41,7 @@ async function updateLink() {
 
   if (error || !updated) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error?.message
     });
@@ -49,7 +49,7 @@ async function updateLink() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Liaison modifiée"
   });
 
@@ -64,14 +64,14 @@ async function updateLink() {
 
     <UForm class="flex gap-2 flex-col" :state="member" :validate="validate">
 
-      <UFormGroup label="Adresse mail du compte" name="email">
+      <UFormField label="Adresse mail du compte" name="email">
         <UInput v-model="member.linkedEmail" placeholder="Email" />
-      </UFormGroup>
+      </UFormField>
     </UForm>
 
     <template #actions>
       <UButton
-        color="yellow"
+        color="warning"
         :loading="isLoading"
         @click="updateLink()"
       >
@@ -81,6 +81,6 @@ async function updateLink() {
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

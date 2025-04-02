@@ -119,7 +119,7 @@
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: "Produit supprimé",
     })
     close()
@@ -153,7 +153,7 @@
       <UTooltip text="Modifier">
         <UButton
           icon="i-heroicons-pencil-square"
-          color="yellow"
+          color="warning"
           @click="inventoryItemModalOpen = true"
         />
       </UTooltip>
@@ -162,7 +162,7 @@
         <UPopover>
           <UButton
             icon="i-heroicons-trash"
-            color="red"
+            color="error"
           />
 
           <template #panel="{ close }">
@@ -171,7 +171,7 @@
 
               <UButton
                 @click="deleteItem(close);"
-                color="red"
+                color="error"
                 class="mx-auto"
               >
                 Supprimer
@@ -198,13 +198,13 @@
       <GenericStatCard
         title="En stock"
         :value="inventoryItem?.quantity ?? '∞' "
-        :value-class="inventoryItem?.quantityAlert && inventoryItem?.quantity && inventoryItem?.quantity <= inventoryItem?.quantityAlert ? 'text-red-600' : ''"
+        :value-class="inventoryItem?.quantityAlert && inventoryItem?.quantity && inventoryItem?.quantity <= inventoryItem?.quantityAlert ? 'text-error-600' : ''"
         :loading="isLoading">
       </GenericStatCard>
 
       <GenericStatCard
         :title="inventoryItem?.canBeSold ? 'Vente activée' : 'Vente désactivée' "
-        :value-class="inventoryItem?.canBeSold ? 'text-green-600' : 'text-red-600'"
+        :value-class="inventoryItem?.canBeSold ? 'text-success-600' : 'text-error-600'"
         :loading="isLoading">
         <template #value>
           <UIcon
@@ -224,16 +224,18 @@
 
   <UModal
     v-model="inventoryItemModalOpen">
-    <UCard>
-      <InventoryItemForm
-        :item="inventoryItem ? {...inventoryItem} : undefined"
-        @updated="(value) => {inventoryItemModalOpen = false; loadItem() }"
-      />
-    </UCard>
+    <template #content>
+      <UCard>
+        <InventoryItemForm
+          :item="inventoryItem ? {...inventoryItem} : undefined"
+          @updated="(value) => {inventoryItemModalOpen = false; loadItem() }"
+        />
+      </UCard>
+    </template>
   </UModal>
 
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

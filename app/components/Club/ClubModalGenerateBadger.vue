@@ -20,7 +20,7 @@ async function generateBadger() {
     <UAlert
       icon="i-heroicons-megaphone"
       class="my-4"
-      color="red"
+      color="error"
       variant="soft"
       title="Une fois la génération effectué, l'ancien lien ne fonctionnera plus."
     />
@@ -35,6 +35,6 @@ async function generateBadger() {
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

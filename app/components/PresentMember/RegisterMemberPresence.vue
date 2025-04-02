@@ -124,7 +124,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   isSubmitting.value = false;
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error.message
     });
@@ -180,7 +180,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
                 :label="activity.name" />
 
             <template v-if="activitiesSupervisor.length > 0 && hasClubSupervisorRole(state.member?.role)">
-              <UDivider class="col-span-2" :label="getAvailableClubRole(ClubRole.Supervisor).text" />
+              <USeparator class="col-span-2" :label="getAvailableClubRole(ClubRole.Supervisor).text" />
 
               <UCheckbox
                 class="w-full"
@@ -192,7 +192,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
             </template>
 
             <template v-if="activitiesAdmin.length > 0 && isClubAdmin(state.member?.role)">
-              <UDivider class="col-span-2" :label="getAvailableClubRole(ClubRole.Admin).text" />
+              <USeparator class="col-span-2" :label="getAvailableClubRole(ClubRole.Admin).text" />
 
               <UCheckbox
                 class="w-full"
@@ -209,7 +209,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
         <UButton :loading="isSubmitting" block type="submit">
           Enregistrer
         </UButton>
-        <UButton class="mt-2" color="red" :loading="isSubmitting" block @click="emit('canceled')">
+        <UButton class="mt-2" color="error" :loading="isSubmitting" block @click="emit('canceled')">
           Annuler
         </UButton>
       </UForm>
@@ -217,6 +217,6 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   </UCard>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

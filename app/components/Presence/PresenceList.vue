@@ -34,7 +34,7 @@
 
         <UButton
           v-if="presenceStore.selectedRange"
-          color="red"
+          color="error"
           @click="presenceStore.selectedRange = null"
         >
           Supprimer la date
@@ -45,7 +45,7 @@
     <UAccordion
       class="mb-0"
       variant="soft"
-      color="orange"
+      color="warning"
       :ui="{
         default: {
           class: 'mb-0'
@@ -73,6 +73,6 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

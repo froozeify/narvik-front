@@ -1,19 +1,11 @@
 <script setup lang="ts">
-import { useSelfUserStore } from "~/stores/useSelfUser";
-import ModalLegalsAcceptance from "~/components/Modal/ModalLegalsAcceptance.vue";
-
-const selfUser = useSelfUserStore()
-if (!selfUser.isLegalsAccepted()) {
-  useModal().open(ModalLegalsAcceptance, {
-    preventClose: true
-  })
-}
+const appConfig = useAppConfig()
 </script>
 
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-    <UModals />
-    <UNotifications />
-  </NuxtLayout>
+  <UApp :toaster="appConfig.toaster">
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </UApp>
 </template>
