@@ -166,7 +166,7 @@
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: "Vente enregistrée",
     });
 
@@ -248,7 +248,7 @@
                 <div v-if="item.description" class="text-xs print:hidden">{{ item.description }}</div>
               </div>
               <div v-if="item.quantityAlert && (item.quantity || item.quantity === 0) && item.quantity <= item.quantityAlert"
-                   class="print:hidden text-xs font-bold text-red-600">
+                   class="print:hidden text-xs font-bold text-error-600">
                 Stock restant : {{ item.quantity }}
               </div>
               <div class="text-xs bg-neutral-200 print:!bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
@@ -356,7 +356,7 @@
           </div>
         </UFormField>
 
-        <UButton :loading="isCreatingSale" class="mt-4" block color="green" :disabled="cart.size < 1 || !selectedPaymentMode || !seller" @click="createSale()">Finaliser la vente</UButton>
+        <UButton :loading="isCreatingSale" class="mt-4" block color="success" :disabled="cart.size < 1 || !selectedPaymentMode || !seller" @click="createSale()">Finaliser la vente</UButton>
       </UCard>
     </template>
   </GenericLayoutContentWithStickySide>

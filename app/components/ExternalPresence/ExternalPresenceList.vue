@@ -84,7 +84,7 @@
 
       if (value.error) {
         toast.add({
-          color: "red",
+          color: "error",
           title: "Une erreur s'est produite",
           description: value.error.message || value.error.toString()
         })
@@ -133,7 +133,7 @@
     } else {
       isDownloadingCsv.value = false
       toast.add({
-        color: "red",
+        color: "error",
         title: "Date non définie.",
         description: "Veuillez sélectionner une date afin de pouvoir télécharger le csv."
       })
@@ -160,7 +160,7 @@
       <div class="flex-1"></div>
 
       <template v-if="isAdmin">
-        <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv" :disabled="!selectedRange">
+        <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv" :disabled="!selectedRange">
           CSV
         </UButton>
       </template>

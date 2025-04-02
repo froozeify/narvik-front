@@ -109,7 +109,7 @@ async function onUpdatePasswordSubmit() {
 
   updatePasswordModalOpen.value = false
   toast.add({
-    color: "green",
+    color: "success",
     title: "Mot de passe modifié"
   })
 }
@@ -140,7 +140,7 @@ loadUser()
       <div class="flex-1 text-center font-bold text-2xl flex justify-center items-center gap-2 ">
         <p>{{ user.fullName }}</p>
         <UIcon
-          :class="user.accountActivated ? 'text-green-600' : 'text-red-600'"
+          :class="user.accountActivated ? 'text-success-600' : 'text-error-600'"
           :name="user.accountActivated ? 'i-heroicons-check': 'i-heroicons-x-mark'"
         />
       </div>

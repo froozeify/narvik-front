@@ -55,7 +55,7 @@ const validate = (state: any): FormError[] => {
 async function updateSale() {
   if (!sale.createdAt) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La date doit être définie",
     });
   }
@@ -82,7 +82,7 @@ async function updateSale() {
 
   if (error || !updated) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error?.message
     });
@@ -95,7 +95,7 @@ async function updateSale() {
   props.sale.paymentMode = updated.paymentMode
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Vente modifiée"
   });
 

@@ -62,7 +62,7 @@ async function search(query: any, replayCount: number = 0) {
           return await search(query, ++replayCount);
         } else {
           toast.add({
-            color: "red",
+            color: "error",
             title: "Une erreur est survenue",
             description: "Il semblerait que la requête ne peut aboutir. Veuillez rafraichir la page."
           })
@@ -71,7 +71,7 @@ async function search(query: any, replayCount: number = 0) {
       }
 
       toast.add({
-        color: "red",
+        color: "error",
         title: "Une erreur est survenue",
         description: searchResult.error.message
       })

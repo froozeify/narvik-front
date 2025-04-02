@@ -128,7 +128,7 @@ async function updateActivity(activity: Activity) {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: !activity.uuid ? "Activité créée" : "Activité modifiée",
   });
 
@@ -152,7 +152,7 @@ async function deleteActivity() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Activité supprimée"
   })
   selectedActivity.value = undefined
@@ -177,7 +177,7 @@ async function migrateActivity(migrationTarget: string) {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Activité migrée"
   })
   await getActivities()

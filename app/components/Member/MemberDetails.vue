@@ -198,7 +198,7 @@ function changeMemberRole(close: Function) {
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: "Rôle modifié"
     })
 
@@ -314,7 +314,7 @@ async function deleteRow(memberPresence: MemberPresence) {
     await getMemberPresences();
 
     toast.add({
-      color: "green",
+      color: "success",
       title: "Présence supprimée"
     })
 
@@ -391,7 +391,7 @@ async function addMemberSeason(seasonIri: string, isSecondary: boolean = false, 
     loadItem()
 
     toast.add({
-      color: "green",
+      color: "success",
       title: "Saison ajoutée"
     })
   })
@@ -415,7 +415,7 @@ async function deleteMemberSeason(memberSeason: MemberSeason) {
     await getMemberSeasons()
 
     toast.add({
-      color: "green",
+      color: "success",
       title: "Saison supprimée"
     })
   })
@@ -437,7 +437,7 @@ async function deleteMember() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Membre supprimé"
   })
   navigateTo('/admin/members')
@@ -747,7 +747,7 @@ async function deleteMember() {
                 Ajouter une activité
               </UButton>
 
-              <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
+              <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv">
                 CSV
               </UButton>
             </div>

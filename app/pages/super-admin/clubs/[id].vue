@@ -174,7 +174,7 @@ loadClubUsers()
       <div class="flex-1 text-center font-bold text-2xl flex justify-center items-center gap-2 ">
         <p>{{ club.name }}</p>
         <UIcon
-          :class="club.isActivated ? 'text-green-600' : 'text-red-600'"
+          :class="club.isActivated ? 'text-success-600' : 'text-error-600'"
           :name="club.isActivated ? 'i-heroicons-check': 'i-heroicons-x-mark'"
         />
       </div>

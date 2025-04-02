@@ -75,7 +75,7 @@ async function register() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Le compte a été créé",
   });
 
@@ -107,7 +107,7 @@ async function initiateRegister() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Un code vérification à été envoyé par email",
   });
 

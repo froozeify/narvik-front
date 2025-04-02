@@ -132,7 +132,7 @@ const props = defineProps({
           <div class="flex-1"></div>
 
           <template v-if="isAdmin">
-            <UButton @click="saleStore.getSalesCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="saleStore.isDownloadingCsv" :disabled="!selectedRange">
+            <UButton @click="saleStore.getSalesCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="saleStore.isDownloadingCsv" :disabled="!selectedRange">
               CSV
             </UButton>
           </template>

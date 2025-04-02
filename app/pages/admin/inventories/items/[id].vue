@@ -119,7 +119,7 @@
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: "Produit supprimé",
     })
     close()
@@ -198,13 +198,13 @@
       <GenericStatCard
         title="En stock"
         :value="inventoryItem?.quantity ?? '∞' "
-        :value-class="inventoryItem?.quantityAlert && inventoryItem?.quantity && inventoryItem?.quantity <= inventoryItem?.quantityAlert ? 'text-red-600' : ''"
+        :value-class="inventoryItem?.quantityAlert && inventoryItem?.quantity && inventoryItem?.quantity <= inventoryItem?.quantityAlert ? 'text-error-600' : ''"
         :loading="isLoading">
       </GenericStatCard>
 
       <GenericStatCard
         :title="inventoryItem?.canBeSold ? 'Vente activée' : 'Vente désactivée' "
-        :value-class="inventoryItem?.canBeSold ? 'text-green-600' : 'text-red-600'"
+        :value-class="inventoryItem?.canBeSold ? 'text-success-600' : 'text-error-600'"
         :loading="isLoading">
         <template #value>
           <UIcon

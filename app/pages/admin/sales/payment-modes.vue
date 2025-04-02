@@ -147,7 +147,7 @@ definePageMeta({
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: !paymentMode.uuid ? "Moyen de paiement crée" : "Moyen de paiement modifié",
     });
 

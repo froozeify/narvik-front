@@ -119,7 +119,7 @@ definePageMeta({
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: !item.id ? "Catégorie créée" : "Catégorie modifiée",
     });
 

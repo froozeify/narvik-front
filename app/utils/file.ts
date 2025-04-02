@@ -10,7 +10,7 @@ export function displayFileErrorToast(description: string): void {
   toast.add({
     title: "Erreur lors de l'envoie du fichier",
     description: description,
-    color: "red"
+    color: "error"
   })
 }
 

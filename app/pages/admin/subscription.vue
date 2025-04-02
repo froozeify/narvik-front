@@ -37,7 +37,7 @@ const selfStore = useSelfUserStore()
         </div>
         <div v-else>
           <p>
-            <b>Statut</b> : <span :class="selfStore.selectedProfile.club.isActivated ? '' : 'text-red-500'">{{ selfStore.selectedProfile.club.isActivated ? 'Actif' : 'Non actif' }}</span>
+            <b>Statut</b> : <span :class="selfStore.selectedProfile.club.isActivated ? '' : 'text-error-500'">{{ selfStore.selectedProfile.club.isActivated ? 'Actif' : 'Non actif' }}</span>
           </p>
           <p v-if="selfStore.selectedProfile.club.renewDate">
             <b>Date de renouvellement</b> : {{ formatDateReadable(selfStore.selectedProfile.club.renewDate.toString()) }}

@@ -115,7 +115,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   isSubmitting.value = false;
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error.message
     });

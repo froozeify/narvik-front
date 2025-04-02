@@ -66,7 +66,7 @@ async function resetPassword() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Le mot de passe a été modifié avec succès",
   });
 
@@ -98,7 +98,7 @@ async function initiatePasswordReset() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Un code vérification à été envoyé par email",
   });
 

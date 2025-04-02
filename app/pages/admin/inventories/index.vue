@@ -200,7 +200,7 @@
       <UCard>
         <div class="flex mb-2">
           <div class="flex-1"></div>
-          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
+          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv">
             CSV
           </UButton>
         </div>
@@ -276,7 +276,7 @@
           </template>
 
           <template #quantity-cell="{ row }">
-            <p v-if="row.original.quantity || row.original.quantity === 0" :class="row.original.quantityAlert && row.original.quantity <= row.original.quantityAlert ? 'font-bold text-red-600' : ''">
+            <p v-if="row.original.quantity || row.original.quantity === 0" :class="row.original.quantityAlert && row.original.quantity <= row.original.quantityAlert ? 'font-bold text-error-600' : ''">
               {{ row.original.quantity }}
             </p>
             <i v-else>Non définie</i>

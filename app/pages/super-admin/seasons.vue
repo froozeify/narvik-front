@@ -117,7 +117,7 @@ definePageMeta({
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: !item.id ? "Saison créée" : "Saison modifiée",
     });
 

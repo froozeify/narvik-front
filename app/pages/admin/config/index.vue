@@ -69,7 +69,7 @@ function copyBadgerLink() {
   clipboard.write(window.location.origin + getBadgerLoginPath())
   toast.add({
     title: 'URL Copiée',
-    color: "green"
+    color: "success"
   })
 }
 
@@ -100,7 +100,7 @@ async function controlShootingUpdated() {
   selfStore.refreshSelectedClub().then()
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Paramètre enregistré"
   });
 }
@@ -133,7 +133,7 @@ async function ignoredActivitiesDaysUpdated() {
   selfStore.refreshSelectedClub().then()
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Paramètre enregistré"
   });
 }

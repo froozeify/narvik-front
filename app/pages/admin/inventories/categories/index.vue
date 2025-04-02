@@ -141,7 +141,7 @@
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: !category.uuid ? "Catégorie créée" : "Catégorie modifiée",
     });
 
@@ -237,7 +237,7 @@
 
           </UCard>
 
-          <UButton v-if="selectedCategory.uuid" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
+          <UButton v-if="selectedCategory.uuid" color="success" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 

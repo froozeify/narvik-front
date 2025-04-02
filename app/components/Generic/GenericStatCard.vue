@@ -66,9 +66,9 @@ const topRightClass = computed( () => {
   let value = "flex items-center justify-end text-md"
   if (isIncreasing.value != undefined) {
     if (isIncreasing.value) {
-      value += " text-green-500"
+      value += " text-success-500"
     } else {
-      value += " text-red-500"
+      value += " text-error-500"
     }
   }
   return value;

@@ -143,7 +143,7 @@ async function copyLicence() {
     clipboard.write(props.item.member.licence)
     toast.add({
       title: 'Licence copiée',
-      color: "green"
+      color: "success"
     })
   }
 }
@@ -241,7 +241,7 @@ async function copyLicence() {
 
             <div v-if="member.medicalCertificateExpiration && member.medicalCertificateStatus !== 'valid'" class="basis-full text-center">
               <UButton
-                :color="member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
+                :color="member.medicalCertificateStatus === 'expired' ? 'error' : 'yellow'"
                 :ui="{ rounded: 'rounded-full' }">
                 Certificat médical : {{ formatDateReadable(member.medicalCertificateExpiration.toString()) }}
               </UButton>
@@ -256,7 +256,7 @@ async function copyLicence() {
 
             <UBadge v-if="member.currentSeason && member.currentSeason.isSecondaryClub"
                     variant="subtle"
-                    color="green"
+                    color="success"
                     :ui="{ rounded: 'rounded-full' }">
               Club secondaire
             </UBadge>

@@ -45,7 +45,7 @@ async function onUpdatePasswordSubmit() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Mot de passe modifié"
   })
 }
@@ -72,7 +72,7 @@ async function deleteUser() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Compte supprimé"
   })
   selfStore.logout()

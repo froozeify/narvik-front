@@ -41,7 +41,7 @@ async function updateLink() {
 
   if (error || !updated) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error?.message
     });
@@ -49,7 +49,7 @@ async function updateLink() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Liaison modifiée"
   });
 

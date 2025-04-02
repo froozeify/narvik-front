@@ -177,7 +177,7 @@
             </template>
 
             <template #renewDate-cell="{ row }">
-              <p :class="dayjs().isAfter(dayjs(row.original.renewDate).subtract(14, 'days')) ? 'text-red-500 font-bold' : ''">{{ formatDateReadable(row.original.renewDate) }}</p>
+              <p :class="dayjs().isAfter(dayjs(row.original.renewDate).subtract(14, 'days')) ? 'text-error-500 font-bold' : ''">{{ formatDateReadable(row.original.renewDate) }}</p>
             </template>
 
             <template #actions-cell="{ row }">

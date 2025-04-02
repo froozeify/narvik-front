@@ -43,7 +43,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   function displayJwtError(description: string, redirect: boolean = true) {
     const toast = useToast()
     toast.add({
-      color: "red",
+      color: "error",
       title: "Erreur d'authentification",
       description: description
     })

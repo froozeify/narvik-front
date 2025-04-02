@@ -90,7 +90,7 @@ function getMembers() {
 
     if (value.error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "Une erreur s'est produite",
         description: value.error.message || value.error.toString()
       })

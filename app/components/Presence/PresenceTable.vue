@@ -166,7 +166,7 @@ function emitPaginate() {
         <div v-if="row.original.member" class="flex flex-wrap gap-2">
           <UBadge v-if="row.original.member.currentSeason && row.original.member.currentSeason.isSecondaryClub"
             variant="subtle"
-            color="green"
+            color="success"
             :ui="{ rounded: 'rounded-full' }">
             Club secondaire
           </UBadge>
@@ -198,7 +198,7 @@ function emitPaginate() {
 
           <div v-if="row.original.member.medicalCertificateExpiration && row.original.member.medicalCertificateStatus !== 'valid'" class="basis-full">
             <UButton
-              :color="row.original.member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
+              :color="row.original.member.medicalCertificateStatus === 'expired' ? 'error' : 'yellow'"
               :ui="{ rounded: 'rounded-full' }">
               Certificat médical : {{ formatDateReadable(row.original.member.medicalCertificateExpiration.toString()) }}
             </UButton>

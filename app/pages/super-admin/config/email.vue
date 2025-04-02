@@ -93,7 +93,7 @@ async function updateSmtpSetting() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Configuration mise à jour"
   })
 
@@ -107,7 +107,7 @@ async function testSmtp() {
   await globalSettingQuery.testSmtp(testEmail.value.trim())
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Email envoyé"
   })
 }
