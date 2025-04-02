@@ -50,19 +50,19 @@ const sort = ref({
 });
 const columns = [
   {
-    key: 'accountActivated',
-    label: 'Activé',
+    accessorKey: 'accountActivated',
+    header: 'Activé',
   },
   {
-    key: 'fullName',
-    label: 'Nom',
+    accessorKey: 'fullName',
+    header: 'Nom',
   },
   {
-    key: 'email',
-    label: 'Email',
+    accessorKey: 'email',
+    header: 'Email',
   },
   {
-    key: 'actions',
+    accessorKey: 'actions',
   }
 ]
 
@@ -287,20 +287,20 @@ loadClubUsers()
             class="w-full"
             :loading="isUsersLoading"
             :columns="columns"
-            :rows="userClubs">
+            :data="userClubs">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucun utilisateurs.</span>
               </div>
             </template>
 
-            <template #accountActivated-data="{ row }">
-              <USwitch :model-value="row.accountActivated" />
+            <template #accountActivated-cell="{ row }">
+              <USwitch :model-value="row.original.accountActivated" />
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="text-right">
-                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.original.uuid)}`">Détails</UButton>
               </div>
             </template>
 

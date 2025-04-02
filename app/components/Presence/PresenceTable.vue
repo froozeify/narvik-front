@@ -72,26 +72,39 @@ export interface TablePaginateInterface {
 
 const columns = [
   {
-    key: 'date',
-    label: props.displayFullDate ? 'Date' : 'Heure',
+    accessorKey: 'date',
+    header: props.displayFullDate ? 'Date' : 'Heure',
     sortable: props.canSort
   },
   {
-    key: 'licence',
-    label: 'Licence',
-    class: 'w-24'
+    accessorKey: 'licence',
+    header: 'Licence',
+    meta: {
+      class: {
+        th: 'w-24',
+      }
+    }
   }, {
-    key: 'fullName',
-    label: 'Nom',
-    class: 'w-1/4'
+    accessorKey: 'fullName',
+    header: 'Nom',
+    meta: {
+      class: {
+        th: 'w-1/4',
+      }
+    }
   }, {
-    key: 'activities',
-    label: 'Activités',
-    class: 'w-full'
+    accessorKey: 'activities',
+    header: 'Activités',
+    meta: {
+      class: {
+        th: 'w-full',
+      }
+    }
   }
 ]
 
 function rowClicked(row: MemberPresence|ExternalPresence) {
+  console.warn("rowClicled, doest it still work or is it row.original")
   if (!props.isExternalPresences && !row.member) {
     return;
   }
@@ -118,7 +131,7 @@ function emitPaginate() {
     sort-mode="manual"
     @update:sort="sortClicked()"
     :columns="columns"
-    :rows="props.presences"
+    :data="props.presences"
     @select="rowClicked">
     <template #empty-state>
       <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -127,47 +140,47 @@ function emitPaginate() {
       </div>
     </template>
 
-    <template #date-data="{row}">
+    <template #date-cell="{ row }">
       <template v-if="props.displayFullDate">
-        {{ formatDateReadable(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
+        {{ formatDateReadable(row.original.date) }} à {{ formatTimeReadable(row.original.createdAt) }}
       </template>
       <template v-else>
-        {{ formatTimeReadable(row.createdAt) }}
+        {{ formatTimeReadable(row.original.createdAt) }}
       </template>
     </template>
 
-    <template #licence-data="{row}">
+    <template #licence-cell="{ row }">
       <template v-if="props.isExternalPresences">
-        {{ row.licence }}
+        {{ row.original.licence }}
       </template>
       <template v-else>
-        {{ row.member?.licence }}
+        {{ row.original.member?.licence }}
       </template>
     </template>
 
-    <template #fullName-data="{row}">
+    <template #fullName-cell="{ row }">
       <template v-if="props.isExternalPresences">
-        {{ row.fullName }}
+        {{ row.original.fullName }}
       </template>
       <template v-else>
-        <div v-if="row.member" class="flex flex-wrap gap-2">
-          <UBadge v-if="row.member.currentSeason && row.member.currentSeason.isSecondaryClub"
+        <div v-if="row.original.member" class="flex flex-wrap gap-2">
+          <UBadge v-if="row.original.member.currentSeason && row.original.member.currentSeason.isSecondaryClub"
             variant="subtle"
             color="green"
             :ui="{ rounded: 'rounded-full' }">
             Club secondaire
           </UBadge>
 
-          <p class="inline-flex items-center w-full">{{ row.member.fullName }}</p>
+          <p class="inline-flex items-center w-full">{{ row.original.member.fullName }}</p>
         </div>
         <p v-else class="italic">Membre supprimé</p>
       </template>
     </template>
 
-    <template #activities-data="{row}">
+    <template #activities-cell="{ row }">
       <div class="flex flex-1 flex-wrap gap-2">
-        <template v-if="!props.isExternalPresences && row.member">
-          <div v-if="row.member.blacklisted" class="basis-full">
+        <template v-if="!props.isExternalPresences && row.original.member">
+          <div v-if="row.original.member.blacklisted" class="basis-full">
             <UButton
               color="neutral"
               :ui="{ rounded: 'rounded-full' }">
@@ -175,7 +188,7 @@ function emitPaginate() {
             </UButton>
           </div>
 
-          <div v-if="!row.member.currentSeason" class="basis-full">
+          <div v-if="!row.original.member.currentSeason" class="basis-full">
             <UButton
                 color="error"
                 :ui="{ rounded: 'rounded-full' }">
@@ -183,29 +196,29 @@ function emitPaginate() {
             </UButton>
           </div>
 
-          <div v-if="row.member.medicalCertificateExpiration && row.member.medicalCertificateStatus !== 'valid'" class="basis-full">
+          <div v-if="row.original.member.medicalCertificateExpiration && row.original.member.medicalCertificateStatus !== 'valid'" class="basis-full">
             <UButton
-              :color="row.member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
+              :color="row.original.member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
               :ui="{ rounded: 'rounded-full' }">
-              Certificat médical : {{ formatDateReadable(row.member.medicalCertificateExpiration.toString()) }}
+              Certificat médical : {{ formatDateReadable(row.original.member.medicalCertificateExpiration.toString()) }}
             </UButton>
           </div>
 
-          <div v-if="new Date((new Date()).setFullYear((new Date().getFullYear() - 1))) > new Date(row.member.lastControlShooting)"
+          <div v-if="new Date((new Date()).setFullYear((new Date().getFullYear() - 1))) > new Date(row.original.member.lastControlShooting)"
                class="basis-full">
             <UButton
                 color="error"
                 :ui="{ rounded: 'rounded-full' }">
-              Dernier contrôle : {{ formatDateReadable(row.member.lastControlShooting) }}
+              Dernier contrôle : {{ formatDateReadable(row.original.member.lastControlShooting) }}
             </UButton>
           </div>
         </template>
 
-        <div v-if="row.activities.length == 0">
+        <div v-if="row.original.activities.length == 0">
           <i>Aucune activités déclarées</i>
         </div>
         <UButton v-else
-          v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
+          v-for="activity in row.original.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
           :color="props.accentColor"
           :variant="props.isExternalPresences ? 'solid' : 'soft'"
           :ui="{ rounded: 'rounded-full' }">

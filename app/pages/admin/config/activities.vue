@@ -43,20 +43,24 @@ const availableRolesSelect = computed( () => {
 
 const columns = [
   {
-    key: 'enabled',
-    label: 'Disponible'
+    accessorKey: 'enabled',
+    header: 'Disponible'
   },
   {
-    key: 'name',
-    label: 'Nom',
-    class: 'w-full'
+    accessorKey: 'name',
+    header: 'Nom',
+    meta: {
+      class: {
+        th: 'w-full',
+      }
+    }
   },
   {
-    key: 'visibility',
-    label: 'Visibilité',
+    accessorKey: 'visibility',
+    header: 'Visibilité',
   },
   {
-    key: 'actions',
+    accessorKey: 'actions',
   }
 ]
 
@@ -202,7 +206,7 @@ getActivities()
           <UTable
             :loading="isLoading"
             :columns="columns"
-            :rows="activities"
+            :data="activities"
             @select="rowClicked">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -211,11 +215,11 @@ getActivities()
               </div>
             </template>
 
-            <template #enabled-data="{ row }">
-              <USwitch :model-value="row.isEnabled" />
+            <template #enabled-cell="{ row }">
+              <USwitch :model-value="row.original.isEnabled" />
             </template>
-            <template #visibility-data="{ row }">
-              {{ getAvailableClubRoles().find((role) => role.value === row.visibility)?.text ?? 'Par défaut - Membre' }}
+            <template #visibility-cell="{ row }">
+              {{ getAvailableClubRoles().find((role) => role.value === row.original.visibility)?.text ?? 'Par défaut - Membre' }}
             </template>
           </UTable>
         </div>

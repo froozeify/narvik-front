@@ -20,23 +20,27 @@ const props = defineProps({
   <UTable
     :columns="[
       {
-        key: 'name',
-        label: 'Nom',
-        class: 'w-1/3'
+        accessorKey: 'name',
+        header: 'Nom',
+        meta: {
+          class: {
+            th: 'w-1/3',
+          }
+        }
       },
       {
-        key: 'enabled',
-        label: 'Souscrite'
+        accessorKey: 'enabled',
+        header: 'Souscrite'
       }
     ]"
-    :rows="[
+    :data="[
       {
         name: 'Gestion des membres',
         enabled: true
       },
       {
         name: 'Enregistrement des présences',
-        enabled: true
+        enabled: false
       },
       {
         name: 'Ventes et gestion des stocks',
@@ -44,8 +48,8 @@ const props = defineProps({
       }
     ]"
     >
-    <template #enabled-data="{ row }">
-      <USwitch :model-value="row.enabled" />
+    <template #enabled-cell="{ row }">
+      <USwitch class="pointer-events-none" v-model="row.original.enabled" />
     </template>
   </UTable>
 </template>

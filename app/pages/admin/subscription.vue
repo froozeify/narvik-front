@@ -10,7 +10,6 @@ definePageMeta({
 
 const selfStore = useSelfUserStore()
 
-
 </script>
 
 <template>

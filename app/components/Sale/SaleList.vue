@@ -142,56 +142,64 @@ const props = defineProps({
           :loading="isLoading"
           :columns="[
             {
-              key: 'createdAt',
-              label: 'Date',
-              class: 'w-40',
+              accessorKey: 'createdAt',
+              header: 'Date',
+              meta: {
+                class: {
+                  th: 'w-40',
+                }
+              },
               sortable: true
             },
             {
-              key: 'paymentMode.name',
-              label: 'Moyen de paiement',
-              class: 'w-48',
+              accessorKey: 'paymentMode.name',
+              header: 'Moyen de paiement',
+              meta: {
+                class: {
+                  th: 'w-48',
+                }
+              },
               sortable: true
             },
             {
-              key: 'price',
-              label: 'Montant',
+              accessorKey: 'price',
+              header: 'Montant',
             },
             {
-              key: 'comment',
-              label: 'Commentaire'
+              accessorKey: 'comment',
+              header: 'Commentaire'
             },
             {
-              key: 'id',
-              label: 'Détail'
+              accessorKey: 'id',
+              header: 'Détail'
             }
           ]"
           :sort="{
             column: 'date',
             direction: 'desc'
           }"
-          :rows="sales">
+          :data="sales">
           <template #empty-state>
             <div class="flex flex-col items-center justify-center py-6 gap-3">
               <span class="italic text-sm">Aucun articles.</span>
             </div>
           </template>
 
-          <template #createdAt-data="{ row }">
-            {{ formatDateTimeReadable(row.createdAt) }}
+          <template #createdAt-cell="{ row }">
+            {{ formatDateTimeReadable(row.original.createdAt) }}
           </template>
 
-          <template #price-data="{ row }">
-            {{ formatMonetary(row.price) }}
+          <template #price-cell="{ row }">
+            {{ formatMonetary(row.original.price) }}
           </template>
 
-          <template #total-data="{ row }">
-            {{ formatMonetary(Number(Number(row.itemPrice) * Number(row.quantity)).toFixed(2)) }}
+          <template #total-cell="{ row }">
+            {{ formatMonetary(Number(Number(row.original.itemPrice) * Number(row.original.quantity)).toFixed(2)) }}
           </template>
 
-          <template #id-data="{ row }">
+          <template #id-cell="{ row }">
             <UButton
-              :to="'/admin/sales/' + convertUuidToUrlUuid(row.uuid)"
+              :to="'/admin/sales/' + convertUuidToUrlUuid(row.original.uuid)"
               variant="soft"
               :ui="{ rounded: 'rounded-full' }">
               Voir le détail

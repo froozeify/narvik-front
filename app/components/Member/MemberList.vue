@@ -32,25 +32,25 @@ getMembers();
 
 const columns = [
   {
-    key: 'licence',
-    label: 'Licence'
+    accessorKey: 'licence',
+    header: 'Licence'
   },
   {
-    key: 'lastname',
-    label: 'Nom',
+    accessorKey: 'lastname',
+    header: 'Nom',
     sortable: true
   },
   {
-    key: 'firstname',
-    label: 'Prénom'
+    accessorKey: 'firstname',
+    header: 'Prénom'
   },
   {
-    key: 'status',
-    label: 'Statut'
+    accessorKey: 'status',
+    header: 'Statut'
   },
   {
-    key: 'actions',
-    label: 'Actions'
+    accessorKey: 'actions',
+    header: 'Actions'
   }
 ]
 
@@ -158,7 +158,7 @@ function displayMemberPage(member: Member) {
         sort-mode="manual"
         @update:sort="getMembers()"
         :columns="columns"
-        :rows="members"
+        :data="members"
         @select="displayMemberPage">
         <template #empty-state>
           <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -166,13 +166,13 @@ function displayMemberPage(member: Member) {
           </div>
         </template>
 
-        <template #status-data="{ row }">
-          <i v-if="!row.currentSeason">Saison non renouvelée</i>
-          <p v-if="row.role && row.role !== ClubRole.Member">{{ getAvailableClubRoles().find((role) => role.value === row.role)?.text }}</p>
+        <template #status-cell="{ row }">
+          <i v-if="!row.original.currentSeason">Saison non renouvelée</i>
+          <p v-if="row.original.role && row.original.role !== ClubRole.Member">{{ getAvailableClubRoles().find((role) => role.value === row.original.role)?.text }}</p>
         </template>
 
-        <template #actions-data="{ row }">
-          <UButton :to="`/admin/members/${convertUuidToUrlUuid(row.uuid)}`">Détail</UButton>
+        <template #actions-cell="{ row }">
+          <UButton :to="`/admin/members/${convertUuidToUrlUuid(row.original.uuid)}`">Détail</UButton>
         </template>
 
       </UTable>

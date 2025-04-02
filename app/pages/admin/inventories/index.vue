@@ -78,23 +78,27 @@
   });
   const columns = [
     {
-      key: 'quantity',
-      label: 'Quantité en stock',
+      accessorKey: 'quantity',
+      header: 'Quantité en stock',
       sortable: true,
     },
     {
-      key: 'name',
-      label: 'Nom',
+      accessorKey: 'name',
+      header: 'Nom',
       sortable: true,
     },
     {
-      key: 'description',
-      label: 'Description',
-      class: 'w-full'
+      accessorKey: 'description',
+      header: 'Description',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      }
     },
     {
-      key: 'category',
-      label: 'Catégorie'
+      accessorKey: 'category',
+      header: 'Catégorie'
     }
   ]
 
@@ -259,7 +263,7 @@
           sort-mode="manual"
           @update:sort="getItemsPaginated()"
           :columns="columns"
-          :rows="apiItems"
+          :data="apiItems"
           @select="rowClicked">
           <template #empty-state>
             <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -267,22 +271,22 @@
             </div>
           </template>
 
-          <template #name-data="{ row }">
-            {{ row.name }}
+          <template #name-cell="{ row }">
+            {{ row.original.name }}
           </template>
 
-          <template #quantity-data="{ row }">
-            <p v-if="row.quantity || row.quantity === 0" :class="row.quantityAlert && row.quantity <= row.quantityAlert ? 'font-bold text-red-600' : ''">
-              {{ row.quantity }}
+          <template #quantity-cell="{ row }">
+            <p v-if="row.original.quantity || row.original.quantity === 0" :class="row.original.quantityAlert && row.original.quantity <= row.original.quantityAlert ? 'font-bold text-red-600' : ''">
+              {{ row.original.quantity }}
             </p>
             <i v-else>Non définie</i>
           </template>
 
-          <template #category-data="{ row }">
-            <UButton v-if="row.category"
+          <template #category-cell="{ row }">
+            <UButton v-if="row.original.category"
               variant="soft"
               :ui="{ rounded: 'rounded-full' }">
-              {{ row.category.name }}
+              {{ row.original.category.name }}
             </UButton>
 
             <i v-else>

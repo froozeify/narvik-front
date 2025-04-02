@@ -93,11 +93,11 @@ async function search(query: any, replayCount: number = 0) {
 }
 
 const columns = [{
-  key: 'licence',
-  label: 'Licence'
+  accessorKey: 'licence',
+  header: 'Licence'
 }, {
-  key: 'fullName',
-  label: 'Nom'
+  accessorKey: 'fullName',
+  header: 'Nom'
 }]
 
 function rowClicked(row: Member) {
@@ -147,7 +147,7 @@ function rowClicked(row: Member) {
         :loading="searching"
         class="w-full"
         :columns="columns"
-        :rows="foundMembers"
+        :data="foundMembers"
         @select="rowClicked">
       <template #empty-state>
         <div class="flex flex-col items-center justify-center py-6 gap-3">

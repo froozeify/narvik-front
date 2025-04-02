@@ -38,17 +38,21 @@ const passwordState = reactive({
 
 const columns = [
   {
-    key: 'displayName',
-    label: 'Nom',
-    class: 'w-full',
+    accessorKey: 'displayName',
+    header: 'Nom',
+    meta: {
+      class: {
+        th: 'w-full',
+      }
+    }
   },
   {
-    key: 'club',
-    label: 'Club'
+    accessorKey: 'club',
+    header: 'Club'
   },
   {
-    key: 'role',
-    label: 'Rôle'
+    accessorKey: 'role',
+    header: 'Rôle'
   }
 ]
 
@@ -208,7 +212,7 @@ loadUser()
             <UTable
               class="flex-1"
               :columns="columns"
-              :rows="user.linkedProfiles"
+              :data="user.linkedProfiles"
             >
               <template #empty-state>
                 <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -216,12 +220,12 @@ loadUser()
                 </div>
               </template>
 
-              <template #club-data="{ row }">
-                <ContentLink :to="`/super-admin/clubs/${convertUuidToUrlUuid(row.club.uuid)}`">{{ row.club.name }}</ContentLink>
+              <template #club-cell="{ row }">
+                <ContentLink :to="`/super-admin/clubs/${convertUuidToUrlUuid(row.original.club.uuid)}`">{{ row.original.club.name }}</ContentLink>
               </template>
 
-              <template #role-data="{ row }">
-                {{ getAvailableClubRole(row.role).text }}
+              <template #role-cell="{ row }">
+                {{ getAvailableClubRole(row.original.role).text }}
               </template>
             </UTable>
           </div>

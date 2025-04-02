@@ -42,12 +42,16 @@
   });
   const columns = [
     {
-      key: 'name',
-      label: 'Nom',
-      class: 'w-full'
+      accessorKey: 'name',
+      header: 'Nom',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      }
     },
     {
-      key: 'actions',
+      accessorKey: 'actions',
     }
   ]
 
@@ -189,7 +193,7 @@
             :loading="isLoading"
             :sort="sort"
             :columns="columns"
-            :rows="categories"
+            :data="categories"
             @select="rowClicked">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -197,13 +201,13 @@
               </div>
             </template>
 
-            <template #name-data="{ row }">
-              {{ row.name }}
+            <template #name-cell="{ row }">
+              {{ row.original.name }}
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="flex items-center gap-1">
-                <p class="text-xs">{{ row.weight }}</p>
+                <p class="text-xs">{{ row.original.weight }}</p>
                 <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
               </div>
             </template>

@@ -37,11 +37,11 @@ definePageMeta({
   const itemsPerPage = ref(30);
   const columns = [
     {
-      key: 'name',
-      label: 'Nom',
+      accessorKey: 'name',
+      header: 'Nom',
     },
     {
-      key: 'actions',
+      accessorKey: 'actions',
     }
   ]
 
@@ -167,7 +167,7 @@ definePageMeta({
             class="w-full"
             :loading="isLoading"
             :columns="columns"
-            :rows="apiItems"
+            :data="apiItems"
             @select="rowClicked">
             <template #empty-state>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -175,11 +175,11 @@ definePageMeta({
               </div>
             </template>
 
-            <template #name-data="{ row }">
-              {{ row.name }}
+            <template #name-cell="{ row }">
+              {{ row.original.name }}
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
 
             </template>
 

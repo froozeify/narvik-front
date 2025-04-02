@@ -651,7 +651,11 @@ async function deleteMember() {
                 {
                   accessorKey: 'season.name',
                   header: 'Saison',
-                  class: 'w-full'
+                  meta: {
+                    class: {
+                      th: 'w-full',
+                    }
+                  }
                 },
                 {
                   accessorKey: 'isSecondaryClub',
@@ -666,7 +670,7 @@ async function deleteMember() {
                 }
               ]"
               :loading="isLoadingMemberSeasons"
-              :rows="memberSeasonRows"
+              :data="memberSeasonRows"
             >
 
               <template #empty-state>
@@ -675,13 +679,13 @@ async function deleteMember() {
                 </div>
               </template>
 
-              <template #actions-data="{row}" >
+              <template #actions-cell="{ row }" >
                 <div v-if="isSupervisor" class="flex gap-4">
                   <UButton
                     icon="i-heroicons-trash"
                     color="error"
                     @click="modal.open(ModalDeleteConfirmation, {
-                      alertTitle: `Suppression de la saison ${row.season.name} pour ${member?.fullName}`,
+                      alertTitle: `Suppression de la saison ${row.original.season.name} pour ${member?.fullName}`,
                       alertColor: 'orange',
                       onDelete() {
                         modal.close()
@@ -693,8 +697,8 @@ async function deleteMember() {
                 </div>
               </template>
 
-              <template #isSecondaryClub-data="{ row }">
-                <USwitch :model-value="row.isSecondaryClub" />
+              <template #isSecondaryClub-cell="{ row }">
+                <USwitch :model-value="row.original.isSecondaryClub" />
               </template>
             </UTable>
 
@@ -759,7 +763,11 @@ async function deleteMember() {
               {
                 accessorKey: 'activities',
                 header: 'Activités',
-                class: 'w-full'
+                meta: {
+                  class: {
+                    th: 'w-full',
+                  }
+                }
               },
               {
                 accessorKey: 'actions'
@@ -768,7 +776,7 @@ async function deleteMember() {
               v-model:sort="sort"
               sort-mode="manual"
               @update:sort="getMemberPresencesPaginated()"
-              :rows="memberPresencesPaginated"
+              :data="memberPresencesPaginated"
             >
 
               <template #empty-state>
@@ -777,18 +785,18 @@ async function deleteMember() {
                 </div>
               </template>
 
-              <template #date-data="{row}">
-                {{ formatDate(row.date) }} à {{ formatTimeReadable(row.createdAt) }}
+              <template #date-cell="{ row }">
+                {{ formatDate(row.original.date) }} à {{ formatTimeReadable(row.original.createdAt) }}
               </template>
 
-              <template #activities-data="{row}">
-                <div v-if="row.activities.length == 0">
+              <template #activities-cell="{ row }">
+                <div v-if="row.original.activities.length == 0">
                   <i>Aucune activités déclarées</i>
                 </div>
 
                 <div class="flex flex-1 flex-wrap gap-4">
                   <UButton
-                    v-for="activity in row.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
+                    v-for="activity in row.original.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
                     variant="soft"
                     :ui="{ rounded: 'rounded-full' }">
                     {{ activity.name }}
@@ -796,7 +804,7 @@ async function deleteMember() {
                 </div>
               </template>
 
-              <template #actions-data="{row}" >
+              <template #actions-cell="{ row }" >
                 <div v-if="isSupervisor" class="flex gap-4">
                   <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
 
@@ -804,7 +812,7 @@ async function deleteMember() {
                     color="error"
                     label="Supprimer"
                     @click="modal.open(ModalDeleteConfirmation, {
-                    title: `Présence du ${formatDateReadable(row.date)}`,
+                    title: `Présence du ${formatDateReadable(row.original.date)}`,
                     alertTitle: 'La suppression de la présence sera définitive.',
                     alertColor: 'orange',
                     onDelete() {
