@@ -12,7 +12,7 @@ useHead({
   title: "Mes informations"
 })
 
-const modal = useModal()
+const overlay = useOverlay()
 const toast = useToast()
 
 const userQuery = new UserQuery();
@@ -96,15 +96,16 @@ async function deleteUser() {
         <UButton
           icon="i-heroicons-trash"
           color="red"
-          @click="modal.open(ModalDeleteConfirmation, {
-                alertTitle: 'Seul le compte sera supprimé.',
-                alertDescription: 'Pour supprimer les enregistrements liée au club (présences, fiche membre), veuillez faire une demande auprès du club.',
-                alertColor: 'orange',
-                onDelete() {
-                  deleteUser()
-                  modal.close()
-                }
-              })"
+          @click="
+          overlay.create(ModalDeleteConfirmation).open({
+            alertTitle: 'Seul le compte sera supprimé.',
+            alertDescription: 'Pour supprimer les enregistrements liée au club (présences, fiche membre), veuillez faire une demande auprès du club.',
+            alertColor: 'orange',
+            onDelete() {
+              deleteUser()
+              // modal.close()
+            }
+          })"
         >
           Supprimer
         </UButton>
@@ -146,7 +147,7 @@ async function deleteUser() {
       <UButton
         v-if="(user?.linkedProfiles?.length ?? 0) > 1"
         color="yellow"
-        @click="modal.open(ModalSelectProfile)">
+        @click="overlay.create(ModalSelectProfile).open()">
         Changer de profil
       </UButton>
     </div>
