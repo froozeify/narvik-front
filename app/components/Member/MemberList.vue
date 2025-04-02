@@ -186,11 +186,13 @@ function displayMemberPage(member: Member) {
 
   <UModal
     v-model="createMemberModal">
-    <UCard>
-      <MemberForm
-        @updated="(value) => {createMemberModal = false; displayMemberPage(value) }"
-      />
-    </UCard>
+    <template #content>
+      <UCard>
+        <MemberForm
+          @updated="(value) => {createMemberModal = false; displayMemberPage(value) }"
+        />
+      </UCard>
+    </template>
   </UModal>
 </template>
 

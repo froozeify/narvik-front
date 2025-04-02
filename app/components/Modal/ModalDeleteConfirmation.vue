@@ -29,7 +29,7 @@ const props = defineProps(
   }
 )
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'close'])
 
 </script>
 

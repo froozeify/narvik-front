@@ -120,11 +120,13 @@ async function deletePresence(close: Function) {
 
   <UModal
       v-model="updateExternalPresenceModalOpen">
-    <RegisterExternalPresence
-      :external-presence="externalPresence"
-      @registered="presenceUpdated"
-      @canceled="presenceCanceled"
-    />
+    <template #content>
+      <RegisterExternalPresence
+        :external-presence="externalPresence"
+        @registered="presenceUpdated"
+        @canceled="presenceCanceled"
+      />
+    </template>
   </UModal>
 </template>
 

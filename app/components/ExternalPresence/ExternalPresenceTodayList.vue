@@ -70,12 +70,14 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
 
   <UModal
       v-model="externalPresenceStore.modalOpen">
-    <ExternalPresenceDetails
-        v-if="selectedExternalPresence"
-        :item="selectedExternalPresence"
-        @updated="externalPresenceUpdated"
-        @close="externalPresenceStore.modalOpen = false; selectedExternalPresence = undefined"
-    />
+    <template #content>
+      <ExternalPresenceDetails
+          v-if="selectedExternalPresence"
+          :item="selectedExternalPresence"
+          @updated="externalPresenceUpdated"
+          @close="externalPresenceStore.modalOpen = false; selectedExternalPresence = undefined"
+      />
+    </template>
   </UModal>
 
 </template>

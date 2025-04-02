@@ -232,32 +232,36 @@ loadUser()
 
   <UModal
     v-model="itemModalOpen">
-    <UCard>
-      <UserForm
-        :item="user ? {...user} : undefined"
-        @updated="(value) => {itemModalOpen = false; loadUser() }"
-      />
-    </UCard>
+    <template #content>
+      <UCard>
+        <UserForm
+          :item="user ? {...user} : undefined"
+          @updated="(value) => {itemModalOpen = false; loadUser() }"
+        />
+      </UCard>
+    </template>
   </UModal>
 
   <UModal
     v-if="user"
     v-model="updatePasswordModalOpen">
-    <UCard>
-      <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
-        <UFormField label="Nouveau mot de passe" name="password">
-          <UInput v-model="passwordState.new" type="password" required />
-        </UFormField>
+    <template #content>
+      <UCard>
+        <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
+          <UFormField label="Nouveau mot de passe" name="password">
+            <UInput v-model="passwordState.new" type="password" required />
+          </UFormField>
 
-        <UFormField label="Confirmation nouveau mot de passe" name="password">
-          <UInput v-model="passwordState.new2" type="password" required />
-        </UFormField>
+          <UFormField label="Confirmation nouveau mot de passe" name="password">
+            <UInput v-model="passwordState.new2" type="password" required />
+          </UFormField>
 
-        <UButton type="submit">
-          Changer le mot de passe
-        </UButton>
-      </UForm>
-    </UCard>
+          <UButton type="submit">
+            Changer le mot de passe
+          </UButton>
+        </UForm>
+      </UCard>
+    </template>
   </UModal>
 </template>
 

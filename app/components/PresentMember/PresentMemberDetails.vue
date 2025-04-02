@@ -334,11 +334,13 @@ async function copyLicence() {
 
     <UModal
         v-model="updateMemberPresenceModalOpen">
-      <RegisterMemberPresence
-          :member-presence="memberPresence"
-          @registered="presenceUpdated"
-          @canceled="updateMemberPresenceModalOpen = false"
-      />
+      <template #content>
+        <RegisterMemberPresence
+            :member-presence="memberPresence"
+            @registered="presenceUpdated"
+            @canceled="updateMemberPresenceModalOpen = false"
+        />
+      </template>
     </UModal>
   </div>
 

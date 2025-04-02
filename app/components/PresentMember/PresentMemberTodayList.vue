@@ -222,7 +222,9 @@ onUnmounted(() => {
 
     <UModal
         v-model="addExternalPresenceModal">
-      <RegisterExternalPresence @registered="externalPresenceRegistered" @canceled="addExternalPresenceModal = false" />
+      <template #content>
+        <RegisterExternalPresence @registered="externalPresenceRegistered" @canceled="addExternalPresenceModal = false" />
+      </template>
     </UModal>
 
     <UModal
@@ -232,21 +234,25 @@ onUnmounted(() => {
            shadow: 'shadow-none'
         }"
     >
-      <PresentMemberDetails
-          v-if="selectedMemberPresence"
-          :item="selectedMemberPresence"
-          @updated="memberPresenceUpdated"
-          @close="memberPresenceModalOpen = false; selectedMemberPresence = null"
-      />
+      <template #content>
+        <PresentMemberDetails
+            v-if="selectedMemberPresence"
+            :item="selectedMemberPresence"
+            @updated="memberPresenceUpdated"
+            @close="memberPresenceModalOpen = false; selectedMemberPresence = null"
+        />
+      </template>
     </UModal>
 
     <UModal
         v-model="searchMemberModalOpen">
-      <template v-if="!selectedMember">
-        <SearchMember :query="searchQuery" @selected-member="memberSelectedFromSearch" />
-      </template>
-      <template v-else>
-        <RegisterMemberPresence :member="selectedMember" @registered="presenceRegistered" @canceled="searchMemberModalOpen = false;" />
+      <template #content>
+        <template v-if="!selectedMember">
+          <SearchMember :query="searchQuery" @selected-member="memberSelectedFromSearch" />
+        </template>
+        <template v-else>
+          <RegisterMemberPresence :member="selectedMember" @registered="presenceRegistered" @canceled="searchMemberModalOpen = false;" />
+        </template>
       </template>
     </UModal>
 
@@ -256,7 +262,9 @@ onUnmounted(() => {
         width: 'lg:max-w-5xl p-4 mx-4'
       }"
     >
-      <PresenceList />
+      <template #content>
+        <PresenceList />
+      </template>
     </UModal>
 
   </div>

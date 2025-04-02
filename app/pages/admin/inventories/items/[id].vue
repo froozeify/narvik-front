@@ -224,12 +224,14 @@
 
   <UModal
     v-model="inventoryItemModalOpen">
-    <UCard>
-      <InventoryItemForm
-        :item="inventoryItem ? {...inventoryItem} : undefined"
-        @updated="(value) => {inventoryItemModalOpen = false; loadItem() }"
-      />
-    </UCard>
+    <template #content>
+      <UCard>
+        <InventoryItemForm
+          :item="inventoryItem ? {...inventoryItem} : undefined"
+          @updated="(value) => {inventoryItemModalOpen = false; loadItem() }"
+        />
+      </UCard>
+    </template>
   </UModal>
 
 </template>

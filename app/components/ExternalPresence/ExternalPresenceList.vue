@@ -181,12 +181,14 @@
 
     <UModal
         v-model="modalOpen">
-      <ExternalPresenceDetails
-          v-if="selectedExternalPresence"
-          :item="selectedExternalPresence"
-          @updated="externalPresenceUpdated"
-          @close="modalOpen = false; selectedExternalPresence = undefined"
-      />
+      <template #content>
+        <ExternalPresenceDetails
+            v-if="selectedExternalPresence"
+            :item="selectedExternalPresence"
+            @updated="externalPresenceUpdated"
+            @close="modalOpen = false; selectedExternalPresence = undefined"
+        />
+      </template>
     </UModal>
   </div>
 </template>
