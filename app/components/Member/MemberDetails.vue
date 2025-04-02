@@ -651,20 +651,20 @@ async function deleteMember() {
               class="flex-1"
               :columns="[
                 {
-                  key: 'season.name',
+                  accessorKey: 'season.name',
                   label: 'Saison',
                   class: 'w-full'
                 },
                 {
-                  key: 'isSecondaryClub',
-                  label: 'Club secondaire',
+                  accessorKey: 'isSecondaryClub',
+                  header: 'Club secondaire',
                 },
                 {
-                  key: 'ageCategory.name',
-                  label: 'Catégorie'
+                  accessorKey: 'ageCategory.name',
+                  header: 'Catégorie'
                 },
                 {
-                  key: 'actions'
+                  accessorKey: 'actions'
                 }
               ]"
               :loading="isLoadingMemberSeasons"
@@ -754,17 +754,17 @@ async function deleteMember() {
               :loading="isLoadingMemberPresencesPaginated"
               :columns="[
               {
-                key: 'date',
-                label: 'Date',
+                accessorKey: 'date',
+                header: 'Date',
                 sortable: true,
               },
               {
-                key: 'activities',
-                label: 'Activités',
+                accessorKey: 'activities',
+                header: 'Activités',
                 class: 'w-full'
               },
               {
-                key: 'actions'
+                accessorKey: 'actions'
               }
             ]"
               v-model:sort="sort"

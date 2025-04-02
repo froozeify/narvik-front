@@ -3,7 +3,8 @@
 
 @theme static {
   --font-sans: ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
-  --ui-text: #000000;
+  /*--ui-text: #000000;*/
+  --ui-color-neutral-700: #000;
 
   --color-blue-500: oklch(0.379 0.146 265.522);
 }
