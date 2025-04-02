@@ -213,7 +213,7 @@ async function deleteLogo() {
       <div v-if="!badgerSetting">
         <UAlert
           icon="i-heroicons-exclamation-triangle"
-          color="yellow"
+          color="warning"
           title="Lien de connexion non généré."
         />
       </div>

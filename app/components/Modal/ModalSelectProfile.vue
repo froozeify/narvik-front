@@ -51,7 +51,7 @@ async function applyProfile() {
     <template #actions>
       <UButton
         @click="applyProfile"
-        color="yellow"
+        color="warning"
       >
         Changer
       </UButton>

@@ -63,7 +63,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
       :display-full-date="false"
       :has-pagination="false"
       :is-loading="isRefreshing"
-      accent-color="orange"
+      accent-color="warning"
       @rowClicked="rowClicked"
     />
   </UCard>

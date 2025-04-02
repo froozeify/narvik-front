@@ -153,7 +153,7 @@ onBeforeUnmount(() => {
         <template #reset>
           <UAlert
             icon="i-heroicons-megaphone"
-            color="yellow"
+            color="warning"
             variant="soft"
             title="En cas de code invalide, un nouveau sera envoyé."
             description="Seul le dernier code de sécurité reçu est valide."

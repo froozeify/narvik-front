@@ -265,7 +265,7 @@ getActivities()
 
         <UButton v-if="selectedActivity.uuid"
                  block
-                 color="orange"
+                 color="warning"
                  :loading="isLoading"
                  @click="modal.open(ActivityModalMigrate, {
                  title: selectedActivity.name,

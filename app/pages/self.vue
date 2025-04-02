@@ -169,7 +169,7 @@ async function deleteUser() {
       <div class="flex-1"></div>
       <UButton
         v-if="(user?.linkedProfiles?.length ?? 0) > 1"
-        color="yellow"
+        color="warning"
         @click="overlay.create(ModalSelectProfile).open()">
         Changer de profil
       </UButton>

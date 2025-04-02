@@ -153,7 +153,7 @@
       <UTooltip text="Modifier">
         <UButton
           icon="i-heroicons-pencil-square"
-          color="yellow"
+          color="warning"
           @click="inventoryItemModalOpen = true"
         />
       </UTooltip>

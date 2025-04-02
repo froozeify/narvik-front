@@ -68,7 +68,7 @@
 
     <UAlert
       icon="i-heroicons-megaphone"
-      color="orange"
+      color="warning"
       title="Veuillez-vous assurer que tous les membres sont bien importés avant."
       description="L'import ne créera pas de nouveaux membres ni activités."
     />

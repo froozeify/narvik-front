@@ -137,7 +137,7 @@ async function updateSale() {
 
     <template #actions>
       <UButton
-        color="yellow"
+        color="warning"
         :loading="isLoading"
         @click="updateSale()"
       >

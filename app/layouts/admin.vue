@@ -117,7 +117,7 @@
       v-if="isAdmin && selfStore.selectedProfile?.club.renewDate && dayjs().add(14, 'days').isAfter(selfStore.selectedProfile.club.renewDate)"
       class="mb-4"
       icon="i-heroicons-credit-card"
-      color="orange"
+      color="warning"
       variant="subtle"
       title="Votre abonnement se termine bientôt."
       :description="`Veuillez penser à le renouveler avant le ${formatDateReadable(selfStore.selectedProfile.club.renewDate.toString())}.`"

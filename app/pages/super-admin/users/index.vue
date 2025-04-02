@@ -180,7 +180,7 @@ async function impersonate(user: User) {
 
     <template #side>
       <div v-if="selectedItem" class="flex flex-col gap-4">
-        <UButton v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">
+        <UButton v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin" color="warning" block :loading="isLoading" @click="impersonate(selectedItem)">
           Impersonifier
         </UButton>
 

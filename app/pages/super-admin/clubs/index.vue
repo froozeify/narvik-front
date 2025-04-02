@@ -194,7 +194,7 @@
 
     <template #side>
       <div v-if="selectedItem" class="flex flex-col gap-4">
-        <UButton v-if="selectedItem.uuid" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
+        <UButton v-if="selectedItem.uuid" color="warning" block :loading="isLoading" @click="impersonate(selectedItem)">Impersonifier</UButton>
         <UButton
           v-if="selectedItem.uuid"
           block

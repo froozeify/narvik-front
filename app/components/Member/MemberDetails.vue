@@ -490,7 +490,6 @@ async function deleteMember() {
           <UButton
             v-if="isAdmin"
             icon="i-heroicons-pencil-square"
-            color="orange"
             @click="overlay.create(MemberEditLinkedEmailModal, {
               props: {
                 member: member,
@@ -513,7 +512,6 @@ async function deleteMember() {
           <UButton
             v-if="isAdmin"
             icon="i-heroicons-pencil-square"
-            color="yellow"
             @click="itemModalOpen = true"
           >
             Modifier
@@ -652,7 +650,7 @@ async function deleteMember() {
               :columns="[
                 {
                   accessorKey: 'season.name',
-                  label: 'Saison',
+                  header: 'Saison',
                   class: 'w-full'
                 },
                 {

@@ -55,7 +55,7 @@ async function deletePresence(close: Function) {
       <UButton
         @click="emit('close')"
         icon="i-heroicons-x-circle"
-        color="orange"
+        color="warning"
         variant="ghost"
         size="xs"
       />
@@ -66,7 +66,7 @@ async function deletePresence(close: Function) {
           @click="updateExternalPresenceModalOpen = true"
           icon="i-heroicons-pencil-square"
           size="xs"
-          color="orange"
+          color="warning"
           variant="solid"
           label="Editer"
       />
@@ -108,7 +108,7 @@ async function deletePresence(close: Function) {
       <div class="flex gap-4 justify-center flex-wrap">
         <UButton
             v-for="activity in externalPresence?.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-            color="orange"
+            color="warning"
             :ui="{ rounded: 'rounded-full' }"
         >
           {{ activity.name }}

@@ -182,7 +182,7 @@ loadClubUsers()
       <div class="flex justify-between gap-2">
         <UButton
           icon="i-heroicons-pencil"
-          color="yellow"
+          color="warning"
           size="xs"
           label="Modifier"
           @click="itemModalOpen = true"
@@ -259,7 +259,7 @@ loadClubUsers()
               </div>
 
               <div class="flex justify-center mt-4">
-                <UButton color="yellow" @click="selfStore.impersonateClub(club)">Impersonifier</UButton>
+                <UButton color="warning" @click="selfStore.impersonateClub(club)">Impersonifier</UButton>
               </div>
 
             </div>

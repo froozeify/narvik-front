@@ -123,7 +123,7 @@ definePageMeta({
       >
         <UButton v-if="sale"
           icon="i-heroicons-pencil"
-          color="yellow"
+          color="warning"
           size="xs"
           label="Modifier"
           @click="modal.open(SaleModalEdit, {

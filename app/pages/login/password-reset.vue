@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
           <div v-else>
             <UAlert
               icon="i-heroicons-megaphone"
-              color="yellow"
+              color="warning"
               variant="soft"
               title="En cas d'erreur un nouveau code de sécurité sera envoyé."
               description="Seul le dernier code de sécurité reçu est valide."

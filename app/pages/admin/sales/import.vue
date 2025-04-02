@@ -65,7 +65,7 @@
   <div class="flex flex-col gap-4">
     <UAlert
       icon="i-heroicons-megaphone"
-      color="orange"
+      color="warning"
       title="Import statique."
       description="Les ventes importées ne seront pas liées avec les produits de l'inventaire."
     />

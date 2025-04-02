@@ -148,7 +148,7 @@ loadUser()
 
         <UButton
           icon="i-heroicons-pencil"
-          color="yellow"
+          color="warning"
           size="xs"
           label="Modifier"
           @click="itemModalOpen = true"
@@ -196,7 +196,7 @@ loadUser()
             </div>
 
             <div class="flex justify-center mt-4">
-              <UButton color="yellow" @click="selfStore.impersonateUser(user)">Impersonifier</UButton>
+              <UButton color="warning" @click="selfStore.impersonateUser(user)">Impersonifier</UButton>
             </div>
           </div>
         </div>

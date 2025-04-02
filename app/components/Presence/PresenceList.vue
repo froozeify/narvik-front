@@ -45,7 +45,7 @@
     <UAccordion
       class="mb-0"
       variant="soft"
-      color="orange"
+      color="warning"
       :ui="{
         default: {
           class: 'mb-0'

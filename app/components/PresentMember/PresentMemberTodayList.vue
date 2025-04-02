@@ -177,7 +177,7 @@ onUnmounted(() => {
 
       <span class="flex-1"></span>
 
-      <UButton variant="soft" color="orange" label="Enregistrement utilisateur externe" @click="openAddExternalPresenceModal()"/>
+      <UButton variant="soft" color="warning" label="Enregistrement utilisateur externe" @click="openAddExternalPresenceModal()"/>
       <UButton label="S'enregistrer" @click="openAddPresenceModal()"/>
     </div>
 

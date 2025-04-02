@@ -106,7 +106,7 @@
           <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="neutral">Administration</UButton>
         </div>
         <div v-if="selfStore.isImpersonating">
-          <UButton color="orange" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
+          <UButton color="warning" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
         </div>
         <UDropdownMenu :items="rightMenu">
           <UButton

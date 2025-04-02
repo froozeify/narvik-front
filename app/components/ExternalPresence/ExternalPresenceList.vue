@@ -173,7 +173,7 @@
       :can-sort="true"
       :display-no-data-register="false"
       :is-loading="isLoading"
-      accent-color="orange"
+      accent-color="warning"
       @rowClicked="rowClicked"
       @sort="(object: TableSortInterface) => { sort = object; getPresences() }"
       @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; sort = object.sort; getPresences() }"
