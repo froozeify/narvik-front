@@ -581,7 +581,7 @@ async function deleteMember() {
             <div class="flex flex-col items-center justify-center flex-wrap gap-1">
               <div v-if="member.blacklisted">
                 <UButton
-                  color="black"
+                  color="neutral"
                   :ui="{ rounded: 'rounded-full' }">
                   Blacklisté
                 </UButton>

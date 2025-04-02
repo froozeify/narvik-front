@@ -172,7 +172,7 @@ function parseGetActivities(value: FetchItemData<Metric>) {
 <template>
   <div>
     <div id="wrapper" class=" mx-auto">
-      <div class="sm:grid sm:grid-flow-row sm:gap-4 sm:grid-cols-4">
+      <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
 
         <GenericStatCard
           title="Membres"

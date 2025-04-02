@@ -45,7 +45,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
         <UTooltip text="Rafraichir">
           <UButton
               icon="i-heroicons-arrow-path"
-              color="gray"
+              color="neutral"
               variant="solid"
               aria-label="Rafraichir"
               :loading="isRefreshing"

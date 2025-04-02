@@ -158,8 +158,8 @@ async function copyLicence() {
           <UButton
             @click="emit('close')"
             icon="i-heroicons-x-circle"
-            color="white"
-            variant="ghost"
+            color="neutral"
+            variant="outline"
             size="xs"
           />
 
@@ -233,7 +233,7 @@ async function copyLicence() {
 
             <div v-if="member.blacklisted" class="basis-full text-center">
               <UButton
-                color="black"
+                color="neutral"
                 :ui="{ rounded: 'rounded-full' }">
                 Blacklisté
               </UButton>

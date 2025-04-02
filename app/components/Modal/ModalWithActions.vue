@@ -25,7 +25,7 @@ const props = defineProps(
 
           <div class="flex gap-2 justify-between sm:justify-end flex-wrap">
             <slot name="cancel">
-              <UButton color="gray" variant="ghost" @click="emit('close', false)">
+              <UButton color="neutral" variant="ghost" @click="emit('close', false)">
                 Annuler
               </UButton>
             </slot>

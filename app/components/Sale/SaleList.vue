@@ -66,7 +66,7 @@ const props = defineProps({
   <div class="flex flex-col gap-4 relative">
     <div class="flex flex-wrap justify-center">
       <UButton
-        color="gray"
+        color="neutral"
         variant="ghost"
         size="2xs"
         icon="i-heroicons-arrow-path"

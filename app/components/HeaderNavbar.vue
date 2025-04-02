@@ -96,14 +96,14 @@
             <NuxtImg v-else :src="siteLogo" class="w-7 object-contain"/>
           </UTooltip>
         </NuxtLink>
-        <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="gray">Accueil</UButton>
+        <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="neutral">Accueil</UButton>
         <div v-if="isSupervisor">
-          <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
+          <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="neutral">Vente</UButton>
         </div>
       </div>
       <div class="flex gap-4">
         <div v-if="isSupervisor">
-          <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton>
+          <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="neutral">Administration</UButton>
         </div>
         <div v-if="selfStore.isImpersonating">
           <UButton color="orange" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
@@ -111,7 +111,7 @@
         <UDropdownMenu :items="rightMenu">
           <UButton
             variant="ghost"
-            color="gray"
+            color="neutral"
             :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? (selectedProfile?.displayName ?? user?.fullName) : 'Pointeuse') : undefined">
             <template #trailing>
               <UAvatar v-if="!isBadger"

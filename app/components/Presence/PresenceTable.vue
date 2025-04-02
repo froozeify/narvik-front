@@ -169,7 +169,7 @@ function emitPaginate() {
         <template v-if="!props.isExternalPresences && row.member">
           <div v-if="row.member.blacklisted" class="basis-full">
             <UButton
-              color="black"
+              color="neutral"
               :ui="{ rounded: 'rounded-full' }">
               Blacklisté
             </UButton>
