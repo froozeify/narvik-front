@@ -22,7 +22,6 @@ const isAdmin = selfStore.isAdmin()
 
 const { member, user, selectedProfile } = storeToRefs(selfStore)
 
-const updatePasswordModalOpen = ref(false)
 const passwordState = reactive({
   current: undefined as string|undefined,
   new: undefined as string|undefined,
@@ -45,7 +44,6 @@ async function onUpdatePasswordSubmit() {
     return failedPasswordUpdate(error.message)
   }
 
-  updatePasswordModalOpen.value = false
   toast.add({
     color: "green",
     title: "Mot de passe modifié"
@@ -89,9 +87,34 @@ async function deleteUser() {
         <div class="text-3xl font-bold">Mon compte</div>
         <div class="flex-1"></div>
 
-        <UButton icon="i-heroicons-lock-closed" @click="updatePasswordModalOpen = true" >
-          Changer le mot de passe
-        </UButton>
+        <UModal>
+          <UButton icon="i-heroicons-lock-closed" >
+            Changer le mot de passe
+          </UButton>
+
+          <template #content>
+            <UCard>
+              <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
+
+                <UFormField label="Mot de passe actuel" name="password">
+                  <UInput v-model="passwordState.current" type="password" required />
+                </UFormField>
+
+                <UFormField label="Nouveau mot de passe" name="password">
+                  <UInput v-model="passwordState.new" type="password" required />
+                </UFormField>
+
+                <UFormField label="Confirmation nouveau mot de passe" name="password">
+                  <UInput v-model="passwordState.new2" type="password" required />
+                </UFormField>
+
+                <UButton type="submit">
+                  Changer le mot de passe
+                </UButton>
+              </UForm>
+            </UCard>
+          </template>
+        </UModal>
 
         <UButton
           icon="i-heroicons-trash"
@@ -157,32 +180,5 @@ async function deleteUser() {
       <p>Veuillez vous assurer que l'adresse mail du compte correspond à celle enregistré auprès de votre club.</p>
       <p>Si ce n'est pas le cas, veuillez le signaler à votre club pour que celui-ci modifie le compte lié.</p>
     </GenericCard>
-
-    <UModal
-      v-if="user"
-      v-model="updatePasswordModalOpen">
-      <template #content>
-        <UCard>
-          <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
-
-            <UFormField label="Mot de passe actuel" name="password">
-              <UInput v-model="passwordState.current" type="password" required />
-            </UFormField>
-
-            <UFormField label="Nouveau mot de passe" name="password">
-              <UInput v-model="passwordState.new" type="password" required />
-            </UFormField>
-
-            <UFormField label="Confirmation nouveau mot de passe" name="password">
-              <UInput v-model="passwordState.new2" type="password" required />
-            </UFormField>
-
-            <UButton type="submit">
-              Changer le mot de passe
-            </UButton>
-          </UForm>
-        </UCard>
-      </template>
-    </UModal>
   </div>
 </template>
