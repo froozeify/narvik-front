@@ -24,7 +24,7 @@ function getBasicAuthorization(isBadger: boolean = false): string {
   return `Basic ${btoa(bearer)}`
 }
 
-async function useApi<T>(path: string, options: UseApiDataOptions<T>, requireLogin: boolean = true, retry: number = 0) {
+async function useApi<T>(path: string, options: UseApiDataOptions<T> = {}, requireLogin: boolean = true, retry: number = 0) {
   let overloadedOptions: UseApiDataOptions<T> = {
     mode: "cors",
     cache: false,
