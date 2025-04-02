@@ -145,6 +145,7 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   async function refresh() {
     const userQuery = new UserQuery()
     const {retrieved} = await userQuery.self()
+
     if (retrieved) {
       user.value = retrieved
 
