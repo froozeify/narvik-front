@@ -33,14 +33,11 @@ export default defineAppConfig({
       slots: {
         root: 'w-full'
       }
-    }
-    // card: {
-    //   background: 'bg-neutral-50 dark:bg-gray-900'
-    // },
-    // table: {
-    //   td: {
-    //     padding: 'py-2'
-    //   }
-    // }
+    },
+    table: {
+      slots: {
+        td: 'py-2'
+      }
+    },
   }
 })
