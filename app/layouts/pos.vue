@@ -75,7 +75,7 @@
 </script>
 
 <template>
-  <GenericLayoutAdmin :links="links">
+  <GenericLayoutAdmin :items="links">
     <UAlert
       v-if="!selfStore.selectedProfile?.club.salesEnabled"
       class="mb-4"

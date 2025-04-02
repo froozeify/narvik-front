@@ -2,10 +2,9 @@
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import UserQuery from "~/composables/api/query/UserQuery";
 
-const emit = defineEmits(['accepted', 'cancel'])
+const emit = defineEmits(['accepted', 'cancel', 'close'])
 
 const toast = useToast();
-const runtimeConfig = useRuntimeConfig()
 const selfStore = useSelfUserStore()
 const isAdmin = selfStore.isAdmin()
 const isLoading = ref(false)
@@ -31,13 +30,13 @@ async function accept() {
 
   isLoading.value = false
   emit('accepted')
-  await useModal().close()
+  emit('close')
 }
 
 </script>
 
 <template>
-  <ModalWithActions title="Mise à jour des conditions légales">
+  <ModalWithActions :dismissible="false" title="Mise à jour des conditions légales">
     <slot>
       <div>
         Merci de bien vouloir lire et accepter
@@ -50,7 +49,7 @@ async function accept() {
     </slot>
 
     <template #cancel>
-      <UButton color="red" variant="ghost" @click="useModal().close(); selfStore.logout(); emit('cancel')">
+      <UButton color="red" variant="ghost" @click="selfStore.logout(); emit('cancel'); emit('close', true)">
         Refuser et se déconnecter
       </UButton>
     </template>

@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import type {PropType, Ref} from "vue";
 import type {FormError, FormErrorEvent} from "#ui/types";
-import type {Member} from "~/types/api/item/clubDependent/member";
-import {type User, UserRole} from "~/types/api/item/user";
-import UserQuery from "~/composables/api/query/UserQuery";
 import ClubQuery from "~/composables/api/query/ClubQuery";
-import type {Club, WriteClub} from "~/types/api/item/club";
+import type {WriteClub} from "~/types/api/item/club";
 import {formatDateReadable} from "~/utils/date";
-import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
-import type {NuxtError} from "#app";
 
 const props = defineProps({
   item: {
@@ -35,7 +30,6 @@ const emit = defineEmits([
 const isUpdating = ref(false)
 
 const toast = useToast()
-const modal = useModal()
 const clubQuery = new ClubQuery()
 
 function getDefaultItem() {
@@ -119,37 +113,37 @@ async function submitItem() {
 <template>
   <UForm :state="item" :validate="validate" @submit="submitItem" @error="onError">
     <div class="flex gap-2 flex-col relative">
-      <UFormGroup label="Date de renouvellement" name="renewDate">
+      <UFormField label="Date de renouvellement" name="renewDate">
         {{ formatDateReadable(item.renewDate?.toString()) || 'Non défini' }}
-      </UFormGroup>
-      <UFormGroup label="Activé" name="isActivated">
-        <UToggle v-model="item.isActivated" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'" />
-      </UFormGroup>
-      <UFormGroup label="Nom" name="name" required>
+      </UFormField>
+      <UFormField label="Activé" name="isActivated">
+        <USwitch v-model="item.isActivated" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'" />
+      </UFormField>
+      <UFormField label="Nom" name="name" required>
         <UInput v-model="item.name" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormGroup>
-      <UFormGroup label="Vente" name="salesEnabled">
-        <UToggle v-model="item.salesEnabled" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormGroup>
-      <UFormGroup label="Commentaire" :error="item.comment ? (item.comment.length > 249 && 'Longueur maximum atteinte (250)') : ''">
+      </UFormField>
+      <UFormField label="Vente" name="salesEnabled">
+        <USwitch v-model="item.salesEnabled" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+      </UFormField>
+      <UFormField label="Commentaire" :error="item.comment ? (item.comment.length > 249 && 'Longueur maximum atteinte (250)') : ''">
         <UTextarea v-model="item.comment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormGroup>
+      </UFormField>
 
-      <UFormGroup label="Site" name="website">
+      <UFormField label="Site" name="website">
         <UInput v-model="item.website" type="url" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormGroup>
+      </UFormField>
 
-      <UDivider label="Contact" />
+      <USeparator label="Contact" />
 
-      <UFormGroup label="Nom" name="contactName">
+      <UFormField label="Nom" name="contactName">
         <UInput v-model="item.contactName" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormGroup>
-      <UFormGroup label="Email" name="contactEmail">
+      </UFormField>
+      <UFormField label="Email" name="contactEmail">
         <UInput v-model="item.contactEmail" type="email" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormGroup>
-      <UFormGroup label="Téléphone" name="contactPhone">
+      </UFormField>
+      <UFormField label="Téléphone" name="contactPhone">
         <UInput v-model="item.contactPhone" type="tel" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormGroup>
+      </UFormField>
 
       <GenericItemTimestampInfo :item="item" />
     </div>

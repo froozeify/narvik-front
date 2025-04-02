@@ -5,7 +5,7 @@ import type {PropType} from "vue";
 
 const props = defineProps(
   {
-    links: {
+    items: {
       type: Array as PropType<GroupedNavigationLinks[]>,
     }
   }
@@ -33,14 +33,15 @@ watchEffect(() => {
               :label="menuVisible ? 'Masquer le menu' : 'Menu'"
               @click="menuVisible = !menuVisible"
             />
-            <template v-if="menuVisible" v-for="groupedLinks in props.links">
-              <UDivider v-if="groupedLinks.title !== undefined"
+            <template v-if="menuVisible" v-for="groupedLinks in props.items">
+              <USeparator v-if="groupedLinks.title !== undefined"
                         class="p-2"
                         :label="groupedLinks.title"
               />
 
-              <UVerticalNavigation
-                :links="groupedLinks.links"
+              <UNavigationMenu
+                orientation="vertical"
+                :items="groupedLinks.links"
                 @click="menuVisible = isDesktopDisplay"
                 :ui="{
                   wrapper: 'border-s border-gray-200 dark:border-gray-800 space-y-2',

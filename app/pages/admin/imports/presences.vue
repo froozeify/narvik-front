@@ -102,7 +102,7 @@ member.licence,date,activities.0.name,activities.1.name
 45671134,2018-08-03T00:00:00+00:00,Bureau,</pre>
         </div>
 
-        <UDivider class="col-span-1" orientation="vertical" />
+        <USeparator class="col-span-1" orientation="vertical" />
 
         <div class="col-span-5 space-y-2">
           <p class="font-bold">Présences externe</p>

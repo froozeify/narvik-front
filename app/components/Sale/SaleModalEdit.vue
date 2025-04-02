@@ -31,6 +31,17 @@ const saleQuery = new SaleQuery()
 const sale: Sale = {...props.sale}
 const paymentModeValue = ref(sale.paymentMode?.uuid)
 
+const paymentModesSelect = computed( () => {
+  const items: SelectItem[] = []
+  saleStore.paymentModes.forEach(value => {
+    items.push({
+      label: value.name,
+      value: value.uuid
+    })
+  })
+  return items;
+})
+
 if (saleStore.paymentModes.length < 1) {
   saleStore.getPaymentModes()
 }
@@ -101,7 +112,7 @@ async function updateSale() {
 
     <UForm class="flex gap-2 flex-col" :state="sale" :validate="validate">
 
-      <UFormGroup
+      <UFormField
         v-if="isAdmin"
         label="Date"
         name="createdAt"
@@ -113,15 +124,15 @@ async function updateSale() {
             <GenericDatePicker v-model="sale.createdAt" mode="dateTime" />
           </template>
         </UPopover>
-      </UFormGroup>
+      </UFormField>
 
-      <UFormGroup label="Moyen de paiement" name="paymentMode">
-        <USelect v-model="paymentModeValue" :options="saleStore.paymentModes" option-attribute="name" value-attribute="uuid" />
-      </UFormGroup>
+      <UFormField label="Moyen de paiement" name="paymentMode">
+        <USelect v-model="paymentModeValue" :items="paymentModesSelect" />
+      </UFormField>
 
-      <UFormGroup label="Commentaire" name="comment">
+      <UFormField label="Commentaire" name="comment">
         <UTextarea v-model="sale.comment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente" />
-      </UFormGroup>
+      </UFormField>
     </UForm>
 
     <template #actions>

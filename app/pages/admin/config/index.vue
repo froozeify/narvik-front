@@ -39,6 +39,16 @@ const activities: Ref<Activity[] | undefined> = ref(undefined);
 activityQuery.getAll().then(value => {
   activities.value = value.items
 })
+const activitiesSelect = computed( () => {
+  const items: SelectItem[] = []
+  activities.forEach(value => {
+    items.push({
+      label: value.name,
+      value: value.uuid
+    })
+  })
+  return items;
+})
 
 const logoUploading = ref(false)
 const state = reactive({
@@ -226,9 +236,7 @@ async function deleteLogo() {
           <USelectMenu
             v-model="configState.excludedActivitiesFromOpeningDays"
             @change="ignoredActivitiesDaysUpdated"
-            :options="activities"
-            option-attribute="name"
-            value-attribute="uuid"
+            :items="activitiesSelect"
             multiple
           >
             <template #label>
@@ -246,9 +254,7 @@ async function deleteLogo() {
           <USelect
             v-model="configState.selectedControlShootingActivity"
             @change="controlShootingUpdated"
-            :options="activities"
-            option-attribute="name"
-            value-attribute="uuid"
+            :options="activitiesSelect"
             placeholder="Aucun contrôle défini" />
         </div>
       </GenericCard>

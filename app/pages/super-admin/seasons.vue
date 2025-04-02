@@ -186,7 +186,7 @@ definePageMeta({
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()" />
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getItemsPaginated()" />
             <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="apiTotalItems" />
           </div>
         </div>
@@ -198,9 +198,9 @@ definePageMeta({
         <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
             <div class="flex gap-2 flex-col relative">
-              <UFormGroup label="Nom" name="name" required>
+              <UFormField label="Nom" name="name" required>
                 <UInput v-model="selectedItem.name" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>

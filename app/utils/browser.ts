@@ -27,7 +27,7 @@ export function createBrowserCsvDownload(filename: string, data: any) {
 
 /**
  * Detecting if the device is tactile.
- * Mainly use to "fix" the nuxt ui bug on UDropdown.
+ * Mainly use to "fix" the nuxt ui bug on UDropdownMenu.
  * The bug should be fixed in nuxt ui v3
  */
 export function isTouchDevice() {

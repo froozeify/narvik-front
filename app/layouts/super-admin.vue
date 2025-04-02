@@ -66,7 +66,7 @@
 </script>
 
 <template>
-  <GenericLayoutAdmin :links="links">
+  <GenericLayoutAdmin :items="links">
     <slot></slot>
   </GenericLayoutAdmin>
 </template>

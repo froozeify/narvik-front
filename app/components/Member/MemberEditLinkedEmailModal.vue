@@ -64,9 +64,9 @@ async function updateLink() {
 
     <UForm class="flex gap-2 flex-col" :state="member" :validate="validate">
 
-      <UFormGroup label="Adresse mail du compte" name="email">
+      <UFormField label="Adresse mail du compte" name="email">
         <UInput v-model="member.linkedEmail" placeholder="Email" />
-      </UFormGroup>
+      </UFormField>
     </UForm>
 
     <template #actions>

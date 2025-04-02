@@ -217,7 +217,7 @@ function emitPaginate() {
   </UTable>
 
   <div v-if="props.hasPagination" class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-    <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="emitPaginate()" />
+    <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="emitPaginate()" />
     <UPagination v-model="page" @update:model-value="emitPaginate()" :page-count="parseInt(itemsPerPage.toString())" :total="props.totalPresences" />
   </div>
 </template>

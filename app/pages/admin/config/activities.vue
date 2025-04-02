@@ -30,6 +30,16 @@ watch(selectedActivity, (value, oldValue) => {
 const activityQuery = new ActivityQuery();
 
 const availableRoles = getAvailableClubRoles()
+const availableRolesSelect = computed( () => {
+  const items: SelectItem[] = []
+  availableRoles.forEach(value => {
+    items.push({
+      label: value.text,
+      value: value.value
+    })
+  })
+  return items;
+})
 
 const columns = [
   {
@@ -202,7 +212,7 @@ getActivities()
             </template>
 
             <template #enabled-data="{ row }">
-              <UToggle :model-value="row.isEnabled" />
+              <USwitch :model-value="row.isEnabled" />
             </template>
             <template #visibility-data="{ row }">
               {{ getAvailableClubRoles().find((role) => role.value === row.visibility)?.text ?? 'Par défaut - Membre' }}
@@ -217,22 +227,20 @@ getActivities()
         <UForm :state="selectedActivity" @submit="updateActivity(selectedActivity)" :validate="validate">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Disponible" name="available">
-                <UToggle v-model="selectedActivity.isEnabled"/>
-              </UFormGroup>
+              <UFormField label="Disponible" name="available">
+                <USwitch v-model="selectedActivity.isEnabled"/>
+              </UFormField>
 
-              <UFormGroup label="Nom" name="name">
+              <UFormField label="Nom" name="name">
                 <UInput v-model="selectedActivity.name"/>
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Visibilité" name="visibility">
+              <UFormField label="Visibilité" name="visibility">
                 <USelect
                   v-model="selectedActivity.visibility as string"
-                  :options="availableRoles"
-                  option-attribute="text"
-                  value-attribute="value"
+                  :items="availableRolesSelect"
                   :placeholder="`Par défaut - Membre`" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>

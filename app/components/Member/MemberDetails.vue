@@ -45,6 +45,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 
   const toast = useToast()
   const modal = useModal()
+  const overlay = useOverlay()
 
   const selfStore = useSelfUserStore();
 
@@ -107,6 +108,16 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
   activityQuery.getAll().then(value => {
     activities.value = value.items.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
   });
+  const activitiesSelect = computed( () => {
+    const items: SelectItem[] = []
+    activities.value.forEach(value => {
+      items.push({
+        label: value.name,
+        value: value
+      })
+    })
+    return items;
+  })
 
   watch(filteredActivities, (newValue) => {
     getMemberPresencesPaginated()
@@ -114,6 +125,16 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 
   const selectedNewRole: Ref<string | undefined> = ref(undefined);
   const availableRoles = getAvailableClubRoles()
+  const rolesSelect = computed( () => {
+    const items: SelectItem[] = []
+    availableRoles.forEach(value => {
+      items.push({
+        label: value.text,
+        value: value.value
+      })
+    })
+    return items;
+  })
 
   watch(member, (newValue, oldValue) => {
     if (newValue) {
@@ -449,9 +470,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
 
               <USelect
                 v-model="selectedNewRole"
-                :options="availableRoles"
-                option-attribute="text"
-                value-attribute="value"
+                :options="rolesSelect"
                 placeholder="Aucun rôle de défini" />
 
               <UButton
@@ -473,8 +492,10 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
             v-if="isAdmin"
             icon="i-heroicons-pencil-square"
             color="orange"
-            @click="modal.open(MemberEditLinkedEmailModal, {
-              member: member,
+            @click="overlay.create(MemberEditLinkedEmailModal, {
+              props: {
+                member: member,
+              },
               onUpdated() {
                 loadItem()
               }
@@ -592,7 +613,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
               <MemberDetailsPersonnalInfo icon="i-heroicons-phone" :label="member.phone?.match(/.{1,2}/g)?.join(' ')" :to="member.phone ? 'tel:' + member.phone : undefined" />
               <MemberDetailsPersonnalInfo icon="i-heroicons-phone" :label="member.mobilePhone?.match(/.{1,2}/g)?.join(' ')" :to="member.mobilePhone ? 'tel:' + member.mobilePhone : undefined" />
 
-              <UDivider label="Adresse" class="xl:col-span-2" />
+              <USeparator label="Adresse" class="xl:col-span-2" />
 
               <div class="xl:col-span-2">
                 <p>{{ member.postal1 }}</p>
@@ -674,7 +695,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
               </template>
 
               <template #isSecondaryClub-data="{ row }">
-                <UToggle :model-value="row.isSecondaryClub" />
+                <USwitch :model-value="row.isSecondaryClub" />
               </template>
             </UTable>
 
@@ -707,8 +728,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
               <USelectMenu
                 class="w-44"
                 v-model="filteredActivities"
-                :options="activities"
-                option-attribute="name"
+                :items="activitiesSelect"
                 multiple
               >
                 <template #label>
@@ -800,7 +820,7 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
             </UTable>
 
             <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-              <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMemberPresencesPaginated()" />
+              <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getMemberPresencesPaginated()" />
               <UPagination v-model="page" @update:model-value="getMemberPresencesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMemberPresencesPaginated" />
             </div>
           </div>

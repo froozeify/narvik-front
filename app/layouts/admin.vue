@@ -103,7 +103,7 @@
 </script>
 
 <template>
-  <GenericLayoutAdmin :links="links">
+  <GenericLayoutAdmin :items="links">
     <UAlert
       v-if="!selfStore.selectedProfile?.club.isActivated"
       class="mb-4"

@@ -6,9 +6,8 @@ const appConfig = useAppConfig()
 
 const selfUser = useSelfUserStore()
 if (!selfUser.isLegalsAccepted()) {
-  useModal().open(ModalLegalsAcceptance, {
-    preventClose: true
-  })
+  const modal = useOverlay().create(ModalLegalsAcceptance)
+  modal.open()
 }
 </script>
 

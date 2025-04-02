@@ -165,7 +165,7 @@
             </template>
 
             <template #isActivated-data="{ row }">
-              <UToggle :model-value="row.isActivated" />
+              <USwitch :model-value="row.isActivated" />
             </template>
 
             <template #name-data="{ row }">
@@ -185,7 +185,7 @@
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()" />
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getItemsPaginated()" />
             <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="apiTotalItems" />
           </div>
         </div>

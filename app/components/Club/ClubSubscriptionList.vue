@@ -45,7 +45,7 @@ const props = defineProps({
     ]"
     >
     <template #enabled-data="{ row }">
-      <UToggle :model-value="row.enabled" />
+      <USwitch :model-value="row.enabled" />
     </template>
   </UTable>
 </template>

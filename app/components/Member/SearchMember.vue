@@ -110,7 +110,7 @@ function rowClicked(row: Member) {
 <template>
   <div class="flex flex-col justify-start px-4 py-4 rounded-lg divide-y divide-gray-200 dark:divide-gray-800 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 min-h-96">
 
-    <UFormGroup label="Nom / Licence">
+    <UFormField label="Nom / Licence">
       <GenericBarcodeReader
         class="mb-4"
         v-model="cameraPreview"
@@ -141,7 +141,7 @@ function rowClicked(row: Member) {
           />
         </template>
       </UInput>
-    </UFormGroup>
+    </UFormField>
 
     <UTable
         :loading="searching"

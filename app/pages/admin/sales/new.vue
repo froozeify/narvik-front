@@ -30,6 +30,17 @@
   const { searchQuery, cart, cartTotalPrice, cartComment, cartCustomItemModalOpen, customItemForm, selectedPaymentMode } = storeToRefs(cartStore)
   const { sellers, seller, paymentModes } = storeToRefs(saleStore)
 
+  const sellersSelect = computed( () => {
+    const items: SelectItem[] = []
+    sellers.forEach(value => {
+      items.push({
+        label: value.fullName,
+        value: value
+      })
+    })
+    return items;
+  })
+
   const inventoryItemQuery = new InventoryItemQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
   const saleQuery = new SaleQuery()
@@ -260,17 +271,17 @@
       <UModal v-model="cartCustomItemModalOpen">
         <UCard>
           <UForm class="flex gap-2 flex-col" :state="customItemForm" :validate="cartStore.validateCustomCartForm" @submit="cartStore.addCustomItemToCart">
-            <UFormGroup label="Nom" name="name">
+            <UFormField label="Nom" name="name">
               <UInput v-model="customItemForm.name"/>
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup label="Prix de vente" name="sellingPrice">
+            <UFormField label="Prix de vente" name="sellingPrice">
               <UInput v-model="customItemForm.sellingPrice">
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
                 </template>
               </UInput>
-            </UFormGroup>
+            </UFormField>
 
             <div class="flex gap-2 mt-2 justify-end">
               <UButton color="red" variant="ghost" @click="cartStore.closeCustomItemModal()">
@@ -319,15 +330,15 @@
       </UCard>
 
       <UCard class="print:hidden">
-        <UFormGroup label="Vendeur" :error="!seller && 'Un vendeur doit être défini'">
-          <UInputMenu v-model="seller" :options="sellers" option-attribute="fullName" :search-attributes="['lastname', 'firstname']" />
-        </UFormGroup>
+        <UFormField label="Vendeur" :error="!seller && 'Un vendeur doit être défini'">
+          <UInputMenu v-model="seller" :items="sellersSelect" :filter-fields="['lastname', 'firstname']" />
+        </UFormField>
 
-        <UFormGroup label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'" class="my-2">
+        <UFormField label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'" class="my-2">
           <UTextarea v-model="cartComment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente"/>
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Mode de paiement">
+        <UFormField label="Mode de paiement">
           <div class="flex flex-wrap gap-2">
             <UButton
               v-for="paymentMode in paymentModes"
@@ -341,7 +352,7 @@
               </div>
             </UButton>
           </div>
-        </UFormGroup>
+        </UFormField>
 
         <UButton :loading="isCreatingSale" class="mt-4" block color="green" :disabled="cart.size < 1 || !selectedPaymentMode || !seller" @click="createSale()">Finaliser la vente</UButton>
       </UCard>

@@ -224,7 +224,7 @@ definePageMeta({
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getPaymentModesPaginated()" />
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getPaymentModesPaginated()" />
             <UPagination v-model="page" @update:model-value="getPaymentModesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalPaymentModes" />
           </div>
         </div>
@@ -236,15 +236,15 @@ definePageMeta({
         <UForm :state="selectedPaymentMode" @submit="updatePaymentMode(selectedPaymentMode)" :validate="validate">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Disponible" name="available">
-                <UToggle v-model="selectedPaymentMode.available" />
-              </UFormGroup>
+              <UFormField label="Disponible" name="available">
+                <USwitch v-model="selectedPaymentMode.available" />
+              </UFormField>
 
-              <UFormGroup label="Nom" name="name">
+              <UFormField label="Nom" name="name">
                 <UInput v-model="selectedPaymentMode.name" />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Icône" name="icon">
+              <UFormField label="Icône" name="icon">
 
                 <template #description>
                   <UButton variant="link" to="https://heroicons.com/" target="_blank" :padded="false">Liste des icônes Heroicons</UButton>
@@ -261,11 +261,11 @@ definePageMeta({
 
                 <UInput v-model="selectedPaymentMode.icon" />
 
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Poids dans la liste" name="weight">
+              <UFormField label="Poids dans la liste" name="weight">
                 <UInput type="number" v-model="selectedPaymentMode.weight" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>

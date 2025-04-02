@@ -73,13 +73,13 @@ function redirectSuccessLogin() {
 
     <UCard>
       <UForm :state="state" class="space-y-4" :validate="validate" @submit="onSubmit">
-        <UFormGroup label="Email" name="email">
+        <UFormField label="Email" name="email">
           <UInput v-model="state.email" type="email" />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Mot de passe" name="password">
+        <UFormField label="Mot de passe" name="password">
           <UInput v-model="state.password" type="password" />
-        </UFormGroup>
+        </UFormField>
 
         <div class="flex justify-end !-mt-0 ">
           <UButton class="text-xs" v-if="notificationsModule && notificationsModule['enabled']" variant="link" @click="navigateTo('login/password-reset')">
@@ -92,7 +92,7 @@ function redirectSuccessLogin() {
             Connexion
           </UButton>
 
-          <UDivider label="Ou" />
+          <USeparator label="Ou" />
 
           <UButton block :disabled="isLoading" variant="soft" to="login/register">
             S'enregistrer

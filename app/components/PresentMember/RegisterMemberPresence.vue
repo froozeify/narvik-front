@@ -180,7 +180,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
                 :label="activity.name" />
 
             <template v-if="activitiesSupervisor.length > 0 && hasClubSupervisorRole(state.member?.role)">
-              <UDivider class="col-span-2" :label="getAvailableClubRole(ClubRole.Supervisor).text" />
+              <USeparator class="col-span-2" :label="getAvailableClubRole(ClubRole.Supervisor).text" />
 
               <UCheckbox
                 class="w-full"
@@ -192,7 +192,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
             </template>
 
             <template v-if="activitiesAdmin.length > 0 && isClubAdmin(state.member?.role)">
-              <UDivider class="col-span-2" :label="getAvailableClubRole(ClubRole.Admin).text" />
+              <USeparator class="col-span-2" :label="getAvailableClubRole(ClubRole.Admin).text" />
 
               <UCheckbox
                 class="w-full"

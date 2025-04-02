@@ -4,7 +4,7 @@
   import {isDarkMode, isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
   import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
 
-  const modal = useModal()
+  const overlay = useOverlay()
 
   const selfStore = useSelfUserStore();
   const appConfigStore = useAppConfigStore();
@@ -42,11 +42,11 @@
       icon: 'i-heroicons-arrow-path-rounded-square',
       class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? '' : 'hidden',
       click: () => {
-        modal.open(ModalSelectProfile, {
+        overlay.create(ModalSelectProfile, {
           onSelected() {
             navigateTo('/self')
           }
-        })
+        }).open()
       }
     }], [{
       slot: 'darkMode',
@@ -106,7 +106,7 @@
         <div v-if="selfStore.isImpersonating">
           <UButton color="orange" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
         </div>
-        <UDropdown :items="rightMenu">
+        <UDropdownMenu :items="rightMenu">
           <UButton
             variant="ghost"
             color="gray"
@@ -131,7 +131,7 @@
                 {{ isDark ? 'Thème sombre' : 'Thème clair' }}
               </span>
           </template>
-        </UDropdown>
+        </UDropdownMenu>
       </div>
     </nav>
   </header>

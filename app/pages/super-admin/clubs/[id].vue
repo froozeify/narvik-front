@@ -295,7 +295,7 @@ loadClubUsers()
             </template>
 
             <template #accountActivated-data="{ row }">
-              <UToggle :model-value="row.accountActivated" />
+              <USwitch :model-value="row.accountActivated" />
             </template>
 
             <template #actions-data="{ row }">
@@ -307,7 +307,7 @@ loadClubUsers()
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="loadClubUsers()"/>
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="loadClubUsers()"/>
             <UPagination v-model="page" @update:model-value="loadClubUsers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalUsers"/>
           </div>
         </div>

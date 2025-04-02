@@ -164,17 +164,17 @@
       <UCard>
         <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
 
-          <UFormGroup label="Mot de passe actuel" name="password">
+          <UFormField label="Mot de passe actuel" name="password">
             <UInput v-model="passwordState.current" type="password" required />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Nouveau mot de passe" name="password">
+          <UFormField label="Nouveau mot de passe" name="password">
             <UInput v-model="passwordState.new" type="password" required />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Confirmation nouveau mot de passe" name="password">
+          <UFormField label="Confirmation nouveau mot de passe" name="password">
             <UInput v-model="passwordState.new2" type="password" required />
-          </UFormGroup>
+          </UFormField>
 
           <UButton type="submit">
             Changer le mot de passe

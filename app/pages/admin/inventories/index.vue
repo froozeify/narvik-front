@@ -25,6 +25,16 @@
 
   const searchQuery: Ref<string> = ref('')
   const categories: Ref<InventoryCategory[]> = ref([])
+  const categoriesSelect = computed( () => {
+    const items: SelectItem[] = []
+    categories.forEach(value => {
+      items.push({
+        label: value.name,
+        value: value
+      })
+    })
+    return items;
+  })
   const filteredCategories: Ref<InventoryCategory[]> = ref([])
   itemCategoryQuery.getAll().then(value => {
     categories.value = value.items
@@ -225,8 +235,7 @@
             <USelectMenu
               class="w-44"
               v-model="filteredCategories"
-              :options="categories"
-              option-attribute="name"
+              :items="categoriesSelect"
               multiple
             >
               <template #label>
@@ -285,7 +294,7 @@
         </UTable>
 
         <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-          <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()" />
+          <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getItemsPaginated()" />
           <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalApiItems" />
         </div>
 

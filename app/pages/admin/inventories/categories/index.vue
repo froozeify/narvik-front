@@ -211,7 +211,7 @@
           </UTable>
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getCategoriesPaginated()" />
+            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getCategoriesPaginated()" />
             <UPagination v-model="page" @update:model-value="getCategoriesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalCategories" />
           </div>
         </div>
@@ -223,12 +223,12 @@
         <UForm :state="selectedCategory" @submit="updateCategory(selectedCategory)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Nom" name="name">
+              <UFormField label="Nom" name="name">
                 <UInput v-model="selectedCategory.name" />
-              </UFormGroup>
-              <UFormGroup label="Poids dans la liste" name="weight">
+              </UFormField>
+              <UFormField label="Poids dans la liste" name="weight">
                 <UInput type="number" v-model="selectedCategory.weight" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>
