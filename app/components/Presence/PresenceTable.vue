@@ -103,12 +103,11 @@ const columns = [
   }
 ]
 
-function rowClicked(row: MemberPresence|ExternalPresence) {
-  console.warn("rowClicled, doest it still work or is it row.original")
-  if (!props.isExternalPresences && !row.member) {
+function rowClicked(row) {
+  if (!props.isExternalPresences && !row.original.member) {
     return;
   }
-  emit('rowClicked', row)
+  emit('rowClicked', row.original)
 }
 
 function sortClicked() {
@@ -132,7 +131,11 @@ function emitPaginate() {
     @update:sort="sortClicked()"
     :columns="columns"
     :data="props.presences"
-    @select="rowClicked">
+    @select="rowClicked"
+    :ui="{
+      tr: 'cursor-pointer'
+    }"
+  >
     <template #empty-state>
       <div class="flex flex-col items-center justify-center py-6 gap-3">
         <span class="italic text-sm">Aucune présences enregistrée.</span>
