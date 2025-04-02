@@ -25,7 +25,7 @@
 
   const siteLogo: Ref<string> = appConfigStore.getLogo()
 
-  const rightMenu = [
+  const rightMenu = ref<DropdownMenuItem[][]>([
     [{
       label: !isBadger ? 'Profil' : 'Pointeuse',
       avatar: {
@@ -40,8 +40,8 @@
     }, {
       label: 'Changer de profil',
       icon: 'i-heroicons-arrow-path-rounded-square',
-      class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? '' : 'hidden',
-      click: () => {
+      class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? 'cursor-pointer' : 'hidden',
+      onSelect: () => {
         overlay.create(ModalSelectProfile, {
           onSelected() {
             navigateTo('/self')
@@ -51,20 +51,22 @@
     }], [{
       slot: 'darkMode',
       label: 'Thème',
-      click: () => {
+      class: 'cursor-pointer',
+      onSelect: () => {
         isDark.value = !isDark.value
       }
     }, {
       label: 'Déconnexion',
       icon: 'i-heroicons-arrow-right-start-on-rectangle-20-solid',
-      click: () => {
+      class: 'cursor-pointer',
+      onSelect: () => {
         selfStore.logout()
       }
     }]
-  ]
+  ])
 
   if (selfStore.isSuperAdmin()) {
-    rightMenu.unshift([
+    rightMenu.value.unshift([
       {
         label: 'Administration global',
         icon: 'i-heroicons-building-library',
