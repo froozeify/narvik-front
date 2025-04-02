@@ -27,7 +27,7 @@
   const categories: Ref<InventoryCategory[]> = ref([])
   const categoriesSelect = computed( () => {
     const items: SelectItem[] = []
-    categories.forEach(value => {
+    categories.value.forEach(value => {
       items.push({
         label: value.name,
         value: value

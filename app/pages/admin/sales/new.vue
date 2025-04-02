@@ -32,7 +32,7 @@
 
   const sellersSelect = computed( () => {
     const items: SelectItem[] = []
-    sellers.forEach(value => {
+    sellers.value.forEach(value => {
       items.push({
         label: value.fullName,
         value: value
