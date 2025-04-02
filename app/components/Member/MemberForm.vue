@@ -149,7 +149,7 @@ async function submitItem() {
         </UPopover>
       </UFormField>
     </div>
-    <UAlert v-if="memberAge < 18" icon="i-heroicons-exclamation-triangle" color="red" variant="subtle" title="Consentement recueil des données (RGPD)">
+    <UAlert v-if="memberAge < 18" icon="i-heroicons-exclamation-triangle" color="error" variant="subtle" title="Consentement recueil des données (RGPD)">
       <template #description>
         <p v-if="memberAge < 15">-15 ans, le consentement pour le recueil doit être effectué auprès des parents.</p>
         <p v-if="memberAge === 0 || memberAge >= 15">15-18 ans, le consentement pour le recueil doit être effectué auprès de l'enfant.</p>

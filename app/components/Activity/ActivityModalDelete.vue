@@ -27,7 +27,7 @@ const emit = defineEmits(['delete'])
     <template #actions>
       <UButton
         @click="emit('delete')"
-        color="red"
+        color="error"
       >
         Valider la suppression
       </UButton>

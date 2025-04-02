@@ -76,7 +76,7 @@ async function deletePresence(close: Function) {
           <UButton
               icon="i-heroicons-trash"
               size="xs"
-              color="red"
+              color="error"
               variant="ghost"
           />
 
@@ -86,7 +86,7 @@ async function deletePresence(close: Function) {
 
               <UButton
                   @click="deletePresence(close);"
-                  color="red"
+                  color="error"
                   class="mx-auto"
               >
                 Supprimer

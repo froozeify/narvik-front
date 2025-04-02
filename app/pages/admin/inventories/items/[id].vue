@@ -162,7 +162,7 @@
         <UPopover>
           <UButton
             icon="i-heroicons-trash"
-            color="red"
+            color="error"
           />
 
           <template #panel="{ close }">
@@ -171,7 +171,7 @@
 
               <UButton
                 @click="deleteItem(close);"
-                color="red"
+                color="error"
                 class="mx-auto"
               >
                 Supprimer

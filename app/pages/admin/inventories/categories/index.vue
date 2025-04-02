@@ -240,7 +240,7 @@
           <UButton
             v-if="selectedCategory.uuid"
             block
-            color="red"
+            color="error"
             :loading="isLoading"
             :disabled="(selectedCategory?.items?.length ?? 0) > 0"
             @click="modal.open(ModalDeleteConfirmation, {

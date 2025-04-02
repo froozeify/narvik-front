@@ -30,7 +30,7 @@ function applyProfile() {
         <div class="flex justify-center gap-4">
           <UButton @click="selectedDate = dayjs(selectedDate).add(1, 'months').toDate(); applyProfile()">+1 mois</UButton>
           <UButton @click="selectedDate = dayjs(selectedDate).add(1, 'years').toDate(); applyProfile()">+1 an</UButton>
-          <UButton color="red" variant="ghost" @click="selectedDate = undefined; applyProfile()">Pas de renouvellement</UButton>
+          <UButton color="error" variant="ghost" @click="selectedDate = undefined; applyProfile()">Pas de renouvellement</UButton>
         </div>
         <div class="text-center">
           <GenericDatePicker v-model="selectedDate" mode="date" />

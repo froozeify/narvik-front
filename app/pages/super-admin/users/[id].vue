@@ -157,7 +157,7 @@ loadUser()
         <UButton
           v-if="user.role !== UserRole.SuperAdmin"
           icon="i-heroicons-trash"
-          color="red"
+          color="error"
           size="xs"
           label="Supprimer"
           @click="modal.open(ModalDeleteConfirmation, {

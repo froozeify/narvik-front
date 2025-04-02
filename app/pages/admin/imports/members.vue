@@ -124,7 +124,7 @@
           />
           <UAlert v-else
                   title="Aucun import effectué"
-                  color="red"
+                  color="error"
           />
 
           <UInput
@@ -148,7 +148,7 @@
           />
           <UAlert v-else
                   title="Aucun import effectué"
-                  color="red"
+                  color="error"
           />
 
           <UInput

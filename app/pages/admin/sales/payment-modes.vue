@@ -276,7 +276,7 @@ definePageMeta({
         <UButton
           v-if="selectedPaymentMode.uuid"
           block
-          color="red"
+          color="error"
           :loading="isLoading"
           @click="modal.open(ModalDeleteConfirmation, {
             onDelete() {

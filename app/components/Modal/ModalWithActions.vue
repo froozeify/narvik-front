@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const emit = defineEmits(['cancel', 'close'])
+const emit = defineEmits<{ close: [boolean] }>()
 
 const props = defineProps(
   {
@@ -25,7 +25,7 @@ const props = defineProps(
 
           <div class="flex gap-2 justify-between sm:justify-end flex-wrap">
             <slot name="cancel">
-              <UButton color="gray" variant="ghost" @click="emit('close', true); emit('cancel')">
+              <UButton color="gray" variant="ghost" @click="emit('close', false)">
                 Annuler
               </UButton>
             </slot>

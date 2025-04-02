@@ -285,7 +285,7 @@
               </UFormField>
 
               <div class="flex gap-2 mt-2 justify-end">
-                <UButton color="red" variant="ghost" @click="cartStore.closeCustomItemModal()">
+                <UButton color="error" variant="ghost" @click="cartStore.closeCustomItemModal()">
                   Annuler
                 </UButton>
 

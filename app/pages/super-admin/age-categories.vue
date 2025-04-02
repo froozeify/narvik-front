@@ -208,7 +208,7 @@ definePageMeta({
           <UButton
             v-if="selectedItem.id"
             block
-            color="red"
+            color="error"
             :loading="isLoading"
             @click="modal.open(ModalDeleteConfirmation, {
               onDelete() {

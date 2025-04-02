@@ -34,7 +34,7 @@
 
         <UButton
           v-if="presenceStore.selectedRange"
-          color="red"
+          color="error"
           @click="presenceStore.selectedRange = null"
         >
           Supprimer la date

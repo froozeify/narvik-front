@@ -31,7 +31,7 @@ const selfStore = useSelfUserStore()
 
         <div v-if="!selfStore.selectedProfile?.club">
           <UAlert
-            color="red"
+            color="error"
             title="Impossible d'obtenir les informations sur le club."
             description="Veuillez rafraichir la page ou vous reconnecter si cela ne corrige pas le problème."
           />

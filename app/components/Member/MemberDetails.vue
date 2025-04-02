@@ -522,7 +522,7 @@ async function deleteMember() {
           <UButton
             v-if="member.uuid && (isSuperAdmin || (isAdmin && member.email != loggedUsername))"
             icon="i-heroicons-trash"
-            color="red"
+            color="error"
             @click="
             const modalDelete = overlay.create(ModalDeleteConfirmation);
             modalDelete.open({
@@ -589,7 +589,7 @@ async function deleteMember() {
 
               <div v-if="!member.currentSeason">
                 <UButton
-                  color="red"
+                  color="error"
                   :ui="{ rounded: 'rounded-full' }">
                   Saison non renouvelée
                 </UButton>
@@ -681,7 +681,7 @@ async function deleteMember() {
                 <div v-if="isSupervisor" class="flex gap-4">
                   <UButton
                     icon="i-heroicons-trash"
-                    color="red"
+                    color="error"
                     @click="modal.open(ModalDeleteConfirmation, {
                       alertTitle: `Suppression de la saison ${row.season.name} pour ${member?.fullName}`,
                       alertColor: 'orange',
@@ -803,7 +803,7 @@ async function deleteMember() {
                   <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
 
                   <UButton
-                    color="red"
+                    color="error"
                     label="Supprimer"
                     @click="modal.open(ModalDeleteConfirmation, {
                     title: `Présence du ${formatDateReadable(row.date)}`,

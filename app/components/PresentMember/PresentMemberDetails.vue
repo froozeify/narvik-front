@@ -178,7 +178,7 @@ async function copyLicence() {
                 <UButton
                   icon="i-heroicons-trash"
                   size="xs"
-                  color="red"
+                  color="error"
                   variant="ghost"
                 />
 
@@ -188,7 +188,7 @@ async function copyLicence() {
 
                     <UButton
                       @click="deletePresence(close);"
-                      color="red"
+                      color="error"
                       class="mx-auto"
                     >
                       Supprimer
@@ -249,7 +249,7 @@ async function copyLicence() {
 
             <UButton
               v-if="!member.currentSeason"
-              color="red"
+              color="error"
               :ui="{ rounded: 'rounded-full' }">
               Saison non renouvelée
             </UButton>

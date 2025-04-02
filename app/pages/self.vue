@@ -95,7 +95,7 @@ async function deleteUser() {
 
         <UButton
           icon="i-heroicons-trash"
-          color="red"
+          color="error"
           @click="
           overlay.create(ModalDeleteConfirmation).open({
             alertTitle: 'Seul le compte sera supprimé.',

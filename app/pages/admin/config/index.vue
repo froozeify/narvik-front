@@ -276,7 +276,7 @@ async function deleteLogo() {
       />
 
       <UPopover overlay v-if="selectedProfile?.club.settings.logo">
-        <UButton color="red">
+        <UButton color="error">
           Supprimer le logo
         </UButton>
 
@@ -284,7 +284,7 @@ async function deleteLogo() {
           <div class="p-4 w-56 flex flex-col gap-4">
             <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
-            <UButton color="red" @click="deleteLogo" class="mx-auto">
+            <UButton color="error" @click="deleteLogo" class="mx-auto">
               Supprimer le logo
             </UButton>
           </div>

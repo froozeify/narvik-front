@@ -133,7 +133,7 @@ definePageMeta({
 
         <UButton
           icon="i-heroicons-trash"
-          color="red"
+          color="error"
           size="xs"
           label="Supprimer"
           @click="modal.open(ModalDeleteConfirmation, {

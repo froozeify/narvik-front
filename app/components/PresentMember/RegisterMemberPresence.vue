@@ -209,7 +209,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
         <UButton :loading="isSubmitting" block type="submit">
           Enregistrer
         </UButton>
-        <UButton class="mt-2" color="red" :loading="isSubmitting" block @click="emit('canceled')">
+        <UButton class="mt-2" color="error" :loading="isSubmitting" block @click="emit('canceled')">
           Annuler
         </UButton>
       </UForm>

@@ -108,7 +108,7 @@
       v-if="!selfStore.selectedProfile?.club.isActivated"
       class="mb-4"
       icon="i-heroicons-link-slash"
-      color="red"
+      color="error"
       variant="subtle"
       title="Lecture seule. Club non activé."
       description="Le club n'est pas activé, aucune modification ne sera possible. Veuillez contacter le support pour plus d'information."

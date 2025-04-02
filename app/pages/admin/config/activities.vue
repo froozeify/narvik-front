@@ -250,7 +250,7 @@ getActivities()
 
         <UButton v-if="selectedActivity.uuid"
           block
-          color="red"
+          color="error"
           :loading="isLoading"
           @click="modal.open(ActivityModalDelete, {
             title: selectedActivity.name,

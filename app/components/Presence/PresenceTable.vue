@@ -177,7 +177,7 @@ function emitPaginate() {
 
           <div v-if="!row.member.currentSeason" class="basis-full">
             <UButton
-                color="red"
+                color="error"
                 :ui="{ rounded: 'rounded-full' }">
               Saison non renouvelée
             </UButton>
@@ -194,7 +194,7 @@ function emitPaginate() {
           <div v-if="new Date((new Date()).setFullYear((new Date().getFullYear() - 1))) > new Date(row.member.lastControlShooting)"
                class="basis-full">
             <UButton
-                color="red"
+                color="error"
                 :ui="{ rounded: 'rounded-full' }">
               Dernier contrôle : {{ formatDateReadable(row.member.lastControlShooting) }}
             </UButton>
