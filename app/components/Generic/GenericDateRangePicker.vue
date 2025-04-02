@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { DatePicker as VCalendarDatePicker } from 'v-calendar'
-  import type { DatePickerRangeObject } from 'v-calendar/dist/types/src/use/datePicker'
-  import 'v-calendar/dist/style.css'
+  // import { DatePicker as VCalendarDatePicker } from 'v-calendar'
+  // import type { DatePickerRangeObject } from 'v-calendar/dist/types/src/use/datePicker'
+  // import 'v-calendar/dist/style.css'
   import dayjs from "dayjs";
 
   const props = defineProps({
     modelValue: {
-      type: [Date, Object] as PropType<DatePickerRangeObject | null>,
+      type: [Date, Object] as PropType<object | null>,
       default: null
     }
   })
@@ -78,8 +78,8 @@
           @click="selectRange(range.duration)"
       />
     </div>
-
-    <VCalendarDatePicker v-model.range="date" :columns="columns" v-bind="{ ...attrs, ...$attrs }" />
+    Migrate to other nuxt calendar
+<!--    <VCalendarDatePicker v-model.range="date" :columns="columns" v-bind="{ ...attrs, ...$attrs }" />-->
   </div>
 
 </template>

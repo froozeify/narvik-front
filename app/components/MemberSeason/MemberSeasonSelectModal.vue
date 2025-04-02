@@ -84,6 +84,6 @@ ageCategoryQuery.getAll().then((value) => {
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

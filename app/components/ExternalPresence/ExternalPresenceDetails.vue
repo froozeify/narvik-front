@@ -128,6 +128,6 @@ async function deletePresence(close: Function) {
   </UModal>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

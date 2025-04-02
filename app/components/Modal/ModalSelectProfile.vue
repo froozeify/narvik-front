@@ -59,6 +59,6 @@ async function applyProfile() {
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

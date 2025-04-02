@@ -137,7 +137,7 @@
   </header>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 li {
   display: flex;
   align-items: center;

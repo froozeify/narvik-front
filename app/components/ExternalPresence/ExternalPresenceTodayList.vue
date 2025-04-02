@@ -80,6 +80,6 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
 
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

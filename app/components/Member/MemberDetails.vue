@@ -860,6 +860,6 @@ ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, Categor
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

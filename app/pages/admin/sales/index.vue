@@ -12,6 +12,6 @@
   <SaleList :per-item="true" />
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

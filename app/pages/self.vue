@@ -1,85 +1,84 @@
 <script lang="ts" setup>
-  import type {Member} from "~/types/api/item/clubDependent/member";
-  import {useSelfUserStore} from "~/stores/useSelfUser";
-  import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
-  import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
-  import UserQuery from "~/composables/api/query/UserQuery";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
+import UserQuery from "~/composables/api/query/UserQuery";
 
-  definePageMeta({
-    layout: "member"
-  });
+definePageMeta({
+  layout: "member"
+});
 
-  useHead({
-    title: "Mes informations"
-  })
+useHead({
+  title: "Mes informations"
+})
 
-  const modal = useModal()
-  const toast = useToast()
+const modal = useModal()
+const toast = useToast()
 
-  const userQuery = new UserQuery();
+const userQuery = new UserQuery();
 
-  const selfStore = useSelfUserStore()
-  const isAdmin = selfStore.isAdmin()
+const selfStore = useSelfUserStore()
+const isAdmin = selfStore.isAdmin()
 
-  const { member, user, selectedProfile } = storeToRefs(selfStore)
+const { member, user, selectedProfile } = storeToRefs(selfStore)
 
-  const updatePasswordModalOpen = ref(false)
-  const passwordState = reactive({
-    current: undefined as string|undefined,
-    new: undefined as string|undefined,
-    new2: undefined as string|undefined
-  })
+const updatePasswordModalOpen = ref(false)
+const passwordState = reactive({
+  current: undefined as string|undefined,
+  new: undefined as string|undefined,
+  new2: undefined as string|undefined
+})
 
-  async function onUpdatePasswordSubmit() {
-    if (!user.value) return failedPasswordUpdate();
+async function onUpdatePasswordSubmit() {
+  if (!user.value) return failedPasswordUpdate();
 
-    if ((!isAdmin && (!passwordState.new || passwordState.new.length < 8)) || passwordState.new !== passwordState.new2) {
-      return failedPasswordUpdate("Les mot de passe ne correspondent pas / trop court")
-    }
-
-    if (!passwordState.current) {
-      return failedPasswordUpdate("Mot de passe actuel non défini")
-    }
-
-    const { error } = await userQuery.selfUpdatePassword(passwordState.current, passwordState.new)
-    if (error) {
-      return failedPasswordUpdate(error.message)
-    }
-
-    updatePasswordModalOpen.value = false
-    toast.add({
-      color: "green",
-      title: "Mot de passe modifié"
-    })
+  if ((!isAdmin && (!passwordState.new || passwordState.new.length < 8)) || passwordState.new !== passwordState.new2) {
+    return failedPasswordUpdate("Les mot de passe ne correspondent pas / trop court")
   }
 
-  function failedPasswordUpdate(explanation?: string) {
+  if (!passwordState.current) {
+    return failedPasswordUpdate("Mot de passe actuel non défini")
+  }
+
+  const { error } = await userQuery.selfUpdatePassword(passwordState.current, passwordState.new)
+  if (error) {
+    return failedPasswordUpdate(error.message)
+  }
+
+  updatePasswordModalOpen.value = false
+  toast.add({
+    color: "green",
+    title: "Mot de passe modifié"
+  })
+}
+
+function failedPasswordUpdate(explanation?: string) {
+  toast.add({
+    color: "red",
+    title: "La modification du mot de passe a échoué",
+    description: explanation
+  })
+}
+
+async function deleteUser() {
+  if (!user.value) return;
+
+  const { error } = await userQuery.selfDelete()
+  if (error) {
     toast.add({
       color: "red",
-      title: "La modification du mot de passe a échoué",
-      description: explanation
+      title: "La suppression du compte à échoué",
+      description: error.message
     })
+    return
   }
 
-  async function deleteUser() {
-    if (!user.value) return;
-
-    const { error } = await userQuery.selfDelete()
-    if (error) {
-      toast.add({
-        color: "red",
-        title: "La suppression du compte à échoué",
-        description: error.message
-      })
-      return
-    }
-
-    toast.add({
-      color: "green",
-      title: "Compte supprimé"
-    })
-    selfStore.logout()
-  }
+  toast.add({
+    color: "green",
+    title: "Compte supprimé"
+  })
+  selfStore.logout()
+}
 
 </script>
 
