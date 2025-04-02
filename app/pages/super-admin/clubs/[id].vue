@@ -308,7 +308,7 @@ loadClubUsers()
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
             <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="loadClubUsers()"/>
-            <UPagination v-model="page" @update:model-value="loadClubUsers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalUsers"/>
+            <UPagination v-model:page="page" @update:page="loadClubUsers()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalUsers"/>
           </div>
         </div>
       </GenericCard>

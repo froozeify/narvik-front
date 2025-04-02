@@ -177,7 +177,7 @@ function displayMemberPage(member: Member) {
 
       <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
         <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getMembers()" />
-        <UPagination v-model="page" @update:model-value="getMembers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMembers" />
+        <UPagination v-model:page="page" @update:page="getMembers()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalMembers" />
       </div>
     </UCard>
   </div>

@@ -299,7 +299,7 @@
 
         <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
           <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getItemsPaginated()" />
-          <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalApiItems" />
+          <UPagination v-model:page="page" @update:page="getItemsPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalApiItems" />
         </div>
 
       </UCard>

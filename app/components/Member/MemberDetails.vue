@@ -703,7 +703,7 @@ async function deleteMember() {
             </UTable>
 
             <div class="flex flex-wrap justify-end gap-4 px-3">
-              <UPagination v-model="seasonPage" :page-count="parseInt(seasonItemsPerPage.toString())" :total="memberSeasons.length" />
+              <UPagination v-model:page="seasonPage" :items-per-page="parseInt(seasonItemsPerPage.toString())" :total="memberSeasons.length" />
             </div>
 
           </div>
@@ -828,7 +828,7 @@ async function deleteMember() {
 
             <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
               <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getMemberPresencesPaginated()" />
-              <UPagination v-model="page" @update:model-value="getMemberPresencesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMemberPresencesPaginated" />
+              <UPagination v-model:page="page" @update:page="getMemberPresencesPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalMemberPresencesPaginated" />
             </div>
           </div>
         </UCard>

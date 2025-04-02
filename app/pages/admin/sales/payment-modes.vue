@@ -229,7 +229,7 @@ definePageMeta({
 
           <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
             <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getPaymentModesPaginated()" />
-            <UPagination v-model="page" @update:model-value="getPaymentModesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalPaymentModes" />
+            <UPagination v-model:page="page" @update:page="getPaymentModesPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalPaymentModes" />
           </div>
         </div>
       </UCard>
