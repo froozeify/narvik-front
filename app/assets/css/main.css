@@ -10,8 +10,20 @@
   /*--ui-text: #000000;*/
   /*--ui-color-neutral-700: #000; Move to root, otherwise the change is not applied */
 
-  --color-blue-400: oklch(80.9% 0.105 251.813);
-  --color-blue-500: oklch(0.379 0.146 265.522);
+  /*--color-blue-400: oklch(80.9% 0.105 251.813);*/
+  /*--color-blue-500: oklch(0.379 0.146 265.522);*/
+
+  --color-blue-950: #102152;
+  --color-blue-900: #13255E;
+  --color-blue-800: #152A69;
+  --color-blue-700: #172F75;
+  --color-blue-600: #193381;
+  --color-blue-500: #1C398E;
+  --color-blue-400: #708DE3;
+  --color-blue-300: #B8C6F1;
+  --color-blue-200: #CFD8F5;
+  --color-blue-100: #E7ECFA;
+  --color-blue-50: #FFFFFF;
 }
 
 html, body, #__nuxt, #__nuxt > div, #__layout{
