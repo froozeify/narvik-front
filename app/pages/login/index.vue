@@ -7,6 +7,7 @@ import {useSelfUserStore} from "~/stores/useSelfUser";
 import ModalLegalsAcceptance from "~/components/Modal/ModalLegalsAcceptance.vue";
 
 const toast = useToast()
+const overlay = useOverlay()
 const isLoading = ref(false)
 
 const state = reactive({
@@ -43,15 +44,13 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
   }
 
   if (!selfStore.isLegalsAccepted()) {
-    useModal().open(ModalLegalsAcceptance, {
-      preventClose: true,
+    const modal = overlay.create(ModalLegalsAcceptance)
+    await modal.open({
       onAccepted() {
         redirectSuccessLogin()
-      },
-      onCancel() {
-        isLoading.value = false
       }
     })
+    isLoading.value = false
   } else {
     redirectSuccessLogin()
   }

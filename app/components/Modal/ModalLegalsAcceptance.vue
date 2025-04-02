@@ -2,7 +2,7 @@
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import UserQuery from "~/composables/api/query/UserQuery";
 
-const emit = defineEmits(['accepted', 'cancel', 'close'])
+const emit = defineEmits(['accepted', 'close'])
 
 const toast = useToast();
 const selfStore = useSelfUserStore()
@@ -30,7 +30,7 @@ async function accept() {
 
   isLoading.value = false
   emit('accepted')
-  emit('close')
+  emit('close', true)
 }
 
 </script>
@@ -49,7 +49,7 @@ async function accept() {
     </slot>
 
     <template #cancel>
-      <UButton color="red" variant="ghost" @click="selfStore.logout(); emit('cancel'); emit('close', true)">
+      <UButton color="error" variant="ghost" @click="selfStore.logout(); emit('close', false)">
         Refuser et se déconnecter
       </UButton>
     </template>
@@ -58,7 +58,6 @@ async function accept() {
       <UButton
         :loading="isLoading"
         @click="accept"
-        color="green"
       >
         Accepter
       </UButton>

@@ -32,16 +32,18 @@ watchEffect(() => {
   isHorizontal.value = !isMobileDisplay.value
 })
 
-const selected = ref(0)
-const items = [{
-  key: 'initial',
-  label: 'Demande de création',
-  icon: 'i-heroicons-lock-closed',
-}, {
-  key: 'reset',
-  label: 'Validation et création',
-  icon: 'i-heroicons-envelope-open',
-}]
+const selected = ref('0')
+const items = ref<TabsItem[]>([
+  {
+    slot: 'initial' as const,
+    label: 'Demande de création',
+    icon: 'i-heroicons-lock-closed',
+  }, {
+    slot: 'reset' as const,
+    label: 'Validation et création',
+    icon: 'i-heroicons-envelope-open',
+  }
+])
 
 const validate = (state: any): FormError[] => {
   const errors = []
@@ -109,7 +111,7 @@ async function initiateRegister() {
     title: "Un code vérification à été envoyé par email",
   });
 
-  selected.value = 1
+  selected.value = '1'
 }
 
 onMounted(() => {
@@ -128,14 +130,13 @@ onBeforeUnmount(() => {
       <NuxtImg :src="siteLogo" class="h-full" />
     </div>
 
-    <div>
+    <div class="mb-2">
       <UButton size="2xs" variant="link" to="/login" label="Se connecter" icon="i-heroicons-arrow-uturn-left" />
     </div>
 
     <UCard>
-      <UTabs v-model="selected" :items="items" :orientation="isHorizontal ? 'horizontal' : 'vertical'">
-        <template #item="{ item }">
-          <div v-if="item.key === 'initial'">
+      <UTabs v-model="selected" :items="items">
+        <template #initial>
             <UForm :state="state" class="space-y-4" @submit="initiateRegister">
               <UFormField label="Email" name="email">
                 <UInput v-model="state.email" type="email" />
@@ -147,47 +148,47 @@ onBeforeUnmount(() => {
                 Créer le compte
               </UButton>
             </UForm>
-          </div>
-          <div v-else>
-            <UAlert
-              icon="i-heroicons-megaphone"
-              color="yellow"
-              variant="soft"
-              title="En cas de code invalide, un nouveau sera envoyé."
-              description="Seul le dernier code de sécurité reçu est valide."
-            />
-            <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="register">
-              <UFormField label="Code de sécurité" name="securityCode">
-                <UInput v-model.trim="state.securityCode" />
-              </UFormField>
+        </template>
 
-              <UFormField label="Email" name="email">
-                <UInput v-model.trim="state.email" type="email" />
-              </UFormField>
+        <template #reset>
+          <UAlert
+            icon="i-heroicons-megaphone"
+            color="yellow"
+            variant="soft"
+            title="En cas de code invalide, un nouveau sera envoyé."
+            description="Seul le dernier code de sécurité reçu est valide."
+          />
+          <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="register">
+            <UFormField label="Code de sécurité" name="securityCode">
+              <UInput v-model.trim="state.securityCode" />
+            </UFormField>
 
-              <UFormField label="Mot de passe" name="password">
-                <UInput v-model="state.password" type="password" />
-              </UFormField>
+            <UFormField label="Email" name="email">
+              <UInput v-model.trim="state.email" type="email" />
+            </UFormField>
 
-              <UFormField label="Prénom" name="firstname">
-                <UInput v-model="state.firstname" />
-              </UFormField>
+            <UFormField label="Mot de passe" name="password">
+              <UInput v-model="state.password" type="password" />
+            </UFormField>
 
-              <UFormField label="Nom" name="lastname">
-                <UInput v-model="state.lastname" />
-              </UFormField>
+            <UFormField label="Prénom" name="firstname">
+              <UInput v-model="state.firstname" />
+            </UFormField>
 
-              <UFormField required name="legals">
-                <UCheckbox required v-model="state.legals"  label="J'accepte les Conditions Générales d'Utilisation, les Conditions Générales de Vente et la Politique de confidentialité " />
-              </UFormField>
+            <UFormField label="Nom" name="lastname">
+              <UInput v-model="state.lastname" />
+            </UFormField>
 
-              <div class="flex justify-between">
-                <UButton type="submit" :loading="isLoading" block>
-                  Créer le compte
-                </UButton>
-              </div>
-            </UForm>
-          </div>
+            <UFormField required name="legals">
+              <UCheckbox required v-model="state.legals"  label="J'accepte les Conditions Générales d'Utilisation, les Conditions Générales de Vente et la Politique de confidentialité " />
+            </UFormField>
+
+            <div class="flex justify-between">
+              <UButton type="submit" :loading="isLoading" block>
+                Créer le compte
+              </UButton>
+            </div>
+          </UForm>
         </template>
       </UTabs>
 
