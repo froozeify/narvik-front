@@ -36,7 +36,7 @@ export default defineAppConfig({
     },
     table: {
       slots: {
-        td: 'py-2'
+        td: 'py-2 text-(--ui-text)'
       }
     },
   }
