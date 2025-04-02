@@ -2,6 +2,8 @@
 import { useSelfUserStore } from "~/stores/useSelfUser";
 import ModalLegalsAcceptance from "~/components/Modal/ModalLegalsAcceptance.vue";
 
+const appConfig = useAppConfig()
+
 const selfUser = useSelfUserStore()
 if (!selfUser.isLegalsAccepted()) {
   useModal().open(ModalLegalsAcceptance, {
@@ -11,9 +13,9 @@ if (!selfUser.isLegalsAccepted()) {
 </script>
 
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-    <UModals />
-    <UNotifications />
-  </NuxtLayout>
+  <UApp :toaster="appConfig.toaster">
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </UApp>
 </template>
