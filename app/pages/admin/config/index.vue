@@ -28,6 +28,11 @@ const activityQuery = new ActivityQuery();
 
 const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.badgerToken);
 
+interface SelectItem {
+  label: string,
+  value: string|undefined,
+}
+
 const configState = reactive({
   selectedControlShootingActivity: selectedProfile.value?.club.settings.controlShootingActivity?.uuid,
   excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays?.map((a: Activity) => a.uuid)
@@ -238,6 +243,7 @@ async function deleteLogo() {
             v-model="configState.excludedActivitiesFromOpeningDays"
             @change="ignoredActivitiesDaysUpdated"
             :items="activitiesSelect"
+            value-key="value"
             multiple
           >
             <template #default>
