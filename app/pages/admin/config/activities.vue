@@ -216,7 +216,7 @@ getActivities()
             </template>
 
             <template #enabled-cell="{ row }">
-              <USwitch :model-value="row.original.isEnabled" />
+              <USwitch class="pointer-events-none" :model-value="row.original.isEnabled" />
             </template>
             <template #visibility-cell="{ row }">
               {{ getAvailableClubRoles().find((role) => role.value === row.original.visibility)?.text ?? 'Par défaut - Membre' }}
