@@ -142,8 +142,7 @@ async function copyLicence() {
   if (selfStore.hasSupervisorRole() && props.item.member?.licence) {
     clipboard.write(props.item.member.licence)
     toast.add({
-      title: 'Licence copiée',
-      color: "success"
+      title: 'Licence copiée'
     })
   }
 }

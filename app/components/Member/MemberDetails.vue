@@ -607,7 +607,7 @@ async function deleteMember() {
                 Dernier contrôle : {{ formatDateReadable(member.lastControlShooting.toString()) }}
               </div>
 
-              <MemberDetailsPersonnalInfo icon="i-heroicons-identification" :label="member.licence" to="#" @click.prevent="clipboard.write(member.licence ?? '');toast.add({title: 'Licence copiée', color: 'green'});" />
+              <MemberDetailsPersonnalInfo icon="i-heroicons-identification" :label="member.licence" to="#" @click.prevent="clipboard.write(member.licence ?? '');toast.add({title: 'Licence copiée'});" />
               <MemberDetailsPersonnalInfo icon="i-heroicons-at-symbol" :label="member.email" :to="'mailto:' + member.email" />
               <MemberDetailsPersonnalInfo icon="i-heroicons-phone" :label="member.phone?.match(/.{1,2}/g)?.join(' ')" :to="member.phone ? 'tel:' + member.phone : undefined" />
               <MemberDetailsPersonnalInfo icon="i-heroicons-phone" :label="member.mobilePhone?.match(/.{1,2}/g)?.join(' ')" :to="member.mobilePhone ? 'tel:' + member.mobilePhone : undefined" />
