@@ -24,11 +24,11 @@ function getBasicAuthorization(isBadger: boolean = false): string {
   return `Basic ${btoa(bearer)}`
 }
 
-async function useApi<T>(path: string, options: UseApiDataOptions<T> = {}, requireLogin: boolean = true, retry: number = 0) {
+async function useApi<T>(path: string, options: UseApiDataOptions<T> = {}, requireLogin: boolean = true, retry: number = 0, timeout: number = 30000) {
   let overloadedOptions: UseApiDataOptions<T> = {
     mode: "cors",
     cache: false,
-    timeout: 30000, // Default timeout after 30s
+    timeout: timeout, // Doing that otherwise for search user post we get an "array is undefined" error...
 
     headers: {
       Accept: MIME_TYPE,
@@ -287,13 +287,12 @@ export async function usePost<T>(path: string, payload: object) {
   try {
     const data = await useApi<T>(path, {
       method: "POST",
-      timeout: 10000, // Timeout after 10s
       body: payload,
       headers: {
         Accept: MIME_TYPE,
         "Content-Type": MIME_TYPE,
       },
-    });
+    }, true, 0, 10000);
 
     item = data as T;
   } catch (e) {
