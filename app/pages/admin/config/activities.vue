@@ -58,9 +58,6 @@ const columns = [
   {
     accessorKey: 'visibility',
     header: 'Visibilité',
-  },
-  {
-    accessorKey: 'actions',
   }
 ]
 
