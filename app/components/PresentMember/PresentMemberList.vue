@@ -4,8 +4,9 @@
   import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
   import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
   import {useSelfUserStore} from "~/stores/useSelfUser";
-  import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
   import {createBrowserCsvDownload} from "~/utils/browser";
+  import type {TableSortInterface} from "~/components/Presence/PresenceTable.vue";
+  import type {TablePaginateInterface} from "~/components/Generic/GenericTablePagination.vue";
 
   const props = defineProps({
     listOnly: {
@@ -171,7 +172,7 @@
       :is-loading="isLoading"
       @rowClicked="rowClicked"
       @sort="(object: TableSortInterface) => { sort = object; getPresences() }"
-      @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; sort = object.sort; getPresences() }"
+      @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; getPresences() }"
     />
 
     <UModal

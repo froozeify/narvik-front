@@ -176,7 +176,7 @@
       accent-color="warning"
       @rowClicked="rowClicked"
       @sort="(object: TableSortInterface) => { sort = object; getPresences() }"
-      @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; sort = object.sort; getPresences() }"
+      @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; getPresences() }"
     />
 
     <UModal

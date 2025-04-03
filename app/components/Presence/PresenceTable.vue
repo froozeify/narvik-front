@@ -2,8 +2,8 @@
 import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import type {PropType} from "vue";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
-import {usePaginationValues} from "~/composables/api/list";
 import {formatDateReadable} from "~/utils/date";
+import type {TablePaginateInterface} from "~/components/Generic/GenericTablePagination.vue";
 
 const props = defineProps({
   presences: {
@@ -45,16 +45,16 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits([
-  'register',
-  'rowClicked',
-  'sort',
-  'paginate'
-])
+const emit = defineEmits<{
+  register: [],
+  rowClicked: [MemberPresence|ExternalPresence],
+  sort: [TableSortInterface],
+  paginate: [TablePaginateInterface],
+}>()
 
 const page = ref(1);
 const itemsPerPage = ref(10);
-const sort = ref({
+const sort: Ref<TableSortInterface> = ref({
   column: 'date',
   direction: 'desc'
 });
@@ -62,12 +62,6 @@ const sort = ref({
 export interface TableSortInterface {
   column: string,
   direction: string
-}
-
-export interface TablePaginateInterface {
-  page: number,
-  itemsPerPage: number,
-  sort: TableSortInterface
 }
 
 const columns = [
@@ -114,10 +108,6 @@ function sortClicked() {
   if (props.canSort) {
     emit('sort', sort.value)
   }
-}
-
-function emitPaginate() {
-  emit('paginate', { page: page.value, itemsPerPage: itemsPerPage.value, sort: sort.value })
 }
 
 </script>
@@ -232,10 +222,12 @@ function emitPaginate() {
 
   </UTable>
 
-  <div v-if="props.hasPagination" class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-    <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="emitPaginate()" />
-    <UPagination v-model:page="page" @update:page="emitPaginate()" :items-per-page="parseInt(itemsPerPage.toString())" :total="props.totalPresences" />
-  </div>
+  <GenericTablePagination
+    v-model:page="page"
+    v-model:items-per-page="itemsPerPage"
+    :total-items="props.totalPresences"
+    @paginate="(object: TablePaginateInterface) => { emit('paginate', object) }"
+  />
 </template>
 
 <style scoped lang="css">
