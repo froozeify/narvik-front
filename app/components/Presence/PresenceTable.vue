@@ -126,7 +126,7 @@ function sortClicked() {
       tr: 'cursor-pointer'
     }"
   >
-    <template #empty-state>
+    <template #empty>
       <div class="flex flex-col items-center justify-center py-6 gap-3">
         <span class="italic text-sm">Aucune présences enregistrée.</span>
         <UButton v-if="props.displayNoDataRegister" class="mt-4" label="S'enregistrer" @click="emit('register')"/>

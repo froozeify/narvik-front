@@ -152,7 +152,7 @@ async function impersonate(user: User) {
             :columns="columns"
             :data="apiItems"
             @select="rowClicked">
-            <template #empty-state>
+            <template #empty>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucun utilisateurs.</span>
               </div>

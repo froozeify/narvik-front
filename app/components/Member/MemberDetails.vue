@@ -673,7 +673,7 @@ async function deleteMember() {
               :data="memberSeasonRows"
             >
 
-              <template #empty-state>
+              <template #empty>
                 <div class="flex flex-col items-center justify-center py-6 gap-3">
                   <span class="italic text-sm">Aucune saisons enregistrée</span>
                 </div>
@@ -779,7 +779,7 @@ async function deleteMember() {
               :data="memberPresencesPaginated"
             >
 
-              <template #empty-state>
+              <template #empty>
                 <div class="flex flex-col items-center justify-center py-6 gap-3">
                   <span class="italic text-sm">Aucune présence enregistrée</span>
                 </div>

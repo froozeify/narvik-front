@@ -208,7 +208,7 @@ getActivities()
             :columns="columns"
             :data="activities"
             @select="rowClicked">
-            <template #empty-state>
+            <template #empty>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucune activité enregistrée</span>
                 <UButton class="mt-4" label="Créer" @click="createActivity()"/>
