@@ -45,6 +45,7 @@
     <UAccordion
       variant="soft"
       color="warning"
+      :unmount-on-hide="false"
       :ui="{
         item: 'border-none',
         content: 'pt-1.5 pb-3',
