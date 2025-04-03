@@ -297,10 +297,12 @@
 
         </UTable>
 
-        <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-          <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="getItemsPaginated()" />
-          <UPagination v-model:page="page" @update:page="getItemsPaginated()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalApiItems" />
-        </div>
+        <GenericTablePagination
+          v-model:page="page"
+          v-model:items-per-page="itemsPerPage"
+          :total-items="totalApiItems"
+          @paginate="(object: TablePaginateInterface) => { getItemsPaginated() }"
+        />
 
       </UCard>
     </template>

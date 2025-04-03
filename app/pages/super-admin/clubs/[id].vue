@@ -306,10 +306,12 @@ loadClubUsers()
 
           </UTable>
 
-          <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="loadClubUsers()"/>
-            <UPagination v-model:page="page" @update:page="loadClubUsers()" :items-per-page="parseInt(itemsPerPage.toString())" :total="totalUsers"/>
-          </div>
+          <GenericTablePagination
+            v-model:page="page"
+            v-model:items-per-page="itemsPerPage"
+            :total-items="totalUsers"
+            @paginate="(object: TablePaginateInterface) => { loadClubUsers() }"
+          />
         </div>
       </GenericCard>
     </div>
