@@ -231,7 +231,7 @@ onUnmounted(() => {
     <UModal
         v-model:open="memberPresenceModalOpen"
         :ui="{
-           content: 'bg-transparent dark:bg-transparent shadow-none ring-transparent overflow-y-auto'
+           content: 'bg-transparent dark:bg-transparent shadow-none ring-transparent'
         }"
     >
       <template #content>

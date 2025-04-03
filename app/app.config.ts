@@ -34,6 +34,11 @@ export default defineAppConfig({
         root: 'w-full'
       }
     },
+    modal: {
+      slots: {
+        content: 'overflow-y-auto' // Fix for cards not scrolling when they have too much content...
+      }
+    },
     table: {
       slots: {
         td: 'py-2 text-(--ui-text)',
