@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import type {Member} from "~/types/api/item/clubDependent/member";
+import type {TableRow} from "#ui/types";
 
 const props = defineProps({
   query: {
@@ -100,9 +101,9 @@ const columns = [{
   header: 'Nom'
 }]
 
-function rowClicked(row: Member) {
-  memberSelected.value = row
-  emit('selected-member', row)
+function rowClicked(row: TableRow<Member>) {
+  memberSelected.value = row.original
+  emit('selected-member', row.original)
 }
 
 </script>

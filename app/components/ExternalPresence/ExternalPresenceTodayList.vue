@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
+import type {TableRow} from "#ui/types";
 
 const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)
 
@@ -15,8 +16,8 @@ async function getExternalPresences() {
   await externalPresenceStore.refresh()
 }
 
-function rowClicked(row: ExternalPresence) {
-  selectedExternalPresence.value = row;
+function rowClicked(row: TableRow<ExternalPresence>) {
+  selectedExternalPresence.value = row.original;
   externalPresenceStore.modalOpen = true;
 }
 

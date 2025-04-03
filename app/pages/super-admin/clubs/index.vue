@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import type {FormError} from "#ui/types";
+import type {FormError, TableRow} from "#ui/types";
   import ClubQuery from "~/composables/api/query/ClubQuery";
   import type {Club, WriteClub} from "~/types/api/item/club";
   import type {NuxtError} from "#app";
@@ -103,8 +103,8 @@
     isLoading.value = false
   }
 
-  function rowClicked(row: Club) {
-    selectedItem.value = {...row} // We make a shallow clone
+  function rowClicked(row: TableRow<Club>) {
+    selectedItem.value = {...row.original} // We make a shallow clone
     isSideVisible.value = true
   }
 

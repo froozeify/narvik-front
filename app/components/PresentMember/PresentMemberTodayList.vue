@@ -9,6 +9,7 @@ import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExte
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {useSelfUserStore} from "~/stores/useSelfUser";
+import type {TableRow} from "#ui/types";
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
@@ -76,8 +77,8 @@ async function getPresences(force: boolean = false) {
   }
 }
 
-function rowClicked(row: MemberPresence) {
-  selectedMemberPresence.value = row;
+function rowClicked(row: TableRow<MemberPresence>) {
+  selectedMemberPresence.value = row.original;
   memberPresenceModalOpen.value = true;
 }
 

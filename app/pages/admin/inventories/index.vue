@@ -7,6 +7,7 @@
   import {createBrowserCsvDownload, verifyCameraIsPresent} from "~/utils/browser";
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
   import {formatDateInput} from "~/utils/date";
+  import type {TableRow} from "#ui/types";
 
   definePageMeta({
     layout: "pos"
@@ -102,8 +103,8 @@
     }
   ]
 
-  function rowClicked(row: InventoryItem) {
-    selectedItem.value = {...row} // We make a shallow clone
+  function rowClicked(row: TableRow<InventoryItem>) {
+    selectedItem.value = {...row.original} // We make a shallow clone
     isSideVisible.value = true
   }
 

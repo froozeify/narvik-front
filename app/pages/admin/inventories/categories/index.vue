@@ -4,7 +4,7 @@
   import {usePaginationValues} from "~/composables/api/list";
   import type {Member} from "~/types/api/item/clubDependent/member";
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
-  import type {FormError} from "#ui/types";
+  import type {FormError, TableRow} from "#ui/types";
   import {convertUuidToUrlUuid} from "~/utils/resource";
   import type {NuxtError} from "#app";
   import type {ItemError} from "~/types/api/itemError";
@@ -78,8 +78,8 @@
     isLoading.value = false
   }
 
-  function rowClicked(row: object) {
-    selectedCategory.value = {...row} // We make a shallow clone
+  function rowClicked(row: TableRow<InventoryCategory>) {
+    selectedCategory.value = {...row.original} // We make a shallow clone
     isVisible.value = true
   }
 

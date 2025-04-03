@@ -4,6 +4,7 @@ import type {PropType} from "vue";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {formatDateReadable} from "~/utils/date";
 import type {TablePaginateInterface} from "~/components/Generic/GenericTablePagination.vue";
+import type {TableRow} from "#ui/types";
 
 const props = defineProps({
   presences: {
@@ -97,7 +98,7 @@ const columns = [
   }
 ]
 
-function rowClicked(row) {
+function rowClicked(row: TableRow<ExternalPresence|MemberPresence>) {
   if (!props.isExternalPresences && !row.original.member) {
     return;
   }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type {FormError} from "#ui/types";
+import type {FormError, TableRow} from "#ui/types";
 import type {Club} from "~/types/api/item/club";
 import type {NuxtError} from "#app";
 import {usePaginationValues} from "~/composables/api/list";
@@ -71,8 +71,8 @@ definePageMeta({
     isLoading.value = false
   }
 
-  function rowClicked(row: Club) {
-    selectedItem.value = {...row} // We make a shallow clone
+  function rowClicked(row: TableRow<Club>) {
+    selectedItem.value = {...row.original} // We make a shallow clone
     isSideVisible.value = true
   }
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type {FormError} from "#ui/types";
+import type {FormError, TableRow} from "#ui/types";
 import type {NuxtError} from "#app";
 import {usePaginationValues} from "~/composables/api/list";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
@@ -93,8 +93,8 @@ async function getItemsPaginated() {
   isLoading.value = false
 }
 
-function rowClicked(row: User) {
-  selectedItem.value = {...row} // We make a shallow clone
+function rowClicked(row: TableRow<User>) {
+  selectedItem.value = {...row.original} // We make a shallow clone
   isSideVisible.value = true
 }
 

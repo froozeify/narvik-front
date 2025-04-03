@@ -7,6 +7,7 @@
   import {createBrowserCsvDownload} from "~/utils/browser";
   import type {TableSortInterface} from "~/components/Presence/PresenceTable.vue";
   import type {TablePaginateInterface} from "~/components/Generic/GenericTablePagination.vue";
+  import type {TableRow} from "#ui/types";
 
   const props = defineProps({
     listOnly: {
@@ -96,8 +97,8 @@
     });
   }
 
-  function rowClicked(row: MemberPresence) {
-    selectedPresence.value = row
+  function rowClicked(row: TableRow<MemberPresence>) {
+    selectedPresence.value = row.original
     modalOpen.value = true
   }
 

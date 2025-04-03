@@ -3,7 +3,7 @@ import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale
 import {usePaginationValues} from "~/composables/api/list";
 import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
 import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
-import type {FormError} from "#ui/types";
+import type {FormError, TableRow} from "#ui/types";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import type {NuxtError} from "#app";
 import type {ItemError} from "~/types/api/itemError";
@@ -81,8 +81,8 @@ definePageMeta({
     isLoading.value = false
   }
 
-  function rowClicked(row: object) {
-    selectedPaymentMode.value = {...row} // We make a shallow clone
+  function rowClicked(row: TableRow<SalePaymentMode>) {
+    selectedPaymentMode.value = {...row.original} // We make a shallow clone
     isVisible.value = true
   }
 

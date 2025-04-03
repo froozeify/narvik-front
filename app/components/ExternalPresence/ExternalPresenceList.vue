@@ -6,6 +6,7 @@
   import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
   import {useSelfUserStore} from "~/stores/useSelfUser";
   import {createBrowserCsvDownload} from "~/utils/browser";
+  import type {TableRow} from "#ui/types";
 
   const props = defineProps({
     listOnly: {
@@ -98,10 +99,10 @@
     });
   }
 
-  function rowClicked(row: ExternalPresence) {
+  function rowClicked(row: TableRow<ExternalPresence>) {
     if (props.listOnly) return;
 
-    selectedExternalPresence.value = row
+    selectedExternalPresence.value = row.original
     modalOpen.value = true
   }
 
