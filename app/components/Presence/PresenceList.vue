@@ -43,14 +43,14 @@
     </UCard>
 
     <UAccordion
-      class="mb-0"
       variant="soft"
       color="warning"
       :ui="{
-        default: {
-          class: 'mb-0'
-        }
+        item: 'border-none',
+        content: 'pt-1.5 pb-3',
+        trigger: 'transition mb-1.5 px-2.5 py-1.5 bg-orange-50 dark:bg-orange-950 rounded-md text-orange-500 dark:text-orange-400 border-none  cursor-pointer'
       }"
+      :truncate="false"
       :items="[
           {
             'label': `Licenciés autre club / non licenciés (${presenceStore.totalExternal})`,

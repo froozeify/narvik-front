@@ -24,6 +24,9 @@
 
 :root {
   --ui-color-neutral-700: #000;
+  /*--table-even: rgba(28, 57, 142, 0.03);*/
+  --table-even: hsl(from var(--color-blue-500) h s l / 0.03);
+  --table-even-dark: hsl(from var(--color-blue-400) h s l / 0.03);
 }
 
 html, body, #__nuxt, #__nuxt > div, #__layout{

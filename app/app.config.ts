@@ -37,7 +37,7 @@ export default defineAppConfig({
     table: {
       slots: {
         td: 'py-2 text-(--ui-text)',
-        tr: 'even:bg-neutral-100 even:dark:bg-neutral-800'
+        tr: ' even:bg-(--table-even) dark:even:bg-(--table-even-dark)'
       }
     },
   }
