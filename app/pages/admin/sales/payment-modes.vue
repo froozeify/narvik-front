@@ -93,7 +93,7 @@ definePageMeta({
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La modification a échouée",
         description: error.message
       });
@@ -139,7 +139,7 @@ definePageMeta({
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: !paymentMode.uuid ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
@@ -162,7 +162,7 @@ definePageMeta({
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       });

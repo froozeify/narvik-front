@@ -67,7 +67,7 @@ async function register() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "Impossible d'effectuer la création du compte.",
       description: error.data?.detail ?? error.message
     });
@@ -99,7 +99,7 @@ async function initiateRegister() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "Impossible d'effectuer la demande de création.",
       description: error.message
     });

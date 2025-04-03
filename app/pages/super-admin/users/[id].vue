@@ -63,7 +63,7 @@ async function loadUser() {
 
   if (!retrieved || error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "Utilisateur non trouvé",
     })
 
@@ -83,7 +83,7 @@ async function deleteUser() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La suppression a échouée",
       description: error.message
     })
@@ -116,7 +116,7 @@ async function onUpdatePasswordSubmit() {
 
 function failedPasswordUpdate(explanation?: string) {
   toast.add({
-    color: "red",
+    color: "error",
     title: "La modification du mot de passe a échoué",
     description: explanation
   })

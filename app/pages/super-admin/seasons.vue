@@ -109,7 +109,7 @@ definePageMeta({
 
     if (apiError) {
       toast.add({
-        color: "red",
+        color: "error",
         title: !item.id ? "La création a échouée" : "La modification a échouée",
         description: apiError.message
       });
@@ -132,7 +132,7 @@ definePageMeta({
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       });

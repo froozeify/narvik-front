@@ -90,7 +90,7 @@
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La modification a échouée",
         description: error.message
       });
@@ -133,7 +133,7 @@
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: !category.uuid ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
@@ -156,7 +156,7 @@
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       });

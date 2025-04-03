@@ -158,7 +158,7 @@
 
     if (!created || error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La vente à échoué",
         description: error?.message
       });

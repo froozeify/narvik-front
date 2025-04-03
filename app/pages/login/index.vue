@@ -34,7 +34,7 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
   const { error } = await useLoginUser(event.data.email, event.data.password);
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: error.statusCode === 400 ? "Erreur de connexion" : "Trop de tentative",
       description: error.statusCode === 400 ? 'Mauvais email/mot de passe' : 'Veuillez réessayer dans 5 minutes.'
     })

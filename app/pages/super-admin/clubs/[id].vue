@@ -73,7 +73,7 @@ async function loadItem() {
 
   if (!retrieved || error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "Club non trouvé",
     })
 
@@ -124,7 +124,7 @@ async function deleteClub() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La suppression a échouée",
       description: error.message
     })

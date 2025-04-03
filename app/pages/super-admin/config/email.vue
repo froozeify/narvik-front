@@ -87,7 +87,7 @@ async function updateSmtpSetting() {
   if (error || !item) {
     toast.add({
       title: "Une erreur est survenue",
-      color: "red"
+      color: "error"
     })
     return
   }

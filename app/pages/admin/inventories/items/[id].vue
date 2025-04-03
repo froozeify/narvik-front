@@ -36,7 +36,7 @@
   loadItem().then(value => {
     if (!value) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "Produit non trouvé",
       })
 
@@ -110,7 +110,7 @@
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       })

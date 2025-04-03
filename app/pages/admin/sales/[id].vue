@@ -66,7 +66,7 @@ definePageMeta({
 
     if (!retrieved || error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "Vente non trouvé",
       })
 
@@ -86,7 +86,7 @@ definePageMeta({
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       })

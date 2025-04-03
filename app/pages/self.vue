@@ -52,7 +52,7 @@ async function onUpdatePasswordSubmit() {
 
 function failedPasswordUpdate(explanation?: string) {
   toast.add({
-    color: "red",
+    color: "error",
     title: "La modification du mot de passe a échoué",
     description: explanation
   })
@@ -64,7 +64,7 @@ async function deleteUser() {
   const { error } = await userQuery.selfDelete()
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La suppression du compte à échoué",
       description: error.message
     })

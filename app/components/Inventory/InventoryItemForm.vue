@@ -134,7 +134,7 @@ async function updateItem() {
     toast.add({
       title: "Une erreur est survenue",
       description: errorMessage,
-      color: "red"
+      color: "error"
     })
     return
   }

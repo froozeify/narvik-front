@@ -168,7 +168,7 @@ function loadItem() {
     memberQuery.get(props.memberId).then(value => {
       if (value.error) {
         toast.add({
-          color: "red",
+          color: "error",
           title: "Une erreur s'est produite",
           description: value.error.message || value.error.toString()
         })
@@ -190,7 +190,7 @@ function changeMemberRole(close: Function) {
   memberQuery.updateRole(member.value, selectedNewRole.value as ClubRole).then(({updated, error}) => {
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "Une erreur est survenue",
         description: error.message
       })
@@ -302,7 +302,7 @@ async function deleteRow(memberPresence: MemberPresence) {
   memberPresenceQuery.delete(memberPresence).then(async ({error}) => {
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       })
@@ -381,7 +381,7 @@ async function addMemberSeason(seasonIri: string, isSecondary: boolean = false, 
   memberSeasonQuery.post(memberSeason).then(async ({error}) => {
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "L'ajout a échoué",
         description: error.message
       })
@@ -405,7 +405,7 @@ async function deleteMemberSeason(memberSeason: MemberSeason) {
   memberSeasonQuery.delete(memberSeason).then(async ({error}) => {
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       })
@@ -428,7 +428,7 @@ async function deleteMember() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La suppression a échouée",
       description: error.message
     })

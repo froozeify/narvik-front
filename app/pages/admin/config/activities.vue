@@ -120,7 +120,7 @@ async function updateActivity(activity: Activity) {
 
   if (errorApi) {
     toast.add({
-      color: "red",
+      color: "error",
       title: !activity.uuid ? "La création a échouée" : "La modification a échouée",
       description: errorApi.message
     });
@@ -144,7 +144,7 @@ async function deleteActivity() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La suppression a échouée",
       description: error.message
     })
@@ -169,7 +169,7 @@ async function migrateActivity(migrationTarget: string) {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La migration a échouée",
       description: error.message
     })

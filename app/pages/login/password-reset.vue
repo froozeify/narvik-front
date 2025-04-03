@@ -59,7 +59,7 @@ async function resetPassword() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "Impossible d'effectuer la modification du mot de passe. Le mot de passe ou le code est incorrect.",
     });
     return;
@@ -90,7 +90,7 @@ async function initiatePasswordReset() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "Impossible d'effectuer la demande de réinitialisation.",
       description: "Compte non trouvé ou bloqué. Veuillez réessayer dans 24h."
     });

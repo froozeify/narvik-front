@@ -74,7 +74,7 @@
       toast.add({
         title: "Erreur lors de la migration",
         description: error.message,
-        color: "red"
+        color: "error"
       })
       return
     }

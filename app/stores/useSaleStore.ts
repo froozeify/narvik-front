@@ -94,7 +94,7 @@ export const useSaleStore = defineStore('sale', () => {
     } else {
       isDownloadingCsv.value = false
       useToast().add({
-        color: "red",
+        color: "error",
         title: "Date non définie.",
         description: "Veuillez sélectionner une date afin de pouvoir télécharger le csv."
       })
