@@ -4,9 +4,14 @@ import ClubQuery from "~/composables/api/query/ClubQuery";
 
 const emit = defineEmits(['generated', 'close'])
 
+const isLoading = ref(false)
+
 async function generateBadger() {
+  isLoading.value = true
   const clubQuery = new ClubQuery()
   const { updated } = await clubQuery.generateBadger()
+  isLoading.value = false
+
   if (updated) {
     emit("generated", updated)
     emit('close', true)
@@ -28,6 +33,7 @@ async function generateBadger() {
 
     <template #actions>
       <UButton
+        :loading="isLoading"
         @click="generateBadger()"
       >
         Générer

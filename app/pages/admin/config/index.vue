@@ -200,9 +200,10 @@ async function deleteLogo() {
         class="my-4"
         @click="
           overlay.create(ClubModalGenerateBadger).open({
-            onGenerated() {
+            onGenerated(newClub: Club) {
               badgerSetting = newClub.badgerToken
-                selfStore.refreshSelectedClub()
+              selfStore.refreshSelectedClub()
+              useToast().add({title: 'Lien de connexion généré'})
             }
           })"
       >
