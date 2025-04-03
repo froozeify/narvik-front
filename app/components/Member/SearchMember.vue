@@ -101,9 +101,9 @@ const columns = [{
   header: 'Nom'
 }]
 
-function rowClicked(row: TableRow<Member>) {
-  memberSelected.value = row.original
-  emit('selected-member', row.original)
+function rowClicked(row: Member) {
+  memberSelected.value = row
+  emit('selected-member', row)
 }
 
 </script>
@@ -149,7 +149,7 @@ function rowClicked(row: TableRow<Member>) {
         class="w-full"
         :columns="columns"
         :data="foundMembers"
-        @select="rowClicked">
+        @select="(evt) => rowClicked(evt.original)">
       <template #empty>
         <div class="flex flex-col items-center justify-center py-6 gap-3">
           <span class="italic text-sm">Aucune résultat trouvé</span>
