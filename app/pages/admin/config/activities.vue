@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
-import type {FormError} from "#ui/types";
+import type {FormError, TableRow} from "#ui/types";
 import ActivityModalDelete from "~/components/Activity/ActivityModalDelete.vue";
 import ActivityModalMigrate from "~/components/Activity/ActivityModalMigrate.vue";
 import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
@@ -15,7 +15,7 @@ useHead({
 })
 
 const toast = useToast()
-const modal = useModal()
+const overlay = useOverlay()
 
 const isLoading = ref(true)
 const activities: Ref<Activity[]> = ref([])
@@ -78,8 +78,8 @@ async function getActivities() {
   isLoading.value = false
 }
 
-function rowClicked(row: Activity) {
-  selectedActivity.value = {...row} // We make a shallow clone
+function rowClicked(row: TableRow<Activity>) {
+  selectedActivity.value = {...row.original} // We make a shallow clone
   isVisible.value = true
 }
 
@@ -253,34 +253,32 @@ getActivities()
         </UForm>
 
         <UButton v-if="selectedActivity.uuid"
-          block
-          color="error"
-          :loading="isLoading"
-          @click="modal.open(ActivityModalDelete, {
-            title: selectedActivity.name,
-            onDelete() {
-              modal.close()
-              deleteActivity()
-            }
-          })"
-        >
-          Supprimer
-        </UButton>
-
-        <UButton v-if="selectedActivity.uuid"
                  block
-                 color="warning"
+                 variant="soft"
                  :loading="isLoading"
-                 @click="modal.open(ActivityModalMigrate, {
+                 @click="overlay.create(ActivityModalMigrate).open({
                  title: selectedActivity.name,
                  activities: activities,
                  onMigrate(targetId: string) {
-                   modal.close()
                    migrateActivity(targetId)
                  }
           })"
         >
           Migrer
+        </UButton>
+
+        <UButton v-if="selectedActivity.uuid"
+          block
+          color="error"
+          :loading="isLoading"
+          @click="overlay.create(ActivityModalDelete).open({
+            title: selectedActivity.name,
+            onDelete() {
+              deleteActivity()
+            }
+          })"
+        >
+          Supprimer
         </UButton>
       </div>
     </template>

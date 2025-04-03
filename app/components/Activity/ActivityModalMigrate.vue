@@ -45,13 +45,13 @@ const items = computed( () => {
     />
 
     <UFormField class="mb-4" label="Activité cible">
-      <USelect required v-model="migrationTarget" :items="items" />
+      <USelect required class="w-full" v-model="migrationTarget" :items="items" />
     </UFormField>
 
     <template #actions>
       <UButton
         :disabled="!migrationTarget"
-        @click="emit('migrate', migrationTarget)"
+        @click="emit('migrate', migrationTarget); emit('close', true)"
         color="warning"
       >
         Migrer
