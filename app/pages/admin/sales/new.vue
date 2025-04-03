@@ -268,7 +268,7 @@
         </div>
       </UCard>
 
-      <UModal v-model="cartCustomItemModalOpen">
+      <UModal v-model:open="cartCustomItemModalOpen">
         <template #content>
           <UCard>
             <UForm class="flex gap-2 flex-col" :state="customItemForm" :validate="cartStore.validateCustomCartForm" @submit="cartStore.addCustomItemToCart">

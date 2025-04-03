@@ -223,7 +223,7 @@
   </div>
 
   <UModal
-    v-model="inventoryItemModalOpen">
+    v-model:open="inventoryItemModalOpen">
     <template #content>
       <UCard>
         <InventoryItemForm

@@ -332,7 +332,7 @@ async function copyLicence() {
     </UCard>
 
     <UModal
-        v-model="updateMemberPresenceModalOpen">
+        v-model:open="updateMemberPresenceModalOpen">
       <template #content>
         <RegisterMemberPresence
             :member-presence="memberPresence"

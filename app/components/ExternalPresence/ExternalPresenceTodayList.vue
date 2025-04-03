@@ -70,7 +70,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
   </UCard>
 
   <UModal
-      v-model="externalPresenceStore.modalOpen">
+      v-model:open="externalPresenceStore.modalOpen">
     <template #content>
       <ExternalPresenceDetails
           v-if="selectedExternalPresence"

@@ -318,7 +318,7 @@ loadClubUsers()
   </div>
 
   <UModal
-    v-model="itemModalOpen">
+    v-model:open="itemModalOpen">
     <template #content>
       <UCard>
         <ClubForm

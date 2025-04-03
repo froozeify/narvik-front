@@ -837,7 +837,7 @@ async function deleteMember() {
       </div>
 
       <UModal
-        v-model="itemModalOpen">
+        v-model:open="itemModalOpen">
         <template #content>
           <UCard>
             <MemberForm
@@ -848,7 +848,7 @@ async function deleteMember() {
         </template>
       </UModal>
 
-      <UModal v-model="addMemberPresenceModal">
+      <UModal v-model:open="addMemberPresenceModal">
         <template #content>
           <RegisterMemberPresence
             :member="member"
@@ -860,7 +860,7 @@ async function deleteMember() {
       </UModal>
 
       <UModal
-        v-model="memberPresenceModal">
+        v-model:open="memberPresenceModal">
         <template #content>
           <RegisterMemberPresence
             :member-presence="selectedPresence"

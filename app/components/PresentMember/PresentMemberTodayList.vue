@@ -198,7 +198,7 @@ onUnmounted(() => {
             <UButton
                 icon="i-heroicons-arrow-path"
                 color="neutral"
-                variant="solid"
+                variant="outline"
                 aria-label="Rafraichir"
                 :loading="isRefreshing"
                 @click="getPresences(true)"
@@ -222,14 +222,14 @@ onUnmounted(() => {
 
 
     <UModal
-        v-model="addExternalPresenceModal">
+        v-model:open="addExternalPresenceModal">
       <template #content>
         <RegisterExternalPresence @registered="externalPresenceRegistered" @canceled="addExternalPresenceModal = false" />
       </template>
     </UModal>
 
     <UModal
-        v-model="memberPresenceModalOpen"
+        v-model:open="memberPresenceModalOpen"
         :ui="{
            background: 'bg-transparent dark:bg-transparent',
            shadow: 'shadow-none'
@@ -246,7 +246,7 @@ onUnmounted(() => {
     </UModal>
 
     <UModal
-        v-model="searchMemberModalOpen">
+        v-model:open="searchMemberModalOpen">
       <template #content>
         <template v-if="!selectedMember">
           <SearchMember :query="searchQuery" @selected-member="memberSelectedFromSearch" />
@@ -258,7 +258,7 @@ onUnmounted(() => {
     </UModal>
 
     <UModal
-      v-model="historyModal"
+      v-model:open="historyModal"
       :ui="{
         width: 'lg:max-w-5xl p-4 mx-4'
       }"

@@ -185,7 +185,7 @@ function displayMemberPage(member: Member) {
   </div>
 
   <UModal
-    v-model="createMemberModal">
+    v-model:open="createMemberModal">
     <template #content>
       <UCard>
         <MemberForm

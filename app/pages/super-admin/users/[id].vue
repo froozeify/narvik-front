@@ -235,7 +235,7 @@ loadUser()
   </div>
 
   <UModal
-    v-model="itemModalOpen">
+    v-model:open="itemModalOpen">
     <template #content>
       <UCard>
         <UserForm
@@ -248,7 +248,7 @@ loadUser()
 
   <UModal
     v-if="user"
-    v-model="updatePasswordModalOpen">
+    v-model:open="updatePasswordModalOpen">
     <template #content>
       <UCard>
         <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">

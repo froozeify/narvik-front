@@ -119,7 +119,7 @@ async function deletePresence(close: Function) {
   </UCard>
 
   <UModal
-      v-model="updateExternalPresenceModalOpen">
+      v-model:open="updateExternalPresenceModalOpen">
     <template #content>
       <RegisterExternalPresence
         :external-presence="externalPresence"

@@ -181,7 +181,7 @@
     />
 
     <UModal
-        v-model="modalOpen">
+        v-model:open="modalOpen">
       <template #content>
         <ExternalPresenceDetails
             v-if="selectedExternalPresence"

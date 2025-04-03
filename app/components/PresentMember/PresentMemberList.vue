@@ -177,7 +177,7 @@
     />
 
     <UModal
-        v-model="modalOpen">
+        v-model:open="modalOpen">
       <PresentMemberDetails
           v-if="selectedPresence"
           :view-only="props.listOnly"
