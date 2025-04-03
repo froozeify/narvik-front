@@ -2,7 +2,7 @@
 
 import {useSelfUserStore} from "~/stores/useSelfUser";
 
-const emit = defineEmits(['selected'])
+const emit = defineEmits(['selected', 'close'])
 
 const selfStore = useSelfUserStore()
 const { user, member, selectedProfile } = storeToRefs(selfStore)
@@ -37,7 +37,7 @@ async function applyProfile() {
 </script>
 
 <template>
-  <ModalWithActions title="Choix du profil">
+  <ModalWithActions title="Choix du profil" @close="(state: boolean) => emit('close', state)">
 
     <slot>
       <div>

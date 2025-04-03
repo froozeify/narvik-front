@@ -15,7 +15,7 @@ const props = defineProps(
   }
 )
 
-const emit = defineEmits(['updated'])
+const emit = defineEmits(['updated', 'close'])
 
 const toast = useToast()
 const modal = useModal()
@@ -60,7 +60,7 @@ async function updateLink() {
 </script>
 
 <template>
-  <ModalWithActions title="Changement du compte lié">
+  <ModalWithActions title="Changement du compte lié" @close="(state: boolean) => emit('close', state)">
 
     <UForm class="flex gap-2 flex-col" :state="member" :validate="validate">
 

@@ -17,7 +17,7 @@ const props = defineProps(
   }
 )
 
-const emit = defineEmits(['migrate'])
+const emit = defineEmits(['migrate', 'close'])
 
 const migrationTarget: Ref<string|undefined> = ref(undefined)
 
@@ -35,7 +35,7 @@ const items = computed( () => {
 </script>
 
 <template>
-  <ModalWithActions :title="props.title">
+  <ModalWithActions :title="props.title" @close="(state: boolean) => emit('close', state)">
 
     <UAlert
       class="my-4"

@@ -4,7 +4,6 @@ import SeasonQuery from "~/composables/api/query/SeasonQuery";
 import type {Season} from "~/types/api/item/season";
 import type {AgeCategory} from "~/types/api/item/ageCategory";
 import AgeCategoryQuery from "~/composables/api/query/AgeCategoryQuery";
-import {value} from "valibot";
 
 const props = defineProps(
   {
@@ -23,7 +22,7 @@ const isSecondary: Ref<boolean> = ref(false)
 const selectedAgeCategory: Ref<string | undefined> = ref(undefined)
 
 
-const emit = defineEmits(['selected'])
+const emit = defineEmits(['selected', 'close'])
 
 const seasonsSelect = computed( () => {
   const items: SelectItem[] = []
@@ -59,7 +58,7 @@ ageCategoryQuery.getAll().then((value) => {
 </script>
 
 <template>
-  <ModalWithActions title="Sélection d'une saison">
+  <ModalWithActions title="Sélection d'une saison" @close="(state: boolean) => emit('close', state)">
 
     <UFormField label="Saison">
       <USelect v-model="selectedSeason" :items="seasonsSelect" value-attribute="@id" />

@@ -9,12 +9,12 @@ const props = defineProps(
   }
 )
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'close'])
 
 </script>
 
 <template>
-  <ModalWithActions :title="props.title">
+  <ModalWithActions :title="props.title" @close="(state: boolean) => emit('close', state)">
 
     <UAlert
       class="my-4"

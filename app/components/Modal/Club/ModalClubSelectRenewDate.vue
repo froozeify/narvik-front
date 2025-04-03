@@ -11,7 +11,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['selected'])
+const emit = defineEmits(['selected', 'close'])
 
 const selectedDate: Ref<Date|undefined> = ref(props.item.renewDate ? dayjs(props.item.renewDate).toDate() : undefined)
 
@@ -23,7 +23,7 @@ function applyProfile() {
 </script>
 
 <template>
-  <ModalWithActions title="Choix de la date de renouvelement">
+  <ModalWithActions title="Choix de la date de renouvelement" @close="(state: boolean) => emit('close', state)">
 
     <slot>
       <div class="flex flex-col justify-center gap-4">

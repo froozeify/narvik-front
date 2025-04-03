@@ -18,6 +18,8 @@ const props = defineProps(
   }
 )
 
+const emit = defineEmits<{ close: [boolean] }>()
+
 const toast = useToast()
 const modal = useModal()
 
@@ -102,13 +104,13 @@ async function updateSale() {
   // We trigger a refresh of the listing
   saleStore.shouldRefreshSales = true
 
-  await modal.close()
+  emit('close', true)
 }
 
 </script>
 
 <template>
-  <ModalWithActions title="Modification de la vente">
+  <ModalWithActions title="Modification de la vente" @close="(state: boolean) => emit('close', state)">
 
     <UForm class="flex gap-2 flex-col" :state="sale" :validate="validate">
 
