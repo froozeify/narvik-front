@@ -13,9 +13,14 @@ export const useAppConfigStore = defineStore('appConfig', () => {
 
 	// Not exposed
 	const logoImage: Ref<string> = ref('')
+	const logoNk: Ref<string> = ref('')
+
   setLogoImage(isDarkMode().value)
+  setLogoNk(isDarkMode().value)
+
   watch(isDarkMode(), (value) => {
     setLogoImage(value)
+    setLogoNk(value)
   })
 
   function setLogoImage(isDark: boolean) {
@@ -23,6 +28,14 @@ export const useAppConfigStore = defineStore('appConfig', () => {
       logoImage.value = '/logo-narvik-white.png'
     } else {
       logoImage.value = '/logo-narvik.png'
+    }
+  }
+
+  function setLogoNk(isDark: boolean) {
+    if (isDark) {
+      logoNk.value = '/logo-nk-white.png'
+    } else {
+      logoNk.value = '/logo-nk.png'
     }
   }
 
@@ -41,6 +54,9 @@ export const useAppConfigStore = defineStore('appConfig', () => {
 	function getLogo(): Ref<string> {
 		return logoImage
 	}
+  function getLogoNk(): Ref<string> {
+    return logoNk
+  }
 
   function getModuleConfig(name: string): Ref<ConfigValue|null> {
     if (!config.value || !config.value.modules || !config.value.modules[name]) {
@@ -55,6 +71,7 @@ export const useAppConfigStore = defineStore('appConfig', () => {
 
 		refresh,
 		getLogo,
+		getLogoNk,
     getModuleConfig,
 	}
 })
