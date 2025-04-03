@@ -18,9 +18,11 @@
     <UCard class="mb-4">
       <div class="flex flex-wrap items-center gap-4">
 
-        <UInput
+        <div>
+          <UInput
             v-model="presenceStore.searchQuery"
             placeholder="Rechercher..."  />
+        </div>
 
         <div class="flex-1"></div>
 

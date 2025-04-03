@@ -177,14 +177,20 @@
     />
 
     <UModal
-        v-model:open="modalOpen">
-      <PresentMemberDetails
-          v-if="selectedPresence"
-          :view-only="props.listOnly"
-          :item="selectedPresence"
-          @updated="presenceUpdated"
-          @close="modalOpen = false; selectedPresence = undefined"
-      />
+        v-model:open="modalOpen"
+        :ui="{
+           content: 'bg-transparent dark:bg-transparent shadow-none ring-transparent overflow-y-auto',
+        }"
+    >
+      <template #content>
+        <PresentMemberDetails
+            v-if="selectedPresence"
+            :view-only="props.listOnly"
+            :item="selectedPresence"
+            @updated="presenceUpdated"
+            @close="modalOpen = false; selectedPresence = undefined"
+        />
+      </template>
     </UModal>
   </div>
 </template>

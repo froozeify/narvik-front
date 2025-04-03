@@ -231,8 +231,7 @@ onUnmounted(() => {
     <UModal
         v-model:open="memberPresenceModalOpen"
         :ui="{
-           background: 'bg-transparent dark:bg-transparent',
-           shadow: 'shadow-none'
+           content: 'bg-transparent dark:bg-transparent shadow-none ring-transparent overflow-y-auto'
         }"
     >
       <template #content>
@@ -260,7 +259,7 @@ onUnmounted(() => {
     <UModal
       v-model:open="historyModal"
       :ui="{
-        width: 'lg:max-w-5xl p-4 mx-4'
+        content: 'lg:max-w-5xl p-4 mx-4'
       }"
     >
       <template #content>

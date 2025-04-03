@@ -152,7 +152,7 @@ async function copyLicence() {
 <template>
   <div>
     <template v-if="member">
-      <UCard>
+      <UCard class="bg-(--ui-bg)">
         <div class="flex gap-2 mb-2">
           <UButton
             @click="emit('close')"
@@ -213,7 +213,7 @@ async function copyLicence() {
 
         <div class="space-y-4 w-full my-4">
           <div class="text-center text-2xl font-bold">
-            <ContentLink v-if="isSupervisor" class="!text-black" :to="`/admin/members/${convertUuidToUrlUuid(member.uuid)}`">
+            <ContentLink v-if="isSupervisor" class="!text-(--ui-text)" :to="`/admin/members/${convertUuidToUrlUuid(member.uuid)}`">
               {{ member.fullName }}
             </ContentLink>
 
@@ -225,38 +225,33 @@ async function copyLicence() {
             <UBadge
                 v-if="member.currentSeason && member.currentSeason.ageCategory"
                 variant="subtle"
-                color="amber"
-                :ui="{ rounded: 'rounded-full' }">
+                color="amber">
               {{ member.currentSeason.ageCategory.name }}
             </UBadge>
 
             <div v-if="member.blacklisted" class="basis-full text-center">
               <UButton
-                color="neutral"
-                :ui="{ rounded: 'rounded-full' }">
+                color="neutral">
                 Blacklisté
               </UButton>
             </div>
 
             <div v-if="member.medicalCertificateExpiration && member.medicalCertificateStatus !== 'valid'" class="basis-full text-center">
               <UButton
-                :color="member.medicalCertificateStatus === 'expired' ? 'error' : 'yellow'"
-                :ui="{ rounded: 'rounded-full' }">
+                :color="member.medicalCertificateStatus === 'expired' ? 'error' : 'yellow'">
                 Certificat médical : {{ formatDateReadable(member.medicalCertificateExpiration.toString()) }}
               </UButton>
             </div>
 
             <UButton
               v-if="!member.currentSeason"
-              color="error"
-              :ui="{ rounded: 'rounded-full' }">
+              color="error">
               Saison non renouvelée
             </UButton>
 
             <UBadge v-if="member.currentSeason && member.currentSeason.isSecondaryClub"
                     variant="subtle"
-                    color="success"
-                    :ui="{ rounded: 'rounded-full' }">
+                    color="success">
               Club secondaire
             </UBadge>
           </div>
@@ -270,9 +265,7 @@ async function copyLicence() {
           <div class="flex gap-4 justify-center flex-wrap">
             <UButton
                 v-for="activity in memberPresence?.activities?.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-                variant="soft"
-                :ui="{ rounded: 'rounded-full' }"
-            >
+                variant="soft">
               {{ activity.name }}
             </UButton>
           </div>
@@ -291,7 +284,7 @@ async function copyLicence() {
 
       <UCard
           v-if="totalMemberPresences > 0"
-          class="mt-4"
+          class="mt-4 bg-(--ui-bg)"
       >
         <div class="text-xl text-center font-bold mb-4">{{ totalMemberPresences }} présences ces 12 derniers mois</div>
 

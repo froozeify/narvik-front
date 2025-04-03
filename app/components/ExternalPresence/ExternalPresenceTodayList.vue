@@ -47,7 +47,7 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
           <UButton
               icon="i-heroicons-arrow-path"
               color="neutral"
-              variant="solid"
+              variant="outline"
               aria-label="Rafraichir"
               :loading="isRefreshing"
               @click="getExternalPresences()"

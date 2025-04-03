@@ -48,7 +48,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   register: [],
-  rowClicked: [MemberPresence|ExternalPresence],
+  rowClicked: [TableRow<ExternalPresence|MemberPresence>],
   sort: [TableSortInterface],
   paginate: [TablePaginateInterface],
 }>()
@@ -102,7 +102,7 @@ function rowClicked(row: TableRow<ExternalPresence|MemberPresence>) {
   if (!props.isExternalPresences && !row.original.member) {
     return;
   }
-  emit('rowClicked', row.original)
+  emit('rowClicked', row)
 }
 
 function sortClicked() {
