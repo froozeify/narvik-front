@@ -8,7 +8,6 @@ import {convertUuidToUrlUuid} from "~/utils/resource";
 import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
 import ClubModalGenerateBadger from "~/components/Club/ClubModalGenerateBadger.vue";
-import type {Club} from "~/types/api/item/club";
 
 definePageMeta({
   layout: "admin"
@@ -19,7 +18,7 @@ useHead({
 })
 
 const toast = useToast()
-const modal = useModal()
+const overlay = useOverlay()
 
 const selfStore = useSelfUserStore();
 const { selectedProfile } = storeToRefs(selfStore)
@@ -41,7 +40,7 @@ activityQuery.getAll().then(value => {
 })
 const activitiesSelect = computed( () => {
   const items: SelectItem[] = []
-  activities.forEach(value => {
+  activities.value?.forEach(value => {
     items.push({
       label: value.name,
       value: value.uuid
@@ -199,11 +198,11 @@ async function deleteLogo() {
 
       <UButton
         class="my-4"
-        @click="modal.open(ClubModalGenerateBadger, {
-            onGenerated(newClub: Club) {
-              modal.close()
+        @click="
+          overlay.create(ClubModalGenerateBadger).open({
+            onGenerated() {
               badgerSetting = newClub.badgerToken
-              selfStore.refreshSelectedClub()
+                selfStore.refreshSelectedClub()
             }
           })"
       >
@@ -234,12 +233,13 @@ async function deleteLogo() {
       <GenericCard class="h-fit" title="Activités exclus du compte des jours ouverts">
         <div>
           <USelectMenu
+            class="w-full"
             v-model="configState.excludedActivitiesFromOpeningDays"
             @change="ignoredActivitiesDaysUpdated"
             :items="activitiesSelect"
             multiple
           >
-            <template #label>
+            <template #default>
               <span v-if="configState.excludedActivitiesFromOpeningDays && activities && configState.excludedActivitiesFromOpeningDays.length" class="truncate">
                 {{ activities.filter(a => (a.uuid && configState.excludedActivitiesFromOpeningDays?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
               </span>
@@ -252,9 +252,10 @@ async function deleteLogo() {
       <GenericCard class="h-fit mt-4" title="Activité correspondante au contrôle">
         <div>
           <USelect
+            class="w-full"
             v-model="configState.selectedControlShootingActivity"
             @change="controlShootingUpdated"
-            :options="activitiesSelect"
+            :items="activitiesSelect"
             placeholder="Aucun contrôle défini" />
         </div>
       </GenericCard>
