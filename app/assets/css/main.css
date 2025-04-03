@@ -1,11 +1,7 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-:root {
-  --ui-color-neutral-700: #000;
-}
-
-@theme static {
+@theme {
   --font-sans: ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
   /*--ui-text: #000000;*/
   /*--ui-color-neutral-700: #000; Move to root, otherwise the change is not applied */
@@ -24,6 +20,10 @@
   --color-blue-200: #CFD8F5;
   --color-blue-100: #E7ECFA;
   --color-blue-50: #FFFFFF;
+}
+
+:root {
+  --ui-color-neutral-700: #000;
 }
 
 html, body, #__nuxt, #__nuxt > div, #__layout{
