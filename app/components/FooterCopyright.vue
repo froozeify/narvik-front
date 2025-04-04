@@ -9,7 +9,6 @@
     },
   })
 
-
   const runtimeConfig = useRuntimeConfig()
   const appConfigStore = useAppConfigStore()
 
@@ -52,11 +51,7 @@
 <template>
   <div class="container mx-auto mt-12">
 
-<!--    <USeparator class="my-4" :decorative="true">-->
-<!--      <NuxtLink to="https://about.narvik.app" target="_blank"><NuxtImg :src="logoNk" width="42" /></NuxtLink>-->
-<!--    </USeparator>-->
-
-    <div class="m-4 dark:bg-(--ui-bg-elevated)/50 border border-neutral-100 dark:border-transparent rounded-xl shadow-md px-12 py-8 grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
+    <div class="mx-4 dark:bg-(--ui-bg-elevated)/50 border border-neutral-100 dark:border-transparent rounded-xl shadow-md px-12 py-8 grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
       <div class="flex flex-col justify-center items-center lg:items-start">
         <NuxtLink class="transition opacity-85 hover:opacity-100" to="https://about.narvik.app" target="_blank" ><NuxtImg :src="logoNk" /></NuxtLink>
         <div class="hidden lg:block mt-2 text-xs">
@@ -72,12 +67,6 @@
         <template v-for="(val, index) in externalLinks">
           <div><ContentLink class="text-(--ui-text) dark:text-white dark:hover:text-white" :to="val.to" target="_blank" >{{ val.label }}</ContentLink></div>
         </template>
-
-<!--        <div class="flex flex-row justify-end gap-x-4 text-xs flex-wrap">-->
-<!--          <template v-for="(val, index) in externalLinks">-->
-<!--            <div><ContentLink class="text-(&#45;&#45;ui-text)" :to="val.to" target="_blank" >{{ val.label }}</ContentLink></div>-->
-<!--          </template>-->
-<!--        </div>-->
       </div>
 
       <div v-if="props.displayVersion" class="-mt-2 lg:-mt-4 lg:col-span-3 transition opacity-40 hover:opacity-70 flex flex-row justify-center lg:justify-end  text-[.6rem] gap-1">
