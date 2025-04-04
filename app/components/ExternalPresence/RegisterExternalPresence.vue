@@ -3,7 +3,10 @@ import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import type {PropType, Ref} from "vue";
 import type {FormSubmitEvent} from "#ui/types";
-import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
+import type {
+  ExternalPresence,
+  WriteExternalPresence
+} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
@@ -43,7 +46,7 @@ const state = reactive({
   licence: undefined as string|undefined,
   firstname: undefined as string|undefined,
   lastname: undefined as string|undefined,
-  activities: [] as Array<Activity>
+  activities: {} as { [k: string]: boolean }
 })
 
 watch(state, async (value) => {
@@ -55,7 +58,7 @@ watch(state, async (value) => {
 
   if (searchResult.item.length !== 1) return;
 
-  matchedMember.value = searchResult.item[0];
+  matchedMember.value = searchResult.item[0] ?? null;
   registerMemberPresenceModal.value = true
 })
 
@@ -64,10 +67,10 @@ if (props.externalPresence) {
   state.firstname = props.externalPresence.firstname
   state.lastname = props.externalPresence.lastname
 
-  state.activities = []
+  state.activities = {}
   props.externalPresence.activities?.forEach(actvt => {
-    if (actvt.isEnabled) {
-      state.activities.push(actvt)
+    if (actvt["@id"] && actvt.isEnabled) {
+      state.activities[actvt["@id"]] = true
     }
   });
 }
@@ -83,7 +86,7 @@ activityQuery.getAll().then(value => {
 async function onSubmit(event: FormSubmitEvent<any>) {
   isSubmitting.value = true;
 
-  let externalPresence: ExternalPresence = {
+  const externalPresence: WriteExternalPresence = {
     licence: event.data.licence,
     firstname: event.data.firstname,
     lastname: event.data.lastname,
@@ -91,11 +94,12 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     activities: []
   }
 
-  event.data.activities.forEach( (actvt: Activity) => {
-    if (actvt["@id"]) {
-      externalPresence.activities.push(actvt["@id"])
+
+  for (const [key, value] of Object.entries(event.data.activities)) {
+    if (key && value) {
+      externalPresence.activities?.push(key)
     }
-  })
+  }
 
   let item: ExternalPresence | undefined = undefined;
   let isUpdating = false
@@ -164,40 +168,45 @@ function presenceCanceled() {
     </div>
 
     <div v-else>
-      <div v-if="state.lastname" class="text-2xl">Enregistrement pour <b>{{ state.lastname }} {{ state.firstname }}</b></div>
+      <div v-if="state.lastname" class="text-2xl">Enregistrement pour <b>{{ state.lastname.toUpperCase() }} {{ state.firstname }}</b></div>
       <div v-else class="text-2xl">Enregistrement utilisateur externe</div>
 
       <UForm :state="state" @submit="onSubmit" class="mt-4">
-        <UInput
+        <UFormField label="Licence">
+          <UInput
             v-model="state.licence"
             :disabled="props.externalPresence !== undefined && !(isSupervisor || isBadger)"
-            placeholder="Licence"
-        />
+          />
+        </UFormField>
 
-        <UInput class="my-4"
-          v-model="state.lastname"
-          required
-          :disabled="props.externalPresence !== undefined && !(isSupervisor || isBadger)"
-          placeholder="Nom"
-        />
+        <UFormField class="my-2" label="Nom" required>
+          <UInput
+            v-model="state.lastname"
+            required
+            :disabled="props.externalPresence !== undefined && !(isSupervisor || isBadger)"
+          />
+        </UFormField>
 
-        <UInput
+        <UFormField label="Prénom" required>
+          <UInput
             v-model="state.firstname"
             required
             :disabled="props.externalPresence !== undefined && !(isSupervisor || isBadger)"
-            placeholder="Prénom"
-        />
+          />
+        </UFormField>
+
 
         <div class="mt-4">Activités</div>
         <div class="my-4">
           <div class="grid grid-cols-2 gap-2 gap-y-2 ">
-            <UCheckbox
+            <template v-for="activity in activities">
+              <UCheckbox v-if="activity['@id']"
                 class="w-full"
-                v-for="activity in activities"
-                v-model="state.activities"
+                v-model="state.activities[activity['@id']]"
                 :value="activity"
                 :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
+            </template>
           </div>
         </div>
 

@@ -142,7 +142,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
 <template>
   <UCard>
-    <div v-if="isLoading" class="h-full">
+    <div v-if="isLoading || !state.member" class="h-full">
       <USkeleton class="h-8 w-36" />
       <USkeleton class="h-4 w-12 my-4" />
 
@@ -161,7 +161,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
       <UForm :state="state" @submit="onSubmit">
         <UPopover v-if="props.dateEditable" :popper="{ placement: 'bottom-start' }" class="mt-4">
-          <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(selectedDate) || 'Choisir une date'" />
+          <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(selectedDate?.toString()) || 'Choisir une date'" />
 
           <template #panel="{ close }">
             <GenericDatePicker v-model="selectedDate" @close="close" />
