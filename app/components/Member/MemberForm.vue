@@ -34,6 +34,7 @@ const emit = defineEmits([
 
 const isUpdating = ref(false)
 const popoverOpen = ref(false)
+const popoverMedicalOpen = ref(false)
 
 const toast = useToast()
 const memberQuery = new MemberQuery()
@@ -141,11 +142,11 @@ async function submitItem() {
       </UFormField>
 
       <UFormField label="Certificat médical" name="medicalCertificateExpiration">
-        <UPopover v-model:open="popoverOpen">
+        <UPopover v-model:open="popoverMedicalOpen">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.medicalCertificateExpiration?.toString()) || 'Choisir une date'" />
 
           <template #content>
-            <GenericDatePicker v-model="item.medicalCertificateExpiration" mode="date" @close="popoverOpen = false" />
+            <GenericDatePicker v-model="item.medicalCertificateExpiration" mode="date" @close="popoverMedicalOpen = false" />
           </template>
         </UPopover>
       </UFormField>
