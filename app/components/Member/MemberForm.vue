@@ -116,7 +116,7 @@ async function submitItem() {
   <UForm class="flex gap-2 flex-col" :state="item" :validate="validate" @submit="submitItem" @error="onError">
     <div class="flex justify-between">
       <UFormField label="Genre" name="gender">
-        <USelect v-model="item.gender" :items="[{label: 'Homme', value: 'M'}, {label: 'Femme', value: 'F'}]" option-attribute="name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+        <USelect class="min-w-32" v-model="item.gender" :items="[{label: 'Homme', value: 'M'}, {label: 'Femme', value: 'F'}]" option-attribute="name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
       </UFormField>
 
       <UFormField label="Blacklisté">
@@ -146,7 +146,13 @@ async function submitItem() {
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.medicalCertificateExpiration?.toString()) || 'Choisir une date'" />
 
           <template #content>
-            <GenericDatePicker v-model="item.medicalCertificateExpiration" mode="date" @close="popoverMedicalOpen = false" />
+            <div>
+              <div class="p-2 text-xs text-center">
+                <p>Date d'expiration du</p>
+                <p>certificat médical</p>
+              </div>
+              <GenericDatePicker class="!w-full" v-model="item.medicalCertificateExpiration" mode="date" @close="popoverMedicalOpen = false" />
+            </div>
           </template>
         </UPopover>
       </UFormField>

@@ -38,6 +38,17 @@ html {
   font-size: 20px;
 }
 
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .thin-scrollbar {
+    scrollbar-width: thin;
+  }
+}
+
+/* v-calendar picker custom color */
 .vc-nk {
   --vc-accent-50: var(--color-primary-50);
   --vc-accent-100: var(--color-primary-100);
