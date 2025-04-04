@@ -283,22 +283,24 @@ async function deleteLogo() {
           @change="uploadLogo"
       />
 
-      <UPopover overlay v-if="selectedProfile?.club.settings.logo">
+      <UModal v-if="selectedProfile?.club.settings.logo">
         <UButton color="error">
           Supprimer le logo
         </UButton>
 
-        <template #panel="{ close }">
-          <div class="p-4 w-56 flex flex-col gap-4">
-            <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+        <template #content>
+          <UCard>
+            <div class="flex flex-col gap-4">
+              <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
-            <UButton color="error" @click="deleteLogo" class="mx-auto">
-              Supprimer le logo
-            </UButton>
-          </div>
+              <UButton color="error" @click="deleteLogo" class="mx-auto">
+                Supprimer le logo
+              </UButton>
+            </div>
+          </UCard>
         </template>
 
-      </UPopover>
+      </UModal>
 
     </GenericCard>
   </div>

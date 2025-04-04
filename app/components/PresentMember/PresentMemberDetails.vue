@@ -44,6 +44,8 @@ const imageQuery = new ImageQuery()
 const memberQuery = new MemberQuery()
 const memberPresenceQuery = new MemberPresenceQuery()
 
+const popoverOpen = ref(false)
+
 const memberPresence: Ref<MemberPresence> = ref(props.item)
 const member: Ref<Member | undefined> = ref(undefined)
 
@@ -130,10 +132,10 @@ function presenceUpdated(newMemberPresence: MemberPresence) {
   emit('updated', newMemberPresence)
 }
 
-async function deletePresence(close: Function) {
+async function deletePresence() {
   if (isSupervisor || isBadger) {
     await memberPresenceQuery.delete(memberPresence.value)
-    close()
+    popoverOpen.value = false
     emit('updated', null)
   }
 }
@@ -173,7 +175,7 @@ async function copyLicence() {
               label="Editer la présence"
             />
             <UTooltip v-if="!member.blacklisted || (isSupervisor)" text="Supprimer la présence">
-              <UPopover>
+              <UPopover v-model:open="popoverOpen">
                 <UButton
                   icon="i-heroicons-trash"
                   size="xs"
@@ -181,12 +183,12 @@ async function copyLicence() {
                   variant="ghost"
                 />
 
-                <template #panel="{ close }">
+                <template #content>
                   <div class="p-4 w-56 flex flex-col gap-4">
                     <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
                     <UButton
-                      @click="deletePresence(close);"
+                      @click="deletePresence();"
                       color="error"
                       class="mx-auto"
                     >

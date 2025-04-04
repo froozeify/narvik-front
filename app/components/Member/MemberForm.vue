@@ -33,6 +33,7 @@ const emit = defineEmits([
 ])
 
 const isUpdating = ref(false)
+const popoverOpen = ref(false)
 
 const toast = useToast()
 const memberQuery = new MemberQuery()
@@ -124,27 +125,27 @@ async function submitItem() {
 
     <div class="flex justify-between">
       <UFormField label="Date de naissance" name="birthday">
-        <UPopover :popper="{ placement: 'bottom-start' }">
+        <UPopover v-model:open="popoverOpen">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.birthday?.toString()) || 'Choisir une date'" />
 
-          <template #panel="{ close }">
+          <template #content>
             <div>
               <div class="p-2 text-xs text-center">
                 <p>Vous pouvez cliquer sur l'année</p>
                 <p>afin de changer celle-ci</p>
               </div>
-              <GenericDatePicker class="!w-full" v-model="item.birthday" mode="date" @close="close" />
+              <GenericDatePicker class="!w-full" v-model="item.birthday" mode="date" @close="popoverOpen = false" />
             </div>
           </template>
         </UPopover>
       </UFormField>
 
       <UFormField label="Certificat médical" name="medicalCertificateExpiration">
-        <UPopover :popper="{ placement: 'bottom-start' }">
+        <UPopover v-model:open="popoverOpen">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.medicalCertificateExpiration?.toString()) || 'Choisir une date'" />
 
-          <template #panel="{ close }">
-            <GenericDatePicker v-model="item.medicalCertificateExpiration" mode="date" @close="close" />
+          <template #content>
+            <GenericDatePicker v-model="item.medicalCertificateExpiration" mode="date" @close="popoverOpen = false" />
           </template>
         </UPopover>
       </UFormField>

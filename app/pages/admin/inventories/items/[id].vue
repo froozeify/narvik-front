@@ -19,6 +19,7 @@
   const route = useRoute()
   const itemId = decodeUrlUuid(route.params.id.toString());
 
+  const popoverOpen = ref(false)
   const inventoryItemModalOpen = ref(false)
 
   const inventoryItem: Ref<InventoryItem | undefined> = ref(undefined)
@@ -122,7 +123,7 @@
       color: "success",
       title: "Produit supprimé",
     })
-    close()
+    popoverOpen.value = false
     navigateTo('/admin/inventories')
   }
 </script>
@@ -159,18 +160,18 @@
       </UTooltip>
 
       <UTooltip text="Supprimer">
-        <UPopover>
+        <UPopover v-model:open="popoverOpen">
           <UButton
             icon="i-heroicons-trash"
             color="error"
           />
 
-          <template #panel="{ close }">
+          <template #content>
             <div class="p-4 w-56 flex flex-col gap-4">
               <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
               <UButton
-                @click="deleteItem(close);"
+                @click="deleteItem();"
                 color="error"
                 class="mx-auto"
               >

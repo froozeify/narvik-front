@@ -11,6 +11,8 @@
   });
 
   const presenceStore = usePresenceStore()
+
+  const popoverOpen = ref(false)
 </script>
 
 <template>
@@ -26,11 +28,11 @@
 
         <div class="flex-1"></div>
 
-        <UPopover :popper="{ placement: 'bottom-start' }">
+        <UPopover v-model:open="popoverOpen">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateRangeReadable(presenceStore.selectedRange) || 'Choisir une date'" />
 
-          <template #panel="{ close }">
-            <GenericDateRangePicker v-model="presenceStore.selectedRange" @close="close" />
+          <template #content>
+            <GenericDateRangePicker v-model="presenceStore.selectedRange" @close="popoverOpen = false" />
           </template>
         </UPopover>
 

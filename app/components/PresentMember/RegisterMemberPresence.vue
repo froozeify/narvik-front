@@ -36,6 +36,7 @@ const emit = defineEmits([
 ])
 
 const toast = useToast()
+const popoverOpen = ref(false)
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
@@ -160,11 +161,13 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       <div class="text-2xl">Enregistrement pour <b>{{ state.member.fullName }}</b></div>
 
       <UForm :state="state" @submit="onSubmit">
-        <UPopover v-if="props.dateEditable" :popper="{ placement: 'bottom-start' }" class="mt-4">
+        <UPopover v-if="props.dateEditable"
+                  v-model:open="popoverOpen"
+                  class="mt-4">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(selectedDate?.toString()) || 'Choisir une date'" />
 
-          <template #panel="{ close }">
-            <GenericDatePicker v-model="selectedDate" @close="close" />
+          <template #content>
+            <GenericDatePicker v-model="selectedDate" @close="popoverOpen = false" />
           </template>
         </UPopover>
 

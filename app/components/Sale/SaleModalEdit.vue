@@ -28,6 +28,7 @@ const saleStore = useSaleStore()
 const isAdmin = selfStore.isAdmin();
 
 const isLoading = ref(false)
+const popoverOpen = ref(false)
 
 const saleQuery = new SaleQuery()
 const sale: Sale = {...props.sale}
@@ -119,11 +120,11 @@ async function updateSale() {
         label="Date"
         name="createdAt"
       >
-        <UPopover :popper="{ placement: 'bottom-start' }">
+        <UPopover v-model:open="popoverOpen">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateTimeReadable(sale.createdAt) || 'Choisir une date'" />
 
-          <template #panel="{ close }">
-            <GenericDatePicker v-model="sale.createdAt" mode="dateTime" />
+          <template #content>
+            <GenericDatePicker v-model="sale.createdAt" mode="dateTime" @close="popoverOpen = false" />
           </template>
         </UPopover>
       </UFormField>

@@ -71,6 +71,7 @@ const totalMemberPresencesPaginated = ref(0)
 
 const isDownloadingCsv = ref(false)
 const itemModalOpen = ref(false)
+const changeMemberRoleModalOpen = ref(false)
 
 
 const chartData: Ref<object|undefined> = ref(undefined)
@@ -184,7 +185,7 @@ function loadItem() {
   }
 }
 
-function changeMemberRole(close: Function) {
+function changeMemberRole() {
   if (!isAdmin || !member.value || !selectedNewRole.value) return;
 
   memberQuery.updateRole(member.value, selectedNewRole.value as ClubRole).then(({updated, error}) => {
@@ -206,7 +207,7 @@ function changeMemberRole(close: Function) {
       member.value.role = updated.role
     }
 
-    close();
+    changeMemberRoleModalOpen.value = false
   });
 }
 
@@ -458,31 +459,34 @@ async function deleteMember() {
 
       <!-- Admin && not current account -->
       <template v-if="member">
-        <UPopover overlay v-if="isSuperAdmin || (isAdmin && member.email != loggedUsername)">
-          <UButton color="violet">
+        <UModal v-if="isSuperAdmin || (isAdmin && member.email != loggedUsername)"
+          v-model:open="changeMemberRoleModalOpen"
+        >
+          <UButton>
             Modifier les permissions
           </UButton>
 
-          <template #panel="{ close }">
-            <div class="p-4 w-56 flex flex-col gap-4">
-              <div class="text-center text-lg font-bold">Nouveau rôle souhaité</div>
+          <template #content>
+            <UCard>
+              <div class="flex flex-col gap-4">
+                <div class="text-center text-lg font-bold">Nouveau rôle souhaité</div>
 
-              <USelect
-                v-model="selectedNewRole"
-                :options="rolesSelect"
-                placeholder="Aucun rôle de défini" />
+                <USelect
+                  v-model="selectedNewRole"
+                  :options="rolesSelect"
+                  placeholder="Aucun rôle de défini" />
 
-              <UButton
-                @click="changeMemberRole(close)"
-                color="purple"
-                class="mx-auto"
-              >
-                Modifier
-              </UButton>
-            </div>
+                <UButton
+                  @click="changeMemberRole()"
+                  class="mx-auto"
+                >
+                  Modifier
+                </UButton>
+              </div>
+            </UCard>
           </template>
 
-        </UPopover>
+        </UModal>
 
         <div class="flex-1"></div>
 

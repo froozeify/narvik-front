@@ -20,6 +20,8 @@ const props = defineProps({
 
   const isAdmin = selfStore.isAdmin()
 
+  const popoverOpen = ref(false)
+
   const totalAmountSales = computed(() => {
     let amount = 0
     sales.value.forEach(sale => {
@@ -78,11 +80,11 @@ const props = defineProps({
 
       <div class="w-full mb-2"></div>
 
-      <UPopover :popper="{ placement: 'bottom-start' }" class="">
+      <UPopover v-model:open="popoverOpen">
         <UButton icon="i-heroicons-calendar-days-20-solid" :label="selectedRange ? formatDateRangeReadable(selectedRange) || 'Choisir une plage' : 'Choisir une plage'" />
 
-        <template #panel="{ close }">
-          <GenericDateRangePicker v-model="selectedRange" @close="close" />
+        <template #content>
+          <GenericDateRangePicker v-model="selectedRange" @close="popoverOpen = false" />
         </template>
       </UPopover>
 

@@ -5,7 +5,7 @@ import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExte
 import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 
-const toast = useToast()
+
 
 const props = defineProps({
   item: {
@@ -18,6 +18,8 @@ const emit = defineEmits([
   'updated',
   'close'
 ])
+
+const popoverOpen = ref(false)
 
 const selfStore = useSelfUserStore()
 const isSupervisor = selfStore.hasSupervisorRole()
@@ -36,13 +38,13 @@ function presenceUpdated(newExternalPresence: ExternalPresence) {
 
 function presenceCanceled(newExternalPresence: ExternalPresence) {
   updateExternalPresenceModalOpen.value = false;
-  emit('canceled', newExternalPresence)
+  emit('close', false)
 }
 
-async function deletePresence(close: Function) {
+async function deletePresence() {
   if (isSupervisor || isBadger) {
     await externalPresenceQuery.delete(externalPresence.value)
-    close()
+    popoverOpen.value = false
     emit('updated', null)
   }
 }
@@ -53,7 +55,7 @@ async function deletePresence(close: Function) {
   <UCard class="bg-orange-50 dark:bg-orange-950">
     <div class="flex gap-2">
       <UButton
-        @click="emit('close')"
+        @click="emit('close', false)"
         icon="i-heroicons-x-circle"
         color="warning"
         variant="ghost"
@@ -72,7 +74,7 @@ async function deletePresence(close: Function) {
       />
 
       <UTooltip text="Supprimer" v-if="isSupervisor || isBadger">
-        <UPopover>
+        <UPopover v-model:open="popoverOpen">
           <UButton
               icon="i-heroicons-trash"
               size="xs"
@@ -80,12 +82,12 @@ async function deletePresence(close: Function) {
               variant="ghost"
           />
 
-          <template #panel="{ close }">
+          <template #content>
             <div class="p-4 w-56 flex flex-col gap-4">
               <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
               <UButton
-                  @click="deletePresence(close);"
+                  @click="deletePresence();"
                   color="error"
                   class="mx-auto"
               >
