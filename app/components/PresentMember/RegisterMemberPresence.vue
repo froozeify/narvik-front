@@ -48,17 +48,19 @@ const selectedDate: Ref<Date|null> = ref(null);
 
 const state = reactive({
   member: props.member as Member|undefined,
-  activities: [] as Array<Activity>,
+  activities: {} as { [k: string]: boolean }
 })
 
 if (props.memberPresence) {
   state.member = props.memberPresence.member
-  state.activities = []
+  state.activities = {}
   if (props.memberPresence.date) {
     selectedDate.value = new Date(props.memberPresence.date)
   }
   props.memberPresence.activities?.forEach(actvt => {
-      state.activities.push(actvt)
+    if (actvt["@id"]) {
+      state.activities[actvt["@id"]] = true
+    }
   });
 }
 
@@ -96,11 +98,11 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     delete memberPresence.member // We remove the member key since we only update the activities (PATCH request)
   }
 
-  event.data.activities.forEach( (actvt: Activity) => {
-    if (actvt["@id"]) {
-      memberPresence.activities.push(actvt["@id"])
+  for (const [key, value] of Object.entries(event.data.activities)) {
+    if (key && value) {
+      memberPresence.activities.push(key)
     }
-  })
+  }
 
   if (props.dateEditable && selectedDate.value) {
     const date = formatDateInput(selectedDate.value.toString())
@@ -174,36 +176,41 @@ async function onSubmit(event: FormSubmitEvent<any>) {
         <div class="mt-4">Activités</div>
         <div class="my-4">
           <div class="grid grid-cols-2 gap-2 gap-y-2 ">
-            <UCheckbox
+            <template v-for="activity in activitiesMember">
+              <UCheckbox v-if="activity['@id']"
                 class="w-full"
-                v-for="activity in activitiesMember"
-                v-model="state.activities"
+                v-model="state.activities[activity['@id']]"
                 :value="activity"
                 :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
+            </template>
+
 
             <template v-if="activitiesSupervisor.length > 0 && hasClubSupervisorRole(state.member?.role)">
               <USeparator class="col-span-2" :label="getAvailableClubRole(ClubRole.Supervisor).text" />
 
-              <UCheckbox
-                class="w-full"
-                v-for="activitySupervisor in activitiesSupervisor"
-                v-model="state.activities"
-                :value="activitySupervisor"
-                :name="'actvts-' + activitySupervisor.uuid"
-                :label="activitySupervisor.name" />
+              <template v-for="activitySupervisor in activitiesSupervisor">
+                <UCheckbox v-if="activitySupervisor['@id']"
+                  class="w-full"
+                  v-model="state.activities[activitySupervisor['@id']]"
+                  :value="activitySupervisor"
+                  :name="'actvts-' + activitySupervisor.uuid"
+                  :label="activitySupervisor.name" />
+              </template>
+
             </template>
 
             <template v-if="activitiesAdmin.length > 0 && isClubAdmin(state.member?.role)">
               <USeparator class="col-span-2" :label="getAvailableClubRole(ClubRole.Admin).text" />
 
-              <UCheckbox
-                class="w-full"
-                v-for="activityAdmin in activitiesAdmin"
-                v-model="state.activities"
-                :value="activityAdmin"
-                :name="'actvta-' + activityAdmin.uuid"
-                :label="activityAdmin.name" />
+              <template v-for="activityAdmin in activitiesAdmin">
+                <UCheckbox v-if="activityAdmin['@id']"
+                  class="w-full"
+                  v-model="state.activities[activityAdmin['@id']]"
+                  :value="activityAdmin"
+                  :name="'actvta-' + activityAdmin.uuid"
+                  :label="activityAdmin.name" />
+              </template>
             </template>
 
           </div>
