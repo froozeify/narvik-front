@@ -123,7 +123,7 @@ async function deleteUser() {
           overlay.create(ModalDeleteConfirmation).open({
             alertTitle: 'Seul le compte sera supprimé.',
             alertDescription: 'Pour supprimer les enregistrements liée au club (présences, fiche membre), veuillez faire une demande auprès du club.',
-            alertColor: 'orange',
+            alertColor: 'error',
             onDelete() {
               deleteUser()
               // modal.close()

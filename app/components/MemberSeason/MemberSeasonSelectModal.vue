@@ -1,16 +1,10 @@
 <script setup lang="ts">
 
+import type { SelectItem } from '@nuxt/ui'
 import SeasonQuery from "~/composables/api/query/SeasonQuery";
 import type {Season} from "~/types/api/item/season";
 import type {AgeCategory} from "~/types/api/item/ageCategory";
 import AgeCategoryQuery from "~/composables/api/query/AgeCategoryQuery";
-
-const props = defineProps(
-  {
-  }
-)
-
-const modal = useModal()
 
 const seasonQuery = new SeasonQuery()
 const ageCategoryQuery = new AgeCategoryQuery()
@@ -20,7 +14,6 @@ const ageCategories: Ref<AgeCategory[]> = ref([])
 const selectedSeason: Ref<string | undefined> = ref(undefined)
 const isSecondary: Ref<boolean> = ref(false)
 const selectedAgeCategory: Ref<string | undefined> = ref(undefined)
-
 
 const emit = defineEmits(['selected', 'close'])
 
@@ -61,21 +54,20 @@ ageCategoryQuery.getAll().then((value) => {
   <ModalWithActions title="Sélection d'une saison" @close="(state: boolean) => emit('close', state)">
 
     <UFormField label="Saison">
-      <USelect v-model="selectedSeason" :items="seasonsSelect" value-attribute="@id" />
+      <USelect class="w-full" v-model="selectedSeason" :items="seasonsSelect" value-attribute="@id" />
     </UFormField>
-
 
     <UFormField label="Club secondaire">
       <USwitch v-model="isSecondary" />
     </UFormField>
 
     <UFormField label="Catégorie d'âge">
-      <USelect v-model="selectedAgeCategory" :items="ageCategoriesSelect" />
+      <USelect class="w-full" v-model="selectedAgeCategory" :items="ageCategoriesSelect" />
     </UFormField>
 
     <template #actions>
       <UButton
-        @click="emit('selected', selectedSeason, isSecondary, selectedAgeCategory); modal.close();"
+        @click="emit('selected', selectedSeason, isSecondary, selectedAgeCategory); emit('close', true);"
       >
         Sélectionner
       </UButton>

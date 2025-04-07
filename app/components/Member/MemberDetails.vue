@@ -9,7 +9,6 @@ import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/pr
 import {formatDate, formatDateReadable} from "~/utils/date"
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
-import {usePaginationValues} from "~/composables/api/list";
 import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import type {MemberSeason, MemberSeasonWrite} from "~/types/api/item/clubDependent/memberSeason";
@@ -45,6 +44,8 @@ const props = defineProps({
 
 const toast = useToast()
 const overlay = useOverlay()
+
+const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
 
 const selfStore = useSelfUserStore();
 
@@ -300,27 +301,27 @@ async function getMemberPresencesPaginated() {
 async function deleteRow(memberPresence: MemberPresence) {
   isUpdating.value = true
 
-  memberPresenceQuery.delete(memberPresence).then(async ({error}) => {
-    if (error) {
-      toast.add({
-        color: "error",
-        title: "La suppression a échouée",
-        description: error.message
-      })
-      isUpdating.value = false
-      return;
-    }
+  const { error } = await memberPresenceQuery.delete(memberPresence)
 
-    // We remove the presence from the array
-    await getMemberPresences();
-
+  if (error) {
     toast.add({
-      color: "success",
-      title: "Présence supprimée"
+      color: "error",
+      title: "La suppression a échouée",
+      description: error.message
     })
-
     isUpdating.value = false
+    return;
+  }
+
+  // We remove the presence from the array
+  await getMemberPresences();
+
+  toast.add({
+    color: "success",
+    title: "Présence supprimée"
   })
+
+  isUpdating.value = false
 }
 
 function presenceUpdated(presence?: MemberPresence) {
@@ -403,22 +404,21 @@ async function deleteMemberSeason(memberSeason: MemberSeason) {
     return
   }
 
-  memberSeasonQuery.delete(memberSeason).then(async ({error}) => {
-    if (error) {
-      toast.add({
-        color: "error",
-        title: "La suppression a échouée",
-        description: error.message
-      })
-      return;
-    }
-
-    await getMemberSeasons()
-
+  const { error } = await memberSeasonQuery.delete(memberSeason)
+  if (error) {
     toast.add({
-      color: "success",
-      title: "Saison supprimée"
+      color: "error",
+      title: "La suppression a échouée",
+      description: error.message
     })
+    return;
+  }
+
+  await getMemberSeasons()
+
+  toast.add({
+    color: "success",
+    title: "Saison supprimée"
   })
 }
 
@@ -526,13 +526,12 @@ async function deleteMember() {
             icon="i-heroicons-trash"
             color="error"
             @click="
-            const modalDelete = overlay.create(ModalDeleteConfirmation);
-            modalDelete.open({
+            overlayDeleteConfirmation.open({
                 alertDescription: 'Les historiques de présences seront anonymisés et ne pourront être rétablie auprès de ce membre.',
-                alertColor: 'orange',
-                onDelete() {
-                  deleteMember()
-                  modalDelete.close()
+                alertColor: 'error',
+                async onDelete() {
+                  await deleteMember()
+                  overlayDeleteConfirmation.close(true)
                 }
               })"
           >
@@ -639,8 +638,8 @@ async function deleteMember() {
             <div v-if="isSupervisor" class="flex gap-4">
               <div class="flex-1"></div>
               <UButton
-                @click="modal.open(MemberSeasonSelectModal, {
-                  onSelected(seasonIri: String, isSecondary: boolean, ageCategory: string|undefined) {
+                @click="overlay.create(MemberSeasonSelectModal).open({
+                  onSelected(seasonIri: string, isSecondary: boolean, ageCategory: string|undefined) {
                     addMemberSeason(seasonIri, isSecondary, ageCategory)
                   }
                 })"
@@ -689,12 +688,12 @@ async function deleteMember() {
                   <UButton
                     icon="i-heroicons-trash"
                     color="error"
-                    @click="modal.open(ModalDeleteConfirmation, {
-                      alertTitle: `Suppression de la saison ${row.original.season.name} pour ${member?.fullName}`,
-                      alertColor: 'orange',
-                      onDelete() {
-                        modal.close()
-                        deleteMemberSeason(row)
+                    @click="overlayDeleteConfirmation.open({
+                      alertTitle: `Suppression de la saison ${row.original.season?.name} pour ${member?.fullName}`,
+                      alertColor: 'error',
+                      async onDelete() {
+                        await deleteMemberSeason(row.original)
+                        overlayDeleteConfirmation.close(true)
                       }
                     })"
                   >
@@ -739,10 +738,10 @@ async function deleteMember() {
                 :items="activitiesSelect"
                 multiple
               >
-                <template #label>
-              <span v-if="filteredActivities.length" class="truncate">
-                {{ filteredActivities.map(fa => fa.name).join(', ') }}
-              </span>
+                <template #default>
+                  <span v-if="filteredActivities.length" class="truncate">
+                    {{ filteredActivities.map(fa => fa.label).join(', ') }}
+                  </span>
                   <span v-else>Activités</span>
                 </template>
               </USelectMenu>
@@ -817,13 +816,13 @@ async function deleteMember() {
                   <UButton
                     color="error"
                     label="Supprimer"
-                    @click="modal.open(ModalDeleteConfirmation, {
+                    @click="overlayDeleteConfirmation.open({
                     title: `Présence du ${formatDateReadable(row.original.date)}`,
                     alertTitle: 'La suppression de la présence sera définitive.',
-                    alertColor: 'orange',
-                    onDelete() {
-                      modal.close()
-                      deleteRow(row)
+                    alertColor: 'error',
+                    async onDelete() {
+                      await deleteRow(row.original)
+                      overlayDeleteConfirmation.close(true)
                     }
                   })"
                   />
