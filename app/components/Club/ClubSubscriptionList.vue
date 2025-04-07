@@ -40,7 +40,7 @@ const props = defineProps({
       },
       {
         name: 'Enregistrement des présences',
-        enabled: false
+        enabled: true
       },
       {
         name: 'Ventes et gestion des stocks',
