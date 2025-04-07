@@ -149,7 +149,11 @@ function rowClicked(row: Member) {
         class="w-full"
         :columns="columns"
         :data="foundMembers"
-        @select="(evt) => rowClicked(evt.original)">
+        @select="(evt) => rowClicked(evt.original)"
+        :ui="{
+          tr: 'cursor-pointer'
+        }"
+    >
       <template #empty>
         <div class="flex flex-col items-center justify-center py-6 gap-3">
           <span class="italic text-sm">Aucune résultat trouvé</span>

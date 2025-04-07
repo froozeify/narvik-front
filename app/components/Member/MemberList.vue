@@ -5,6 +5,7 @@ import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {usePaginationValues} from "~/composables/api/list";
 import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
 import {ClubRole, getAvailableClubRoles} from "../../types/api/item/club";
+import type {TableRow} from "#ui/types";
 
 const toast = useToast();
 const isLoading = ref(true);
@@ -112,8 +113,8 @@ function queryUpdated() {
   }, 800);
 }
 
-function displayMemberPage(member: Member) {
-  navigateTo(`/admin/members/${convertUuidToUrlUuid(member.uuid)}`)
+function displayMemberPage(row: TableRow<Member>) {
+  navigateTo(`/admin/members/${convertUuidToUrlUuid(row.original.uuid)}`)
 }
 
 </script>
@@ -157,7 +158,11 @@ function displayMemberPage(member: Member) {
         @update:sort="getMembers()"
         :columns="columns"
         :data="members"
-        @select="displayMemberPage">
+        @select="displayMemberPage"
+        :ui="{
+          tr: 'cursor-pointer'
+        }"
+      >
         <template #empty>
           <div class="flex flex-col items-center justify-center py-6 gap-3">
             <span class="italic text-sm">Aucun membres trouvés.</span>
