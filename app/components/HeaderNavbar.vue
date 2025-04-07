@@ -1,15 +1,15 @@
 <script setup lang="ts">
   import {useSelfUserStore} from "~/stores/useSelfUser";
   import {useAppConfigStore} from "~/stores/useAppConfig";
-  import {isDarkMode, isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
+  import { isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
   import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
+  import type { DropdownMenuItem } from "#ui/components/DropdownMenu";
 
   const overlay = useOverlay()
 
   const selfStore = useSelfUserStore();
   const appConfigStore = useAppConfigStore();
 
-  const isDark = isDarkMode()
 
   const { selectedProfile, user } = storeToRefs(selfStore)
 
@@ -26,43 +26,43 @@
   const siteLogo: Ref<string> = appConfigStore.getLogo()
 
   const rightMenu = ref<DropdownMenuItem[][]>([
-    [{
-      label: !isBadger ? 'Profil' : 'Pointeuse',
-      avatar: {
-        icon: 'i-heroicons-user',
-        size: 'xs',
-        src: selfStore.member?.profileImageBase64,
-        ui: {
-          rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+    [
+      {
+        slot: 'darkMode',
+      }
+    ],
+    [
+      {
+        label: !isBadger ? 'Profil' : 'Pointeuse',
+        avatar: {
+          icon: 'i-heroicons-user',
+          size: 'xs',
+          src: selfStore.member?.profileImageBase64
+        },
+        to: !isBadger ? "/self" : ''
+      }, {
+        label: 'Changer de profil',
+        icon: 'i-heroicons-arrow-path-rounded-square',
+        class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? 'cursor-pointer' : 'hidden',
+        onSelect: () => {
+          overlay.create(ModalSelectProfile).open({
+            onSelected() {
+              navigateTo('/self')
+            }
+          })
         }
-      },
-      to: !isBadger ? "/self" : ''
-    }, {
-      label: 'Changer de profil',
-      icon: 'i-heroicons-arrow-path-rounded-square',
-      class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? 'cursor-pointer' : 'hidden',
-      onSelect: () => {
-        overlay.create(ModalSelectProfile, {
-          onSelected() {
-            navigateTo('/self')
-          }
-        }).open()
       }
-    }], [{
-      slot: 'darkMode',
-      label: 'Thème',
-      class: 'cursor-pointer',
-      onSelect: () => {
-        isDark.value = !isDark.value
+    ],
+    [
+      {
+        label: 'Déconnexion',
+        icon: 'i-heroicons-arrow-right-start-on-rectangle-20-solid',
+        class: 'cursor-pointer',
+        onSelect: () => {
+          selfStore.logout()
+        }
       }
-    }, {
-      label: 'Déconnexion',
-      icon: 'i-heroicons-arrow-right-start-on-rectangle-20-solid',
-      class: 'cursor-pointer',
-      onSelect: () => {
-        selfStore.logout()
-      }
-    }]
+    ]
   ])
 
   if (selfStore.isSuperAdmin()) {
@@ -125,13 +125,7 @@
             </template>
           </UButton>
           <template #darkMode>
-              <UIcon
-                :name="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
-                class="flex-shrink-0 w-5 h-5 text-gray-400 dark:text-gray-500"
-                />
-              <span>
-                {{ isDark ? 'Thème sombre' : 'Thème clair' }}
-              </span>
+              <ThemeSwitcher />
           </template>
         </UDropdownMenu>
       </div>

@@ -67,6 +67,8 @@
         <template v-for="(val, index) in externalLinks">
           <div><ContentLink class="text-(--ui-text) dark:text-white dark:hover:text-white" :to="val.to" target="_blank" >{{ val.label }}</ContentLink></div>
         </template>
+
+        <ThemeSwitcher class="mt-2" />
       </div>
 
       <div v-if="props.displayVersion" class="-mt-2 lg:-mt-4 lg:col-span-3 transition opacity-40 hover:opacity-70 flex flex-row justify-center lg:justify-end  text-[.6rem] gap-1">
