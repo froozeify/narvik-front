@@ -34,11 +34,7 @@
     [
       {
         label: !isBadger ? 'Profil' : 'Pointeuse',
-        avatar: {
-          icon: 'i-heroicons-user',
-          size: 'xs',
-          src: selfStore.member?.profileImageBase64
-        },
+        icon: 'i-heroicons-user',
         to: !isBadger ? "/self" : ''
       }, {
         label: 'Changer de profil',
