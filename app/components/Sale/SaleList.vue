@@ -203,7 +203,7 @@ const props = defineProps({
             <UButton
               :to="'/admin/sales/' + convertUuidToUrlUuid(row.original.uuid)"
               variant="soft"
-              :ui="{ rounded: 'rounded-full' }">
+            >
               Voir le détail
             </UButton>
           </template>

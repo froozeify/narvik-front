@@ -286,7 +286,7 @@
           <template #category-cell="{ row }">
             <UButton v-if="row.original.category"
               variant="soft"
-              :ui="{ rounded: 'rounded-full' }">
+            >
               {{ row.original.category.name }}
             </UButton>
 

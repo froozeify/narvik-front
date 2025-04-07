@@ -18,8 +18,8 @@ const props = defineProps(
 const emit = defineEmits(['updated', 'close'])
 
 const toast = useToast()
-const modal = useModal()
 
+const overlay = useOverlay()
 
 const isLoading = ref(false)
 
@@ -28,7 +28,7 @@ const member: Member = {...props.member}
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
+  if (!member.linkedEmail) errors.push({ path: 'email', message: 'Champ requis' })
   return errors
 }
 
@@ -54,7 +54,7 @@ async function updateLink() {
   });
 
   emit('updated')
-  await modal.close()
+  emit('close', true)
 }
 
 </script>

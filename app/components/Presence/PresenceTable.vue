@@ -160,8 +160,7 @@ function sortClicked() {
         <div v-if="row.original.member" class="flex flex-wrap gap-2">
           <UBadge v-if="row.original.member.currentSeason && row.original.member.currentSeason.isSecondaryClub"
             variant="subtle"
-            color="success"
-            :ui="{ rounded: 'rounded-full' }">
+            color="success">
             Club secondaire
           </UBadge>
 
@@ -176,8 +175,7 @@ function sortClicked() {
         <template v-if="!props.isExternalPresences && row.original.member">
           <div v-if="row.original.member.blacklisted" class="basis-full">
             <UButton
-              color="neutral"
-              :ui="{ rounded: 'rounded-full' }">
+              color="neutral">
               Blacklisté
             </UButton>
           </div>
@@ -185,7 +183,7 @@ function sortClicked() {
           <div v-if="!row.original.member.currentSeason" class="basis-full">
             <UButton
                 color="error"
-                :ui="{ rounded: 'rounded-full' }">
+            >
               Saison non renouvelée
             </UButton>
           </div>
@@ -193,7 +191,7 @@ function sortClicked() {
           <div v-if="row.original.member.medicalCertificateExpiration && row.original.member.medicalCertificateStatus !== 'valid'" class="basis-full">
             <UButton
               :color="row.original.member.medicalCertificateStatus === 'expired' ? 'error' : 'yellow'"
-              :ui="{ rounded: 'rounded-full' }">
+            >
               Certificat médical : {{ formatDateReadable(row.original.member.medicalCertificateExpiration.toString()) }}
             </UButton>
           </div>
@@ -202,7 +200,7 @@ function sortClicked() {
                class="basis-full">
             <UButton
                 color="error"
-                :ui="{ rounded: 'rounded-full' }">
+            >
               Dernier contrôle : {{ formatDateReadable(row.original.member.lastControlShooting) }}
             </UButton>
           </div>
@@ -215,7 +213,7 @@ function sortClicked() {
           v-for="activity in row.original.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
           :color="props.accentColor"
           :variant="props.isExternalPresences ? 'solid' : 'soft'"
-          :ui="{ rounded: 'rounded-full' }">
+        >
           {{ activity.name }}
         </UButton>
       </div>
@@ -223,7 +221,7 @@ function sortClicked() {
 
   </UTable>
 
-  <GenericTablePagination
+  <GenericTablePagination v-if="props.hasPagination"
     v-model:page="page"
     v-model:items-per-page="itemsPerPage"
     :total-items="props.totalPresences"

@@ -204,7 +204,7 @@ definePageMeta({
         <template #itemCategory-cell="{ row }">
           <UButton v-if="row.original.itemCategory"
                    variant="soft"
-                   :ui="{ rounded: 'rounded-full' }">
+          >
             {{ row.original.itemCategory }}
           </UButton>
 
@@ -226,7 +226,7 @@ definePageMeta({
           <UButton v-if="row.original.item"
              :to="'/admin/inventories/items/' + convertUuidToUrlUuid(row.original.item.uuid)"
              variant="soft"
-             :ui="{ rounded: 'rounded-full' }">
+          >
             Voir l'article
           </UButton>
           <i v-else>

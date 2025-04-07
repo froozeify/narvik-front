@@ -146,7 +146,7 @@
         <UButton v-if="inventoryItem?.category"
            :to="'/admin/inventories?category=' + convertUuidToUrlUuid(inventoryItem.category.uuid)"
            variant="soft"
-           :ui="{ rounded: 'rounded-full' }">
+        >
           {{ inventoryItem.category.name }}
         </UButton>
       </div>

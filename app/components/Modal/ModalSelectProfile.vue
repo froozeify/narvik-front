@@ -1,17 +1,19 @@
 <script setup lang="ts">
 
 import {useSelfUserStore} from "~/stores/useSelfUser";
+import type {SelectItem} from "@nuxt/ui";
 
 const emit = defineEmits(['selected', 'close'])
 
 const selfStore = useSelfUserStore()
 const { user, member, selectedProfile } = storeToRefs(selfStore)
 
+const isLoading = ref(false)
 const selectedProfileId: Ref<string|undefined> = ref(selectedProfile.value?.id)
 
 const items = computed( () => {
   const items: SelectItem[] = []
-  user?.linkedProfiles.forEach(value => {
+  user.value?.linkedProfiles?.forEach(value => {
     items.push({
       label: value.displayName,
       value: value.id
@@ -23,6 +25,7 @@ const items = computed( () => {
 async function applyProfile() {
   if (!selectedProfileId.value || !user.value?.linkedProfiles) return
 
+  isLoading.value = true
   const foundProfile = user.value.linkedProfiles.find( (profile) => profile.id === selectedProfileId.value)
   if (foundProfile) {
     member.value = undefined
@@ -30,8 +33,9 @@ async function applyProfile() {
   }
 
   await selfStore.refresh()
-  await useModal().close()
+  isLoading.value = false
   emit('selected')
+  emit('close', true)
 }
 
 </script>
@@ -39,17 +43,17 @@ async function applyProfile() {
 <template>
   <ModalWithActions title="Choix du profil" @close="(state: boolean) => emit('close', state)">
 
-    <slot>
-      <div>
-        <USelect
-          v-model="selectedProfileId"
-          :items="items"
-          placeholder="Aucun profil défini" />
-      </div>
-    </slot>
+    <div>
+      <USelect
+        class="w-full"
+        v-model="selectedProfileId"
+        :items="items"
+        placeholder="Aucun profil défini" />
+    </div>
 
     <template #actions>
       <UButton
+        :loading="isLoading"
         @click="applyProfile"
         color="warning"
       >

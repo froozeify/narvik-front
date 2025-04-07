@@ -21,6 +21,7 @@ import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeaso
 import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
 import MemberEditLinkedEmailModal from "~/components/Member/MemberEditLinkedEmailModal.vue";
 import clipboard from "clipboardy";
+import type {SelectItem} from "@nuxt/ui";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
@@ -473,7 +474,7 @@ async function deleteMember() {
 
                 <USelect
                   v-model="selectedNewRole"
-                  :options="rolesSelect"
+                  :items="rolesSelect"
                   placeholder="Aucun rôle de défini" />
 
                 <UButton
@@ -494,10 +495,8 @@ async function deleteMember() {
           <UButton
             v-if="isAdmin"
             icon="i-heroicons-pencil-square"
-            @click="overlay.create(MemberEditLinkedEmailModal, {
-              props: {
-                member: member,
-              },
+            @click="overlay.create(MemberEditLinkedEmailModal).open({
+              member: member,
               onUpdated() {
                 loadItem()
               }
@@ -546,7 +545,7 @@ async function deleteMember() {
       <div class="lg:col-span-5">
         <UCard v-if="!member">
           <div class="mx-auto my-0 h-24 w-24 aspect-square">
-            <USkeleton class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+            <USkeleton class="w-full h-full"/>
           </div>
 
           <div class="space-y-4 w-full mt-4">
@@ -582,24 +581,21 @@ async function deleteMember() {
             <div class="flex flex-col items-center justify-center flex-wrap gap-1">
               <div v-if="member.blacklisted">
                 <UButton
-                  color="neutral"
-                  :ui="{ rounded: 'rounded-full' }">
+                  color="neutral">
                   Blacklisté
                 </UButton>
               </div>
 
               <div v-if="!member.currentSeason">
                 <UButton
-                  color="error"
-                  :ui="{ rounded: 'rounded-full' }">
+                  color="error">
                   Saison non renouvelée
                 </UButton>
               </div>
 
               <div v-if="member.medicalCertificateExpiration && member.medicalCertificateStatus !== 'valid'">
                 <UButton
-                  :color="member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
-                  :ui="{ rounded: 'rounded-full' }">
+                  :color="member.medicalCertificateStatus === 'expired' ? 'error' : 'warning'">
                   Certificat médical : {{ formatDateReadable(member.medicalCertificateExpiration.toString()) }}
                 </UButton>
               </div>
@@ -802,8 +798,7 @@ async function deleteMember() {
                 <div class="flex flex-1 flex-wrap gap-4">
                   <UButton
                     v-for="activity in row.original.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-                    variant="soft"
-                    :ui="{ rounded: 'rounded-full' }">
+                    variant="soft">
                     {{ activity.name }}
                   </UButton>
                 </div>

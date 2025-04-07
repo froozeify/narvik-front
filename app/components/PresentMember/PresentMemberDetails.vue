@@ -227,7 +227,7 @@ async function copyLicence() {
             <UBadge
                 v-if="member.currentSeason && member.currentSeason.ageCategory"
                 variant="subtle"
-                color="amber">
+                color="warning">
               {{ member.currentSeason.ageCategory.name }}
             </UBadge>
 
@@ -312,7 +312,7 @@ async function copyLicence() {
       </div>
 
       <div class="mx-auto my-0 h-24 w-24 aspect-square">
-        <USkeleton class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+        <USkeleton class="w-full h-full" />
       </div>
 
       <div class="space-y-4 w-full mt-4">

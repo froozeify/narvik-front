@@ -111,7 +111,6 @@ async function deletePresence() {
         <UButton
             v-for="activity in externalPresence?.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
             color="warning"
-            :ui="{ rounded: 'rounded-full' }"
         >
           {{ activity.name }}
         </UButton>
