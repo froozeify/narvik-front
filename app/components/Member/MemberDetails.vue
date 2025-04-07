@@ -775,7 +775,8 @@ async function deleteMember() {
                 }
               },
               {
-                accessorKey: 'actions'
+                accessorKey: 'actions',
+                header: ''
               }
             ]"
               v-model:sort="sort"
@@ -811,7 +812,7 @@ async function deleteMember() {
 
               <template #actions-cell="{ row }" >
                 <div v-if="isSupervisor" class="flex gap-4">
-                  <UButton label="Modifier" @click="selectedPresence = row; memberPresenceModal = true;" />
+                  <UButton label="Modifier" @click="selectedPresence = row.original; memberPresenceModal = true;" />
 
                   <UButton
                     color="error"
