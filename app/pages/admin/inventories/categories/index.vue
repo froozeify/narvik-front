@@ -52,6 +52,7 @@
     },
     {
       accessorKey: 'actions',
+      header: ''
     }
   ]
 

@@ -42,6 +42,7 @@ definePageMeta({
     },
     {
       accessorKey: 'actions',
+      header: ''
     }
   ]
 

@@ -670,7 +670,8 @@ async function deleteMember() {
                   header: 'Catégorie'
                 },
                 {
-                  accessorKey: 'actions'
+                  accessorKey: 'actions',
+                  header: ''
                 }
               ]"
               :loading="isLoadingMemberSeasons"

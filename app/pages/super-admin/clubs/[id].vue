@@ -63,6 +63,7 @@ const columns = [
   },
   {
     accessorKey: 'actions',
+    header: ''
   }
 ]
 

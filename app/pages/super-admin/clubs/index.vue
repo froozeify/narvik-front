@@ -72,6 +72,7 @@ import type {FormError, TableRow} from "#ui/types";
     },
     {
       accessorKey: 'actions',
+      header: ''
     }
   ]
 
