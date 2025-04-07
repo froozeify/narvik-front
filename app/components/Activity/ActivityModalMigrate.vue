@@ -39,7 +39,7 @@ const items = computed( () => {
 
     <UAlert
       class="my-4"
-      color="warning"
+      color="error"
       variant="soft"
       title="Une fois la migration effectuée, l'activité sera supprimée."
     />
@@ -52,7 +52,6 @@ const items = computed( () => {
       <UButton
         :disabled="!migrationTarget"
         @click="emit('migrate', migrationTarget); emit('close', true)"
-        color="warning"
       >
         Migrer
       </UButton>

@@ -113,8 +113,8 @@ function queryUpdated() {
   }, 800);
 }
 
-function displayMemberPage(row: TableRow<Member>) {
-  navigateTo(`/admin/members/${convertUuidToUrlUuid(row.original.uuid)}`)
+function displayMemberPage(member: Member) {
+  navigateTo(`/admin/members/${convertUuidToUrlUuid(member.uuid)}`)
 }
 
 </script>

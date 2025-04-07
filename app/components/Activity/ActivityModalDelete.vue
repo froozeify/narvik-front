@@ -18,7 +18,7 @@ const emit = defineEmits(['delete', 'close'])
 
     <UAlert
       class="my-4"
-      color="warning"
+      color="error"
       variant="soft"
       title="La suppression d'une activité, supprimera aussi toutes les activités des membres liées."
       description="Il conseillé de faire un migration à la place."
