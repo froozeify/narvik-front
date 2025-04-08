@@ -8,6 +8,7 @@
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
   import {formatDateInput} from "~/utils/date";
   import type {TableRow} from "#ui/types";
+  import type {SelectItem} from "@nuxt/ui";
 
   definePageMeta({
     layout: "pos"
@@ -211,28 +212,30 @@
             @decoded="onDecoded"
           />
 
-          <UInput
-            v-model="searchQuery"
-            @update:model-value="searchQueryUpdated()"
-            placeholder="Rechercher..."
-            :ui="{ icon: { trailing: { pointer: '' } } }"
-          >
-            <template #trailing v-if="cameraIsPresent || searchQuery">
-              <UIcon
-                v-if="cameraIsPresent"
-                class="cursor-pointer"
-                name="i-heroicons-qr-code"
-                @click="cameraPreview = true"
-              />
+          <div>
+            <UInput
+              v-model="searchQuery"
+              @update:model-value="searchQueryUpdated()"
+              placeholder="Rechercher..."
+            >
+              <template #trailing v-if="cameraIsPresent || searchQuery">
+                <UIcon
+                  v-if="cameraIsPresent"
+                  class="cursor-pointer"
+                  name="i-heroicons-qr-code"
+                  @click="cameraPreview = true"
+                />
 
-              <UIcon
-                v-if="searchQuery"
-                class="cursor-pointer"
-                name="i-heroicons-x-mark"
-                @click="searchQuery = ''; getItemsPaginated()"
-              />
-            </template>
-          </UInput>
+                <UIcon
+                  v-if="searchQuery"
+                  class="cursor-pointer"
+                  name="i-heroicons-x-mark"
+                  @click="searchQuery = ''; getItemsPaginated()"
+                />
+              </template>
+            </UInput>
+          </div>
+
 
           <div class="flex-1"></div>
 
@@ -243,7 +246,7 @@
               :items="categoriesSelect"
               multiple
             >
-              <template #label>
+              <template #default>
               <span v-if="filteredCategories.length" class="truncate">
                 {{ filteredCategories.map(fa => fa.name).join(', ') }}
               </span>
