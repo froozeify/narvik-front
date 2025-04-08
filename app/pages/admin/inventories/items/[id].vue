@@ -199,7 +199,7 @@
       <GenericStatCard
         title="En stock"
         :value="inventoryItem?.quantity ?? '∞' "
-        :value-class="inventoryItem?.quantityAlert && inventoryItem?.quantity && inventoryItem?.quantity <= inventoryItem?.quantityAlert ? 'text-error-600' : ''"
+        :value-class="inventoryItem?.quantityAlert && (inventoryItem?.quantity || inventoryItem?.quantity === 0) && inventoryItem?.quantity <= inventoryItem?.quantityAlert ? 'text-error-600' : ''"
         :loading="isLoading">
       </GenericStatCard>
 
