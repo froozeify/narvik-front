@@ -30,13 +30,15 @@
   const cartStore = useCartStore()
   const { searchQuery, cart, cartTotalPrice, cartComment, cartCustomItemModalOpen, customItemForm, selectedPaymentMode } = storeToRefs(cartStore)
   const { sellers, seller, paymentModes } = storeToRefs(saleStore)
+  const sellerSelected = ref(!seller.value ? undefined : { label: seller.value.fullName, value: seller.value.uuid, item: seller.value } as SelectItem)
 
   const sellersSelect = computed( () => {
     const items: SelectItem[] = []
     sellers.value.forEach(value => {
       items.push({
         label: value.fullName,
-        value: value
+        value: value.uuid,
+        item: value
       })
     })
     return items;
@@ -127,6 +129,12 @@
   const cameraIsPresent = verifyCameraIsPresent()
 
   // Sale management
+  function sellerUpdated() {
+    if (sellerSelected.value) {
+      seller.value = sellerSelected.value.item
+    }
+  }
+
   async function createSale() {
     isCreatingSale.value = true
 
@@ -334,8 +342,8 @@
         </UCard>
 
         <UCard class="print:hidden">
-          <UFormField label="Vendeur" :error="!seller && 'Un vendeur doit être défini'">
-            <UInputMenu class="w-full" v-model="seller" :items="sellersSelect" :filter-fields="['lastname', 'firstname']" />
+          <UFormField label="Vendeur" :error="!sellerSelected && 'Un vendeur doit être défini'">
+            <UInputMenu class="w-full" v-model="sellerSelected" :items="sellersSelect" :filter-fields="['item.lastname', 'item.firstname']" @change="sellerUpdated" />
           </UFormField>
 
           <UFormField class="my-2" label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'">
