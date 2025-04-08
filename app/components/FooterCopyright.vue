@@ -22,7 +22,7 @@
   const versions: externalLink[] = [
     {
       label: `Version ${runtimeConfig.public.clientVersion}`,
-      to: 'https://github.com/froozeify/narvik-front'
+      to: 'https://github.com/Narvik-app/frontend'
     }
   ]
   if (appConfigStore.config?.appVersion) {
