@@ -2,7 +2,7 @@
 
 import type {PropType} from "vue";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
-import type {SelectItem} from "#ui/components/Select.vue";
+import type {SelectApiItem} from "~/types/select";
 
 const props = defineProps(
   {
@@ -22,11 +22,12 @@ const emit = defineEmits(['migrate', 'close'])
 const migrationTarget: Ref<string|undefined> = ref(undefined)
 
 const items = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem<Activity>[] = []
   props.activities?.forEach(value => {
     items.push({
       label: value.name,
-      value: value.uuid
+      value: value.uuid,
+      item: value
     })
   })
   return items;

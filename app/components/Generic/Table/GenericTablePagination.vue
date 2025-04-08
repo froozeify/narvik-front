@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {usePaginationValues} from "~/composables/api/list";
+import type {TablePaginateInterface} from "~/types/table";
 
 const props = defineProps({
   totalItems: {
@@ -15,11 +16,6 @@ const emit = defineEmits<{
 // 2 ways binding
 const page = defineModel<number>("page", { default: 1, required: true })
 const itemsPerPage = defineModel<number>("itemsPerPage", { default: 30, required: true })
-
-export interface TablePaginateInterface {
-  page: number,
-  itemsPerPage: number
-}
 
 function emitPaginate(pagination: TablePaginateInterface) {
   emit('paginate', pagination)

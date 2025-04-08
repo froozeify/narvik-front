@@ -21,7 +21,9 @@ import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeaso
 import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
 import MemberEditLinkedEmailModal from "~/components/Member/MemberEditLinkedEmailModal.vue";
 import clipboard from "clipboardy";
-import type {SelectItem} from "@nuxt/ui";
+import type {GetModelValue} from "@nuxt/ui";
+import type {TablePaginateInterface} from "~/types/table";
+import type {SelectApiItem} from "~/types/select";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
@@ -105,17 +107,18 @@ const memberPresenceQuery = new MemberPresenceQuery();
 const imageQuery = new ImageQuery();
 
 const activityQuery = new ActivityQuery()
-const filteredActivities: Ref<Activity[]> = ref([])
+const filteredActivities: Ref<GetModelValue<Activity, any, any>[]> = ref([])
 const activities: Ref<Activity[]> = ref([])
 activityQuery.getAll().then(value => {
   activities.value = value.items.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
 });
 const activitiesSelect = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem<Activity>[] = []
   activities.value.forEach(value => {
     items.push({
       label: value.name,
-      value: value
+      value: value.uuid,
+      item: value
     })
   })
   return items;
@@ -128,7 +131,7 @@ watch(filteredActivities, (newValue) => {
 const selectedNewRole: Ref<string | undefined> = ref(undefined);
 const availableRoles = getAvailableClubRoles()
 const rolesSelect = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem[] = []
   availableRoles.forEach(value => {
     items.push({
       label: value.text,
@@ -284,8 +287,8 @@ async function getMemberPresencesPaginated() {
 
   if (filteredActivities.value.length > 0) {
     filteredActivities.value.forEach(filteredActivity => {
-      if (!filteredActivity.uuid) return;
-      urlParams.append('activities.uuid[]', filteredActivity.uuid)
+      if (!filteredActivity.value.uuid) return;
+      urlParams.append('activities.uuid[]', filteredActivity.value.uuid)
     })
   }
 

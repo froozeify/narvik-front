@@ -5,6 +5,7 @@ import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sal
 import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
 import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
 import type {FormError, FormErrorEvent} from "#ui/types";
+import type {SelectApiItem} from "~/types/select";
 
 const props = defineProps({
   item: {
@@ -42,12 +43,14 @@ const toast = useToast()
 const inventoryItemQuery = new InventoryItemQuery()
 const inventoryCategoryQuery = new InventoryCategoryQuery()
 
+const selectedItem = ref(props.item?.category ? { label: props.item.category.name, value: props.item.category.uuid, item: props.item.category } as SelectApiItem<InventoryCategory>: undefined)
 const items = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem<InventoryCategory>[] = []
   categories.value?.forEach(value => {
     items.push({
       label: value.name,
-      value: value
+      value: value.uuid,
+      item: value
     })
   })
   return items;
@@ -92,8 +95,8 @@ async function updateItem() {
   isUpdating.value = true
   const isCreate = !item.value.uuid
 
-  if (item.value.category) {
-    item.value.category = item.value.category["@id"]
+  if (selectedItem.value) {
+    item.value.category = selectedItem.value.item["@id"]
   } else {
     item.value.category = null
   }
@@ -160,15 +163,14 @@ async function getCategories() {
 
     <UFormField label="Catégorie">
       <USelectMenu
-        v-model="item.category"
+        v-model="selectedItem"
         :items="items"
         :class="props.viewOnly ? 'pointer-events-none' : ''"
         :tabindex="props.viewOnly ? '-1' : '0'"
-        :ui="{ icon: { trailing: { pointer: '' } } }"
       >
-        <template #label>
-          <span v-if="item.category">
-            {{ item.category.name }}
+        <template #default>
+          <span v-if="selectedItem">
+            {{ selectedItem.label }}
           </span>
           <span v-else><i>Aucune catégorie</i></span>
         </template>
@@ -177,13 +179,13 @@ async function getCategories() {
           <UIcon
             class="cursor-pointer"
             name="i-heroicons-x-mark"
-            @click="item.category = null"
+            @click="selectedItem = undefined"
           />
         </template>
       </USelectMenu>
     </UFormField>
 
-    <UFormField label="Nom" name="name">
+    <UFormField label="Nom" name="name" required>
       <UInput v-model="item.name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
     </UFormField>
 
@@ -221,7 +223,7 @@ async function getCategories() {
       </UInput>
     </UFormField>
 
-    <UFormField label="Prix de vente" name="sellingPrice">
+    <UFormField label="Prix de vente" name="sellingPrice" required>
       <UInput v-model="item.sellingPrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'">
         <template #trailing>
           <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>

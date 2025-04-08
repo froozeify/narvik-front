@@ -5,6 +5,7 @@ import type {FormError, TableRow} from "#ui/types";
 import ActivityModalDelete from "~/components/Activity/ActivityModalDelete.vue";
 import ActivityModalMigrate from "~/components/Activity/ActivityModalMigrate.vue";
 import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
+import type {SelectApiItem} from "~/types/select";
 
 definePageMeta({
   layout: "admin"
@@ -31,7 +32,7 @@ const activityQuery = new ActivityQuery();
 
 const availableRoles = getAvailableClubRoles()
 const availableRolesSelect = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem[] = []
   availableRoles.forEach(value => {
     items.push({
       label: value.text,

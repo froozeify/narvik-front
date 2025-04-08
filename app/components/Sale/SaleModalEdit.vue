@@ -8,7 +8,8 @@ import {formatDateTimeReadable} from "~/utils/date";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useSaleStore} from "~/stores/useSaleStore";
 import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
-import type {SelectItem} from "@nuxt/ui";
+import type {SelectApiItem} from "~/types/select";
+import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
 
 const props = defineProps(
   {
@@ -35,7 +36,7 @@ const sale: Sale = {...props.sale}
 const paymentModeValue = ref(sale.paymentMode?.uuid)
 
 const paymentModesSelect = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem<SalePaymentMode>[] = []
   saleStore.paymentModes.forEach(value => {
     items.push({
       label: value.name,

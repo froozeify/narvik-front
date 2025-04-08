@@ -8,6 +8,7 @@ import {convertUuidToUrlUuid} from "~/utils/resource";
 import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
 import ClubModalGenerateBadger from "~/components/Club/ClubModalGenerateBadger.vue";
+import type {SelectApiItem} from "~/types/select";
 
 definePageMeta({
   layout: "admin"
@@ -28,11 +29,6 @@ const activityQuery = new ActivityQuery();
 
 const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.badgerToken);
 
-interface SelectItem {
-  label: string,
-  value: string|undefined,
-}
-
 const configState = reactive({
   selectedControlShootingActivity: selectedProfile.value?.club.settings.controlShootingActivity?.uuid,
   excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays?.map((a: Activity) => a.uuid)
@@ -44,11 +40,12 @@ activityQuery.getAll().then(value => {
   activities.value = value.items
 })
 const activitiesSelect = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem<Activity>[] = []
   activities.value?.forEach(value => {
     items.push({
       label: value.name,
-      value: value.uuid
+      value: value.uuid,
+      item: value
     })
   })
   return items;

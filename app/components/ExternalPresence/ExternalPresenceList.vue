@@ -3,7 +3,7 @@
   import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
   import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
   import {formatDateInput} from "~/utils/date";
-  import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
+  import type {TablePaginateInterface} from "~/types/table";
   import {useSelfUserStore} from "~/stores/useSelfUser";
   import {createBrowserCsvDownload} from "~/utils/browser";
   import type {TableRow} from "#ui/types";

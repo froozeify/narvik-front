@@ -5,10 +5,11 @@
   import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
   import {createBrowserCsvDownload, verifyCameraIsPresent} from "~/utils/browser";
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
-  import type {TableRow} from "#ui/types";
-  import type {SelectItem} from "@nuxt/ui";
+  import type {GetModelValue} from "@nuxt/ui";
   import type {ColumnSort} from "@tanstack/table-core";
   import {getTableSortVal} from "~/utils/table";
+  import type {TablePaginateInterface} from "~/types/table";
+  import type {SelectApiItem} from "~/types/select";
 
   definePageMeta({
     layout: "pos"
@@ -28,16 +29,17 @@
   const searchQuery: Ref<string> = ref('')
   const categories: Ref<InventoryCategory[]> = ref([])
   const categoriesSelect = computed( () => {
-    const items: SelectItem[] = []
+    const items: SelectApiItem<InventoryCategory>[] = []
     categories.value.forEach(value => {
       items.push({
         label: value.name,
-        value: value
+        value: value.uuid,
+        item: value
       })
     })
     return items;
   })
-  const filteredCategories: Ref<InventoryCategory[]> = ref([])
+  const filteredCategories: Ref<GetModelValue<InventoryCategory, any, any>[]> = ref([])
   itemCategoryQuery.getAll().then(value => {
     categories.value = value.items
 
@@ -107,8 +109,8 @@
     }
   ]
 
-  function rowClicked(row: TableRow<InventoryItem>) {
-    selectedItem.value = {...row.original} // We make a shallow clone
+  function rowClicked(item: InventoryItem) {
+    selectedItem.value = {...item} // We make a shallow clone
     isSideVisible.value = true
   }
 
@@ -124,8 +126,8 @@
 
     if (filteredCategories.value.length > 0) {
       filteredCategories.value.forEach(filteredCategory => {
-        if (!filteredCategory.uuid) return;
-        urlParams.append('category.uuid[]', filteredCategory.uuid)
+        if (!filteredCategory.item.uuid) return;
+        urlParams.append('category.uuid[]', filteredCategory.item.uuid)
       })
     }
 
@@ -145,17 +147,6 @@
       })
     }
 
-    // if (sort.value.column === 'name') {
-    //   urlParams.append(`order[category.weight]`, 'asc');
-    // }
-
-    // urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
-
-    // For remaining items we sort first by this then by category
-    if (sort.value.column === 'quantity') {
-      urlParams.append(`order[category.weight]`, 'asc');
-    }
-
 
     if (searchQuery.value.trim().length > 0) {
       urlParams.append('multiple[name, barcode]', searchQuery.value.trim())
@@ -170,7 +161,7 @@
     isLoading.value = false
 
     if (totalApiItems.value === 1) {
-      rowClicked(apiItems.value.at(0) as InventoryItem)
+      rowClicked(items.at(0) as InventoryItem)
     }
 
   }
@@ -289,7 +280,7 @@
           @update:sorting="getItemsPaginated()"
           :columns="columns"
           :data="apiItems"
-          @select="rowClicked">
+          @select="(row) => rowClicked(row.original)">
           <template #empty>
             <div class="flex flex-col items-center justify-center py-6 gap-3">
               <span class="italic text-sm">Aucun articles.</span>
@@ -327,7 +318,7 @@
 
           <template #actions-cell="{ row }">
             <div class="text-right">
-              <UButton @click="rowClicked(row)">Détails</UButton>
+              <UButton @click="rowClicked(row.original)">Détails</UButton>
             </div>
           </template>
 

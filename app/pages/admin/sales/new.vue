@@ -11,7 +11,8 @@
   import {formatDate} from "~/utils/date";
   import dayjs from "dayjs";
   import {convertUuidToUrlUuid} from "~/utils/resource";
-  import type {SelectItem} from "@nuxt/ui";
+  import type {SelectApiItem} from "~/types/select";
+  import type {Member} from "~/types/api/item/clubDependent/member";
 
   definePageMeta({
     layout: "pos"
@@ -30,10 +31,10 @@
   const cartStore = useCartStore()
   const { searchQuery, cart, cartTotalPrice, cartComment, cartCustomItemModalOpen, customItemForm, selectedPaymentMode } = storeToRefs(cartStore)
   const { sellers, seller, paymentModes } = storeToRefs(saleStore)
-  const sellerSelected = ref(!seller.value ? undefined : { label: seller.value.fullName, value: seller.value.uuid, item: seller.value } as SelectItem)
+  const sellerSelected = ref(!seller.value ? undefined : { label: seller.value.fullName, value: seller.value.uuid, item: seller.value } as SelectApiItem<Member>)
 
   const sellersSelect = computed( () => {
-    const items: SelectItem[] = []
+    const items: SelectApiItem<Member>[] = []
     sellers.value.forEach(value => {
       items.push({
         label: value.fullName,

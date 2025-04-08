@@ -1,7 +1,8 @@
 <script setup lang="ts">
 
 import {useSelfUserStore} from "~/stores/useSelfUser";
-import type {SelectItem} from "@nuxt/ui";
+import type {SelectApiItem} from "~/types/select";
+import type {LinkedProfile} from "~/types/api/linkedProfile";
 
 const emit = defineEmits(['selected', 'close'])
 
@@ -12,7 +13,7 @@ const isLoading = ref(false)
 const selectedProfileId: Ref<string|undefined> = ref(selectedProfile.value?.id)
 
 const items = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem<LinkedProfile>[] = []
   user.value?.linkedProfiles?.forEach(value => {
     items.push({
       label: value.displayName,

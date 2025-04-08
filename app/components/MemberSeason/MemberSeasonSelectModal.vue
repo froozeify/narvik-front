@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
-import type { SelectItem } from '@nuxt/ui'
 import SeasonQuery from "~/composables/api/query/SeasonQuery";
 import type {Season} from "~/types/api/item/season";
 import type {AgeCategory} from "~/types/api/item/ageCategory";
 import AgeCategoryQuery from "~/composables/api/query/AgeCategoryQuery";
+import type {SelectApiItem} from "~/types/select";
 
 const seasonQuery = new SeasonQuery()
 const ageCategoryQuery = new AgeCategoryQuery()
@@ -18,7 +18,7 @@ const selectedAgeCategory: Ref<string | undefined> = ref(undefined)
 const emit = defineEmits(['selected', 'close'])
 
 const seasonsSelect = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem<Season>[] = []
   seasons.value.forEach(value => {
     items.push({
       label: value.name,
@@ -29,7 +29,7 @@ const seasonsSelect = computed( () => {
 })
 
 const ageCategoriesSelect = computed( () => {
-  const items: SelectItem[] = []
+  const items: SelectApiItem<AgeCategory>[] = []
   ageCategories.value.forEach(value => {
     items.push({
       label: value.name,
