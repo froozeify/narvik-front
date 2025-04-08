@@ -21,7 +21,6 @@ import MemberSeasonQuery from "~/composables/api/query/clubDependent/MemberSeaso
 import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
 import MemberEditLinkedEmailModal from "~/components/Member/MemberEditLinkedEmailModal.vue";
 import clipboard from "clipboardy";
-import type {GetModelValue} from "@nuxt/ui";
 import type {TablePaginateInterface} from "~/types/table";
 import type {SelectApiItem} from "~/types/select";
 
@@ -107,7 +106,7 @@ const memberPresenceQuery = new MemberPresenceQuery();
 const imageQuery = new ImageQuery();
 
 const activityQuery = new ActivityQuery()
-const filteredActivities: Ref<GetModelValue<Activity, any, any>[]> = ref([])
+const filteredActivities: Ref<SelectApiItem<Activity>[]> = ref([])
 const activities: Ref<Activity[]> = ref([])
 activityQuery.getAll().then(value => {
   activities.value = value.items.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
@@ -287,8 +286,8 @@ async function getMemberPresencesPaginated() {
 
   if (filteredActivities.value.length > 0) {
     filteredActivities.value.forEach(filteredActivity => {
-      if (!filteredActivity.value.uuid) return;
-      urlParams.append('activities.uuid[]', filteredActivity.value.uuid)
+      if (!filteredActivity.value) return;
+      urlParams.append('activities.uuid[]', filteredActivity.value)
     })
   }
 
@@ -346,8 +345,8 @@ async function downloadCsv() {
 
   if (filteredActivities.value.length > 0) {
     filteredActivities.value.forEach(filteredActivity => {
-      if (!filteredActivity.uuid) return;
-      urlParams.append('activities.uuid[]', filteredActivity.uuid)
+      if (!filteredActivity.value) return;
+      urlParams.append('activities.uuid[]', filteredActivity.value)
     })
   }
 

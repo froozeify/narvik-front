@@ -5,7 +5,6 @@
   import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
   import {createBrowserCsvDownload, verifyCameraIsPresent} from "~/utils/browser";
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
-  import type {GetModelValue} from "@nuxt/ui";
   import type {ColumnSort} from "@tanstack/table-core";
   import {getTableSortVal} from "~/utils/table";
   import type {TablePaginateInterface} from "~/types/table";
@@ -39,7 +38,7 @@
     })
     return items;
   })
-  const filteredCategories: Ref<GetModelValue<InventoryCategory, any, any>[]> = ref([])
+  const filteredCategories: Ref<SelectApiItem<InventoryCategory>[]> = ref([])
   itemCategoryQuery.getAll().then(value => {
     categories.value = value.items
 
@@ -47,7 +46,11 @@
     if (queryParams.category !== undefined) {
       const matchedCategory = value.items.find( (category) => category.uuid == decodeUrlUuid(queryParams.category?.toString()))
       if (matchedCategory) {
-        filteredCategories.value.push(matchedCategory)
+        filteredCategories.value.push({
+          label: matchedCategory.name,
+          value: matchedCategory.uuid,
+          item: matchedCategory
+        } as SelectApiItem<InventoryCategory>)
         useRouter().replace(useRouter().currentRoute.value.path) // We remove the param from the url
         getItemsPaginated()
       }
