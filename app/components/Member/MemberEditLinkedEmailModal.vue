@@ -71,7 +71,6 @@ async function updateLink() {
 
     <template #actions>
       <UButton
-        color="warning"
         :loading="isLoading"
         @click="updateLink()"
       >
