@@ -67,9 +67,9 @@ const validate = (state: any): FormError[] => {
   }
 
   const errors = []
-  if (!state.host) errors.push({ path: 'host', message: 'Champ requis' })
-  if (!state.port) errors.push({ path: 'port', message: 'Champ requis' })
-  if (!state.sender) errors.push({ path: 'sender', message: 'Champ requis' })
+  if (!state.host) errors.push({ name: 'host', message: 'Champ requis' })
+  if (!state.port) errors.push({ name: 'port', message: 'Champ requis' })
+  if (!state.sender) errors.push({ name: 'sender', message: 'Champ requis' })
   return errors
 }
 

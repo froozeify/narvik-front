@@ -58,8 +58,8 @@ function getDefaultItem() {
 const validate = (state: Member): FormError[] => {
   const errors = []
 
-  if (!state.firstname) errors.push({ path: 'firstname', message: 'Champ requis' })
-  if (!state.lastname) errors.push({ path: 'lastname', message: 'Champ requis' })
+  if (!state.firstname) errors.push({ name: 'firstname', message: 'Champ requis' })
+  if (!state.lastname) errors.push({ name: 'lastname', message: 'Champ requis' })
 
   return errors
 }

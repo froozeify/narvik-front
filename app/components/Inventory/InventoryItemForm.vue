@@ -69,8 +69,8 @@ function getDefaultInventoryItem() {
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
-  if (!state.sellingPrice) errors.push({ path: 'sellingPrice', message: 'Champ requis' })
+  if (!state.name) errors.push({ name: 'name', message: 'Champ requis' })
+  if (!state.sellingPrice) errors.push({ name: 'sellingPrice', message: 'Champ requis' })
   return errors
 }
 
@@ -203,7 +203,6 @@ async function getCategories() {
         v-model="item.barcode"
         :class="props.viewOnly ? 'pointer-events-none' : ''"
         :tabindex="props.viewOnly ? '-1' : '0'"
-        :ui="{ icon: { trailing: { pointer: '' } } }"
       >
         <template #trailing v-if="cameraIsPresent">
           <UIcon

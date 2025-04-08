@@ -28,7 +28,7 @@ const member: Member = {...props.member}
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!member.linkedEmail) errors.push({ path: 'email', message: 'Champ requis' })
+  if (!member.linkedEmail) errors.push({ name: 'email', message: 'Champ requis' })
   return errors
 }
 

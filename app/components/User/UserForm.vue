@@ -44,7 +44,7 @@ function getDefaultItem() {
 
 const validate = (state: Member): FormError[] => {
   const errors = []
-  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
+  if (!state.email) errors.push({ name: 'email', message: 'Champ requis' })
   return errors
 }
 

@@ -42,9 +42,9 @@ const items = [{
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
-  if (!state.password || state.password.length < 8) errors.push({ path: 'password', message: 'Champ requis (8 caractères minimum)' })
-  if (!state.securityCode) errors.push({ path: 'securityCode', message: 'Champ requis' })
+  if (!state.email) errors.push({ name: 'email', message: 'Champ requis' })
+  if (!state.password || state.password.length < 8) errors.push({ name: 'password', message: 'Champ requis (8 caractères minimum)' })
+  if (!state.securityCode) errors.push({ name: 'securityCode', message: 'Champ requis' })
   return errors
 }
 

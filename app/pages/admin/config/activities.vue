@@ -83,7 +83,7 @@ function rowClicked(row: TableRow<Activity>) {
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.name) errors.push({path: 'name', message: 'Champ requis'})
+  if (!state.name) errors.push({name: 'name', message: 'Champ requis'})
   return errors
 }
 

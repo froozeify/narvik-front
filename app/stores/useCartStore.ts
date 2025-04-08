@@ -78,10 +78,10 @@ export const useCartStore = defineStore('cart', () => {
   // Custom cart item
   function validateCustomCartForm(state: any): FormError[] {
     const errors = []
-    if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
-    if (!state.sellingPrice) errors.push({ path: 'sellingPrice', message: 'Champ requis' })
+    if (!state.name) errors.push({ name: 'name', message: 'Champ requis' })
+    if (!state.sellingPrice) errors.push({ name: 'sellingPrice', message: 'Champ requis' })
     const sellingPrice = parseFloat(state.sellingPrice)
-    if (isNaN(sellingPrice)) errors.push({ path: 'sellingPrice', message: 'Le champ doit être un nombre' })
+    if (isNaN(sellingPrice)) errors.push({ name: 'sellingPrice', message: 'Le champ doit être un nombre' })
     return errors
   }
 

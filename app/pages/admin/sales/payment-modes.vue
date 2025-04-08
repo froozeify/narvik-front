@@ -177,8 +177,8 @@ definePageMeta({
 
   const validate = (state: any): FormError[] => {
     const errors = []
-    if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
-    if (!state.icon) errors.push({ path: 'icon', message: 'Champ requis' })
+    if (!state.name) errors.push({ name: 'name', message: 'Champ requis' })
+    if (!state.icon) errors.push({ name: 'icon', message: 'Champ requis' })
     return errors
   }
 

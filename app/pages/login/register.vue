@@ -47,12 +47,12 @@ const items = ref<TabsItem[]>([
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.securityCode) errors.push({ path: 'securityCode', message: 'Champ requis' })
-  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
-  if (!state.password || state.password.length < 8) errors.push({ path: 'password', message: 'Champ requis (8 caractères minimum)' })
-  if (!state.firstname) errors.push({ path: 'firstname', message: 'Champ requis' })
-  if (!state.lastname) errors.push({ path: 'lastname', message: 'Champ requis' })
-  if (!state.legals) errors.push({ path: 'legals', message: 'Vous devez accepter les conditions légales' })
+  if (!state.securityCode) errors.push({ name: 'securityCode', message: 'Champ requis' })
+  if (!state.email) errors.push({ name: 'email', message: 'Champ requis' })
+  if (!state.password || state.password.length < 8) errors.push({ name: 'password', message: 'Champ requis (8 caractères minimum)' })
+  if (!state.firstname) errors.push({ name: 'firstname', message: 'Champ requis' })
+  if (!state.lastname) errors.push({ name: 'lastname', message: 'Champ requis' })
+  if (!state.legals) errors.push({ name: 'legals', message: 'Vous devez accepter les conditions légales' })
   return errors
 }
 

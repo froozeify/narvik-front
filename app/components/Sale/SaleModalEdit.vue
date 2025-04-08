@@ -52,7 +52,7 @@ if (saleStore.paymentModes.length < 1) {
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.createdAt) errors.push({ path: 'createdAt', message: 'Champ requis' })
+  if (!state.createdAt) errors.push({ name: 'createdAt', message: 'Champ requis' })
   return errors
 }
 
