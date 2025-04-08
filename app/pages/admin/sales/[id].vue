@@ -23,7 +23,10 @@ definePageMeta({
   const isAdmin = selfStore.isAdmin()
 
   const toast = useToast()
-  const modal = useModal()
+
+  const overlay = useOverlay()
+  const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
   const route = useRoute()
   const itemId = decodeUrlUuid(route.params.id.toString());
 
@@ -130,7 +133,7 @@ definePageMeta({
           color="warning"
           size="xs"
           label="Modifier"
-          @click="modal.open(SaleModalEdit, {
+          @click="overlay.create(SaleModalEdit).open({
             sale: sale
           })"
         />
@@ -140,10 +143,10 @@ definePageMeta({
           color="error"
           size="xs"
           label="Supprimer"
-          @click="modal.open(ModalDeleteConfirmation, {
-            onDelete() {
-              modal.close()
-              deleteSale()
+          @click="overlayDeleteConfirmation.open({
+            async onDelete() {
+              await deleteSale()
+              overlayDeleteConfirmation.close(true)
             }
           })"
         />

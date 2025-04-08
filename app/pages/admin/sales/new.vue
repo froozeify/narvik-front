@@ -347,7 +347,7 @@
           </UFormField>
 
           <UFormField class="my-2" label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'">
-            <UTextarea class="w-full" v-model="cartComment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente"/>
+            <UTextarea v-model="cartComment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente"/>
           </UFormField>
 
           <UFormField label="Mode de paiement">

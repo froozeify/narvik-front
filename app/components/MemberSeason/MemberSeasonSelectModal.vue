@@ -54,7 +54,7 @@ ageCategoryQuery.getAll().then((value) => {
   <ModalWithActions title="Sélection d'une saison" @close="(state: boolean) => emit('close', state)">
 
     <UFormField label="Saison">
-      <USelect class="w-full" v-model="selectedSeason" :items="seasonsSelect" value-attribute="@id" />
+      <USelect v-model="selectedSeason" :items="seasonsSelect" value-attribute="@id" />
     </UFormField>
 
     <UFormField label="Club secondaire">
@@ -62,7 +62,7 @@ ageCategoryQuery.getAll().then((value) => {
     </UFormField>
 
     <UFormField label="Catégorie d'âge">
-      <USelect class="w-full" v-model="selectedAgeCategory" :items="ageCategoriesSelect" />
+      <USelect v-model="selectedAgeCategory" :items="ageCategoriesSelect" />
     </UFormField>
 
     <template #actions>

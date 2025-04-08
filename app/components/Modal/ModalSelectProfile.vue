@@ -45,7 +45,6 @@ async function applyProfile() {
 
     <div>
       <USelect
-        class="w-full"
         v-model="selectedProfileId"
         :items="items"
         placeholder="Aucun profil défini" />

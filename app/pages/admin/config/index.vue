@@ -239,7 +239,6 @@ async function deleteLogo() {
       <GenericCard class="h-fit" title="Activités exclus du compte des jours ouverts">
         <div>
           <USelectMenu
-            class="w-full"
             v-model="configState.excludedActivitiesFromOpeningDays"
             @change="ignoredActivitiesDaysUpdated"
             :items="activitiesSelect"
@@ -259,7 +258,6 @@ async function deleteLogo() {
       <GenericCard class="h-fit mt-4" title="Activité correspondante au contrôle">
         <div>
           <USelect
-            class="w-full"
             v-model="configState.selectedControlShootingActivity"
             @change="controlShootingUpdated"
             :items="activitiesSelect"

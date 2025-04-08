@@ -45,7 +45,7 @@ const items = computed( () => {
     />
 
     <UFormField class="mb-4" label="Activité cible">
-      <USelect required class="w-full" v-model="migrationTarget" :items="items" />
+      <USelect required v-model="migrationTarget" :items="items" />
     </UFormField>
 
     <template #actions>

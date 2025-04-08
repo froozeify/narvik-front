@@ -34,15 +34,35 @@ export default defineAppConfig({
         root: 'w-full'
       }
     },
+    inputMenu: {
+      slots: {
+        root: 'w-full'
+      }
+    },
     modal: {
       slots: {
         content: 'overflow-y-auto thin-scrollbar' // Fix for cards not scrolling when they have too much content...
+      }
+    },
+    select: {
+      slots: {
+        base: 'w-full'
+      }
+    },
+    selectMenu: {
+      slots: {
+        base: 'w-full'
       }
     },
     table: {
       slots: {
         td: 'py-2 text-(--ui-text)',
         tr: ' even:bg-(--table-even) dark:even:bg-(--table-even-dark)'
+      }
+    },
+    textarea: {
+      slots: {
+        root: 'w-full'
       }
     },
   }

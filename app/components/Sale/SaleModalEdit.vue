@@ -8,6 +8,7 @@ import {formatDateTimeReadable} from "~/utils/date";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useSaleStore} from "~/stores/useSaleStore";
 import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
+import type {SelectItem} from "@nuxt/ui";
 
 const props = defineProps(
   {
@@ -21,7 +22,6 @@ const props = defineProps(
 const emit = defineEmits<{ close: [boolean] }>()
 
 const toast = useToast()
-const modal = useModal()
 
 const selfStore = useSelfUserStore();
 const saleStore = useSaleStore()
