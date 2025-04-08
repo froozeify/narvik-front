@@ -62,6 +62,7 @@
         <div><ContentLink to="https://about.narvik.app" target="_blank">À propos de Narvik</ContentLink></div>
         <div><ContentLink to="https://docs.narvik.app" target="_blank">Documentation</ContentLink></div>
         <div><ContentLink to="https://about.narvik.app/contact" target="_blank">Nous contacter</ContentLink></div>
+        <div><ContentLink to="https://github.com/Narvik-app" target="_blank">Github</ContentLink></div>
       </div>
       <div class="flex flex-col gap-1 justify-center items-center lg:items-end text-xs">
         <template v-for="(val, index) in externalLinks">
