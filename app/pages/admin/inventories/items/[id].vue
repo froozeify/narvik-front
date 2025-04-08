@@ -7,6 +7,7 @@
   import { Line } from 'vue-chartjs'
   import {formatMonetary} from "~/utils/string";
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
+  import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors)
 
   definePageMeta({
@@ -16,10 +17,13 @@
   const isLoading = ref(true)
 
   const toast = useToast()
+  const overlay = useOverlay()
+
   const route = useRoute()
   const itemId = decodeUrlUuid(route.params.id.toString());
 
-  const popoverOpen = ref(false)
+
+  const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
   const inventoryItemModalOpen = ref(false)
 
   const inventoryItem: Ref<InventoryItem | undefined> = ref(undefined)
@@ -104,7 +108,7 @@
     }
   }
 
-  async function deleteItem(close: Function) {
+  async function deleteItem() {
     if (!inventoryItem.value) return
 
     const { error } = await itemQuery.delete(inventoryItem.value)
@@ -123,7 +127,6 @@
       color: "success",
       title: "Produit supprimé",
     })
-    popoverOpen.value = false
     navigateTo('/admin/inventories')
   }
 </script>
@@ -160,26 +163,17 @@
       </UTooltip>
 
       <UTooltip text="Supprimer">
-        <UPopover v-model:open="popoverOpen">
-          <UButton
-            icon="i-heroicons-trash"
-            color="error"
-          />
-
-          <template #content>
-            <div class="p-4 w-56 flex flex-col gap-4">
-              <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
-
-              <UButton
-                @click="deleteItem();"
-                color="error"
-                class="mx-auto"
-              >
-                Supprimer
-              </UButton>
-            </div>
-          </template>
-        </UPopover>
+        <UButton
+          icon="i-heroicons-trash"
+          color="error"
+          @click="
+            overlayDeleteConfirmation.open({
+                async onDelete() {
+                  await deleteItem()
+                  overlayDeleteConfirmation.close(true)
+                }
+              })"
+        />
       </UTooltip>
     </div>
 
