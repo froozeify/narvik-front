@@ -18,7 +18,9 @@
   })
 
   const toast = useToast()
-  const modal = useModal()
+  const overlay = useOverlay()
+  const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
   const apiQuery = new InventoryCategoryQuery();
 
   const categories: Ref<InventoryCategory[]> = ref([])
@@ -240,7 +242,7 @@
 
           </UCard>
 
-          <UButton v-if="selectedCategory.uuid" color="success" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
+          <UButton v-if="selectedCategory.uuid" variant="soft" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
@@ -250,12 +252,14 @@
             color="error"
             :loading="isLoading"
             :disabled="(selectedCategory?.items?.length ?? 0) > 0"
-            @click="modal.open(ModalDeleteConfirmation, {
-              onDelete() {
-                modal.close()
-                deleteCategory()
-              }
-            })"
+            @click="
+              overlayDeleteConfirmation.open({
+                async onDelete() {
+                  await deleteCategory()
+                  overlayDeleteConfirmation.close(true)
+                }
+              })
+            "
           >
             Supprimer
           </UButton>

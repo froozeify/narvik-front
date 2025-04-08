@@ -168,11 +168,11 @@
           color="error"
           @click="
             overlayDeleteConfirmation.open({
-                async onDelete() {
-                  await deleteItem()
-                  overlayDeleteConfirmation.close(true)
-                }
-              })"
+              async onDelete() {
+                await deleteItem()
+                overlayDeleteConfirmation.close(true)
+              }
+            })"
         />
       </UTooltip>
     </div>

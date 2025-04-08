@@ -72,8 +72,8 @@ watchEffect(() => {
           <UIcon :name="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')" />
         </UButton>
       </div>
-      <div v-if="sideMobileVisible" class="overflow-y-auto flex flex-col gap-4 ">
-        <div class="p-1">
+      <div v-if="sideMobileVisible" class="overflow-y-auto">
+        <div class="p-1 flex flex-col gap-4">
           <slot name="side"></slot>
         </div>
       </div>

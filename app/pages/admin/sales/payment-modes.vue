@@ -17,7 +17,9 @@ definePageMeta({
   })
 
   const toast = useToast()
-  const modal = useModal()
+  const overlay = useOverlay()
+  const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
   const apiQuery = new SalePaymentModeQuery()
 
   const paymentModes: Ref<SalePaymentMode[]> = ref([])
@@ -254,7 +256,7 @@ definePageMeta({
               <UFormField label="Icône" name="icon">
 
                 <template #description>
-                  <UButton variant="link" to="https://heroicons.com/" target="_blank" :padded="false">Liste des icônes Heroicons</UButton>
+                  <ContentLink variant="link" to="https://heroicons.com/" target="_blank">Liste des icônes Heroicons</ContentLink>
                   <ul class="text-xs">
                     <li>Espèces : <code>banknotes</code></li>
                     <li>Chèque : <code>ticket</code></li>
@@ -285,12 +287,14 @@ definePageMeta({
           block
           color="error"
           :loading="isLoading"
-          @click="modal.open(ModalDeleteConfirmation, {
-            onDelete() {
-              modal.close()
-              deletePaymentMode()
-            }
-          })"
+          @click="
+            overlayDeleteConfirmation.open({
+              async onDelete() {
+                await deletePaymentMode()
+                overlayDeleteConfirmation.close(true)
+              }
+            })
+          "
         >
           Supprimer
         </UButton>
