@@ -120,8 +120,7 @@ async function testSmtp() {
       <GenericCard title="Configuration SMTP">
 
         <UButton
-          color="blue"
-          size="2xs"
+          size="xs"
           icon="i-heroicons-arrow-path"
           class="mb-4"
           :loading="isLoading"

@@ -70,7 +70,7 @@ const props = defineProps({
       <UButton
         color="neutral"
         variant="ghost"
-        size="2xs"
+        size="xs"
         icon="i-heroicons-arrow-path"
         :loading="isLoading"
         @click="saleStore.getSales()"

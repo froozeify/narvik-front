@@ -112,7 +112,7 @@
             <template #trailing>
               <UAvatar v-if="!isBadger"
                        size="xs"
-                       :alt="selfStore.member?.fullName"
+                       :alt="selfStore.member?.fullName ?? user?.fullName"
                        :src="selfStore.member?.profileImageBase64"
               />
               <UIcon v-else
