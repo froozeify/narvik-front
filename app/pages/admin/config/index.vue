@@ -94,7 +94,7 @@ async function controlShootingUpdated() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error.message
     });
@@ -127,7 +127,7 @@ async function ignoredActivitiesDaysUpdated() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error.message
     });
