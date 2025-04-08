@@ -1,14 +1,14 @@
 <script setup lang="ts">
-  import {usePaginationValues} from "~/composables/api/list";
   import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
   import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
   import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
   import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
   import {createBrowserCsvDownload, verifyCameraIsPresent} from "~/utils/browser";
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
-  import {formatDateInput} from "~/utils/date";
   import type {TableRow} from "#ui/types";
   import type {SelectItem} from "@nuxt/ui";
+  import type {ColumnSort} from "@tanstack/table-core";
+  import {getTableSortVal} from "~/utils/table";
 
   definePageMeta({
     layout: "pos"
@@ -74,20 +74,19 @@
   // Table settings
   const page = ref(1);
   const itemsPerPage = ref(30);
-  const sort = ref({
-    column: 'quantity',
-    direction: 'asc'
-  });
+  const sort = ref([{
+    id: 'quantity',
+    desc: false,
+
+  }] as ColumnSort[]);
   const columns = [
     {
       accessorKey: 'quantity',
       header: 'Quantité en stock',
-      sortable: true,
     },
     {
       accessorKey: 'name',
       header: 'Nom',
-      sortable: true,
     },
     {
       accessorKey: 'description',
@@ -101,6 +100,10 @@
     {
       accessorKey: 'category',
       header: 'Catégorie'
+    },
+    {
+      accessorKey: 'actions',
+      header: ''
     }
   ]
 
@@ -127,11 +130,26 @@
     }
 
     // When filter by name the category is applied before
-    if (sort.value.column === 'name') {
-      urlParams.append(`order[category.weight]`, 'asc');
+    if (sort.value.length > 0) {
+      sort.value.forEach((value) => {
+        if (value.id === 'name') {
+          urlParams.append(`order[category.weight]`, 'asc')
+        }
+
+        urlParams.append(`order[${value.id}]`, getTableSortVal(value))
+
+        // For remaining items we sort first by this then by category
+        if (value.id === 'quantity') {
+          urlParams.append(`order[category.weight]`, 'asc')
+        }
+      })
     }
 
-    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+    // if (sort.value.column === 'name') {
+    //   urlParams.append(`order[category.weight]`, 'asc');
+    // }
+
+    // urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
 
     // For remaining items we sort first by this then by category
     if (sort.value.column === 'quantity') {
@@ -248,7 +266,7 @@
             >
               <template #default>
               <span v-if="filteredCategories.length" class="truncate">
-                {{ filteredCategories.map(fa => fa.name).join(', ') }}
+                {{ filteredCategories.map(fa => fa.label).join(', ') }}
               </span>
                 <span v-else>Catégories</span>
               </template>
@@ -263,9 +281,12 @@
         <UTable
           class="w-full"
           :loading="isLoading"
-          v-model:sort="sort"
-          sort-mode="manual"
-          @update:sort="getItemsPaginated()"
+          v-model:sorting="sort"
+          :sorting-options="{
+            manualSorting: true,
+            enableMultiSort: false,
+          }"
+          @update:sorting="getItemsPaginated()"
           :columns="columns"
           :data="apiItems"
           @select="rowClicked">
@@ -275,10 +296,16 @@
             </div>
           </template>
 
+          <template #name-header="{ column }">
+            <GenericTableSortButton :column="column" />
+          </template>
           <template #name-cell="{ row }">
             {{ row.original.name }}
           </template>
 
+          <template #quantity-header="{ column }">
+            <GenericTableSortButton :column="column" />
+          </template>
           <template #quantity-cell="{ row }">
             <p v-if="row.original.quantity || row.original.quantity === 0" :class="row.original.quantityAlert && row.original.quantity <= row.original.quantityAlert ? 'font-bold text-error-600' : ''">
               {{ row.original.quantity }}
@@ -296,7 +323,12 @@
             <i v-else>
               Pas de catégorie.
             </i>
+          </template>
 
+          <template #actions-cell="{ row }">
+            <div class="text-right">
+              <UButton @click="rowClicked(row)">Détails</UButton>
+            </div>
           </template>
 
         </UTable>

@@ -6,7 +6,7 @@
   import {useSelfUserStore} from "~/stores/useSelfUser";
   import {createBrowserCsvDownload} from "~/utils/browser";
   import type {TableSortInterface} from "~/components/Presence/PresenceTable.vue";
-  import type {TablePaginateInterface} from "~/components/Generic/GenericTablePagination.vue";
+  import type {TablePaginateInterface} from "~/components/Generic/Table/GenericTablePagination.vue";
   import type {TableRow} from "#ui/types";
 
   const props = defineProps({
