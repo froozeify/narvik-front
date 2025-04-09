@@ -1,8 +1,5 @@
 <script lang="ts" setup>
-import type {FormError, TableRow} from "#ui/types";
-import type {NuxtError} from "#app";
-import {usePaginationValues} from "~/composables/api/list";
-import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+import type {TableRow} from "#ui/types";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {type User, UserRole} from "~/types/api/item/user";
@@ -16,8 +13,6 @@ useHead({
   title: 'Clubs'
 })
 
-const toast = useToast()
-const modal = useModal()
 const apiQuery = new UserQuery();
 
 const selfStore = useSelfUserStore()
@@ -160,7 +155,7 @@ async function impersonate(user: User) {
             </template>
 
             <template #accountActivated-cell="{ row }">
-              <USwitch :model-value="row.original.accountActivated" />
+              <USwitch class="pointer-events-none" :model-value="row.original.accountActivated" />
             </template>
 
             <template #actions-cell="{ row }">

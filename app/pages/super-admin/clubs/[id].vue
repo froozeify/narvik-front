@@ -8,9 +8,7 @@ import ImageQuery from "~/composables/api/query/ImageQuery";
 import {formatDateReadable} from "~/utils/date";
 import dayjs from "dayjs";
 import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
-import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
 import {convertUuidToUrlUuid} from "~/utils/resource";
-import {usePaginationValues} from "~/composables/api/list";
 import UserQuery from "~/composables/api/query/UserQuery";
 import type {User} from "~/types/api/item/user";
 
@@ -23,7 +21,9 @@ useHead({
 })
 
 const toast = useToast()
-const modal = useModal()
+const overlay = useOverlay()
+const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
 const route = useRoute()
 
 const selfStore = useSelfUserStore()
@@ -194,12 +194,14 @@ loadClubUsers()
           color="error"
           size="xs"
           label="Supprimer"
-          @click="modal.open(ModalDeleteConfirmation, {
-            onDelete() {
-              modal.close()
-              deleteClub()
-            }
-          })"
+          @click="
+            overlayDeleteConfirmation.open({
+              async onDelete() {
+                await deleteClub()
+                overlayDeleteConfirmation.close(true)
+              }
+            })
+          "
         />
       </div>
     </div>
@@ -223,22 +225,22 @@ loadClubUsers()
               {{ club.name }}
             </div>
 
-            <div v-if="club.renewDate" class="text-center text-lg">
-              Renouvellement le
+            <div class="text-center text-lg flex flex-row justify-center align-middle gap-2">
+              <p>Renouvellement le</p>
               <UButton icon="i-heroicons-calendar-days-20-solid"
-                       :color="dayjs().isAfter(dayjs(club.renewDate).subtract(14, 'days')) ? 'red' : 'primary'"
+                       size="xs"
+                       :color="dayjs().isAfter(dayjs(club.renewDate).subtract(14, 'days')) ? 'error' : 'primary'"
                        :label="formatDateReadable(club.renewDate?.toString()) || 'Choisir une date'"
-                       @click="modal.open(ModalClubSelectRenewDate, {
-                  item: club,
-                  async onSelected(date: Date|undefined) {
-                    if (!club) {
-                      return
-                    }
-                    let payload: WriteClub = { renewDate: date }
-                    await clubQuery.patch(club, payload)
-                    await loadItem()
-                  }
-                })"
+                       @click="overlay.create(ModalClubSelectRenewDate).open({
+                        item: club,
+                        async onSelected(date: Date|undefined) {
+                          if (!club) {
+                            return
+                          }
+                          await clubQuery.patch(club, { renewDate: date ?? null })
+                          await loadItem()
+                        }
+                      })"
               />
             </div>
 

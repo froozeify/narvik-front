@@ -9,147 +9,147 @@ import SeasonQuery from "~/composables/api/query/SeasonQuery";
 import type {Season} from "~/types/api/item/season";
 
 definePageMeta({
-    layout: "super-admin"
+  layout: "super-admin"
+});
+
+useHead({
+  title: 'Saisons'
+})
+
+const toast = useToast()
+const overlay = useOverlay()
+const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
+const apiQuery = new SeasonQuery();
+
+const apiItems: Ref<Season[]> = ref([])
+const isLoading = ref(true);
+const apiTotalItems = ref(0)
+const selectedItem: Ref<Season | undefined> = ref(undefined)
+
+const searchQuery: Ref<string> = ref('')
+
+// Side menu visible
+const isSideVisible = ref(false);
+
+// Table settings
+const page = ref(1);
+const itemsPerPage = ref(30);
+const columns = [
+  {
+    accessorKey: 'name',
+    header: 'Nom',
+  },
+  {
+    accessorKey: 'actions',
+    header: ''
+  }
+]
+
+// We get the data from the api on first page load
+getItemsPaginated()
+
+async function getItemsPaginated() {
+  isLoading.value = true
+
+  const urlParams = new URLSearchParams({
+    page: page.value.toString(),
+    itemsPerPage: itemsPerPage.value.toString(),
   });
 
-  useHead({
-    title: 'Saisons'
-  })
-
-  const toast = useToast()
-  const modal = useModal()
-  const apiQuery = new SeasonQuery();
-
-  const selfStore = useSelfUserStore()
-
-  const apiItems: Ref<Season[]> = ref([])
-  const isLoading = ref(true);
-  const apiTotalItems = ref(0)
-  const selectedItem: Ref<Season | undefined> = ref(undefined)
-
-  const searchQuery: Ref<string> = ref('')
-
-  // Side menu visible
-  const isSideVisible = ref(false);
-
-  // Table settings
-  const page = ref(1);
-  const itemsPerPage = ref(30);
-  const columns = [
-    {
-      accessorKey: 'name',
-      header: 'Nom',
-    },
-    {
-      accessorKey: 'actions',
-      header: ''
-    }
-  ]
-
-  // We get the data from the api on first page load
-  getItemsPaginated()
-
-  async function getItemsPaginated() {
-    isLoading.value = true
-
-    const urlParams = new URLSearchParams({
-      page: page.value.toString(),
-      itemsPerPage: itemsPerPage.value.toString(),
-    });
-
-    if (searchQuery.value.trim().length > 0) {
-      urlParams.append('multiple[name]', searchQuery.value.trim())
-    }
-
-    urlParams.append(`order[name]`, 'DESC');
-
-    const { totalItems, items } = await apiQuery.getAll(urlParams)
-    apiItems.value = items
-    if (totalItems) {
-      apiTotalItems.value = totalItems
-    }
-
-    isLoading.value = false
+  if (searchQuery.value.trim().length > 0) {
+    urlParams.append('multiple[name]', searchQuery.value.trim())
   }
 
-  function rowClicked(row: TableRow<Club>) {
-    selectedItem.value = {...row.original} // We make a shallow clone
-    isSideVisible.value = true
+  urlParams.append(`order[name]`, 'DESC');
+
+  const { totalItems, items } = await apiQuery.getAll(urlParams)
+  apiItems.value = items
+  if (totalItems) {
+    apiTotalItems.value = totalItems
   }
 
-  async function createItem() {
-    let item: Season = {
-      name: '20',
-    }
-    selectedItem.value = item
-    isSideVisible.value = true
+  isLoading.value = false
+}
+
+function rowClicked(row: TableRow<Club>) {
+  selectedItem.value = {...row.original} // We make a shallow clone
+  isSideVisible.value = true
+}
+
+async function createItem() {
+  let item: Season = {
+    name: '20',
+  }
+  selectedItem.value = item
+  isSideVisible.value = true
+}
+
+async function updateItem(item: Season) {
+  isLoading.value = true
+
+  // We recreate the payload so we don't edit unwanted fields
+  let payload: Season = {
+    name: item.name
   }
 
-  async function updateItem(item: Season) {
-    isLoading.value = true
+  // We verify if it's a creation or an update
+  let apiError: NuxtError | undefined = undefined
+  if (!item.id) {
+    const {error, created} = await apiQuery.post(payload);
+    apiError = error
+    selectedItem.value = created
+  } else { // Update
+    const {error, updated} = await apiQuery.patch(item, payload);
+    apiError = error
+    selectedItem.value = updated
+  }
 
-    // We recreate the payload so we don't edit unwanted fields
-    let payload: Season = {
-      name: item.name
-    }
+  isLoading.value = false
+  isSideVisible.value = false
 
-    // We verify if it's a creation or an update
-    let apiError: NuxtError | undefined = undefined
-    if (!item.id) {
-      const {error, created} = await apiQuery.post(payload);
-      apiError = error
-      selectedItem.value = created
-    } else { // Update
-      const {error, updated} = await apiQuery.patch(item, payload);
-      apiError = error
-      selectedItem.value = updated
-    }
-
-    isLoading.value = false
-    isSideVisible.value = false
-
-    if (apiError) {
-      toast.add({
-        color: "error",
-        title: !item.id ? "La création a échouée" : "La modification a échouée",
-        description: apiError.message
-      });
-      return;
-    }
-
+  if (apiError) {
     toast.add({
-      color: "success",
-      title: !item.id ? "Saison créée" : "Saison modifiée",
+      color: "error",
+      title: !item.id ? "La création a échouée" : "La modification a échouée",
+      description: apiError.message
     });
-
-    // We refresh the list
-    await getItemsPaginated();
+    return;
   }
 
-  async function deleteItem() {
-    isLoading.value = true
-    const { error } = await apiQuery.delete(selectedItem.value)
-    isLoading.value = false
+  toast.add({
+    color: "success",
+    title: !item.id ? "Saison créée" : "Saison modifiée",
+  });
 
-    if (error) {
-      toast.add({
-        color: "error",
-        title: "La suppression a échouée",
-        description: error.message
-      });
-      return;
-    }
+  // We refresh the list
+  await getItemsPaginated();
+}
 
-    selectedItem.value = undefined
-    // We refresh the list
-    await getItemsPaginated();
+async function deleteItem() {
+  isLoading.value = true
+  const { error } = await apiQuery.delete(selectedItem.value)
+  isLoading.value = false
+
+  if (error) {
+    toast.add({
+      color: "error",
+      title: "La suppression a échouée",
+      description: error.message
+    });
+    return;
   }
 
-  const validate = (state: any): FormError[] => {
-    const errors = []
-    if (!state.name) errors.push({ name: 'name', message: 'Champ requis' })
-    return errors
-  }
+  selectedItem.value = undefined
+  // We refresh the list
+  await getItemsPaginated();
+}
+
+const validate = (state: any): FormError[] => {
+  const errors = []
+  if (!state.name) errors.push({ name: 'name', message: 'Champ requis' })
+  return errors
+}
 </script>
 
 <template>
@@ -215,12 +215,14 @@ definePageMeta({
             block
             color="error"
             :loading="isLoading"
-            @click="modal.open(ModalDeleteConfirmation, {
-              onDelete() {
-                modal.close()
-                deleteItem()
-              }
-            })"
+            @click="
+              overlayDeleteConfirmation.open({
+                async onDelete() {
+                  await deleteItem()
+                  overlayDeleteConfirmation.close(true)
+                }
+              })
+            "
           >
             Supprimer
           </UButton>

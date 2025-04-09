@@ -8,11 +8,11 @@ export default defineAppConfig({
     colors: {
       primary: 'blue',
       neutral: 'slate',
-      orange: 'orange',
-      red: 'red',
-      green: 'green',
-      yellow: 'yellow',
-      purple: 'purple'
+      // orange: 'orange',
+      // red: 'red',
+      // green: 'green',
+      // yellow: 'yellow',
+      // purple: 'purple'
     },
 
     button: {

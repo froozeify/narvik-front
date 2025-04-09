@@ -16,7 +16,9 @@ useHead({
 
 
 const toast = useToast()
-const modal = useModal()
+const overlay = useOverlay()
+const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
 const route = useRoute()
 
 const selfStore = useSelfUserStore()
@@ -164,12 +166,14 @@ loadUser()
           color="error"
           size="xs"
           label="Supprimer"
-          @click="modal.open(ModalDeleteConfirmation, {
-            onDelete() {
-              modal.close()
-              deleteUser()
-            }
-          })"
+          @click="
+            overlayDeleteConfirmation.open({
+              async onDelete() {
+                await deleteUser()
+                overlayDeleteConfirmation.close(true)
+              }
+            })
+          "
         />
       </div>
     </div>

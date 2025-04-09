@@ -121,7 +121,7 @@
             </template>
           </UButton>
           <template #darkMode>
-              <ThemeSwitcher />
+              <ThemeSwitcher class="mx-auto" />
           </template>
         </UDropdownMenu>
       </div>
@@ -130,8 +130,5 @@
 </template>
 
 <style scoped lang="css">
-li {
-  display: flex;
-  align-items: center;
-}
+
 </style>

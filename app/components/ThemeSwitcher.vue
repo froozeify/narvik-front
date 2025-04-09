@@ -29,8 +29,5 @@
 </template>
 
 <style scoped lang="css">
-li {
-  display: flex;
-  align-items: center;
-}
+
 </style>

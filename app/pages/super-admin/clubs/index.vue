@@ -1,132 +1,126 @@
 <script lang="ts" setup>
-import type {FormError, TableRow} from "#ui/types";
-  import ClubQuery from "~/composables/api/query/ClubQuery";
-  import type {Club, WriteClub} from "~/types/api/item/club";
-  import type {NuxtError} from "#app";
-  import {usePaginationValues} from "~/composables/api/list";
-  import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
-  import {useSelfUserStore} from "~/stores/useSelfUser";
-  import {formatDateReadable, formatDateTimeReadable} from "~/utils/date";
-  import SaleModalEdit from "~/components/Sale/SaleModalEdit.vue";
-  import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
-  import dayjs from "dayjs";
-  import {convertUuidToUrlUuid} from "~/utils/resource";
+import type {TableRow} from "#ui/types";
+import ClubQuery from "~/composables/api/query/ClubQuery";
+import type {Club, WriteClub} from "~/types/api/item/club";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import {formatDateReadable} from "~/utils/date";
+import dayjs from "dayjs";
+import {convertUuidToUrlUuid} from "~/utils/resource";
+import type {TablePaginateInterface} from "~/types/table";
 
-  definePageMeta({
-    layout: "super-admin"
+definePageMeta({
+  layout: "super-admin"
+});
+
+useHead({
+  title: 'Clubs'
+})
+
+const apiQuery = new ClubQuery();
+
+const selfStore = useSelfUserStore()
+
+const apiItems: Ref<Club[]> = ref([])
+const isLoading = ref(true);
+const apiTotalItems = ref(0)
+const selectedItem: Ref<WriteClub | undefined> = ref(undefined)
+
+const searchQuery: Ref<string> = ref('')
+
+// Side menu visible
+const isSideVisible = ref(false);
+
+let inputTimer: NodeJS.Timeout;
+async function searchQueryUpdated() {
+  clearTimeout(inputTimer);
+  inputTimer = setTimeout(async () => {
+    page.value = 1;
+    await getItemsPaginated()
+  }, 500);
+}
+
+// Table settings
+const page = ref(1);
+const itemsPerPage = ref(30);
+const columns = [
+  {
+    accessorKey: 'isActivated',
+    header: 'Activé'
+  },
+  {
+    accessorKey: 'name',
+    header: 'Nom',
+  },
+  {
+    accessorKey: 'renewDate',
+    header: 'Renouvellement'
+  },
+  {
+    accessorKey: 'comment',
+    header: 'Commentaire',
+    meta: {
+      class: {
+        th: 'w-full',
+      }
+    }
+  },
+  {
+    accessorKey: 'actions',
+    header: ''
+  }
+]
+
+// We get the data from the api on first page load
+getItemsPaginated()
+
+async function getItemsPaginated() {
+  isLoading.value = true
+
+  const urlParams = new URLSearchParams({
+    page: page.value.toString(),
+    itemsPerPage: itemsPerPage.value.toString(),
   });
 
-  useHead({
-    title: 'Clubs'
-  })
-
-  const toast = useToast()
-  const modal = useModal()
-  const apiQuery = new ClubQuery();
-
-  const selfStore = useSelfUserStore()
-
-  const apiItems: Ref<Club[]> = ref([])
-  const isLoading = ref(true);
-  const apiTotalItems = ref(0)
-  const selectedItem: Ref<WriteClub | undefined> = ref(undefined)
-
-  const searchQuery: Ref<string> = ref('')
-
-  // Side menu visible
-  const isSideVisible = ref(false);
-
-  let inputTimer: NodeJS.Timeout;
-  async function searchQueryUpdated() {
-    clearTimeout(inputTimer);
-    inputTimer = setTimeout(async () => {
-      page.value = 1;
-      await getItemsPaginated()
-    }, 500);
+  if (searchQuery.value.trim().length > 0) {
+    urlParams.append('multiple[name]', searchQuery.value.trim())
   }
 
-  // Table settings
-  const page = ref(1);
-  const itemsPerPage = ref(30);
-  const columns = [
-    {
-      accessorKey: 'isActivated',
-      header: 'Activé'
-    },
-    {
-      accessorKey: 'name',
-      header: 'Nom',
-    },
-    {
-      accessorKey: 'renewDate',
-      header: 'Renouvellement'
-    },
-    {
-      accessorKey: 'comment',
-      header: 'Commentaire',
-      meta: {
-        class: {
-          th: 'w-full',
-        }
-      }
-    },
-    {
-      accessorKey: 'actions',
-      header: ''
-    }
-  ]
+  urlParams.append(`order[renewDate]`, 'ASC');
+  urlParams.append(`order[isActivated]`, 'ASC');
+  urlParams.append(`order[name]`, 'ASC');
 
-  // We get the data from the api on first page load
-  getItemsPaginated()
-
-  async function getItemsPaginated() {
-    isLoading.value = true
-
-    const urlParams = new URLSearchParams({
-      page: page.value.toString(),
-      itemsPerPage: itemsPerPage.value.toString(),
-    });
-
-    if (searchQuery.value.trim().length > 0) {
-      urlParams.append('multiple[name]', searchQuery.value.trim())
-    }
-
-    urlParams.append(`order[renewDate]`, 'ASC');
-    urlParams.append(`order[isActivated]`, 'ASC');
-    urlParams.append(`order[name]`, 'ASC');
-
-    const { totalItems, items } = await apiQuery.getAll(urlParams)
-    apiItems.value = items
-    if (totalItems) {
-      apiTotalItems.value = totalItems
-    }
-
-    isLoading.value = false
+  const { totalItems, items } = await apiQuery.getAll(urlParams)
+  apiItems.value = items
+  if (totalItems) {
+    apiTotalItems.value = totalItems
   }
 
-  function rowClicked(row: TableRow<Club>) {
-    selectedItem.value = {...row.original} // We make a shallow clone
-    isSideVisible.value = true
-  }
+  isLoading.value = false
+}
 
-  async function createItem() {
-    let item: WriteClub = {
-      name: '',
-      isActivated: true,
-      salesEnabled: true
-    }
-    selectedItem.value = item
-    isSideVisible.value = true
-  }
+function rowClicked(row: TableRow<Club>) {
+  selectedItem.value = {...row.original} // We make a shallow clone
+  isSideVisible.value = true
+}
 
-  async function impersonate(club: Club) {
-    const impersonated = await selfStore.impersonateClub(club)
-    if (!impersonated) {
-      console.error('Failed to impersonate.')
-      return
-    }
-    navigateTo('/admin')
+async function createItem() {
+  let item: WriteClub = {
+    name: '',
+    isActivated: true,
+    salesEnabled: true
   }
+  selectedItem.value = item
+  isSideVisible.value = true
+}
+
+async function impersonate(club: Club) {
+  const impersonated = await selfStore.impersonateClub(club)
+  if (!impersonated) {
+    console.error('Failed to impersonate.')
+    return
+  }
+  navigateTo('/admin')
+}
 </script>
 
 <template>
@@ -170,7 +164,7 @@ import type {FormError, TableRow} from "#ui/types";
             </template>
 
             <template #isActivated-cell="{ row }">
-              <USwitch :model-value="row.original.isActivated" />
+              <USwitch class="pointer-events-none" :model-value="row.original.isActivated" />
             </template>
 
             <template #name-cell="{ row }">

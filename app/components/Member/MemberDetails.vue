@@ -527,7 +527,7 @@ async function deleteMember() {
             icon="i-heroicons-trash"
             color="error"
             @click="
-            overlayDeleteConfirmation.open({
+              overlayDeleteConfirmation.open({
                 alertDescription: 'Les historiques de présences seront anonymisés et ne pourront être rétablie auprès de ce membre.',
                 alertColor: 'error',
                 async onDelete() {

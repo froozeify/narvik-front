@@ -17,7 +17,7 @@ const selectedDate: Ref<Date|undefined> = ref(props.item.renewDate ? dayjs(props
 
 function applyProfile() {
   emit('selected', selectedDate.value)
-  useModal().close()
+  emit('close', true)
 }
 
 </script>
