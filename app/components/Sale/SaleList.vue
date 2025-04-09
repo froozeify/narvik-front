@@ -7,61 +7,63 @@ import {useSelfUserStore} from "~/stores/useSelfUser";
 import {convertUuidToUrlUuid} from "~/utils/resource";
 
 const props = defineProps({
-    perItem: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
+  perItem: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+})
+
+const selfStore = useSelfUserStore()
+const saleStore = useSaleStore()
+const { selectedRange, isLoading, lastRefreshDate, sales, paymentModes } = storeToRefs(saleStore)
+
+const isAdmin = selfStore.isAdmin()
+
+const popoverOpen = ref(false)
+
+const totalAmountSales = computed(() => {
+  let amount = 0
+  sales.value.forEach(sale => {
+    amount += Number(sale.price)
   })
+  return amount
+})
 
-  const selfStore = useSelfUserStore()
-  const saleStore = useSaleStore()
-  const { selectedRange, isLoading, lastRefreshDate, sales, paymentModes } = storeToRefs(saleStore)
-
-  const isAdmin = selfStore.isAdmin()
-
-  const popoverOpen = ref(false)
-
-  const totalAmountSales = computed(() => {
-    let amount = 0
-    sales.value.forEach(sale => {
-      amount += Number(sale.price)
+const totalPerPaymentMode = computed(() => {
+  const amountPerPayment: Map<string, {count: number, amount: number, icon: string}> = new Map()
+  paymentModes.value.forEach(paymentMode => {
+    if (!paymentMode.name) return
+    amountPerPayment.set(paymentMode.name, {
+      count: 0,
+      amount: 0,
+      icon: paymentMode.icon ?? ''
     })
-    return amount
-  })
-  const totalPerPaymentMode = computed(() => {
-    const amountPerPayment: Map<string, {count: number, amount: number, icon: string}> = new Map()
-    paymentModes.value.forEach(paymentMode => {
-      if (!paymentMode.name) return
-      amountPerPayment.set(paymentMode.name, {
-        count: 0,
-        amount: 0,
-        icon: paymentMode.icon ?? ''
-      })
-    })
-
-    sales.value.forEach(sale => {
-      const paymentModeObject: SalePaymentMode = sale.paymentMode as SalePaymentMode
-      if (!sale.paymentMode || !paymentModeObject.name) { return }
-
-      let paymentMode = amountPerPayment.get(paymentModeObject.name)
-      if (!paymentMode) {
-        return;
-      }
-
-      paymentMode.count += 1
-      paymentMode.amount += Number(sale.price)
-      amountPerPayment.set(paymentModeObject.name, paymentMode)
-    })
-    return amountPerPayment
   })
 
-  if (sales.value.length == 0 || saleStore.shouldRefreshSales) {
-    saleStore.getSales() // We load the default setting
-  }
-  watch(selectedRange, () => {
-    saleStore.getSales()
+  sales.value.forEach(sale => {
+    const paymentModeObject: SalePaymentMode = sale.paymentMode as SalePaymentMode
+    if (!sale.paymentMode || !paymentModeObject.name) { return }
+
+    let paymentMode = amountPerPayment.get(paymentModeObject.name)
+    if (!paymentMode) {
+      return;
+    }
+
+    paymentMode.count += 1
+    paymentMode.amount += Number(sale.price)
+    amountPerPayment.set(paymentModeObject.name, paymentMode)
   })
+  return amountPerPayment
+})
+
+if (sales.value.length == 0 || saleStore.shouldRefreshSales) {
+  saleStore.getSales() // We load the default setting
+}
+
+watch(selectedRange, () => {
+  saleStore.getSales()
+})
 </script>
 
 <template>
@@ -75,7 +77,7 @@ const props = defineProps({
         :loading="isLoading"
         @click="saleStore.getSales()"
       >
-        Dernière mise à jour : {{ formatDateTimeReadable(lastRefreshDate) }}
+        Dernière mise à jour : {{ formatDateTimeReadable(lastRefreshDate.toString()) }}
       </UButton>
 
       <div class="w-full mb-2"></div>
@@ -151,17 +153,15 @@ const props = defineProps({
                   th: 'w-40',
                 }
               },
-              sortable: true
             },
             {
-              accessorKey: 'paymentMode.name',
+              accessorKey: 'paymentMode',
               header: 'Moyen de paiement',
               meta: {
                 class: {
                   th: 'w-48',
                 }
               },
-              sortable: true
             },
             {
               accessorKey: 'price',
@@ -176,10 +176,10 @@ const props = defineProps({
               header: 'Détail'
             }
           ]"
-          :sort="{
-            column: 'date',
-            direction: 'desc'
-          }"
+          :sort="[{
+            id: 'createdAt',
+            desc: true
+          }]"
           :data="sales">
           <template #empty>
             <div class="flex flex-col items-center justify-center py-6 gap-3">
@@ -187,8 +187,18 @@ const props = defineProps({
             </div>
           </template>
 
+          <template #createdAt-header="{ column }">
+            <GenericTableSortButton :column="column" />
+          </template>
           <template #createdAt-cell="{ row }">
             {{ formatDateTimeReadable(row.original.createdAt) }}
+          </template>
+
+<!--          <template #paymentMode-header="{ column }">-->
+<!--            <GenericTableSortButton :column="column" />-->
+<!--          </template>-->
+          <template #paymentMode-cell="{ row }">
+            {{ row.original.paymentMode.name }}
           </template>
 
           <template #price-cell="{ row }">
