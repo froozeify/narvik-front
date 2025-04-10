@@ -88,18 +88,18 @@
             type="file"
             accept="text/csv"
             icon="i-heroicons-document-text"
-            v-model="state.file"
             @change="importMemberPresences"
           />
 
           <p class="">Exemple</p>
 
-          <pre class=" w-full thin-scrollbar text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
-member.licence,date,activities.0.name,activities.1.name
-01234578,2018-08-03T00:00:00+00:00,50M - Toutes armes,Non existant
-45678412,2018-08-03T00:00:00+00:00,25M,
-45678412,2018-08-04T00:00:00+00:00,50M - Toutes armes,
-45671134,2018-08-03T00:00:00+00:00,Bureau,</pre>
+          <GenericCode>
+            member.licence,date,activities.0.name,activities.1.name <br />
+            01234578,2018-08-03T00:00:00+00:00,50M - Toutes armes,Non existant <br />
+            45678412,2018-08-03T00:00:00+00:00,25M, <br />
+            45678412,2018-08-04T00:00:00+00:00,50M - Toutes armes, <br />
+            45671134,2018-08-03T00:00:00+00:00,Bureau,
+          </GenericCode>
         </div>
 
         <USeparator class="col-span-1" orientation="vertical" />
@@ -113,23 +113,22 @@ member.licence,date,activities.0.name,activities.1.name
             type="file"
             accept="text/csv"
             icon="i-heroicons-document-text"
-            v-model="state.file"
             @change="importExternalPresences"
           />
 
           <p class="">Exemple</p>
 
-          <pre class=" w-full thin-scrollbar text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
-licence,firstname,lastname,date,activities.0.name,activities.1.name
-01234578,Jean,NOM,2018-08-03T00:00:00+00:00,50M - Toutes armes,Non existant
-,Jean,NOM2,2018-08-03T00:00:00+00:00,25M,
-,Jean,NOM3,2018-08-04T00:00:00+00:00,50M - Toutes armes,
-,Jean,NOM4,2018-08-03T00:00:00+00:00,Bureau,</pre>
+          <GenericCode>
+            licence,firstname,lastname,date,activities.0.name,activities.1.name <br />
+            01234578,Jean,NOM,2018-08-03T00:00:00+00:00,50M - Toutes armes,Non existant <br />
+            ,Jean,NOM2,2018-08-03T00:00:00+00:00,25M, <br />
+            ,Jean,NOM3,2018-08-04T00:00:00+00:00,50M - Toutes armes, <br />
+            ,Jean,NOM4,2018-08-03T00:00:00+00:00,Bureau,
+          </GenericCode>
         </div>
       </div>
 
-
-      <pre v-if="apiUploadResponse" class="mb-4 w-full thin-scrollbar text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">{{apiUploadResponse}}</pre>
+      <GenericCode v-if="apiUploadResponse" class="mb-4">{{apiUploadResponse}}</GenericCode>
 
       <div class="flex gap-2">
         <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/narvik-presences.html">Documentation</UButton>

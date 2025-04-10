@@ -179,7 +179,7 @@ async function deleteLogo() {
     toast.add({
       title: "Erreur lors de la suppression du logo",
       description: error.message,
-      color: "red"
+      color: "error"
     })
     return
   }
@@ -274,7 +274,6 @@ async function deleteLogo() {
           type="file"
           accept="image/png"
           icon="i-heroicons-paint-brush"
-          v-model="state.file"
           @change="uploadLogo"
       />
 
