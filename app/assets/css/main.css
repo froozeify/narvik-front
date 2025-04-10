@@ -35,7 +35,7 @@ html, body, #__nuxt, #__nuxt > div, #__layout{
 }
 
 html {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 @layer utilities {
