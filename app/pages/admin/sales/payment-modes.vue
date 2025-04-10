@@ -7,6 +7,7 @@ import type {FormError, TableRow} from "#ui/types";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import type {NuxtError} from "#app";
 import type {ItemError} from "~/types/api/itemError";
+import type {TablePaginateInterface} from "~/types/table";
 
 definePageMeta({
     layout: "pos"
@@ -224,7 +225,7 @@ definePageMeta({
             <template #actions-cell="{ row }">
               <div class="flex items-center gap-1">
                 <p class="text-xs">{{ row.original.weight }}</p>
-                <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+                <GenericStackedUpDown @changed="modifier => { move(row.original, -modifier) }" />
               </div>
             </template>
 
