@@ -294,6 +294,7 @@
             <GenericTableSortButton :column="column" />
           </template>
           <template #name-cell="{ row }">
+            <UBadge v-if="!row.original.canBeSold" color="error" class="mr-2">Désactivé</UBadge>
             {{ row.original.name }}
           </template>
 
