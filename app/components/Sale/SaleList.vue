@@ -60,10 +60,6 @@ const totalPerPaymentMode = computed(() => {
 if (sales.value.length == 0 || saleStore.shouldRefreshSales) {
   saleStore.getSales() // We load the default setting
 }
-
-watch(selectedRange, () => {
-  saleStore.getSales()
-})
 </script>
 
 <template>
@@ -86,7 +82,7 @@ watch(selectedRange, () => {
         <UButton icon="i-heroicons-calendar-days-20-solid" :label="selectedRange ? formatDateRangeReadable(selectedRange) || 'Choisir une plage' : 'Choisir une plage'" />
 
         <template #content>
-          <GenericDateRangePicker v-model="selectedRange" @close="popoverOpen = false" />
+          <GenericDateRangePicker v-model="selectedRange" @range-updated="popoverOpen = false; saleStore.getSales();" />
         </template>
       </UPopover>
 
