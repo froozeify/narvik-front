@@ -25,9 +25,17 @@ function emitPaginate(pagination: TablePaginateInterface) {
 
 <template>
 
-  <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-neutral-200 dark:border-neutral-700">
+  <div class="flex flex-wrap justify-end gap-4 px-3 py-3.5 border-t border-neutral-200 dark:border-neutral-700">
     <USelect class="w-fit" v-model="itemsPerPage" :items="usePaginationValues" @update:model-value="(payload) => emitPaginate({ page: page, itemsPerPage: payload })" />
-    <UPagination v-model:page="page" @update:page="(payload) => emitPaginate({ page: payload, itemsPerPage: itemsPerPage })" :items-per-page="parseInt(itemsPerPage.toString())" :total="props.totalItems" />
+    <UPagination
+      v-model:page="page"
+      @update:page="(payload) => emitPaginate({ page: payload, itemsPerPage: itemsPerPage })"
+      :items-per-page="parseInt(itemsPerPage.toString())"
+      :total="props.totalItems"
+      :ui="{
+        list: 'flex-wrap'
+      }"
+    />
   </div>
 </template>
 
