@@ -1,15 +1,15 @@
 <script setup lang="ts">
   import {useSelfUserStore} from "~/stores/useSelfUser";
   import {useAppConfigStore} from "~/stores/useAppConfig";
-  import {isDarkMode, isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
+  import { isDesktop, isTablet, watchBreakpoint} from "~/utils/browser";
   import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
+  import type { DropdownMenuItem } from "#ui/components/DropdownMenu";
 
-  const modal = useModal()
+  const overlay = useOverlay()
 
   const selfStore = useSelfUserStore();
   const appConfigStore = useAppConfigStore();
 
-  const isDark = isDarkMode()
 
   const { selectedProfile, user } = storeToRefs(selfStore)
 
@@ -25,46 +25,44 @@
 
   const siteLogo: Ref<string> = appConfigStore.getLogo()
 
-  const rightMenu = [
-    [{
-      label: !isBadger ? 'Profil' : 'Pointeuse',
-      avatar: {
+  const rightMenu = ref<DropdownMenuItem[][]>([
+    [
+      {
+        slot: 'darkMode',
+      }
+    ],
+    [
+      {
+        label: !isBadger ? 'Profil' : 'Pointeuse',
         icon: 'i-heroicons-user',
-        size: 'xs',
-        src: selfStore.member?.profileImageBase64,
-        ui: {
-          rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
+        to: !isBadger ? "/self" : ''
+      }, {
+        label: 'Changer de profil',
+        icon: 'i-heroicons-arrow-path-rounded-square',
+        class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? 'cursor-pointer' : 'hidden',
+        onSelect: () => {
+          overlay.create(ModalSelectProfile).open({
+            onSelected() {
+              navigateTo('/self')
+            }
+          })
         }
-      },
-      to: !isBadger ? "/self" : ''
-    }, {
-      label: 'Changer de profil',
-      icon: 'i-heroicons-arrow-path-rounded-square',
-      class: (user.value?.linkedProfiles?.length ?? 0) > 1 ? '' : 'hidden',
-      click: () => {
-        modal.open(ModalSelectProfile, {
-          onSelected() {
-            navigateTo('/self')
-          }
-        })
       }
-    }], [{
-      slot: 'darkMode',
-      label: 'Thème',
-      click: () => {
-        isDark.value = !isDark.value
+    ],
+    [
+      {
+        label: 'Déconnexion',
+        icon: 'i-heroicons-arrow-right-start-on-rectangle-20-solid',
+        class: 'cursor-pointer',
+        onSelect: () => {
+          selfStore.logout()
+        }
       }
-    }, {
-      label: 'Déconnexion',
-      icon: 'i-heroicons-arrow-right-start-on-rectangle-20-solid',
-      click: () => {
-        selfStore.logout()
-      }
-    }]
-  ]
+    ]
+  ])
 
   if (selfStore.isSuperAdmin()) {
-    rightMenu.unshift([
+    rightMenu.value.unshift([
       {
         label: 'Administration global',
         icon: 'i-heroicons-building-library',
@@ -85,7 +83,7 @@
 
 <template>
   <header
-    class="backdrop-blur -mb-px sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-16 print:hidden">
+    class="bg-(--ui-bg) sticky top-0 z-50 h-16 print:hidden shadow-sm">
     <nav class="container mx-auto p-4 flex justify-between h-full overflow-y-auto">
       <div class="flex gap-4 flex-shrink-0">
         <NuxtLink to="/" class="flex align-middle">
@@ -94,27 +92,27 @@
             <NuxtImg v-else :src="siteLogo" class="w-7 object-contain"/>
           </UTooltip>
         </NuxtLink>
-        <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="gray">Accueil</UButton>
+        <UButton class="-mx-3 hidden lg:block" to="/" variant="ghost" color="neutral">Accueil</UButton>
         <div v-if="isSupervisor">
-          <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="gray">Vente</UButton>
+          <UButton to="/admin/sales/new" icon="i-heroicons-shopping-cart" variant="ghost" color="neutral">Vente</UButton>
         </div>
       </div>
       <div class="flex gap-4">
         <div v-if="isSupervisor">
-          <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="gray">Administration</UButton>
+          <UButton to="/admin" icon="i-heroicons-key" variant="ghost" color="neutral">Administration</UButton>
         </div>
         <div v-if="selfStore.isImpersonating">
-          <UButton color="orange" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
+          <UButton color="warning" @click="selfStore.stopImpersonation()">Arrêter impersonification</UButton>
         </div>
-        <UDropdown :items="rightMenu">
+        <UDropdownMenu :items="rightMenu">
           <UButton
             variant="ghost"
-            color="gray"
+            color="neutral"
             :label="(isDesktopDisplay || isTabletDisplay) ? (!isBadger ? (selectedProfile?.displayName ?? user?.fullName) : 'Pointeuse') : undefined">
             <template #trailing>
               <UAvatar v-if="!isBadger"
                        size="xs"
-                       :alt="selfStore.member?.fullName"
+                       :alt="selfStore.member?.fullName ?? user?.fullName"
                        :src="selfStore.member?.profileImageBase64"
               />
               <UIcon v-else
@@ -123,23 +121,14 @@
             </template>
           </UButton>
           <template #darkMode>
-              <UIcon
-                :name="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
-                class="flex-shrink-0 w-5 h-5 text-gray-400 dark:text-gray-500"
-                />
-              <span>
-                {{ isDark ? 'Thème sombre' : 'Thème clair' }}
-              </span>
+              <ThemeSwitcher class="mx-auto" />
           </template>
-        </UDropdown>
+        </UDropdownMenu>
       </div>
     </nav>
   </header>
 </template>
 
-<style scoped lang="scss">
-li {
-  display: flex;
-  align-items: center;
-}
+<style scoped lang="css">
+
 </style>

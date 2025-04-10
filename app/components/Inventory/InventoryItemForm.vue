@@ -5,6 +5,7 @@ import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sal
 import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
 import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
 import type {FormError, FormErrorEvent} from "#ui/types";
+import type {SelectApiItem} from "~/types/select";
 
 const props = defineProps({
   item: {
@@ -42,6 +43,19 @@ const toast = useToast()
 const inventoryItemQuery = new InventoryItemQuery()
 const inventoryCategoryQuery = new InventoryCategoryQuery()
 
+const selectedItem = ref(props.item?.category ? { label: props.item.category.name, value: props.item.category.uuid, item: props.item.category } as SelectApiItem<InventoryCategory>: undefined)
+const items = computed( () => {
+  const items: SelectApiItem<InventoryCategory>[] = []
+  categories.value?.forEach(value => {
+    items.push({
+      label: value.name,
+      value: value.uuid,
+      item: value
+    })
+  })
+  return items;
+})
+
 function getDefaultInventoryItem() {
   const item: InventoryItem = {
     id: undefined,
@@ -55,8 +69,8 @@ function getDefaultInventoryItem() {
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
-  if (!state.sellingPrice) errors.push({ path: 'sellingPrice', message: 'Champ requis' })
+  if (!state.name) errors.push({ name: 'name', message: 'Champ requis' })
+  if (!state.sellingPrice) errors.push({ name: 'sellingPrice', message: 'Champ requis' })
   return errors
 }
 
@@ -81,8 +95,8 @@ async function updateItem() {
   isUpdating.value = true
   const isCreate = !item.value.uuid
 
-  if (item.value.category) {
-    item.value.category = item.value.category["@id"]
+  if (selectedItem.value) {
+    item.value.category = selectedItem.value.item["@id"]
   } else {
     item.value.category = null
   }
@@ -123,7 +137,7 @@ async function updateItem() {
     toast.add({
       title: "Une erreur est survenue",
       description: errorMessage,
-      color: "red"
+      color: "error"
     })
     return
   }
@@ -143,22 +157,20 @@ async function getCategories() {
 
 <template>
   <UForm class="flex gap-2 flex-col" :state="item" :validate="validate" @submit="updateItem" @error="onError">
-    <UFormGroup label="Peut être vendu">
-      <UToggle v-model="item.canBeSold" :disabled="props.viewOnly" />
-    </UFormGroup>
+    <UFormField label="Peut être vendu">
+      <USwitch v-model="item.canBeSold" :disabled="props.viewOnly" />
+    </UFormField>
 
-    <UFormGroup label="Catégorie">
+    <UFormField label="Catégorie">
       <USelectMenu
-        v-model="item.category"
-        :options="categories"
-        option-attribute="name"
+        v-model="selectedItem"
+        :items="items"
         :class="props.viewOnly ? 'pointer-events-none' : ''"
         :tabindex="props.viewOnly ? '-1' : '0'"
-        :ui="{ icon: { trailing: { pointer: '' } } }"
       >
-        <template #label>
-          <span v-if="item.category">
-            {{ item.category.name }}
+        <template #default>
+          <span v-if="selectedItem">
+            {{ selectedItem.label }}
           </span>
           <span v-else><i>Aucune catégorie</i></span>
         </template>
@@ -167,21 +179,21 @@ async function getCategories() {
           <UIcon
             class="cursor-pointer"
             name="i-heroicons-x-mark"
-            @click="item.category = null"
+            @click="selectedItem = undefined"
           />
         </template>
       </USelectMenu>
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Nom" name="name">
+    <UFormField label="Nom" name="name" required>
       <UInput v-model="item.name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Description">
+    <UFormField label="Description">
       <UInput v-model="item.description" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup v-if="!props.viewOnly || item.barcode" label="Code barre">
+    <UFormField v-if="!props.viewOnly || item.barcode" label="Code barre">
       <GenericBarcodeReader
         class="mb-2"
         v-model="cameraPreview"
@@ -191,7 +203,6 @@ async function getCategories() {
         v-model="item.barcode"
         :class="props.viewOnly ? 'pointer-events-none' : ''"
         :tabindex="props.viewOnly ? '-1' : '0'"
-        :ui="{ icon: { trailing: { pointer: '' } } }"
       >
         <template #trailing v-if="cameraIsPresent">
           <UIcon
@@ -201,35 +212,35 @@ async function getCategories() {
           />
         </template>
       </UInput>
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Prix d'achat">
+    <UFormField label="Prix d'achat">
       <UInput v-model="item.purchasePrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'">
         <template #trailing>
           <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
         </template>
       </UInput>
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Prix de vente" name="sellingPrice">
+    <UFormField label="Prix de vente" name="sellingPrice" required>
       <UInput v-model="item.sellingPrice" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'">
         <template #trailing>
           <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
         </template>
       </UInput>
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Vendue par (quantité)">
+    <UFormField label="Vendue par (quantité)">
       <UInput v-model="item.sellingQuantity" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Quantité en stock">
+    <UFormField label="Quantité en stock">
       <UInput v-model="item.quantity" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Alerte quantité en stock critique">
+    <UFormField label="Alerte quantité en stock critique">
       <UInput v-model="item.quantityAlert" type="number" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
     <UButton type="submit" v-if="!props.viewOnly"
       block
@@ -246,6 +257,6 @@ async function getCategories() {
   </UForm>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

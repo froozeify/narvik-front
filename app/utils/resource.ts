@@ -63,6 +63,7 @@ export function formatErrorFromApiResponse(response: any): object {
       return response
     }
   } catch (e) {
+    console.error(response)
     console.error(e)
     return {
       message: `Unknown exception`

@@ -22,8 +22,8 @@ const props = defineProps(
 const isDesktopDisplay = isDesktop()
 const isTabletDisplay = isTablet()
 
-const asideMobileClasses = ref(['overflow-y-auto', 'flex flex-col gap-4 fixed bottom-0 left-4 right-4 rounded-t-lg backdrop-blur-2xl z-10'])
-const asideDesktopClasses = 'print:hidden lg:w-1/3 lg:sticky lg:top-20 lg:h-fit lg:max-h-[calc(100vh-6rem)]'
+const asideMobileClasses = ref(['overflow-y-auto', 'flex flex-col gap-4 fixed bottom-0 left-0 right-0 rounded-t-lg backdrop-blur-2xl z-10'])
+const asideDesktopClasses = 'print:hidden lg:sticky lg:top-19 lg:h-fit lg:max-h-[calc(100vh-6rem)] -mt-1'
 const asideButtonMargin = ref('')
 
 const sideClasses = computed(() => {
@@ -54,8 +54,8 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="flex flex-col-reverse lg:flex-row gap-4">
-    <div class="flex-1 shrink-0">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="lg:col-span-2">
       <slot name="main"></slot>
     </div>
 
@@ -72,14 +72,16 @@ watchEffect(() => {
           <UIcon :name="'i-heroicons-chevron-double-' + (sideMobileVisible ? 'down' : 'up')" />
         </UButton>
       </div>
-      <div v-if="sideMobileVisible" class="overflow-y-auto flex flex-col gap-4">
-        <slot name="side"></slot>
+      <div v-if="sideMobileVisible" class="overflow-y-auto">
+        <div class="p-1 flex flex-col gap-4">
+          <slot name="side"></slot>
+        </div>
       </div>
     </div>
 
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

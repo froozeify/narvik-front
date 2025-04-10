@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
-import type {FormError} from "#ui/types";
+import type {FormError, TableRow} from "#ui/types";
 import ActivityModalDelete from "~/components/Activity/ActivityModalDelete.vue";
 import ActivityModalMigrate from "~/components/Activity/ActivityModalMigrate.vue";
 import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
+import type {SelectApiItem} from "~/types/select";
 
 definePageMeta({
   layout: "admin"
@@ -15,7 +16,7 @@ useHead({
 })
 
 const toast = useToast()
-const modal = useModal()
+const overlay = useOverlay()
 
 const isLoading = ref(true)
 const activities: Ref<Activity[]> = ref([])
@@ -30,23 +31,34 @@ watch(selectedActivity, (value, oldValue) => {
 const activityQuery = new ActivityQuery();
 
 const availableRoles = getAvailableClubRoles()
+const availableRolesSelect = computed( () => {
+  const items: SelectApiItem[] = []
+  availableRoles.forEach(value => {
+    items.push({
+      label: value.text,
+      value: value.value
+    })
+  })
+  return items;
+})
 
 const columns = [
   {
-    key: 'enabled',
-    label: 'Disponible'
+    accessorKey: 'enabled',
+    header: 'Disponible'
   },
   {
-    key: 'name',
-    label: 'Nom',
-    class: 'w-full'
+    accessorKey: 'name',
+    header: 'Nom',
+    meta: {
+      class: {
+        th: 'w-full',
+      }
+    }
   },
   {
-    key: 'visibility',
-    label: 'Visibilité',
-  },
-  {
-    key: 'actions',
+    accessorKey: 'visibility',
+    header: 'Visibilité',
   }
 ]
 
@@ -64,14 +76,14 @@ async function getActivities() {
   isLoading.value = false
 }
 
-function rowClicked(row: Activity) {
-  selectedActivity.value = {...row} // We make a shallow clone
+function rowClicked(row: TableRow<Activity>) {
+  selectedActivity.value = {...row.original} // We make a shallow clone
   isVisible.value = true
 }
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.name) errors.push({path: 'name', message: 'Champ requis'})
+  if (!state.name) errors.push({name: 'name', message: 'Champ requis'})
   return errors
 }
 
@@ -106,7 +118,7 @@ async function updateActivity(activity: Activity) {
 
   if (errorApi) {
     toast.add({
-      color: "red",
+      color: "error",
       title: !activity.uuid ? "La création a échouée" : "La modification a échouée",
       description: errorApi.message
     });
@@ -114,7 +126,7 @@ async function updateActivity(activity: Activity) {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: !activity.uuid ? "Activité créée" : "Activité modifiée",
   });
 
@@ -130,7 +142,7 @@ async function deleteActivity() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La suppression a échouée",
       description: error.message
     })
@@ -138,7 +150,7 @@ async function deleteActivity() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Activité supprimée"
   })
   selectedActivity.value = undefined
@@ -155,7 +167,7 @@ async function migrateActivity(migrationTarget: string) {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La migration a échouée",
       description: error.message
     })
@@ -163,7 +175,7 @@ async function migrateActivity(migrationTarget: string) {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Activité migrée"
   })
   await getActivities()
@@ -192,20 +204,20 @@ getActivities()
           <UTable
             :loading="isLoading"
             :columns="columns"
-            :rows="activities"
+            :data="activities"
             @select="rowClicked">
-            <template #empty-state>
+            <template #empty>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucune activité enregistrée</span>
                 <UButton class="mt-4" label="Créer" @click="createActivity()"/>
               </div>
             </template>
 
-            <template #enabled-data="{ row }">
-              <UToggle :model-value="row.isEnabled" />
+            <template #enabled-cell="{ row }">
+              <USwitch class="pointer-events-none" :model-value="row.original.isEnabled" />
             </template>
-            <template #visibility-data="{ row }">
-              {{ getAvailableClubRoles().find((role) => role.value === row.visibility)?.text ?? 'Par défaut - Membre' }}
+            <template #visibility-cell="{ row }">
+              {{ getAvailableClubRoles().find((role) => role.value === row.original.visibility)?.text ?? 'Par défaut - Membre' }}
             </template>
           </UTable>
         </div>
@@ -217,22 +229,20 @@ getActivities()
         <UForm :state="selectedActivity" @submit="updateActivity(selectedActivity)" :validate="validate">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Disponible" name="available">
-                <UToggle v-model="selectedActivity.isEnabled"/>
-              </UFormGroup>
+              <UFormField label="Disponible" name="available">
+                <USwitch v-model="selectedActivity.isEnabled"/>
+              </UFormField>
 
-              <UFormGroup label="Nom" name="name">
+              <UFormField label="Nom" name="name">
                 <UInput v-model="selectedActivity.name"/>
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Visibilité" name="visibility">
+              <UFormField label="Visibilité" name="visibility">
                 <USelect
                   v-model="selectedActivity.visibility as string"
-                  :options="availableRoles"
-                  option-attribute="text"
-                  value-attribute="value"
+                  :items="availableRolesSelect"
                   :placeholder="`Par défaut - Membre`" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>
@@ -241,34 +251,32 @@ getActivities()
         </UForm>
 
         <UButton v-if="selectedActivity.uuid"
-          block
-          color="red"
-          :loading="isLoading"
-          @click="modal.open(ActivityModalDelete, {
-            title: selectedActivity.name,
-            onDelete() {
-              modal.close()
-              deleteActivity()
-            }
-          })"
-        >
-          Supprimer
-        </UButton>
-
-        <UButton v-if="selectedActivity.uuid"
                  block
-                 color="orange"
+                 variant="soft"
                  :loading="isLoading"
-                 @click="modal.open(ActivityModalMigrate, {
+                 @click="overlay.create(ActivityModalMigrate).open({
                  title: selectedActivity.name,
                  activities: activities,
                  onMigrate(targetId: string) {
-                   modal.close()
                    migrateActivity(targetId)
                  }
           })"
         >
           Migrer
+        </UButton>
+
+        <UButton v-if="selectedActivity.uuid"
+          block
+          color="error"
+          :loading="isLoading"
+          @click="overlay.create(ActivityModalDelete).open({
+            title: selectedActivity.name,
+            onDelete() {
+              deleteActivity()
+            }
+          })"
+        >
+          Supprimer
         </UButton>
       </div>
     </template>
@@ -276,7 +284,7 @@ getActivities()
 </template>
 
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>
 

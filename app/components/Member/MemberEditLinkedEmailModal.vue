@@ -15,11 +15,11 @@ const props = defineProps(
   }
 )
 
-const emit = defineEmits(['updated'])
+const emit = defineEmits(['updated', 'close'])
 
 const toast = useToast()
-const modal = useModal()
 
+const overlay = useOverlay()
 
 const isLoading = ref(false)
 
@@ -28,7 +28,7 @@ const member: Member = {...props.member}
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
+  if (!member.linkedEmail) errors.push({ name: 'email', message: 'Champ requis' })
   return errors
 }
 
@@ -41,7 +41,7 @@ async function updateLink() {
 
   if (error || !updated) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error?.message
     });
@@ -49,29 +49,28 @@ async function updateLink() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Liaison modifiée"
   });
 
   emit('updated')
-  await modal.close()
+  emit('close', true)
 }
 
 </script>
 
 <template>
-  <ModalWithActions title="Changement du compte lié">
+  <ModalWithActions title="Changement du compte lié" @close="(state: boolean) => emit('close', state)">
 
     <UForm class="flex gap-2 flex-col" :state="member" :validate="validate">
 
-      <UFormGroup label="Adresse mail du compte" name="email">
+      <UFormField label="Adresse mail du compte" name="email">
         <UInput v-model="member.linkedEmail" placeholder="Email" />
-      </UFormGroup>
+      </UFormField>
     </UForm>
 
     <template #actions>
       <UButton
-        color="yellow"
         :loading="isLoading"
         @click="updateLink()"
       >
@@ -81,6 +80,6 @@ async function updateLink() {
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

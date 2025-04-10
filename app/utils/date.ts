@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import type {DateRange} from "~/types/date";
 
 export function formatDate(date?: string): string | null {
   if (!date) return null;
@@ -18,7 +19,7 @@ export function formatDateReadable(date?: string): string | null {
   return new Date(date).toLocaleString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
 }
 
-export function formatDateRangeReadable(dateRange: {start: Date, end: Date}): string | null {
+export function formatDateRangeReadable(dateRange?: DateRange): string | null {
   if (!dateRange) return null;
   let response = '';
 

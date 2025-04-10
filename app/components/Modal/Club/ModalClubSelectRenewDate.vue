@@ -11,26 +11,26 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['selected'])
+const emit = defineEmits(['selected', 'close'])
 
 const selectedDate: Ref<Date|undefined> = ref(props.item.renewDate ? dayjs(props.item.renewDate).toDate() : undefined)
 
 function applyProfile() {
   emit('selected', selectedDate.value)
-  useModal().close()
+  emit('close', true)
 }
 
 </script>
 
 <template>
-  <ModalWithActions title="Choix de la date de renouvelement">
+  <ModalWithActions title="Choix de la date de renouvelement" @close="(state: boolean) => emit('close', state)">
 
     <slot>
       <div class="flex flex-col justify-center gap-4">
         <div class="flex justify-center gap-4">
           <UButton @click="selectedDate = dayjs(selectedDate).add(1, 'months').toDate(); applyProfile()">+1 mois</UButton>
           <UButton @click="selectedDate = dayjs(selectedDate).add(1, 'years').toDate(); applyProfile()">+1 an</UButton>
-          <UButton color="red" variant="ghost" @click="selectedDate = undefined; applyProfile()">Pas de renouvellement</UButton>
+          <UButton color="error" variant="ghost" @click="selectedDate = undefined; applyProfile()">Pas de renouvellement</UButton>
         </div>
         <div class="text-center">
           <GenericDatePicker v-model="selectedDate" mode="date" />
@@ -48,6 +48,6 @@ function applyProfile() {
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

@@ -8,9 +8,7 @@ import ImageQuery from "~/composables/api/query/ImageQuery";
 import {formatDateReadable} from "~/utils/date";
 import dayjs from "dayjs";
 import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
-import MemberSeasonSelectModal from "~/components/MemberSeason/MemberSeasonSelectModal.vue";
 import {convertUuidToUrlUuid} from "~/utils/resource";
-import {usePaginationValues} from "~/composables/api/list";
 import UserQuery from "~/composables/api/query/UserQuery";
 import type {User} from "~/types/api/item/user";
 
@@ -23,7 +21,9 @@ useHead({
 })
 
 const toast = useToast()
-const modal = useModal()
+const overlay = useOverlay()
+const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
 const route = useRoute()
 
 const selfStore = useSelfUserStore()
@@ -50,19 +50,20 @@ const sort = ref({
 });
 const columns = [
   {
-    key: 'accountActivated',
-    label: 'Activé',
+    accessorKey: 'accountActivated',
+    header: 'Activé',
   },
   {
-    key: 'fullName',
-    label: 'Nom',
+    accessorKey: 'fullName',
+    header: 'Nom',
   },
   {
-    key: 'email',
-    label: 'Email',
+    accessorKey: 'email',
+    header: 'Email',
   },
   {
-    key: 'actions',
+    accessorKey: 'actions',
+    header: ''
   }
 ]
 
@@ -73,7 +74,7 @@ async function loadItem() {
 
   if (!retrieved || error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "Club non trouvé",
     })
 
@@ -124,7 +125,7 @@ async function deleteClub() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "La suppression a échouée",
       description: error.message
     })
@@ -174,7 +175,7 @@ loadClubUsers()
       <div class="flex-1 text-center font-bold text-2xl flex justify-center items-center gap-2 ">
         <p>{{ club.name }}</p>
         <UIcon
-          :class="club.isActivated ? 'text-green-600' : 'text-red-600'"
+          :class="club.isActivated ? 'text-success-600' : 'text-error-600'"
           :name="club.isActivated ? 'i-heroicons-check': 'i-heroicons-x-mark'"
         />
       </div>
@@ -182,7 +183,7 @@ loadClubUsers()
       <div class="flex justify-between gap-2">
         <UButton
           icon="i-heroicons-pencil"
-          color="yellow"
+          color="warning"
           size="xs"
           label="Modifier"
           @click="itemModalOpen = true"
@@ -190,15 +191,17 @@ loadClubUsers()
 
         <UButton
           icon="i-heroicons-trash"
-          color="red"
+          color="error"
           size="xs"
           label="Supprimer"
-          @click="modal.open(ModalDeleteConfirmation, {
-            onDelete() {
-              modal.close()
-              deleteClub()
-            }
-          })"
+          @click="
+            overlayDeleteConfirmation.open({
+              async onDelete() {
+                await deleteClub()
+                overlayDeleteConfirmation.close(true)
+              }
+            })
+          "
         />
       </div>
     </div>
@@ -222,22 +225,22 @@ loadClubUsers()
               {{ club.name }}
             </div>
 
-            <div v-if="club.renewDate" class="text-center text-lg">
-              Renouvellement le
+            <div class="text-center text-lg flex flex-row justify-center align-middle gap-2">
+              <p>Renouvellement le</p>
               <UButton icon="i-heroicons-calendar-days-20-solid"
-                       :color="dayjs().isAfter(dayjs(club.renewDate).subtract(14, 'days')) ? 'red' : 'primary'"
+                       size="xs"
+                       :color="dayjs().isAfter(dayjs(club.renewDate).subtract(14, 'days')) ? 'error' : 'primary'"
                        :label="formatDateReadable(club.renewDate?.toString()) || 'Choisir une date'"
-                       @click="modal.open(ModalClubSelectRenewDate, {
-                  item: club,
-                  async onSelected(date: Date|undefined) {
-                    if (!club) {
-                      return
-                    }
-                    let payload: WriteClub = { renewDate: date }
-                    await clubQuery.patch(club, payload)
-                    await loadItem()
-                  }
-                })"
+                       @click="overlay.create(ModalClubSelectRenewDate).open({
+                        item: club,
+                        async onSelected(date: Date|undefined) {
+                          if (!club) {
+                            return
+                          }
+                          await clubQuery.patch(club, { renewDate: date ?? null })
+                          await loadItem()
+                        }
+                      })"
               />
             </div>
 
@@ -259,7 +262,7 @@ loadClubUsers()
               </div>
 
               <div class="flex justify-center mt-4">
-                <UButton color="yellow" @click="selfStore.impersonateClub(club)">Impersonifier</UButton>
+                <UButton color="warning" @click="selfStore.impersonateClub(club)">Impersonifier</UButton>
               </div>
 
             </div>
@@ -287,45 +290,49 @@ loadClubUsers()
             class="w-full"
             :loading="isUsersLoading"
             :columns="columns"
-            :rows="userClubs">
-            <template #empty-state>
+            :data="userClubs">
+            <template #empty>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucun utilisateurs.</span>
               </div>
             </template>
 
-            <template #accountActivated-data="{ row }">
-              <UToggle :model-value="row.accountActivated" />
+            <template #accountActivated-cell="{ row }">
+              <USwitch :model-value="row.original.accountActivated" />
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="text-right">
-                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.original.uuid)}`">Détails</UButton>
               </div>
             </template>
 
           </UTable>
 
-          <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="loadClubUsers()"/>
-            <UPagination v-model="page" @update:model-value="loadClubUsers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalUsers"/>
-          </div>
+          <GenericTablePagination
+            v-model:page="page"
+            v-model:items-per-page="itemsPerPage"
+            :total-items="totalUsers"
+            @paginate="(object: TablePaginateInterface) => { loadClubUsers() }"
+          />
         </div>
       </GenericCard>
     </div>
   </div>
 
   <UModal
-    v-model="itemModalOpen">
-    <UCard>
-      <ClubForm
-        :item="club ? {...club} : undefined"
-        @updated="(value) => {itemModalOpen = false; loadItem() }"
-      />
-    </UCard>
+    v-model:open="itemModalOpen">
+    <template #content>
+      <UCard>
+        <ClubForm
+          :item="club ? {...club} : undefined"
+          @updated="(value) => {itemModalOpen = false; loadItem() }"
+        />
+      </UCard>
+    </template>
   </UModal>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

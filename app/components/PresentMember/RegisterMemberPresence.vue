@@ -36,6 +36,7 @@ const emit = defineEmits([
 ])
 
 const toast = useToast()
+const popoverOpen = ref(false)
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
@@ -47,17 +48,19 @@ const selectedDate: Ref<Date|null> = ref(null);
 
 const state = reactive({
   member: props.member as Member|undefined,
-  activities: [] as Array<Activity>,
+  activities: {} as { [k: string]: boolean }
 })
 
 if (props.memberPresence) {
   state.member = props.memberPresence.member
-  state.activities = []
+  state.activities = {}
   if (props.memberPresence.date) {
     selectedDate.value = new Date(props.memberPresence.date)
   }
   props.memberPresence.activities?.forEach(actvt => {
-      state.activities.push(actvt)
+    if (actvt["@id"]) {
+      state.activities[actvt["@id"]] = true
+    }
   });
 }
 
@@ -95,11 +98,11 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     delete memberPresence.member // We remove the member key since we only update the activities (PATCH request)
   }
 
-  event.data.activities.forEach( (actvt: Activity) => {
-    if (actvt["@id"]) {
-      memberPresence.activities.push(actvt["@id"])
+  for (const [key, value] of Object.entries(event.data.activities)) {
+    if (key && value) {
+      memberPresence.activities.push(key)
     }
-  })
+  }
 
   if (props.dateEditable && selectedDate.value) {
     const date = formatDateInput(selectedDate.value.toString())
@@ -124,7 +127,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   isSubmitting.value = false;
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error.message
     });
@@ -142,7 +145,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
 <template>
   <UCard>
-    <div v-if="isLoading" class="h-full">
+    <div v-if="isLoading || !state.member" class="h-full">
       <USkeleton class="h-8 w-36" />
       <USkeleton class="h-4 w-12 my-4" />
 
@@ -160,47 +163,54 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       <div class="text-2xl">Enregistrement pour <b>{{ state.member.fullName }}</b></div>
 
       <UForm :state="state" @submit="onSubmit">
-        <UPopover v-if="props.dateEditable" :popper="{ placement: 'bottom-start' }" class="mt-4">
-          <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(selectedDate) || 'Choisir une date'" />
+        <UPopover v-if="props.dateEditable"
+                  v-model:open="popoverOpen"
+                  class="mt-4">
+          <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(selectedDate?.toString()) || 'Choisir une date'" />
 
-          <template #panel="{ close }">
-            <GenericDatePicker v-model="selectedDate" @close="close" />
+          <template #content>
+            <GenericDatePicker v-model="selectedDate" @close="popoverOpen = false" />
           </template>
         </UPopover>
 
         <div class="mt-4">Activités</div>
         <div class="my-4">
           <div class="grid grid-cols-2 gap-2 gap-y-2 ">
-            <UCheckbox
+            <template v-for="activity in activitiesMember">
+              <UCheckbox v-if="activity['@id']"
                 class="w-full"
-                v-for="activity in activitiesMember"
-                v-model="state.activities"
+                v-model="state.activities[activity['@id']]"
                 :value="activity"
                 :name="'actvt-' + activity.uuid"
                 :label="activity.name" />
+            </template>
+
 
             <template v-if="activitiesSupervisor.length > 0 && hasClubSupervisorRole(state.member?.role)">
-              <UDivider class="col-span-2" :label="getAvailableClubRole(ClubRole.Supervisor).text" />
+              <USeparator class="col-span-2" :label="getAvailableClubRole(ClubRole.Supervisor).text" />
 
-              <UCheckbox
-                class="w-full"
-                v-for="activitySupervisor in activitiesSupervisor"
-                v-model="state.activities"
-                :value="activitySupervisor"
-                :name="'actvts-' + activitySupervisor.uuid"
-                :label="activitySupervisor.name" />
+              <template v-for="activitySupervisor in activitiesSupervisor">
+                <UCheckbox v-if="activitySupervisor['@id']"
+                  class="w-full"
+                  v-model="state.activities[activitySupervisor['@id']]"
+                  :value="activitySupervisor"
+                  :name="'actvts-' + activitySupervisor.uuid"
+                  :label="activitySupervisor.name" />
+              </template>
+
             </template>
 
             <template v-if="activitiesAdmin.length > 0 && isClubAdmin(state.member?.role)">
-              <UDivider class="col-span-2" :label="getAvailableClubRole(ClubRole.Admin).text" />
+              <USeparator class="col-span-2" :label="getAvailableClubRole(ClubRole.Admin).text" />
 
-              <UCheckbox
-                class="w-full"
-                v-for="activityAdmin in activitiesAdmin"
-                v-model="state.activities"
-                :value="activityAdmin"
-                :name="'actvta-' + activityAdmin.uuid"
-                :label="activityAdmin.name" />
+              <template v-for="activityAdmin in activitiesAdmin">
+                <UCheckbox v-if="activityAdmin['@id']"
+                  class="w-full"
+                  v-model="state.activities[activityAdmin['@id']]"
+                  :value="activityAdmin"
+                  :name="'actvta-' + activityAdmin.uuid"
+                  :label="activityAdmin.name" />
+              </template>
             </template>
 
           </div>
@@ -209,7 +219,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
         <UButton :loading="isSubmitting" block type="submit">
           Enregistrer
         </UButton>
-        <UButton class="mt-2" color="red" :loading="isSubmitting" block @click="emit('canceled')">
+        <UButton class="mt-2" color="error" :loading="isSubmitting" block @click="emit('canceled')">
           Annuler
         </UButton>
       </UForm>
@@ -217,6 +227,6 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   </UCard>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

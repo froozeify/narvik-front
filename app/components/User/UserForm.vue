@@ -44,7 +44,7 @@ function getDefaultItem() {
 
 const validate = (state: Member): FormError[] => {
   const errors = []
-  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
+  if (!state.email) errors.push({ name: 'email', message: 'Champ requis' })
   return errors
 }
 
@@ -86,7 +86,7 @@ async function submitItem() {
     toast.add({
       title: "Une erreur est survenue",
       description: errorMessage,
-      color: "red"
+      color: "error"
     })
     return
   }
@@ -99,30 +99,30 @@ async function submitItem() {
 <template>
   <UForm class="flex gap-2 flex-col" :state="item" :validate="validate" @submit="submitItem" @error="onError">
     <div class="flex gap-2 flex-col">
-      <UFormGroup v-if="item.role !== UserRole.SuperAdmin" label="Activé" name="accountActivated">
-        <UToggle v-model="item.accountActivated" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'" />
-      </UFormGroup>
-      <UFormGroup label="Rôle" name="role">
+      <UFormField v-if="item.role !== UserRole.SuperAdmin" label="Activé" name="accountActivated">
+        <USwitch v-model="item.accountActivated" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'" />
+      </UFormField>
+      <UFormField label="Rôle" name="role">
         <USelect
           v-model="item.role"
-          :options="Object.values(UserRole).slice(0, -1)"
+          :items="Object.values(UserRole).slice(0, -1)"
           placeholder="Aucun rôle de défini"
           :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"
         />
-      </UFormGroup>
-      <UFormGroup label="Email" name="email" required>
+      </UFormField>
+      <UFormField label="Email" name="email" required>
         <UInput v-model="item.email" type="email" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'" />
-      </UFormGroup>
-      <UFormGroup label="Nom" name="lastname">
+      </UFormField>
+      <UFormField label="Nom" name="lastname">
         <UInput v-model="item.lastname" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'" />
-      </UFormGroup>
-      <UFormGroup label="Prénom" name="firstname">
+      </UFormField>
+      <UFormField label="Prénom" name="firstname">
         <UInput v-model="item.firstname" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'" />
-      </UFormGroup>
+      </UFormField>
 
-      <UFormGroup v-if="item.legalsAccepted" label="Legals accepté le">
+      <UFormField v-if="item.legalsAccepted" label="Legals accepté le">
         <p class="text-sm">{{ formatDateTimeReadable(item.legalsAccepted?.toString()) }}</p>
-      </UFormGroup>
+      </UFormField>
       <GenericItemTimestampInfo :item="item" />
     </div>
 
@@ -142,6 +142,6 @@ async function submitItem() {
   </UForm>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

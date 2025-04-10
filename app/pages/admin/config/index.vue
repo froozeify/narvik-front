@@ -8,7 +8,7 @@ import {convertUuidToUrlUuid} from "~/utils/resource";
 import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
 import ClubModalGenerateBadger from "~/components/Club/ClubModalGenerateBadger.vue";
-import type {Club} from "~/types/api/item/club";
+import type {SelectApiItem} from "~/types/select";
 
 definePageMeta({
   layout: "admin"
@@ -19,7 +19,7 @@ useHead({
 })
 
 const toast = useToast()
-const modal = useModal()
+const overlay = useOverlay()
 
 const selfStore = useSelfUserStore();
 const { selectedProfile } = storeToRefs(selfStore)
@@ -38,6 +38,17 @@ const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined
 const activities: Ref<Activity[] | undefined> = ref(undefined);
 activityQuery.getAll().then(value => {
   activities.value = value.items
+})
+const activitiesSelect = computed( () => {
+  const items: SelectApiItem<Activity>[] = []
+  activities.value?.forEach(value => {
+    items.push({
+      label: value.name,
+      value: value.uuid,
+      item: value
+    })
+  })
+  return items;
 })
 
 const logoUploading = ref(false)
@@ -59,7 +70,7 @@ function copyBadgerLink() {
   clipboard.write(window.location.origin + getBadgerLoginPath())
   toast.add({
     title: 'URL Copiée',
-    color: "green"
+    color: "success"
   })
 }
 
@@ -80,7 +91,7 @@ async function controlShootingUpdated() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error.message
     });
@@ -90,7 +101,7 @@ async function controlShootingUpdated() {
   selfStore.refreshSelectedClub().then()
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Paramètre enregistré"
   });
 }
@@ -113,7 +124,7 @@ async function ignoredActivitiesDaysUpdated() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "L'enregistrement a échoué",
       description: error.message
     });
@@ -123,7 +134,7 @@ async function ignoredActivitiesDaysUpdated() {
   selfStore.refreshSelectedClub().then()
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Paramètre enregistré"
   });
 }
@@ -189,11 +200,12 @@ async function deleteLogo() {
 
       <UButton
         class="my-4"
-        @click="modal.open(ClubModalGenerateBadger, {
+        @click="
+          overlay.create(ClubModalGenerateBadger).open({
             onGenerated(newClub: Club) {
-              modal.close()
               badgerSetting = newClub.badgerToken
               selfStore.refreshSelectedClub()
+              useToast().add({title: 'Lien de connexion généré'})
             }
           })"
       >
@@ -203,7 +215,7 @@ async function deleteLogo() {
       <div v-if="!badgerSetting">
         <UAlert
           icon="i-heroicons-exclamation-triangle"
-          color="yellow"
+          color="warning"
           title="Lien de connexion non généré."
         />
       </div>
@@ -226,12 +238,11 @@ async function deleteLogo() {
           <USelectMenu
             v-model="configState.excludedActivitiesFromOpeningDays"
             @change="ignoredActivitiesDaysUpdated"
-            :options="activities"
-            option-attribute="name"
-            value-attribute="uuid"
+            :items="activitiesSelect"
+            value-key="value"
             multiple
           >
-            <template #label>
+            <template #default>
               <span v-if="configState.excludedActivitiesFromOpeningDays && activities && configState.excludedActivitiesFromOpeningDays.length" class="truncate">
                 {{ activities.filter(a => (a.uuid && configState.excludedActivitiesFromOpeningDays?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
               </span>
@@ -246,9 +257,7 @@ async function deleteLogo() {
           <USelect
             v-model="configState.selectedControlShootingActivity"
             @change="controlShootingUpdated"
-            :options="activities"
-            option-attribute="name"
-            value-attribute="uuid"
+            :items="activitiesSelect"
             placeholder="Aucun contrôle défini" />
         </div>
       </GenericCard>
@@ -269,29 +278,31 @@ async function deleteLogo() {
           @change="uploadLogo"
       />
 
-      <UPopover overlay v-if="selectedProfile?.club.settings.logo">
-        <UButton color="red">
+      <UModal v-if="selectedProfile?.club.settings.logo">
+        <UButton color="error">
           Supprimer le logo
         </UButton>
 
-        <template #panel="{ close }">
-          <div class="p-4 w-56 flex flex-col gap-4">
-            <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
+        <template #content>
+          <UCard>
+            <div class="flex flex-col gap-4">
+              <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
-            <UButton color="red" @click="deleteLogo" class="mx-auto">
-              Supprimer le logo
-            </UButton>
-          </div>
+              <UButton color="error" @click="deleteLogo" class="mx-auto">
+                Supprimer le logo
+              </UButton>
+            </div>
+          </UCard>
         </template>
 
-      </UPopover>
+      </UModal>
 
     </GenericCard>
   </div>
 </template>
 
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>
 

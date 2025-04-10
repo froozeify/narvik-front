@@ -1,85 +1,82 @@
 <script lang="ts" setup>
-  import type {Member} from "~/types/api/item/clubDependent/member";
-  import {useSelfUserStore} from "~/stores/useSelfUser";
-  import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
-  import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
-  import UserQuery from "~/composables/api/query/UserQuery";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+import ModalSelectProfile from "~/components/Modal/ModalSelectProfile.vue";
+import UserQuery from "~/composables/api/query/UserQuery";
 
-  definePageMeta({
-    layout: "member"
-  });
+definePageMeta({
+  layout: "member"
+});
 
-  useHead({
-    title: "Mes informations"
+useHead({
+  title: "Mes informations"
+})
+
+const overlay = useOverlay()
+const toast = useToast()
+
+const userQuery = new UserQuery();
+
+const selfStore = useSelfUserStore()
+const isAdmin = selfStore.isAdmin()
+
+const { member, user, selectedProfile } = storeToRefs(selfStore)
+
+const passwordState = reactive({
+  current: undefined as string|undefined,
+  new: undefined as string|undefined,
+  new2: undefined as string|undefined
+})
+
+async function onUpdatePasswordSubmit() {
+  if (!user.value) return failedPasswordUpdate();
+
+  if ((!isAdmin && (!passwordState.new || passwordState.new.length < 8)) || passwordState.new !== passwordState.new2) {
+    return failedPasswordUpdate("Les mot de passe ne correspondent pas / trop court")
+  }
+
+  if (!passwordState.current) {
+    return failedPasswordUpdate("Mot de passe actuel non défini")
+  }
+
+  const { error } = await userQuery.selfUpdatePassword(passwordState.current, passwordState.new)
+  if (error) {
+    return failedPasswordUpdate(error.message)
+  }
+
+  toast.add({
+    color: "success",
+    title: "Mot de passe modifié"
   })
+}
 
-  const modal = useModal()
-  const toast = useToast()
-
-  const userQuery = new UserQuery();
-
-  const selfStore = useSelfUserStore()
-  const isAdmin = selfStore.isAdmin()
-
-  const { member, user, selectedProfile } = storeToRefs(selfStore)
-
-  const updatePasswordModalOpen = ref(false)
-  const passwordState = reactive({
-    current: undefined as string|undefined,
-    new: undefined as string|undefined,
-    new2: undefined as string|undefined
+function failedPasswordUpdate(explanation?: string) {
+  toast.add({
+    color: "error",
+    title: "La modification du mot de passe a échoué",
+    description: explanation
   })
+}
 
-  async function onUpdatePasswordSubmit() {
-    if (!user.value) return failedPasswordUpdate();
+async function deleteUser() {
+  if (!user.value) return;
 
-    if ((!isAdmin && (!passwordState.new || passwordState.new.length < 8)) || passwordState.new !== passwordState.new2) {
-      return failedPasswordUpdate("Les mot de passe ne correspondent pas / trop court")
-    }
-
-    if (!passwordState.current) {
-      return failedPasswordUpdate("Mot de passe actuel non défini")
-    }
-
-    const { error } = await userQuery.selfUpdatePassword(passwordState.current, passwordState.new)
-    if (error) {
-      return failedPasswordUpdate(error.message)
-    }
-
-    updatePasswordModalOpen.value = false
+  const { error } = await userQuery.selfDelete()
+  if (error) {
     toast.add({
-      color: "green",
-      title: "Mot de passe modifié"
+      color: "error",
+      title: "La suppression du compte à échoué",
+      description: error.message
     })
+    return
   }
 
-  function failedPasswordUpdate(explanation?: string) {
-    toast.add({
-      color: "red",
-      title: "La modification du mot de passe a échoué",
-      description: explanation
-    })
-  }
-
-  async function deleteUser() {
-    if (!user.value) return;
-
-    const { error } = await userQuery.selfDelete()
-    if (error) {
-      toast.add({
-        color: "red",
-        title: "La suppression du compte à échoué",
-        description: error.message
-      })
-      return
-    }
-
-    toast.add({
-      color: "green",
-      title: "Compte supprimé"
-    })
-    selfStore.logout()
-  }
+  toast.add({
+    color: "success",
+    title: "Compte supprimé"
+  })
+  selfStore.logout()
+}
 
 </script>
 
@@ -90,22 +87,48 @@
         <div class="text-3xl font-bold">Mon compte</div>
         <div class="flex-1"></div>
 
-        <UButton icon="i-heroicons-lock-closed" @click="updatePasswordModalOpen = true" >
-          Changer le mot de passe
-        </UButton>
+        <UModal>
+          <UButton icon="i-heroicons-lock-closed" >
+            Changer le mot de passe
+          </UButton>
+
+          <template #content>
+            <UCard>
+              <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
+
+                <UFormField label="Mot de passe actuel" name="password">
+                  <UInput v-model="passwordState.current" type="password" required />
+                </UFormField>
+
+                <UFormField label="Nouveau mot de passe" name="password">
+                  <UInput v-model="passwordState.new" type="password" required />
+                </UFormField>
+
+                <UFormField label="Confirmation nouveau mot de passe" name="password">
+                  <UInput v-model="passwordState.new2" type="password" required />
+                </UFormField>
+
+                <UButton type="submit">
+                  Changer le mot de passe
+                </UButton>
+              </UForm>
+            </UCard>
+          </template>
+        </UModal>
 
         <UButton
           icon="i-heroicons-trash"
-          color="red"
-          @click="modal.open(ModalDeleteConfirmation, {
-                alertTitle: 'Seul le compte sera supprimé.',
-                alertDescription: 'Pour supprimer les enregistrements liée au club (présences, fiche membre), veuillez faire une demande auprès du club.',
-                alertColor: 'orange',
-                onDelete() {
-                  deleteUser()
-                  modal.close()
-                }
-              })"
+          color="error"
+          @click="
+          overlay.create(ModalDeleteConfirmation).open({
+            alertTitle: 'Seul le compte sera supprimé.',
+            alertDescription: 'Pour supprimer les enregistrements liée au club (présences, fiche membre), veuillez faire une demande auprès du club.',
+            alertColor: 'error',
+            onDelete() {
+              deleteUser()
+              // modal.close()
+            }
+          })"
         >
           Supprimer
         </UButton>
@@ -146,8 +169,8 @@
       <div class="flex-1"></div>
       <UButton
         v-if="(user?.linkedProfiles?.length ?? 0) > 1"
-        color="yellow"
-        @click="modal.open(ModalSelectProfile)">
+        color="warning"
+        @click="overlay.create(ModalSelectProfile).open()">
         Changer de profil
       </UButton>
     </div>
@@ -157,30 +180,5 @@
       <p>Veuillez vous assurer que l'adresse mail du compte correspond à celle enregistré auprès de votre club.</p>
       <p>Si ce n'est pas le cas, veuillez le signaler à votre club pour que celui-ci modifie le compte lié.</p>
     </GenericCard>
-
-    <UModal
-      v-if="user"
-      v-model="updatePasswordModalOpen">
-      <UCard>
-        <UForm :state="passwordState" class="space-y-4" @submit="onUpdatePasswordSubmit">
-
-          <UFormGroup label="Mot de passe actuel" name="password">
-            <UInput v-model="passwordState.current" type="password" required />
-          </UFormGroup>
-
-          <UFormGroup label="Nouveau mot de passe" name="password">
-            <UInput v-model="passwordState.new" type="password" required />
-          </UFormGroup>
-
-          <UFormGroup label="Confirmation nouveau mot de passe" name="password">
-            <UInput v-model="passwordState.new2" type="password" required />
-          </UFormGroup>
-
-          <UButton type="submit">
-            Changer le mot de passe
-          </UButton>
-        </UForm>
-      </UCard>
-    </UModal>
   </div>
 </template>

@@ -9,6 +9,7 @@ import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {createBrowserCsvDownload} from "~/utils/browser";
 import {defineStore} from "pinia";
 import {ClubRole} from "~/types/api/item/club";
+import type {DateRange} from "~/types/date";
 
 export const useSaleStore = defineStore('sale', () => {
   const saleQuery = new SaleQuery()
@@ -17,7 +18,7 @@ export const useSaleStore = defineStore('sale', () => {
 
   const isLoading = ref(false)
   const isDownloadingCsv = ref(false)
-  const selectedRange: Ref<{ start: Date, end: Date } | null> = ref({start: new Date(), end: new Date()})
+  const selectedRange: Ref<DateRange | undefined> = ref({start: new Date(), end: new Date()})
   const lastRefreshDate: Ref<Date> = ref(new Date())
 
   const shouldRefreshSales = ref(false)
@@ -38,8 +39,8 @@ export const useSaleStore = defineStore('sale', () => {
       page: page.toString(),
     });
 
-    const formattedStartDate = formatDateInput(selectedRange.value.start.toString())
-    const formattedEndDate = formatDateInput(dayjs(selectedRange.value.end).add(1, 'days').toString())
+    const formattedStartDate = formatDateInput(selectedRange.value?.start.toString())
+    const formattedEndDate = formatDateInput(dayjs(selectedRange.value?.end).add(1, 'days').toString())
     if (formattedStartDate) {
       urlParams.append(`createdAt[after]`, formattedStartDate);
 
@@ -94,7 +95,7 @@ export const useSaleStore = defineStore('sale', () => {
     } else {
       isDownloadingCsv.value = false
       useToast().add({
-        color: "red",
+        color: "error",
         title: "Date non définie.",
         description: "Veuillez sélectionner une date afin de pouvoir télécharger le csv."
       })

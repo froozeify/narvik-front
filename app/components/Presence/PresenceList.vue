@@ -11,6 +11,8 @@
   });
 
   const presenceStore = usePresenceStore()
+
+  const popoverOpen = ref(false)
 </script>
 
 <template>
@@ -18,23 +20,25 @@
     <UCard class="mb-4">
       <div class="flex flex-wrap items-center gap-4">
 
-        <UInput
+        <div>
+          <UInput
             v-model="presenceStore.searchQuery"
             placeholder="Rechercher..."  />
+        </div>
 
         <div class="flex-1"></div>
 
-        <UPopover :popper="{ placement: 'bottom-start' }">
+        <UPopover v-model:open="popoverOpen">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateRangeReadable(presenceStore.selectedRange) || 'Choisir une date'" />
 
-          <template #panel="{ close }">
-            <GenericDateRangePicker v-model="presenceStore.selectedRange" @close="close" />
+          <template #content>
+            <GenericDateRangePicker v-model="presenceStore.selectedRange" @range-updated="popoverOpen = false" />
           </template>
         </UPopover>
 
         <UButton
           v-if="presenceStore.selectedRange"
-          color="red"
+          color="error"
           @click="presenceStore.selectedRange = null"
         >
           Supprimer la date
@@ -43,14 +47,15 @@
     </UCard>
 
     <UAccordion
-      class="mb-0"
       variant="soft"
-      color="orange"
+      color="warning"
+      :unmount-on-hide="false"
       :ui="{
-        default: {
-          class: 'mb-0'
-        }
+        item: 'border-none',
+        content: 'pt-1.5 pb-3',
+        trigger: 'transition mb-1.5 px-2.5 py-1.5 bg-orange-50 dark:bg-orange-950 rounded-md text-orange-500 dark:text-orange-400 border-none  cursor-pointer'
       }"
+      :truncate="false"
       :items="[
           {
             'label': `Licenciés autre club / non licenciés (${presenceStore.totalExternal})`,
@@ -73,6 +78,6 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

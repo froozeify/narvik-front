@@ -3,10 +3,11 @@ import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale
 import {usePaginationValues} from "~/composables/api/list";
 import SalePaymentModeQuery from "~/composables/api/query/clubDependent/plugin/sale/SalePaymentModeQuery";
 import type {SalePaymentMode} from "~/types/api/item/clubDependent/plugin/sale/salePaymentMode";
-import type {FormError} from "#ui/types";
+import type {FormError, TableRow} from "#ui/types";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import type {NuxtError} from "#app";
 import type {ItemError} from "~/types/api/itemError";
+import type {TablePaginateInterface} from "~/types/table";
 
 definePageMeta({
     layout: "pos"
@@ -17,7 +18,9 @@ definePageMeta({
   })
 
   const toast = useToast()
-  const modal = useModal()
+  const overlay = useOverlay()
+  const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
   const apiQuery = new SalePaymentModeQuery()
 
   const paymentModes: Ref<SalePaymentMode[]> = ref([])
@@ -41,16 +44,21 @@ definePageMeta({
   });
   const columns = [
     {
-      key: 'name',
-      label: 'Nom'
+      accessorKey: 'name',
+      header: 'Nom'
     },
     {
-      key: 'icon',
-      label: 'Icône',
-      class: 'w-full'
+      accessorKey: 'icon',
+      header: 'Icône',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      }
     },
     {
-      key: 'actions',
+      accessorKey: 'actions',
+      header: ''
     }
   ]
 
@@ -77,8 +85,8 @@ definePageMeta({
     isLoading.value = false
   }
 
-  function rowClicked(row: object) {
-    selectedPaymentMode.value = {...row} // We make a shallow clone
+  function rowClicked(row: TableRow<SalePaymentMode>) {
+    selectedPaymentMode.value = {...row.original} // We make a shallow clone
     isVisible.value = true
   }
 
@@ -89,7 +97,7 @@ definePageMeta({
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La modification a échouée",
         description: error.message
       });
@@ -135,7 +143,7 @@ definePageMeta({
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: !paymentMode.uuid ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
@@ -143,7 +151,7 @@ definePageMeta({
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: !paymentMode.uuid ? "Moyen de paiement crée" : "Moyen de paiement modifié",
     });
 
@@ -158,7 +166,7 @@ definePageMeta({
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       });
@@ -172,8 +180,8 @@ definePageMeta({
 
   const validate = (state: any): FormError[] => {
     const errors = []
-    if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
-    if (!state.icon) errors.push({ path: 'icon', message: 'Champ requis' })
+    if (!state.name) errors.push({ name: 'name', message: 'Champ requis' })
+    if (!state.icon) errors.push({ name: 'icon', message: 'Champ requis' })
     return errors
   }
 
@@ -197,36 +205,38 @@ definePageMeta({
             :loading="isLoading"
             :sort="sort"
             :columns="columns"
-            :rows="paymentModes"
+            :data="paymentModes"
             @select="rowClicked">
-            <template #empty-state>
+            <template #empty>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucun moyen de paiement.</span>
               </div>
             </template>
 
-            <template #name-data="{ row }">
-              {{ row.name }}
+            <template #name-cell="{ row }">
+              {{ row.original.name }}
             </template>
 
 
-            <template #icon-data="{ row }">
-              <UIcon :name="'i-heroicons-' + row.icon" />
+            <template #icon-cell="{ row }">
+              <UIcon :name="'i-heroicons-' + row.original.icon" />
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="flex items-center gap-1">
-                <p class="text-xs">{{ row.weight }}</p>
-                <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+                <p class="text-xs">{{ row.original.weight }}</p>
+                <GenericStackedUpDown @changed="modifier => { move(row.original, -modifier) }" />
               </div>
             </template>
 
           </UTable>
 
-          <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getPaymentModesPaginated()" />
-            <UPagination v-model="page" @update:model-value="getPaymentModesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalPaymentModes" />
-          </div>
+          <GenericTablePagination
+            v-model:page="page"
+            v-model:items-per-page="itemsPerPage"
+            :total-items="totalPaymentModes"
+            @paginate="(object: TablePaginateInterface) => { getPaymentModesPaginated() }"
+          />
         </div>
       </UCard>
     </template>
@@ -236,18 +246,18 @@ definePageMeta({
         <UForm :state="selectedPaymentMode" @submit="updatePaymentMode(selectedPaymentMode)" :validate="validate">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Disponible" name="available">
-                <UToggle v-model="selectedPaymentMode.available" />
-              </UFormGroup>
+              <UFormField label="Disponible" name="available">
+                <USwitch v-model="selectedPaymentMode.available" />
+              </UFormField>
 
-              <UFormGroup label="Nom" name="name">
+              <UFormField label="Nom" name="name">
                 <UInput v-model="selectedPaymentMode.name" />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Icône" name="icon">
+              <UFormField label="Icône" name="icon">
 
                 <template #description>
-                  <UButton variant="link" to="https://heroicons.com/" target="_blank" :padded="false">Liste des icônes Heroicons</UButton>
+                  <ContentLink variant="link" to="https://heroicons.com/" target="_blank">Liste des icônes Heroicons</ContentLink>
                   <ul class="text-xs">
                     <li>Espèces : <code>banknotes</code></li>
                     <li>Chèque : <code>ticket</code></li>
@@ -261,11 +271,11 @@ definePageMeta({
 
                 <UInput v-model="selectedPaymentMode.icon" />
 
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Poids dans la liste" name="weight">
+              <UFormField label="Poids dans la liste" name="weight">
                 <UInput type="number" v-model="selectedPaymentMode.weight" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>
@@ -276,14 +286,16 @@ definePageMeta({
         <UButton
           v-if="selectedPaymentMode.uuid"
           block
-          color="red"
+          color="error"
           :loading="isLoading"
-          @click="modal.open(ModalDeleteConfirmation, {
-            onDelete() {
-              modal.close()
-              deletePaymentMode()
-            }
-          })"
+          @click="
+            overlayDeleteConfirmation.open({
+              async onDelete() {
+                await deletePaymentMode()
+                overlayDeleteConfirmation.close(true)
+              }
+            })
+          "
         >
           Supprimer
         </UButton>
@@ -293,6 +305,6 @@ definePageMeta({
   </GenericLayoutContentWithStickySide>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

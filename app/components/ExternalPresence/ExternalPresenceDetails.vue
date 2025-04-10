@@ -5,7 +5,7 @@ import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExte
 import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 
-const toast = useToast()
+
 
 const props = defineProps({
   item: {
@@ -18,6 +18,8 @@ const emit = defineEmits([
   'updated',
   'close'
 ])
+
+const popoverOpen = ref(false)
 
 const selfStore = useSelfUserStore()
 const isSupervisor = selfStore.hasSupervisorRole()
@@ -36,13 +38,13 @@ function presenceUpdated(newExternalPresence: ExternalPresence) {
 
 function presenceCanceled(newExternalPresence: ExternalPresence) {
   updateExternalPresenceModalOpen.value = false;
-  emit('canceled', newExternalPresence)
+  emit('close', false)
 }
 
-async function deletePresence(close: Function) {
+async function deletePresence() {
   if (isSupervisor || isBadger) {
     await externalPresenceQuery.delete(externalPresence.value)
-    close()
+    popoverOpen.value = false
     emit('updated', null)
   }
 }
@@ -53,9 +55,9 @@ async function deletePresence(close: Function) {
   <UCard class="bg-orange-50 dark:bg-orange-950">
     <div class="flex gap-2">
       <UButton
-        @click="emit('close')"
+        @click="emit('close', false)"
         icon="i-heroicons-x-circle"
-        color="orange"
+        color="warning"
         variant="ghost"
         size="xs"
       />
@@ -66,27 +68,27 @@ async function deletePresence(close: Function) {
           @click="updateExternalPresenceModalOpen = true"
           icon="i-heroicons-pencil-square"
           size="xs"
-          color="orange"
+          color="warning"
           variant="solid"
           label="Editer"
       />
 
       <UTooltip text="Supprimer" v-if="isSupervisor || isBadger">
-        <UPopover>
+        <UPopover v-model:open="popoverOpen">
           <UButton
               icon="i-heroicons-trash"
               size="xs"
-              color="red"
+              color="error"
               variant="ghost"
           />
 
-          <template #panel="{ close }">
+          <template #content>
             <div class="p-4 w-56 flex flex-col gap-4">
               <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
               <UButton
-                  @click="deletePresence(close);"
-                  color="red"
+                  @click="deletePresence();"
+                  color="error"
                   class="mx-auto"
               >
                 Supprimer
@@ -108,8 +110,7 @@ async function deletePresence(close: Function) {
       <div class="flex gap-4 justify-center flex-wrap">
         <UButton
             v-for="activity in externalPresence?.activities.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-            color="orange"
-            :ui="{ rounded: 'rounded-full' }"
+            color="warning"
         >
           {{ activity.name }}
         </UButton>
@@ -119,15 +120,17 @@ async function deletePresence(close: Function) {
   </UCard>
 
   <UModal
-      v-model="updateExternalPresenceModalOpen">
-    <RegisterExternalPresence
-      :external-presence="externalPresence"
-      @registered="presenceUpdated"
-      @canceled="presenceCanceled"
-    />
+      v-model:open="updateExternalPresenceModalOpen">
+    <template #content>
+      <RegisterExternalPresence
+        :external-presence="externalPresence"
+        @registered="presenceUpdated"
+        @canceled="presenceCanceled"
+      />
+    </template>
   </UModal>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

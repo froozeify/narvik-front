@@ -11,6 +11,8 @@
   import {formatDate} from "~/utils/date";
   import dayjs from "dayjs";
   import {convertUuidToUrlUuid} from "~/utils/resource";
+  import type {SelectApiItem} from "~/types/select";
+  import type {Member} from "~/types/api/item/clubDependent/member";
 
   definePageMeta({
     layout: "pos"
@@ -29,6 +31,19 @@
   const cartStore = useCartStore()
   const { searchQuery, cart, cartTotalPrice, cartComment, cartCustomItemModalOpen, customItemForm, selectedPaymentMode } = storeToRefs(cartStore)
   const { sellers, seller, paymentModes } = storeToRefs(saleStore)
+  const sellerSelected = ref(!seller.value ? undefined : { label: seller.value.fullName, value: seller.value.uuid, item: seller.value } as SelectApiItem<Member>)
+
+  const sellersSelect = computed( () => {
+    const items: SelectApiItem<Member>[] = []
+    sellers.value.forEach(value => {
+      items.push({
+        label: value.fullName,
+        value: value.uuid,
+        item: value
+      })
+    })
+    return items;
+  })
 
   const inventoryItemQuery = new InventoryItemQuery()
   const paymentModeQuery = new SalePaymentModeQuery()
@@ -115,6 +130,12 @@
   const cameraIsPresent = verifyCameraIsPresent()
 
   // Sale management
+  function sellerUpdated() {
+    if (sellerSelected.value) {
+      seller.value = sellerSelected.value.item
+    }
+  }
+
   async function createSale() {
     isCreatingSale.value = true
 
@@ -147,7 +168,7 @@
 
     if (!created || error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La vente à échoué",
         description: error?.message
       });
@@ -155,7 +176,7 @@
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: "Vente enregistrée",
     });
 
@@ -229,7 +250,7 @@
             <div class="print:text-base text-xl font-bold mb-2 border-b">{{ title }}</div>
             <div
               v-for="item in items"
-              class="flex items-center gap-2 mb-1 hover:bg-neutral-100 dark:hover:bg-gray-800/50 rounded-md"
+              class="flex items-center gap-2 mb-1 hover:bg-neutral-100 dark:hover:bg-neutral-600/50 rounded-md"
             >
               <div class="flex-1 flex flex-col">
                 <div class="print:text-xs flex-1">{{ item.name }}</div>
@@ -237,11 +258,11 @@
                 <div v-if="item.description" class="text-xs print:hidden">{{ item.description }}</div>
               </div>
               <div v-if="item.quantityAlert && (item.quantity || item.quantity === 0) && item.quantity <= item.quantityAlert"
-                   class="print:hidden text-xs font-bold text-red-600">
+                   class="print:hidden text-xs font-bold text-error-600">
                 Stock restant : {{ item.quantity }}
               </div>
-              <div class="text-xs bg-neutral-200 print:!bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
-              <UButton class="print:hidden" icon="i-heroicons-shopping-cart" size="2xs" @click="cartStore.addToCart(item)" />
+              <div class="text-xs bg-neutral-200 print:!bg-neutral-200 dark:bg-neutral-600 p-1 rounded-md">{{ formatMonetary(item.sellingPrice) }}</div>
+              <UButton class="print:hidden" icon="i-heroicons-shopping-cart" size="xs" @click="cartStore.addToCart(item)" />
             </div>
           </div>
         </div>
@@ -257,98 +278,102 @@
         </div>
       </UCard>
 
-      <UModal v-model="cartCustomItemModalOpen">
-        <UCard>
-          <UForm class="flex gap-2 flex-col" :state="customItemForm" :validate="cartStore.validateCustomCartForm" @submit="cartStore.addCustomItemToCart">
-            <UFormGroup label="Nom" name="name">
-              <UInput v-model="customItemForm.name"/>
-            </UFormGroup>
+      <UModal v-model:open="cartCustomItemModalOpen">
+        <template #content>
+          <UCard>
+            <UForm class="flex gap-2 flex-col" :state="customItemForm" :validate="cartStore.validateCustomCartForm" @submit="cartStore.addCustomItemToCart">
+              <UFormField label="Nom" name="name">
+                <UInput v-model="customItemForm.name"/>
+              </UFormField>
 
-            <UFormGroup label="Prix de vente" name="sellingPrice">
-              <UInput v-model="customItemForm.sellingPrice">
-                <template #trailing>
-                  <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
-                </template>
-              </UInput>
-            </UFormGroup>
+              <UFormField label="Prix de vente" name="sellingPrice">
+                <UInput v-model="customItemForm.sellingPrice">
+                  <template #trailing>
+                    <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
+                  </template>
+                </UInput>
+              </UFormField>
 
-            <div class="flex gap-2 mt-2 justify-end">
-              <UButton color="red" variant="ghost" @click="cartStore.closeCustomItemModal()">
-                Annuler
-              </UButton>
+              <div class="flex gap-2 mt-2 justify-end">
+                <UButton color="error" variant="ghost" @click="cartStore.closeCustomItemModal()">
+                  Annuler
+                </UButton>
 
-              <UButton type="submit">
-                Ajouter au panier
-              </UButton>
-            </div>
-          </UForm>
-        </UCard>
+                <UButton type="submit">
+                  Ajouter au panier
+                </UButton>
+              </div>
+            </UForm>
+          </UCard>
+        </template>
       </UModal>
     </template>
 
     <template #side>
-      <UCard class="print:hidden">
-        <div class="text-4xl text-center">{{ formatMonetary(cartTotalPrice) }}</div>
-        <div class="mt-4">
-          <div class="flex text-xs align-center mt-1">
-            <div class="flex-1"></div>
-            <UButton v-if="cart.length > 0" size="xs" @click="cartStore.emptyCart()">Vider le panier</UButton>
-          </div>
-          <div v-if="cart.length < 1" class="text-center">
-            <i>Aucun articles</i>
-          </div>
-          <div class="overflow-y-auto max-h-[25vh] mt-2">
-            <div v-for="cartItem in cart" class="flex items-center gap-2 mb-1">
-              <GenericStackedUpDown @changed="modifier => { cartStore.addToCart(cartItem.item, modifier) }" />
+      <div class="flex flex-col gap-4">
+        <UCard class="print:hidden">
+          <div class="text-4xl text-center">{{ formatMonetary(cartTotalPrice) }}</div>
+          <div class="mt-4">
+            <div class="flex text-xs align-center mt-1">
+              <div class="flex-1"></div>
+              <UButton v-if="cart.length > 0" size="xs" @click="cartStore.emptyCart()">Vider le panier</UButton>
+            </div>
+            <div v-if="cart.length < 1" class="text-center">
+              <i>Aucun articles</i>
+            </div>
+            <div class="overflow-y-auto max-h-[25vh] mt-2">
+              <div v-for="cartItem in cart" class="flex items-center gap-2 mb-1">
+                <GenericStackedUpDown @changed="modifier => { cartStore.addToCart(cartItem.item, modifier) }" />
 
-              <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">{{ cartItem.quantity }}</div>
-              <div class="text-sm flex-1 leading-tight">{{ cartItem.item.name }}</div>
-              <UTooltip :text="'Prix unitaire : ' + formatMonetary(cartItem.item.sellingPrice)">
-                <div class="text-xs bg-neutral-200 dark:bg-gray-800 p-1 rounded-md">
-                  <template v-if="cartItem.item.sellingPrice">
-                    {{ formatMonetary(Number(Number(cartItem.item.sellingPrice) * cartItem.quantity).toFixed(2)) }}
-                  </template>
-                  <template v-else>
-                    {{ formatMonetary(cartItem.item.sellingPrice) }}
-                  </template>
-                </div>
-              </UTooltip>
+                <div class="text-xs bg-neutral-200 dark:bg-neutral-600 p-1 rounded-md">{{ cartItem.quantity }}</div>
+                <div class="text-sm flex-1 leading-tight">{{ cartItem.item.name }}</div>
+                <UTooltip :text="'Prix unitaire : ' + formatMonetary(cartItem.item.sellingPrice)" :delay-duration="0">
+                  <div class="text-xs bg-neutral-200 dark:bg-neutral-600 p-1 rounded-md">
+                    <template v-if="cartItem.item.sellingPrice">
+                      {{ formatMonetary(Number(Number(cartItem.item.sellingPrice) * cartItem.quantity).toFixed(2)) }}
+                    </template>
+                    <template v-else>
+                      {{ formatMonetary(cartItem.item.sellingPrice) }}
+                    </template>
+                  </div>
+                </UTooltip>
+              </div>
             </div>
           </div>
-        </div>
-      </UCard>
+        </UCard>
 
-      <UCard class="print:hidden">
-        <UFormGroup label="Vendeur" :error="!seller && 'Un vendeur doit être défini'">
-          <UInputMenu v-model="seller" :options="sellers" option-attribute="fullName" :search-attributes="['lastname', 'firstname']" />
-        </UFormGroup>
+        <UCard class="print:hidden">
+          <UFormField label="Vendeur" :error="!sellerSelected && 'Un vendeur doit être défini'">
+            <UInputMenu class="w-full" v-model="sellerSelected" :items="sellersSelect" :filter-fields="['item.lastname', 'item.firstname']" @change="sellerUpdated" />
+          </UFormField>
 
-        <UFormGroup label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'" class="my-2">
-          <UTextarea v-model="cartComment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente"/>
-        </UFormGroup>
+          <UFormField class="my-2" label="Commentaire" :error="cartComment.length > 249 && 'Longueur maximum atteinte (250)'">
+            <UTextarea v-model="cartComment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire liée à la vente"/>
+          </UFormField>
 
-        <UFormGroup label="Mode de paiement">
-          <div class="flex flex-wrap gap-2">
-            <UButton
-              v-for="paymentMode in paymentModes"
-              :variant="selectedPaymentMode?.uuid == paymentMode.uuid ? 'solid' : 'soft'"
-              class="basis-[calc(50%-0.25rem)]">
-              <div class="flex items-center w-full" @click="selectedPaymentMode = selectedPaymentMode === paymentMode ? null : paymentMode">
-                <UIcon :name="'i-heroicons-' + paymentMode.icon" />
-                <div class="flex-1">
-                  {{ paymentMode.name }}
+          <UFormField label="Mode de paiement">
+            <div class="flex flex-wrap gap-2">
+              <UButton
+                v-for="paymentMode in paymentModes"
+                :variant="selectedPaymentMode?.uuid == paymentMode.uuid ? 'solid' : 'soft'"
+                class="basis-[calc(50%-0.25rem)]">
+                <div class="flex items-center w-full" @click="selectedPaymentMode = selectedPaymentMode === paymentMode ? null : paymentMode">
+                  <UIcon :name="'i-heroicons-' + paymentMode.icon" />
+                  <div class="flex-1">
+                    {{ paymentMode.name }}
+                  </div>
                 </div>
-              </div>
-            </UButton>
-          </div>
-        </UFormGroup>
+              </UButton>
+            </div>
+          </UFormField>
 
-        <UButton :loading="isCreatingSale" class="mt-4" block color="green" :disabled="cart.size < 1 || !selectedPaymentMode || !seller" @click="createSale()">Finaliser la vente</UButton>
-      </UCard>
+          <UButton :loading="isCreatingSale" class="mt-4" block color="success" :disabled="cart.size < 1 || !selectedPaymentMode || !seller" @click="createSale()">Finaliser la vente</UButton>
+        </UCard>
+      </div>
     </template>
   </GenericLayoutContentWithStickySide>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

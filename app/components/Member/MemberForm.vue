@@ -33,6 +33,8 @@ const emit = defineEmits([
 ])
 
 const isUpdating = ref(false)
+const popoverOpen = ref(false)
+const popoverMedicalOpen = ref(false)
 
 const toast = useToast()
 const memberQuery = new MemberQuery()
@@ -56,8 +58,8 @@ function getDefaultItem() {
 const validate = (state: Member): FormError[] => {
   const errors = []
 
-  if (!state.firstname) errors.push({ path: 'firstname', message: 'Champ requis' })
-  if (!state.lastname) errors.push({ path: 'lastname', message: 'Champ requis' })
+  if (!state.firstname) errors.push({ name: 'firstname', message: 'Champ requis' })
+  if (!state.lastname) errors.push({ name: 'lastname', message: 'Champ requis' })
 
   return errors
 }
@@ -100,7 +102,7 @@ async function submitItem() {
     toast.add({
       title: "Une erreur est survenue",
       description: errorMessage,
-      color: "red"
+      color: "error"
     })
     return
   }
@@ -113,98 +115,104 @@ async function submitItem() {
 <template>
   <UForm class="flex gap-2 flex-col" :state="item" :validate="validate" @submit="submitItem" @error="onError">
     <div class="flex justify-between">
-      <UFormGroup label="Genre" name="gender">
-        <USelect v-model="item.gender" :options="[{name: 'Homme', value: 'M'}, {name: 'Femme', value: 'F'}]" option-attribute="name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-      </UFormGroup>
+      <UFormField label="Genre" name="gender">
+        <USelect class="min-w-32" v-model="item.gender" :items="[{label: 'Homme', value: 'M'}, {label: 'Femme', value: 'F'}]" option-attribute="name" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
+      </UFormField>
 
-      <UFormGroup label="Blacklisté">
-        <UToggle v-model="item.blacklisted" :disabled="props.viewOnly" />
-      </UFormGroup>
+      <UFormField label="Blacklisté">
+        <USwitch v-model="item.blacklisted" :disabled="props.viewOnly" />
+      </UFormField>
     </div>
 
     <div class="flex justify-between">
-      <UFormGroup label="Date de naissance" name="birthday">
-        <UPopover :popper="{ placement: 'bottom-start' }">
+      <UFormField label="Date de naissance" name="birthday">
+        <UPopover v-model:open="popoverOpen">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.birthday?.toString()) || 'Choisir une date'" />
 
-          <template #panel="{ close }">
+          <template #content>
             <div>
               <div class="p-2 text-xs text-center">
                 <p>Vous pouvez cliquer sur l'année</p>
                 <p>afin de changer celle-ci</p>
               </div>
-              <GenericDatePicker class="!w-full" v-model="item.birthday" mode="date" @close="close" />
+              <GenericDatePicker class="!w-full" v-model="item.birthday" mode="date" @close="popoverOpen = false" />
             </div>
           </template>
         </UPopover>
-      </UFormGroup>
+      </UFormField>
 
-      <UFormGroup label="Certificat médical" name="medicalCertificateExpiration">
-        <UPopover :popper="{ placement: 'bottom-start' }">
+      <UFormField label="Certificat médical" name="medicalCertificateExpiration">
+        <UPopover v-model:open="popoverMedicalOpen">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateReadable(item.medicalCertificateExpiration?.toString()) || 'Choisir une date'" />
 
-          <template #panel="{ close }">
-            <GenericDatePicker v-model="item.medicalCertificateExpiration" mode="date" @close="close" />
+          <template #content>
+            <div>
+              <div class="p-2 text-xs text-center">
+                <p>Date d'expiration du</p>
+                <p>certificat médical</p>
+              </div>
+              <GenericDatePicker class="!w-full" v-model="item.medicalCertificateExpiration" mode="date" @close="popoverMedicalOpen = false" />
+            </div>
           </template>
         </UPopover>
-      </UFormGroup>
+      </UFormField>
     </div>
-    <UAlert v-if="memberAge < 18" icon="i-heroicons-exclamation-triangle" color="red" variant="subtle" title="Consentement recueil des données (RGPD)">
+    <UAlert v-if="memberAge < 18" icon="i-heroicons-exclamation-triangle" color="error" variant="subtle" title="Consentement recueil des données (RGPD)">
       <template #description>
         <p v-if="memberAge < 15">-15 ans, le consentement pour le recueil doit être effectué auprès des parents.</p>
         <p v-if="memberAge === 0 || memberAge >= 15">15-18 ans, le consentement pour le recueil doit être effectué auprès de l'enfant.</p>
       </template>
     </UAlert>
 
-    <UFormGroup label="Licence" name="licence">
+    <UFormField label="Licence" name="licence">
       <UInput v-model="item.licence" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Nom" name="lastname" required>
+    <UFormField label="Nom" name="lastname" required>
       <UInput v-model="item.lastname" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Prénom" name="firstname" required>
+    <UFormField label="Prénom" name="firstname" required>
       <UInput v-model="item.firstname" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Email" name="email">
+    <UFormField label="Email" name="email">
       <UInput v-model="item.email" type="email" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
-    <UDivider class="mt-4" label="Téléphone" />
+    <USeparator class="mt-4" label="Téléphone" />
 
     <div class="flex justify-between">
-      <UFormGroup label="Fixe" name="phone">
+      <UFormField label="Fixe" name="phone">
         <UInput v-model="item.phone" type="tel" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-      </UFormGroup>
+      </UFormField>
 
-      <UFormGroup label="Mobile" name="mobilePhone">
+      <UFormField label="Mobile" name="mobilePhone">
         <UInput v-model="item.mobilePhone" type="tel" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-      </UFormGroup>
+      </UFormField>
     </div>
 
-    <UDivider class="mt-4" label="Adresse" />
+    <USeparator class="mt-4" label="Adresse" />
 
-    <UFormGroup label="Pays" name="country">
+    <UFormField label="Pays" name="country">
       <UInput v-model="item.country" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
     <div class="flex justify-between">
-      <UFormGroup label="Code postal" name="zipCode">
+      <UFormField label="Code postal" name="zipCode">
         <UInput v-model="item.zipCode" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-      </UFormGroup>
+      </UFormField>
 
-      <UFormGroup label="Ville" name="city">
+      <UFormField label="Ville" name="city">
         <UInput v-model="item.city" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-      </UFormGroup>
+      </UFormField>
     </div>
 
-    <UFormGroup label="Adresse" name="postal">
+    <UFormField label="Adresse" name="postal">
       <UInput v-model="item.postal1" placeholder="Adresse ligne 1" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
       <UInput class="my-2" v-model="item.postal2" placeholder="Adresse ligne 2" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
       <UInput v-model="item.postal3" placeholder="Adresse ligne 3" :class="props.viewOnly ? 'pointer-events-none' : ''" :tabindex="props.viewOnly ? '-1' : '0'" />
-    </UFormGroup>
+    </UFormField>
 
 
     <UButton type="submit" v-if="!props.viewOnly"
@@ -222,6 +230,6 @@ async function submitItem() {
   </UForm>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

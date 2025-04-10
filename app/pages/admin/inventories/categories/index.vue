@@ -4,10 +4,11 @@
   import {usePaginationValues} from "~/composables/api/list";
   import type {Member} from "~/types/api/item/clubDependent/member";
   import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
-  import type {FormError} from "#ui/types";
+  import type {FormError, TableRow} from "#ui/types";
   import {convertUuidToUrlUuid} from "~/utils/resource";
   import type {NuxtError} from "#app";
   import type {ItemError} from "~/types/api/itemError";
+  import type {TablePaginateInterface} from "~/types/table";
 
   definePageMeta({
     layout: "pos"
@@ -18,7 +19,9 @@
   })
 
   const toast = useToast()
-  const modal = useModal()
+  const overlay = useOverlay()
+  const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
   const apiQuery = new InventoryCategoryQuery();
 
   const categories: Ref<InventoryCategory[]> = ref([])
@@ -42,12 +45,17 @@
   });
   const columns = [
     {
-      key: 'name',
-      label: 'Nom',
-      class: 'w-full'
+      accessorKey: 'name',
+      header: 'Nom',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      }
     },
     {
-      key: 'actions',
+      accessorKey: 'actions',
+      header: ''
     }
   ]
 
@@ -74,8 +82,8 @@
     isLoading.value = false
   }
 
-  function rowClicked(row: object) {
-    selectedCategory.value = {...row} // We make a shallow clone
+  function rowClicked(row: TableRow<InventoryCategory>) {
+    selectedCategory.value = {...row.original} // We make a shallow clone
     isVisible.value = true
   }
 
@@ -86,7 +94,7 @@
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La modification a échouée",
         description: error.message
       });
@@ -129,7 +137,7 @@
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: !category.uuid ? "La création a échouée" : "La modification a échouée",
         description: error.message
       });
@@ -137,7 +145,7 @@
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: !category.uuid ? "Catégorie créée" : "Catégorie modifiée",
     });
 
@@ -152,7 +160,7 @@
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       });
@@ -189,31 +197,33 @@
             :loading="isLoading"
             :sort="sort"
             :columns="columns"
-            :rows="categories"
+            :data="categories"
             @select="rowClicked">
-            <template #empty-state>
+            <template #empty>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucune catégories.</span>
               </div>
             </template>
 
-            <template #name-data="{ row }">
-              {{ row.name }}
+            <template #name-cell="{ row }">
+              {{ row.original.name }}
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="flex items-center gap-1">
-                <p class="text-xs">{{ row.weight }}</p>
-                <GenericStackedUpDown @changed="modifier => { move(row, -modifier) }" />
+                <p class="text-xs">{{ row.original.weight }}</p>
+                <GenericStackedUpDown @changed="modifier => { move(row.original, -modifier) }" />
               </div>
             </template>
 
           </UTable>
 
-          <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getCategoriesPaginated()" />
-            <UPagination v-model="page" @update:model-value="getCategoriesPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalCategories" />
-          </div>
+          <GenericTablePagination
+            v-model:page="page"
+            v-model:items-per-page="itemsPerPage"
+            :total-items="totalCategories"
+            @paginate="(object: TablePaginateInterface) => { getCategoriesPaginated() }"
+          />
         </div>
       </UCard>
     </template>
@@ -223,32 +233,34 @@
         <UForm :state="selectedCategory" @submit="updateCategory(selectedCategory)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
             <div class="flex gap-2 flex-col">
-              <UFormGroup label="Nom" name="name">
+              <UFormField label="Nom" name="name">
                 <UInput v-model="selectedCategory.name" />
-              </UFormGroup>
-              <UFormGroup label="Poids dans la liste" name="weight">
+              </UFormField>
+              <UFormField label="Poids dans la liste" name="weight">
                 <UInput type="number" v-model="selectedCategory.weight" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>
 
-          <UButton v-if="selectedCategory.uuid" color="green" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
+          <UButton v-if="selectedCategory.uuid" variant="soft" block :loading="isLoading" :to="'/admin/inventories?category=' + convertUuidToUrlUuid(selectedCategory.uuid)">Voir les articles</UButton>
 
           <UButton type="submit" block :loading="isLoading">Enregistrer</UButton>
 
           <UButton
             v-if="selectedCategory.uuid"
             block
-            color="red"
+            color="error"
             :loading="isLoading"
             :disabled="(selectedCategory?.items?.length ?? 0) > 0"
-            @click="modal.open(ModalDeleteConfirmation, {
-              onDelete() {
-                modal.close()
-                deleteCategory()
-              }
-            })"
+            @click="
+              overlayDeleteConfirmation.open({
+                async onDelete() {
+                  await deleteCategory()
+                  overlayDeleteConfirmation.close(true)
+                }
+              })
+            "
           >
             Supprimer
           </UButton>
@@ -259,6 +271,6 @@
   </GenericLayoutContentWithStickySide>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

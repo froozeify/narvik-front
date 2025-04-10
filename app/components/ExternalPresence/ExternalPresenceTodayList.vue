@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {useExternalPresenceStore} from "~/stores/useExternalPresence";
+import type {TableRow} from "#ui/types";
 
 const selectedExternalPresence: Ref<ExternalPresence | undefined> = ref(undefined)
 
@@ -15,8 +16,8 @@ async function getExternalPresences() {
   await externalPresenceStore.refresh()
 }
 
-function rowClicked(row: ExternalPresence) {
-  selectedExternalPresence.value = row;
+function rowClicked(row: TableRow<ExternalPresence>) {
+  selectedExternalPresence.value = row.original;
   externalPresenceStore.modalOpen = true;
 }
 
@@ -45,8 +46,8 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
         <UTooltip text="Rafraichir">
           <UButton
               icon="i-heroicons-arrow-path"
-              color="gray"
-              variant="solid"
+              color="neutral"
+              variant="outline"
               aria-label="Rafraichir"
               :loading="isRefreshing"
               @click="getExternalPresences()"
@@ -63,23 +64,25 @@ function externalPresenceUpdated(externalPresence: ExternalPresence) {
       :display-full-date="false"
       :has-pagination="false"
       :is-loading="isRefreshing"
-      accent-color="orange"
+      accent-color="warning"
       @rowClicked="rowClicked"
     />
   </UCard>
 
   <UModal
-      v-model="externalPresenceStore.modalOpen">
-    <ExternalPresenceDetails
-        v-if="selectedExternalPresence"
-        :item="selectedExternalPresence"
-        @updated="externalPresenceUpdated"
-        @close="externalPresenceStore.modalOpen = false; selectedExternalPresence = undefined"
-    />
+      v-model:open="externalPresenceStore.modalOpen">
+    <template #content>
+      <ExternalPresenceDetails
+          v-if="selectedExternalPresence"
+          :item="selectedExternalPresence"
+          @updated="externalPresenceUpdated"
+          @close="externalPresenceStore.modalOpen = false; selectedExternalPresence = undefined"
+      />
+    </template>
   </UModal>
 
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

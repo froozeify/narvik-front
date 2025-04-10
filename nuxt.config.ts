@@ -2,35 +2,30 @@
 import pkg from './package.json'
 
 export default defineNuxtConfig({
-  compatibilityDate: '2024-07-15',
+  devtools: { enabled: true },
   future: {
     compatibilityVersion: 4
   },
-
-  devtools: {enabled: true},
-  devServer: {
-    https: true,
-    host: "0.0.0.0" // Expose to local network
-  },
+  compatibilityDate: '2024-11-27',
 
   ssr: false,
 
   modules: [
     '@nuxt/ui',
+    '@nuxt/eslint',
+    '@nuxt/icon',
+    '@nuxt/image',
+    '@nuxt/scripts',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    '@nuxt/image',
     'nuxt-api-party',
     '@nuxtjs/turnstile',
   ],
 
+  css: ['~/assets/css/main.css'],
   ui: {
     global: true,
   },
-
-  css: [
-    '~/assets/css/main.scss'
-  ],
 
   piniaPluginPersistedstate: {
     storage: 'localStorage',

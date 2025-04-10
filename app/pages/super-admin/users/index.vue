@@ -1,8 +1,5 @@
 <script lang="ts" setup>
-import type {FormError} from "#ui/types";
-import type {NuxtError} from "#app";
-import {usePaginationValues} from "~/composables/api/list";
-import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
+import type {TableRow} from "#ui/types";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {type User, UserRole} from "~/types/api/item/user";
@@ -16,8 +13,6 @@ useHead({
   title: 'Clubs'
 })
 
-const toast = useToast()
-const modal = useModal()
 const apiQuery = new UserQuery();
 
 const selfStore = useSelfUserStore()
@@ -50,19 +45,20 @@ const sort = ref({
 });
 const columns = [
   {
-    key: 'accountActivated',
-    label: 'Activé',
+    accessorKey: 'accountActivated',
+    header: 'Activé',
   },
   {
-    key: 'fullName',
-    label: 'Nom',
+    accessorKey: 'fullName',
+    header: 'Nom',
   },
   {
-    key: 'email',
-    label: 'Email',
+    accessorKey: 'email',
+    header: 'Email',
   },
   {
-    key: 'actions',
+    accessorKey: 'actions',
+    header: ''
   }
 ]
 
@@ -93,8 +89,8 @@ async function getItemsPaginated() {
   isLoading.value = false
 }
 
-function rowClicked(row: User) {
-  selectedItem.value = {...row} // We make a shallow clone
+function rowClicked(row: TableRow<User>) {
+  selectedItem.value = {...row.original} // We make a shallow clone
   isSideVisible.value = true
 }
 
@@ -150,37 +146,39 @@ async function impersonate(user: User) {
             :sort="sort"
             sort-mode="manual"
             :columns="columns"
-            :rows="apiItems"
+            :data="apiItems"
             @select="rowClicked">
-            <template #empty-state>
+            <template #empty>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucun utilisateurs.</span>
               </div>
             </template>
 
-            <template #accountActivated-data="{ row }">
-              <UToggle :model-value="row.accountActivated" />
+            <template #accountActivated-cell="{ row }">
+              <USwitch class="pointer-events-none" :model-value="row.original.accountActivated" />
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
               <div class="text-right">
-                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.uuid)}`">Détails</UButton>
+                <UButton variant="soft" :to="`/super-admin/users/${convertUuidToUrlUuid(row.original.uuid)}`">Détails</UButton>
               </div>
             </template>
 
           </UTable>
 
-          <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()"/>
-            <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="apiTotalItems"/>
-          </div>
+          <GenericTablePagination
+            v-model:page="page"
+            v-model:items-per-page="itemsPerPage"
+            :total-items="apiTotalItems"
+            @paginate="(object: TablePaginateInterface) => { getItemsPaginated() }"
+          />
         </div>
       </UCard>
     </template>
 
     <template #side>
       <div v-if="selectedItem" class="flex flex-col gap-4">
-        <UButton v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin" color="yellow" block :loading="isLoading" @click="impersonate(selectedItem)">
+        <UButton v-if="selectedItem.uuid && selectedItem.role !== UserRole.SuperAdmin" color="warning" block :loading="isLoading" @click="impersonate(selectedItem)">
           Impersonifier
         </UButton>
 

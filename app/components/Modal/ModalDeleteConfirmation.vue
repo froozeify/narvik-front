@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type {AlertColor} from "#ui/types";
 import type {PropType} from "vue";
-import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
+import type {VariantProps} from "tailwind-variants";
 
 const props = defineProps(
   {
@@ -23,18 +22,21 @@ const props = defineProps(
       default: undefined
     },
     alertColor: {
-      type: String as PropType<AlertColor>,
+      type: String,
       default: undefined
-    }
+    },
   }
 )
 
-const emit = defineEmits(['delete'])
+// 2 ways binding
+const isDeleting = defineModel<boolean>("is-deleting", { default: false, required: false })
+
+const emit = defineEmits<{ delete: [boolean], close: [boolean] }>()
 
 </script>
 
 <template>
-  <ModalWithActions :title="props.title">
+  <ModalWithActions :title="props.title" @close="(state: boolean) => emit('close', state)">
 
     <slot>
       <div>
@@ -53,8 +55,9 @@ const emit = defineEmits(['delete'])
 
     <template #actions>
       <UButton
-        @click="emit('delete')"
-        color="red"
+        :loading="isDeleting"
+        @click="isDeleting = true; emit('delete', true)"
+        color="error"
       >
         Supprimer
       </UButton>
@@ -62,6 +65,6 @@ const emit = defineEmits(['delete'])
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

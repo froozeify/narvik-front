@@ -1,12 +1,14 @@
 <script setup lang="ts">
-  import {usePaginationValues} from "~/composables/api/list";
   import InventoryItemQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryItemQuery";
   import type {InventoryItem} from "~/types/api/item/clubDependent/plugin/sale/inventoryItem";
   import InventoryCategoryQuery from "~/composables/api/query/clubDependent/plugin/sale/InventoryCategoryQuery";
   import type {InventoryCategory} from "~/types/api/item/clubDependent/plugin/sale/inventoryCategory";
   import {createBrowserCsvDownload, verifyCameraIsPresent} from "~/utils/browser";
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
-  import {formatDateInput} from "~/utils/date";
+  import type {ColumnSort} from "@tanstack/table-core";
+  import {getTableSortVal} from "~/utils/table";
+  import type {TablePaginateInterface} from "~/types/table";
+  import type {SelectApiItem} from "~/types/select";
 
   definePageMeta({
     layout: "pos"
@@ -25,7 +27,18 @@
 
   const searchQuery: Ref<string> = ref('')
   const categories: Ref<InventoryCategory[]> = ref([])
-  const filteredCategories: Ref<InventoryCategory[]> = ref([])
+  const categoriesSelect = computed( () => {
+    const items: SelectApiItem<InventoryCategory>[] = []
+    categories.value.forEach(value => {
+      items.push({
+        label: value.name,
+        value: value.uuid,
+        item: value
+      })
+    })
+    return items;
+  })
+  const filteredCategories: Ref<SelectApiItem<InventoryCategory>[]> = ref([])
   itemCategoryQuery.getAll().then(value => {
     categories.value = value.items
 
@@ -33,7 +46,11 @@
     if (queryParams.category !== undefined) {
       const matchedCategory = value.items.find( (category) => category.uuid == decodeUrlUuid(queryParams.category?.toString()))
       if (matchedCategory) {
-        filteredCategories.value.push(matchedCategory)
+        filteredCategories.value.push({
+          label: matchedCategory.name,
+          value: matchedCategory.uuid,
+          item: matchedCategory
+        } as SelectApiItem<InventoryCategory>)
         useRouter().replace(useRouter().currentRoute.value.path) // We remove the param from the url
         getItemsPaginated()
       }
@@ -62,34 +79,41 @@
   // Table settings
   const page = ref(1);
   const itemsPerPage = ref(30);
-  const sort = ref({
-    column: 'quantity',
-    direction: 'asc'
-  });
+  const sort = ref([{
+    id: 'quantity',
+    desc: false,
+
+  }] as ColumnSort[]);
   const columns = [
     {
-      key: 'quantity',
-      label: 'Quantité en stock',
-      sortable: true,
+      accessorKey: 'quantity',
+      header: 'Quantité en stock',
     },
     {
-      key: 'name',
-      label: 'Nom',
-      sortable: true,
+      accessorKey: 'name',
+      header: 'Nom',
     },
     {
-      key: 'description',
-      label: 'Description',
-      class: 'w-full'
+      accessorKey: 'description',
+      header: 'Description',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      }
     },
     {
-      key: 'category',
-      label: 'Catégorie'
+      accessorKey: 'category',
+      header: 'Catégorie'
+    },
+    {
+      accessorKey: 'actions',
+      header: ''
     }
   ]
 
-  function rowClicked(row: InventoryItem) {
-    selectedItem.value = {...row} // We make a shallow clone
+  function rowClicked(item: InventoryItem) {
+    selectedItem.value = {...item} // We make a shallow clone
     isSideVisible.value = true
   }
 
@@ -105,21 +129,25 @@
 
     if (filteredCategories.value.length > 0) {
       filteredCategories.value.forEach(filteredCategory => {
-        if (!filteredCategory.uuid) return;
-        urlParams.append('category.uuid[]', filteredCategory.uuid)
+        if (!filteredCategory.item.uuid) return;
+        urlParams.append('category.uuid[]', filteredCategory.item.uuid)
       })
     }
 
     // When filter by name the category is applied before
-    if (sort.value.column === 'name') {
-      urlParams.append(`order[category.weight]`, 'asc');
-    }
+    if (sort.value.length > 0) {
+      sort.value.forEach((value) => {
+        if (value.id === 'name') {
+          urlParams.append(`order[category.weight]`, 'asc')
+        }
 
-    urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
+        urlParams.append(`order[${value.id}]`, getTableSortVal(value))
 
-    // For remaining items we sort first by this then by category
-    if (sort.value.column === 'quantity') {
-      urlParams.append(`order[category.weight]`, 'asc');
+        // For remaining items we sort first by this then by category
+        if (value.id === 'quantity') {
+          urlParams.append(`order[category.weight]`, 'asc')
+        }
+      })
     }
 
 
@@ -136,7 +164,7 @@
     isLoading.value = false
 
     if (totalApiItems.value === 1) {
-      rowClicked(apiItems.value.at(0) as InventoryItem)
+      rowClicked(items.at(0) as InventoryItem)
     }
 
   }
@@ -186,7 +214,7 @@
       <UCard>
         <div class="flex mb-2">
           <div class="flex-1"></div>
-          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv">
+          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv">
             CSV
           </UButton>
         </div>
@@ -196,28 +224,30 @@
             @decoded="onDecoded"
           />
 
-          <UInput
-            v-model="searchQuery"
-            @update:model-value="searchQueryUpdated()"
-            placeholder="Rechercher..."
-            :ui="{ icon: { trailing: { pointer: '' } } }"
-          >
-            <template #trailing v-if="cameraIsPresent || searchQuery">
-              <UIcon
-                v-if="cameraIsPresent"
-                class="cursor-pointer"
-                name="i-heroicons-qr-code"
-                @click="cameraPreview = true"
-              />
+          <div>
+            <UInput
+              v-model="searchQuery"
+              @update:model-value="searchQueryUpdated()"
+              placeholder="Rechercher..."
+            >
+              <template #trailing v-if="cameraIsPresent || searchQuery">
+                <UIcon
+                  v-if="cameraIsPresent"
+                  class="cursor-pointer"
+                  name="i-heroicons-qr-code"
+                  @click="cameraPreview = true"
+                />
 
-              <UIcon
-                v-if="searchQuery"
-                class="cursor-pointer"
-                name="i-heroicons-x-mark"
-                @click="searchQuery = ''; getItemsPaginated()"
-              />
-            </template>
-          </UInput>
+                <UIcon
+                  v-if="searchQuery"
+                  class="cursor-pointer"
+                  name="i-heroicons-x-mark"
+                  @click="searchQuery = ''; getItemsPaginated()"
+                />
+              </template>
+            </UInput>
+          </div>
+
 
           <div class="flex-1"></div>
 
@@ -225,13 +255,12 @@
             <USelectMenu
               class="w-44"
               v-model="filteredCategories"
-              :options="categories"
-              option-attribute="name"
+              :items="categoriesSelect"
               multiple
             >
-              <template #label>
+              <template #default>
               <span v-if="filteredCategories.length" class="truncate">
-                {{ filteredCategories.map(fa => fa.name).join(', ') }}
+                {{ filteredCategories.map(fa => fa.label).join(', ') }}
               </span>
                 <span v-else>Catégories</span>
               </template>
@@ -246,48 +275,65 @@
         <UTable
           class="w-full"
           :loading="isLoading"
-          v-model:sort="sort"
-          sort-mode="manual"
-          @update:sort="getItemsPaginated()"
+          v-model:sorting="sort"
+          :sorting-options="{
+            manualSorting: true,
+            enableMultiSort: false,
+          }"
+          @update:sorting="getItemsPaginated()"
           :columns="columns"
-          :rows="apiItems"
-          @select="rowClicked">
-          <template #empty-state>
+          :data="apiItems"
+          @select="(row) => rowClicked(row.original)">
+          <template #empty>
             <div class="flex flex-col items-center justify-center py-6 gap-3">
               <span class="italic text-sm">Aucun articles.</span>
             </div>
           </template>
 
-          <template #name-data="{ row }">
-            {{ row.name }}
+          <template #name-header="{ column }">
+            <GenericTableSortButton :column="column" />
+          </template>
+          <template #name-cell="{ row }">
+            <UBadge v-if="!row.original.canBeSold" color="error" class="mr-2">Désactivé</UBadge>
+            {{ row.original.name }}
           </template>
 
-          <template #quantity-data="{ row }">
-            <p v-if="row.quantity || row.quantity === 0" :class="row.quantityAlert && row.quantity <= row.quantityAlert ? 'font-bold text-red-600' : ''">
-              {{ row.quantity }}
+          <template #quantity-header="{ column }">
+            <GenericTableSortButton :column="column" />
+          </template>
+          <template #quantity-cell="{ row }">
+            <p v-if="row.original.quantity || row.original.quantity === 0" :class="row.original.quantityAlert && row.original.quantity <= row.original.quantityAlert ? 'font-bold text-error-600' : ''">
+              {{ row.original.quantity }}
             </p>
             <i v-else>Non définie</i>
           </template>
 
-          <template #category-data="{ row }">
-            <UButton v-if="row.category"
+          <template #category-cell="{ row }">
+            <UButton v-if="row.original.category"
               variant="soft"
-              :ui="{ rounded: 'rounded-full' }">
-              {{ row.category.name }}
+            >
+              {{ row.original.category.name }}
             </UButton>
 
             <i v-else>
               Pas de catégorie.
             </i>
+          </template>
 
+          <template #actions-cell="{ row }">
+            <div class="text-right">
+              <UButton @click="rowClicked(row.original)">Détails</UButton>
+            </div>
           </template>
 
         </UTable>
 
-        <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-          <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()" />
-          <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="totalApiItems" />
-        </div>
+        <GenericTablePagination
+          v-model:page="page"
+          v-model:items-per-page="itemsPerPage"
+          :total-items="totalApiItems"
+          @paginate="(object: TablePaginateInterface) => { getItemsPaginated() }"
+        />
 
       </UCard>
     </template>
@@ -311,18 +357,20 @@
   </GenericLayoutContentWithSlideover>
 
   <UModal
-    v-model="inventoryItemModalOpen">
-    <UCard>
-      <InventoryItemForm
-        :item="selectedItem ? {...selectedItem} : undefined"
-        :categories="categories"
-        @updated="onItemUpdated"
-      />
-    </UCard>
+    v-model:open="inventoryItemModalOpen">
+    <template #content>
+      <UCard>
+        <InventoryItemForm
+          :item="selectedItem ? {...selectedItem} : undefined"
+          :categories="categories"
+          @updated="onItemUpdated"
+        />
+      </UCard>
+    </template>
   </UModal>
 
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

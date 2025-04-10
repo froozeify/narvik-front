@@ -7,6 +7,7 @@ import {useSelfUserStore} from "~/stores/useSelfUser";
 import ModalLegalsAcceptance from "~/components/Modal/ModalLegalsAcceptance.vue";
 
 const toast = useToast()
+const overlay = useOverlay()
 const isLoading = ref(false)
 
 const state = reactive({
@@ -22,8 +23,8 @@ const notificationsModule = appConfigStore.getModuleConfig('notifications')
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
-  if (!state.password) errors.push({ path: 'password', message: 'Champ requis' })
+  if (!state.email) errors.push({ name: 'email', message: 'Champ requis' })
+  if (!state.password) errors.push({ name: 'password', message: 'Champ requis' })
   return errors
 }
 
@@ -33,7 +34,7 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
   const { error } = await useLoginUser(event.data.email, event.data.password);
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: error.statusCode === 400 ? "Erreur de connexion" : "Trop de tentative",
       description: error.statusCode === 400 ? 'Mauvais email/mot de passe' : 'Veuillez réessayer dans 5 minutes.'
     })
@@ -43,15 +44,13 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
   }
 
   if (!selfStore.isLegalsAccepted()) {
-    useModal().open(ModalLegalsAcceptance, {
-      preventClose: true,
+    const modal = overlay.create(ModalLegalsAcceptance)
+    await modal.open({
       onAccepted() {
         redirectSuccessLogin()
-      },
-      onCancel() {
-        isLoading.value = false
       }
     })
+    isLoading.value = false
   } else {
     redirectSuccessLogin()
   }
@@ -73,13 +72,13 @@ function redirectSuccessLogin() {
 
     <UCard>
       <UForm :state="state" class="space-y-4" :validate="validate" @submit="onSubmit">
-        <UFormGroup label="Email" name="email">
+        <UFormField label="Email" name="email">
           <UInput v-model="state.email" type="email" />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Mot de passe" name="password">
+        <UFormField label="Mot de passe" name="password">
           <UInput v-model="state.password" type="password" />
-        </UFormGroup>
+        </UFormField>
 
         <div class="flex justify-end !-mt-0 ">
           <UButton class="text-xs" v-if="notificationsModule && notificationsModule['enabled']" variant="link" @click="navigateTo('login/password-reset')">
@@ -92,7 +91,7 @@ function redirectSuccessLogin() {
             Connexion
           </UButton>
 
-          <UDivider label="Ou" />
+          <USeparator label="Ou" />
 
           <UButton block :disabled="isLoading" variant="soft" to="login/register">
             S'enregistrer
@@ -103,6 +102,6 @@ function redirectSuccessLogin() {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>

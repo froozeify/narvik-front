@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type {FormError} from "#ui/types";
+import type {FormError, TableRow} from "#ui/types";
 import type {Club} from "~/types/api/item/club";
 import type {NuxtError} from "#app";
 import {usePaginationValues} from "~/composables/api/list";
@@ -8,146 +8,153 @@ import AgeCategoryQuery from "~/composables/api/query/AgeCategoryQuery";
 import type {AgeCategory} from "~/types/api/item/ageCategory";
 
 definePageMeta({
-    layout: "super-admin"
+  layout: "super-admin"
+});
+
+useHead({
+  title: 'Catégories d\'âge'
+})
+
+const toast = useToast()
+const overlay = useOverlay()
+const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
+const apiQuery = new AgeCategoryQuery();
+
+
+const apiItems: Ref<AgeCategory[]> = ref([])
+const isLoading = ref(true);
+const apiTotalItems = ref(0)
+const selectedItem: Ref<AgeCategory | undefined> = ref(undefined)
+
+
+// Side menu visible
+const isSideVisible = ref(false);
+
+// Table settings
+const page = ref(1);
+const itemsPerPage = ref(30);
+const columns = [
+  {
+    accessorKey: 'name',
+    header: 'Nom',
+  },
+  {
+    accessorKey: 'code',
+    header: 'code',
+    meta: {
+      class: {
+        th: 'w-full',
+      }
+    }
+  },
+  {
+    accessorKey: 'actions',
+    header: ''
+  }
+]
+
+// We get the data from the api on first page load
+getItemsPaginated()
+
+async function getItemsPaginated() {
+  isLoading.value = true
+
+  const urlParams = new URLSearchParams({
+    page: page.value.toString(),
+    itemsPerPage: itemsPerPage.value.toString(),
   });
 
-  useHead({
-    title: 'Catégories d\'âge'
-  })
-
-  const toast = useToast()
-  const modal = useModal()
-  const apiQuery = new AgeCategoryQuery();
-
-
-  const apiItems: Ref<AgeCategory[]> = ref([])
-  const isLoading = ref(true);
-  const apiTotalItems = ref(0)
-  const selectedItem: Ref<AgeCategory | undefined> = ref(undefined)
-
-
-  // Side menu visible
-  const isSideVisible = ref(false);
-
-  // Table settings
-  const page = ref(1);
-  const itemsPerPage = ref(30);
-  const columns = [
-    {
-      key: 'name',
-      label: 'Nom',
-    },
-    {
-      key: 'code',
-      label: 'code',
-      class: 'w-full'
-    },
-    {
-      key: 'actions',
-    }
-  ]
-
-  // We get the data from the api on first page load
-  getItemsPaginated()
-
-  async function getItemsPaginated() {
-    isLoading.value = true
-
-    const urlParams = new URLSearchParams({
-      page: page.value.toString(),
-      itemsPerPage: itemsPerPage.value.toString(),
-    });
-
-    const { totalItems, items } = await apiQuery.getAll(urlParams)
-    apiItems.value = items
-    if (totalItems) {
-      apiTotalItems.value = totalItems
-    }
-
-    isLoading.value = false
+  const { totalItems, items } = await apiQuery.getAll(urlParams)
+  apiItems.value = items
+  if (totalItems) {
+    apiTotalItems.value = totalItems
   }
 
-  function rowClicked(row: Club) {
-    selectedItem.value = {...row} // We make a shallow clone
-    isSideVisible.value = true
+  isLoading.value = false
+}
+
+function rowClicked(row: TableRow<Club>) {
+  selectedItem.value = {...row.original} // We make a shallow clone
+  isSideVisible.value = true
+}
+
+async function createItem() {
+  let item: AgeCategory = {
+    name: '',
+    code: ''
+  }
+  selectedItem.value = item
+  isSideVisible.value = true
+}
+
+async function updateItem(item: AgeCategory) {
+  isLoading.value = true
+
+  // We recreate the payload so we don't edit unwanted fields
+  let payload: AgeCategory = {
+    name: item.name,
+    code: item.code
   }
 
-  async function createItem() {
-    let item: AgeCategory = {
-      name: '',
-      code: ''
-    }
-    selectedItem.value = item
-    isSideVisible.value = true
+  // We verify if it's a creation or an update
+  let apiError: NuxtError | undefined = undefined
+  if (!item.id) {
+    const {error, created} = await apiQuery.post(payload);
+    apiError = error
+    selectedItem.value = created
+  } else { // Update
+    const {error, updated} = await apiQuery.patch(item, payload);
+    apiError = error
+    selectedItem.value = updated
   }
 
-  async function updateItem(item: AgeCategory) {
-    isLoading.value = true
+  isLoading.value = false
+  isSideVisible.value = false
 
-    // We recreate the payload so we don't edit unwanted fields
-    let payload: AgeCategory = {
-      name: item.name,
-      code: item.code
-    }
-
-    // We verify if it's a creation or an update
-    let apiError: NuxtError | undefined = undefined
-    if (!item.id) {
-      const {error, created} = await apiQuery.post(payload);
-      apiError = error
-      selectedItem.value = created
-    } else { // Update
-      const {error, updated} = await apiQuery.patch(item, payload);
-      apiError = error
-      selectedItem.value = updated
-    }
-
-    isLoading.value = false
-    isSideVisible.value = false
-
-    if (apiError) {
-      toast.add({
-        color: "red",
-        title: !item.id ? "La création a échouée" : "La modification a échouée",
-        description: apiError.message
-      });
-      return;
-    }
-
+  if (apiError) {
     toast.add({
-      color: "green",
-      title: !item.id ? "Catégorie créée" : "Catégorie modifiée",
+      color: "error",
+      title: !item.id ? "La création a échouée" : "La modification a échouée",
+      description: apiError.message
     });
-
-    // We refresh the list
-    await getItemsPaginated();
+    return;
   }
 
-  async function deleteItem() {
-    isLoading.value = true
-    const { error } = await apiQuery.delete(selectedItem.value)
-    isLoading.value = false
+  toast.add({
+    color: "success",
+    title: !item.id ? "Catégorie créée" : "Catégorie modifiée",
+  });
 
-    if (error) {
-      toast.add({
-        color: "red",
-        title: "La suppression a échouée",
-        description: error.message
-      });
-      return;
-    }
+  // We refresh the list
+  await getItemsPaginated();
+}
 
-    selectedItem.value = undefined
-    // We refresh the list
-    await getItemsPaginated();
+async function deleteItem() {
+  isLoading.value = true
+  const { error } = await apiQuery.delete(selectedItem.value)
+  isLoading.value = false
+
+  if (error) {
+    toast.add({
+      color: "error",
+      title: "La suppression a échouée",
+      description: error.message
+    });
+    return;
   }
 
-  const validate = (state: any): FormError[] => {
-    const errors = []
-    if (!state.name) errors.push({ path: 'name', message: 'Champ requis' })
-    if (!state.code) errors.push({ path: 'code', message: 'Champ requis' })
-    return errors
-  }
+  selectedItem.value = undefined
+  // We refresh the list
+  await getItemsPaginated();
+}
+
+const validate = (state: any): FormError[] => {
+  const errors = []
+  if (!state.name) errors.push({ name: 'name', message: 'Champ requis' })
+  if (!state.code) errors.push({ name: 'code', message: 'Champ requis' })
+  return errors
+}
 </script>
 
 <template>
@@ -166,24 +173,26 @@ definePageMeta({
             class="w-full"
             :loading="isLoading"
             :columns="columns"
-            :rows="apiItems"
+            :data="apiItems"
             @select="rowClicked">
-            <template #empty-state>
+            <template #empty>
               <div class="flex flex-col items-center justify-center py-6 gap-3">
                 <span class="italic text-sm">Aucune catégories.</span>
               </div>
             </template>
 
-            <template #actions-data="{ row }">
+            <template #actions-cell="{ row }">
 
             </template>
 
           </UTable>
 
-          <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-            <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getItemsPaginated()" />
-            <UPagination v-model="page" @update:model-value="getItemsPaginated()" :page-count="parseInt(itemsPerPage.toString())" :total="apiTotalItems" />
-          </div>
+          <GenericTablePagination
+            v-model:page="page"
+            v-model:items-per-page="itemsPerPage"
+            :total-items="apiTotalItems"
+            @paginate="(object: TablePaginateInterface) => { getItemsPaginated() }"
+          />
         </div>
       </UCard>
     </template>
@@ -193,12 +202,12 @@ definePageMeta({
         <UForm :state="selectedItem" @submit="updateItem(selectedItem)" :validate="validate" class="flex flex-col gap-4">
           <UCard>
             <div class="flex gap-2 flex-col relative">
-              <UFormGroup label="Nom" name="name" required>
+              <UFormField label="Nom" name="name" required>
                 <UInput v-model="selectedItem.name" />
-              </UFormGroup>
-              <UFormGroup label="Code" name="code" required>
+              </UFormField>
+              <UFormField label="Code" name="code" required>
                 <UInput v-model="selectedItem.code" />
-              </UFormGroup>
+              </UFormField>
             </div>
 
           </UCard>
@@ -208,14 +217,16 @@ definePageMeta({
           <UButton
             v-if="selectedItem.id"
             block
-            color="red"
+            color="error"
             :loading="isLoading"
-            @click="modal.open(ModalDeleteConfirmation, {
-              onDelete() {
-                modal.close()
-                deleteItem()
-              }
-            })"
+            @click="
+              overlayDeleteConfirmation.open({
+                async onDelete() {
+                  await deleteItem()
+                  overlayDeleteConfirmation.close(true)
+                }
+              })
+            "
           >
             Supprimer
           </UButton>

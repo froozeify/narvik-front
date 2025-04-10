@@ -44,6 +44,8 @@ const imageQuery = new ImageQuery()
 const memberQuery = new MemberQuery()
 const memberPresenceQuery = new MemberPresenceQuery()
 
+const popoverOpen = ref(false)
+
 const memberPresence: Ref<MemberPresence> = ref(props.item)
 const member: Ref<Member | undefined> = ref(undefined)
 
@@ -130,10 +132,10 @@ function presenceUpdated(newMemberPresence: MemberPresence) {
   emit('updated', newMemberPresence)
 }
 
-async function deletePresence(close: Function) {
+async function deletePresence() {
   if (isSupervisor || isBadger) {
     await memberPresenceQuery.delete(memberPresence.value)
-    close()
+    popoverOpen.value = false
     emit('updated', null)
   }
 }
@@ -142,8 +144,7 @@ async function copyLicence() {
   if (selfStore.hasSupervisorRole() && props.item.member?.licence) {
     clipboard.write(props.item.member.licence)
     toast.add({
-      title: 'Licence copiée',
-      color: "green"
+      title: 'Licence copiée'
     })
   }
 }
@@ -153,13 +154,13 @@ async function copyLicence() {
 <template>
   <div>
     <template v-if="member">
-      <UCard>
+      <UCard class="bg-(--ui-bg)">
         <div class="flex gap-2 mb-2">
           <UButton
             @click="emit('close')"
             icon="i-heroicons-x-circle"
-            color="white"
-            variant="ghost"
+            color="neutral"
+            variant="outline"
             size="xs"
           />
 
@@ -174,21 +175,21 @@ async function copyLicence() {
               label="Editer la présence"
             />
             <UTooltip v-if="!member.blacklisted || (isSupervisor)" text="Supprimer la présence">
-              <UPopover>
+              <UPopover v-model:open="popoverOpen">
                 <UButton
                   icon="i-heroicons-trash"
                   size="xs"
-                  color="red"
+                  color="error"
                   variant="ghost"
                 />
 
-                <template #panel="{ close }">
+                <template #content>
                   <div class="p-4 w-56 flex flex-col gap-4">
                     <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
 
                     <UButton
-                      @click="deletePresence(close);"
-                      color="red"
+                      @click="deletePresence();"
+                      color="error"
                       class="mx-auto"
                     >
                       Supprimer
@@ -214,7 +215,7 @@ async function copyLicence() {
 
         <div class="space-y-4 w-full my-4">
           <div class="text-center text-2xl font-bold">
-            <ContentLink v-if="isSupervisor" class="!text-black" :to="`/admin/members/${convertUuidToUrlUuid(member.uuid)}`">
+            <ContentLink v-if="isSupervisor" class="!text-(--ui-text)" :to="`/admin/members/${convertUuidToUrlUuid(member.uuid)}`">
               {{ member.fullName }}
             </ContentLink>
 
@@ -226,38 +227,33 @@ async function copyLicence() {
             <UBadge
                 v-if="member.currentSeason && member.currentSeason.ageCategory"
                 variant="subtle"
-                color="amber"
-                :ui="{ rounded: 'rounded-full' }">
+                color="warning">
               {{ member.currentSeason.ageCategory.name }}
             </UBadge>
 
             <div v-if="member.blacklisted" class="basis-full text-center">
               <UButton
-                color="black"
-                :ui="{ rounded: 'rounded-full' }">
+                color="neutral">
                 Blacklisté
               </UButton>
             </div>
 
             <div v-if="member.medicalCertificateExpiration && member.medicalCertificateStatus !== 'valid'" class="basis-full text-center">
               <UButton
-                :color="member.medicalCertificateStatus === 'expired' ? 'red' : 'yellow'"
-                :ui="{ rounded: 'rounded-full' }">
+                :color="member.medicalCertificateStatus === 'expired' ? 'error' : 'yellow'">
                 Certificat médical : {{ formatDateReadable(member.medicalCertificateExpiration.toString()) }}
               </UButton>
             </div>
 
             <UButton
               v-if="!member.currentSeason"
-              color="red"
-              :ui="{ rounded: 'rounded-full' }">
+              color="error">
               Saison non renouvelée
             </UButton>
 
             <UBadge v-if="member.currentSeason && member.currentSeason.isSecondaryClub"
                     variant="subtle"
-                    color="green"
-                    :ui="{ rounded: 'rounded-full' }">
+                    color="success">
               Club secondaire
             </UBadge>
           </div>
@@ -271,9 +267,7 @@ async function copyLicence() {
           <div class="flex gap-4 justify-center flex-wrap">
             <UButton
                 v-for="activity in memberPresence?.activities?.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))"
-                variant="soft"
-                :ui="{ rounded: 'rounded-full' }"
-            >
+                variant="soft">
               {{ activity.name }}
             </UButton>
           </div>
@@ -292,7 +286,7 @@ async function copyLicence() {
 
       <UCard
           v-if="totalMemberPresences > 0"
-          class="mt-4"
+          class="mt-4 bg-(--ui-bg)"
       >
         <div class="text-xl text-center font-bold mb-4">{{ totalMemberPresences }} présences ces 12 derniers mois</div>
 
@@ -318,7 +312,7 @@ async function copyLicence() {
       </div>
 
       <div class="mx-auto my-0 h-24 w-24 aspect-square">
-        <USkeleton class="w-full h-full" :ui="{ rounded: 'rounded-full' }"/>
+        <USkeleton class="w-full h-full" />
       </div>
 
       <div class="space-y-4 w-full mt-4">
@@ -333,17 +327,19 @@ async function copyLicence() {
     </UCard>
 
     <UModal
-        v-model="updateMemberPresenceModalOpen">
-      <RegisterMemberPresence
-          :member-presence="memberPresence"
-          @registered="presenceUpdated"
-          @canceled="updateMemberPresenceModalOpen = false"
-      />
+        v-model:open="updateMemberPresenceModalOpen">
+      <template #content>
+        <RegisterMemberPresence
+            :member-presence="memberPresence"
+            @registered="presenceUpdated"
+            @canceled="updateMemberPresenceModalOpen = false"
+        />
+      </template>
     </UModal>
   </div>
 
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

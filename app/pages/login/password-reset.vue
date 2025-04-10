@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {FormError} from '#ui/types'
+import type {FormError, TabsItem} from '#ui/types'
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {isMobile, isTablet, watchBreakpoint} from "~/utils/browser";
@@ -29,22 +29,22 @@ watchEffect(() => {
   isHorizontal.value = !isMobileDisplay.value
 })
 
-const selected = ref(0)
-const items = [{
-  key: 'initial',
+const selected = ref('0')
+const items = ref<TabsItem[]>([{
+  slot: 'initial' as const,
   label: 'Demande de réinitialisation',
   icon: 'i-heroicons-lock-closed',
 }, {
-  key: 'reset',
+  slot: 'reset' as const,
   label: 'Vérification et modification',
   icon: 'i-heroicons-envelope-open',
-}]
+}])
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.email) errors.push({ path: 'email', message: 'Champ requis' })
-  if (!state.password || state.password.length < 8) errors.push({ path: 'password', message: 'Champ requis (8 caractères minimum)' })
-  if (!state.securityCode) errors.push({ path: 'securityCode', message: 'Champ requis' })
+  if (!state.email) errors.push({ name: 'email', message: 'Champ requis' })
+  if (!state.password || state.password.length < 8) errors.push({ name: 'password', message: 'Champ requis (8 caractères minimum)' })
+  if (!state.securityCode) errors.push({ name: 'securityCode', message: 'Champ requis' })
   return errors
 }
 
@@ -59,14 +59,14 @@ async function resetPassword() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "Impossible d'effectuer la modification du mot de passe. Le mot de passe ou le code est incorrect.",
     });
     return;
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Le mot de passe a été modifié avec succès",
   });
 
@@ -90,7 +90,7 @@ async function initiatePasswordReset() {
 
   if (error) {
     toast.add({
-      color: "red",
+      color: "error",
       title: "Impossible d'effectuer la demande de réinitialisation.",
       description: "Compte non trouvé ou bloqué. Veuillez réessayer dans 24h."
     });
@@ -98,11 +98,11 @@ async function initiatePasswordReset() {
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Un code vérification à été envoyé par email",
   });
 
-  selected.value = 1
+  selected.value = '1'
 }
 
 onMounted(() => {
@@ -121,61 +121,60 @@ onBeforeUnmount(() => {
       <NuxtImg :src="siteLogo" class="h-full" />
     </div>
 
-    <div>
-      <UButton size="2xs" variant="link" to="/login" label="Se connecter" icon="i-heroicons-arrow-uturn-left" />
+    <div class="mb-2">
+      <UButton size="xs" variant="link" to="/login" label="Se connecter" icon="i-heroicons-arrow-uturn-left" />
     </div>
 
     <UCard>
 
-      <UTabs v-model="selected" :items="items" :orientation="isHorizontal ? 'horizontal' : 'vertical'">
-        <template #item="{ item }">
-          <div v-if="item.key === 'initial'">
-            <UForm :state="state" class="space-y-4" @submit="initiatePasswordReset">
-              <UFormGroup label="Email" name="email">
-                <UInput v-model="state.email" type="email" />
-              </UFormGroup>
+      <UTabs v-model="selected" :items="items">
+        <template #initial>
+          <UForm :state="state" class="space-y-4" @submit="initiatePasswordReset">
+            <UFormField label="Email" name="email">
+              <UInput v-model="state.email" type="email" />
+            </UFormField>
 
-              <NuxtTurnstile v-if="requireTurnstile" v-model="state.turnstileToken" />
+            <NuxtTurnstile v-if="requireTurnstile" v-model="state.turnstileToken" />
 
+            <UButton type="submit" :loading="isLoading">
+              Valider
+            </UButton>
+          </UForm>
+        </template>
+
+        <template #reset>
+          <UAlert
+            icon="i-heroicons-megaphone"
+            color="warning"
+            variant="soft"
+            title="En cas d'erreur un nouveau code de sécurité sera envoyé."
+            description="Seul le dernier code de sécurité reçu est valide."
+          />
+          <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="resetPassword">
+            <UFormField label="Email" name="email">
+              <UInput v-model.trim="state.email" type="email" />
+            </UFormField>
+
+            <UFormField label="Nouveau mot de passe" name="password">
+              <UInput v-model="state.password" type="password" />
+            </UFormField>
+
+            <UFormField label="Code de sécurité" name="securityCode">
+              <UInput v-model.trim="state.securityCode" />
+            </UFormField>
+
+            <div class="flex justify-between">
               <UButton type="submit" :loading="isLoading">
-                Valider
+                Modifier
               </UButton>
-            </UForm>
-          </div>
-          <div v-else>
-            <UAlert
-              icon="i-heroicons-megaphone"
-              color="yellow"
-              variant="soft"
-              title="En cas d'erreur un nouveau code de sécurité sera envoyé."
-              description="Seul le dernier code de sécurité reçu est valide."
-            />
-            <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="resetPassword">
-              <UFormGroup label="Email" name="email">
-                <UInput v-model.trim="state.email" type="email" />
-              </UFormGroup>
-
-              <UFormGroup label="Nouveau mot de passe" name="password">
-                <UInput v-model="state.password" type="password" />
-              </UFormGroup>
-
-              <UFormGroup label="Code de sécurité" name="securityCode">
-                <UInput v-model.trim="state.securityCode" />
-              </UFormGroup>
-
-              <div class="flex justify-between">
-                <UButton type="submit" :loading="isLoading">
-                  Modifier
-                </UButton>
-              </div>
-            </UForm>
-          </div>
+            </div>
+          </UForm>
         </template>
       </UTabs>
     </UCard>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>

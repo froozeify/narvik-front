@@ -9,6 +9,7 @@ import RegisterExternalPresence from "~/components/ExternalPresence/RegisterExte
 import { useExternalPresenceStore } from "~/stores/useExternalPresence";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {useSelfUserStore} from "~/stores/useSelfUser";
+import type {TableRow} from "#ui/types";
 
 const memberPresenceQuery = new MemberPresenceQuery();
 
@@ -76,8 +77,8 @@ async function getPresences(force: boolean = false) {
   }
 }
 
-function rowClicked(row: MemberPresence) {
-  selectedMemberPresence.value = row;
+function rowClicked(row: TableRow<MemberPresence>) {
+  selectedMemberPresence.value = row.original;
   memberPresenceModalOpen.value = true;
 }
 
@@ -177,7 +178,7 @@ onUnmounted(() => {
 
       <span class="flex-1"></span>
 
-      <UButton variant="soft" color="orange" label="Enregistrement utilisateur externe" @click="openAddExternalPresenceModal()"/>
+      <UButton variant="soft" color="warning" label="Enregistrement utilisateur externe" @click="openAddExternalPresenceModal()"/>
       <UButton label="S'enregistrer" @click="openAddPresenceModal()"/>
     </div>
 
@@ -196,8 +197,8 @@ onUnmounted(() => {
           <UTooltip text="Rafraichir">
             <UButton
                 icon="i-heroicons-arrow-path"
-                color="gray"
-                variant="solid"
+                color="neutral"
+                variant="outline"
                 aria-label="Rafraichir"
                 :loading="isRefreshing"
                 @click="getPresences(true)"
@@ -221,47 +222,54 @@ onUnmounted(() => {
 
 
     <UModal
-        v-model="addExternalPresenceModal">
-      <RegisterExternalPresence @registered="externalPresenceRegistered" @canceled="addExternalPresenceModal = false" />
+        v-model:open="addExternalPresenceModal">
+      <template #content>
+        <RegisterExternalPresence @registered="externalPresenceRegistered" @canceled="addExternalPresenceModal = false" />
+      </template>
     </UModal>
 
     <UModal
-        v-model="memberPresenceModalOpen"
+        v-model:open="memberPresenceModalOpen"
         :ui="{
-           background: 'bg-transparent dark:bg-transparent',
-           shadow: 'shadow-none'
+           content: 'bg-transparent dark:bg-transparent shadow-none ring-transparent'
         }"
     >
-      <PresentMemberDetails
-          v-if="selectedMemberPresence"
-          :item="selectedMemberPresence"
-          @updated="memberPresenceUpdated"
-          @close="memberPresenceModalOpen = false; selectedMemberPresence = null"
-      />
-    </UModal>
-
-    <UModal
-        v-model="searchMemberModalOpen">
-      <template v-if="!selectedMember">
-        <SearchMember :query="searchQuery" @selected-member="memberSelectedFromSearch" />
-      </template>
-      <template v-else>
-        <RegisterMemberPresence :member="selectedMember" @registered="presenceRegistered" @canceled="searchMemberModalOpen = false;" />
+      <template #content>
+        <PresentMemberDetails
+            v-if="selectedMemberPresence"
+            :item="selectedMemberPresence"
+            @updated="memberPresenceUpdated"
+            @close="memberPresenceModalOpen = false; selectedMemberPresence = null"
+        />
       </template>
     </UModal>
 
     <UModal
-      v-model="historyModal"
+        v-model:open="searchMemberModalOpen">
+      <template #content>
+        <template v-if="!selectedMember">
+          <SearchMember :query="searchQuery" @selected-member="memberSelectedFromSearch" />
+        </template>
+        <template v-else>
+          <RegisterMemberPresence :member="selectedMember" @registered="presenceRegistered" @canceled="searchMemberModalOpen = false;" />
+        </template>
+      </template>
+    </UModal>
+
+    <UModal
+      v-model:open="historyModal"
       :ui="{
-        width: 'lg:max-w-5xl p-4 mx-4'
+        content: 'lg:max-w-5xl p-4 mx-4'
       }"
     >
-      <PresenceList />
+      <template #content>
+        <PresenceList />
+      </template>
     </UModal>
 
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

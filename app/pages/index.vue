@@ -17,7 +17,6 @@ useHead({
 </template>
 
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>
-

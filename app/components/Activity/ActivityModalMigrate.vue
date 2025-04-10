@@ -2,6 +2,7 @@
 
 import type {PropType} from "vue";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
+import type {SelectApiItem} from "~/types/select";
 
 const props = defineProps(
   {
@@ -16,31 +17,42 @@ const props = defineProps(
   }
 )
 
-const emit = defineEmits(['migrate'])
+const emit = defineEmits(['migrate', 'close'])
 
 const migrationTarget: Ref<string|undefined> = ref(undefined)
+
+const items = computed( () => {
+  const items: SelectApiItem<Activity>[] = []
+  props.activities?.forEach(value => {
+    items.push({
+      label: value.name,
+      value: value.uuid,
+      item: value
+    })
+  })
+  return items;
+})
 
 </script>
 
 <template>
-  <ModalWithActions :title="props.title">
+  <ModalWithActions :title="props.title" @close="(state: boolean) => emit('close', state)">
 
     <UAlert
       class="my-4"
-      color="yellow"
+      color="error"
       variant="soft"
       title="Une fois la migration effectuée, l'activité sera supprimée."
     />
 
-    <UFormGroup class="mb-4" label="Activité cible">
-      <USelect required v-model="migrationTarget" :options="props.activities" option-attribute="name" value-attribute="uuid" />
-    </UFormGroup>
+    <UFormField class="mb-4" label="Activité cible">
+      <USelect required v-model="migrationTarget" :items="items" />
+    </UFormField>
 
     <template #actions>
       <UButton
         :disabled="!migrationTarget"
-        @click="emit('migrate', migrationTarget)"
-        color="orange"
+        @click="emit('migrate', migrationTarget); emit('close', true)"
       >
         Migrer
       </UButton>
@@ -48,6 +60,6 @@ const migrationTarget: Ref<string|undefined> = ref(undefined)
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

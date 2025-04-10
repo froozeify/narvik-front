@@ -67,9 +67,9 @@ const validate = (state: any): FormError[] => {
   }
 
   const errors = []
-  if (!state.host) errors.push({ path: 'host', message: 'Champ requis' })
-  if (!state.port) errors.push({ path: 'port', message: 'Champ requis' })
-  if (!state.sender) errors.push({ path: 'sender', message: 'Champ requis' })
+  if (!state.host) errors.push({ name: 'host', message: 'Champ requis' })
+  if (!state.port) errors.push({ name: 'port', message: 'Champ requis' })
+  if (!state.sender) errors.push({ name: 'sender', message: 'Champ requis' })
   return errors
 }
 
@@ -87,13 +87,13 @@ async function updateSmtpSetting() {
   if (error || !item) {
     toast.add({
       title: "Une erreur est survenue",
-      color: "red"
+      color: "error"
     })
     return
   }
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Configuration mise à jour"
   })
 
@@ -107,7 +107,7 @@ async function testSmtp() {
   await globalSettingQuery.testSmtp(testEmail.value.trim())
 
   toast.add({
-    color: "green",
+    color: "success",
     title: "Email envoyé"
   })
 }
@@ -120,8 +120,7 @@ async function testSmtp() {
       <GenericCard title="Configuration SMTP">
 
         <UButton
-          color="blue"
-          size="2xs"
+          size="xs"
           icon="i-heroicons-arrow-path"
           class="mb-4"
           :loading="isLoading"
@@ -132,34 +131,34 @@ async function testSmtp() {
 
         <UProgress v-if="isLoading" animation="swing" class="mb-2" />
         <UForm v-else class="flex gap-2 flex-col" :state="smtpSetting" :validate="validate" @submit="updateSmtpSetting" @error="onError" autocomplete="off">
-          <UFormGroup label="Activé">
-            <UToggle v-model="smtpSetting.on" />
-          </UFormGroup>
+          <UFormField label="Activé">
+            <USwitch v-model="smtpSetting.on" />
+          </UFormField>
 
           <div v-if="smtpSetting.on">
-            <UFormGroup label="Hôte" name="host" required>
+            <UFormField label="Hôte" name="host" required>
               <UInput v-model="smtpSetting.host" />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup label="Port" name="port" required>
+            <UFormField label="Port" name="port" required>
               <UInput v-model="smtpSetting.port" />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup label="Utilisateur" name="username">
+            <UFormField label="Utilisateur" name="username">
               <UInput v-model="smtpSetting.username" />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup label="Mot de passe" name="password">
+            <UFormField label="Mot de passe" name="password">
               <UInput v-model="smtpSetting.password" type="password" />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup label="Email expéditeur" name="sender" required>
+            <UFormField label="Email expéditeur" name="sender" required>
               <UInput v-model="smtpSetting.sender" />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup label="Nom expéditeur" name="senderName">
+            <UFormField label="Nom expéditeur" name="senderName">
               <UInput v-model="smtpSetting.senderName" />
-            </UFormGroup>
+            </UFormField>
           </div>
 
           <UButton
@@ -177,9 +176,9 @@ async function testSmtp() {
 
     <template #side>
       <GenericCard title="Tester la configuration SMTP">
-        <UFormGroup label="Adresse mail" name="testEmail">
+        <UFormField label="Adresse mail" name="testEmail">
           <UInput v-model="testEmail" type="email" />
-        </UFormGroup>
+        </UFormField>
 
         <UButton
           type="submit"
@@ -197,7 +196,7 @@ async function testSmtp() {
 </template>
 
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 
 </style>
 

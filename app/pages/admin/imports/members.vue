@@ -74,7 +74,7 @@
       toast.add({
         title: "Erreur lors de la migration",
         description: error.message,
-        color: "red"
+        color: "error"
       })
       return
     }
@@ -83,7 +83,7 @@
 
     toast.add({
       title: "Présences migrées",
-      color: "green"
+      color: "success"
     })
   }
 
@@ -119,12 +119,13 @@
         <div class="col-span-5 space-y-4">
           <p class="font-bold">Club principal</p>
           <UAlert v-if="selfStore.selectedProfile?.club.settings.itacImportDate"
+                  variant="soft"
                   :title="'Dernier import effectué le ' + formatDateReadable(selfStore.selectedProfile.club.settings.itacImportDate.toString())"
-                  :color="dayjs(selfStore.selectedProfile.club.settings.itacImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'red' : 'green' "
+                  :color="dayjs(selfStore.selectedProfile.club.settings.itacImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'error' : 'success' "
           />
           <UAlert v-else
                   title="Aucun import effectué"
-                  color="red"
+                  color="error"
           />
 
           <UInput
@@ -138,17 +139,18 @@
           />
         </div>
 
-        <UDivider class="col-span-1" orientation="vertical" />
+        <USeparator class="col-span-1" orientation="vertical" />
 
         <div class="col-span-5 space-y-4">
           <p class="font-bold">Club secondaire</p>
           <UAlert v-if="selfStore.selectedProfile?.club.settings.itacSecondaryImportDate"
+                  variant="soft"
                   :title="'Dernier import effectué le ' + formatDateReadable(selfStore.selectedProfile.club.settings.itacSecondaryImportDate.toString())"
-                  :color="dayjs(selfStore.selectedProfile.club.settings.itacSecondaryImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'red' : 'green' "
+                  :color="dayjs(selfStore.selectedProfile.club.settings.itacSecondaryImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'red' : 'success' "
           />
           <UAlert v-else
                   title="Aucun import effectué"
-                  color="red"
+                  color="error"
           />
 
           <UInput
@@ -166,7 +168,7 @@
       <div class="flex gap-2">
         <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-itac.html#import-des-membres">Documentation</UButton>
         <div class="flex-1"></div>
-        <UButton @click="migrateExternal()" variant="ghost" color="green" :disabled="((selfStore.selectedProfile?.club.settings.itacSecondaryImportRemaining && selfStore.selectedProfile.club.settings.itacSecondaryImportRemaining) ?? 0) > 0">Migration présence externe vers présence membres</UButton>
+        <UButton @click="migrateExternal()" variant="ghost" color="success" :disabled="((selfStore.selectedProfile?.club.settings.itacSecondaryImportRemaining && selfStore.selectedProfile.club.settings.itacSecondaryImportRemaining) ?? 0) > 0">Migration présence externe vers présence membres</UButton>
       </div>
 
     </UCard>

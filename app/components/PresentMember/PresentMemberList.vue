@@ -4,8 +4,10 @@
   import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
   import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
   import {useSelfUserStore} from "~/stores/useSelfUser";
-  import type {TablePaginateInterface, TableSortInterface} from "~/components/Presence/PresenceTable.vue";
   import {createBrowserCsvDownload} from "~/utils/browser";
+  import type {TableSortInterface} from "~/components/Presence/PresenceTable.vue";
+  import type {TablePaginateInterface} from "~/types/table";
+  import type {TableRow} from "#ui/types";
 
   const props = defineProps({
     listOnly: {
@@ -81,7 +83,7 @@
 
       if (value.error) {
         toast.add({
-          color: "red",
+          color: "error",
           title: "Une erreur s'est produite",
           description: value.error.message || value.error.toString()
         })
@@ -95,8 +97,8 @@
     });
   }
 
-  function rowClicked(row: MemberPresence) {
-    selectedPresence.value = row
+  function rowClicked(row: TableRow<MemberPresence>) {
+    selectedPresence.value = row.original
     modalOpen.value = true
   }
 
@@ -129,7 +131,7 @@
     } else {
       isDownloadingCsv.value = false
       toast.add({
-        color: "red",
+        color: "error",
         title: "Date non définie.",
         description: "Veuillez sélectionner une date afin de pouvoir télécharger le csv."
       })
@@ -157,7 +159,7 @@
       <div class="flex-1"></div>
 
       <template v-if="isAdmin">
-        <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="green" :loading="isDownloadingCsv" :disabled="!selectedRange">
+        <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv" :disabled="!selectedRange">
           CSV
         </UButton>
       </template>
@@ -171,22 +173,28 @@
       :is-loading="isLoading"
       @rowClicked="rowClicked"
       @sort="(object: TableSortInterface) => { sort = object; getPresences() }"
-      @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; sort = object.sort; getPresences() }"
+      @paginate="(object: TablePaginateInterface) => { page = object.page; itemsPerPage = object.itemsPerPage; getPresences() }"
     />
 
     <UModal
-        v-model="modalOpen">
-      <PresentMemberDetails
-          v-if="selectedPresence"
-          :view-only="props.listOnly"
-          :item="selectedPresence"
-          @updated="presenceUpdated"
-          @close="modalOpen = false; selectedPresence = undefined"
-      />
+        v-model:open="modalOpen"
+        :ui="{
+           content: 'bg-transparent dark:bg-transparent shadow-none ring-transparent',
+        }"
+    >
+      <template #content>
+        <PresentMemberDetails
+            v-if="selectedPresence"
+            :view-only="props.listOnly"
+            :item="selectedPresence"
+            @updated="presenceUpdated"
+            @close="modalOpen = false; selectedPresence = undefined"
+        />
+      </template>
     </UModal>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import type {Member} from "~/types/api/item/clubDependent/member";
+import type {TableRow} from "#ui/types";
 
 const props = defineProps({
   query: {
@@ -62,7 +63,7 @@ async function search(query: any, replayCount: number = 0) {
           return await search(query, ++replayCount);
         } else {
           toast.add({
-            color: "red",
+            color: "error",
             title: "Une erreur est survenue",
             description: "Il semblerait que la requête ne peut aboutir. Veuillez rafraichir la page."
           })
@@ -71,7 +72,7 @@ async function search(query: any, replayCount: number = 0) {
       }
 
       toast.add({
-        color: "red",
+        color: "error",
         title: "Une erreur est survenue",
         description: searchResult.error.message
       })
@@ -93,11 +94,11 @@ async function search(query: any, replayCount: number = 0) {
 }
 
 const columns = [{
-  key: 'licence',
-  label: 'Licence'
+  accessorKey: 'licence',
+  header: 'Licence'
 }, {
-  key: 'fullName',
-  label: 'Nom'
+  accessorKey: 'fullName',
+  header: 'Nom'
 }]
 
 function rowClicked(row: Member) {
@@ -110,7 +111,7 @@ function rowClicked(row: Member) {
 <template>
   <div class="flex flex-col justify-start px-4 py-4 rounded-lg divide-y divide-gray-200 dark:divide-gray-800 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 min-h-96">
 
-    <UFormGroup label="Nom / Licence">
+    <UFormField label="Nom / Licence">
       <GenericBarcodeReader
         class="mb-4"
         v-model="cameraPreview"
@@ -141,15 +142,19 @@ function rowClicked(row: Member) {
           />
         </template>
       </UInput>
-    </UFormGroup>
+    </UFormField>
 
     <UTable
         :loading="searching"
         class="w-full"
         :columns="columns"
-        :rows="foundMembers"
-        @select="rowClicked">
-      <template #empty-state>
+        :data="foundMembers"
+        @select="(evt) => rowClicked(evt.original)"
+        :ui="{
+          tr: 'cursor-pointer'
+        }"
+    >
+      <template #empty>
         <div class="flex flex-col items-center justify-center py-6 gap-3">
           <span class="italic text-sm">Aucune résultat trouvé</span>
         </div>
@@ -159,6 +164,6 @@ function rowClicked(row: Member) {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

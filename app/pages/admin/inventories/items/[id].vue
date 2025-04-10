@@ -7,6 +7,7 @@
   import { Line } from 'vue-chartjs'
   import {formatMonetary} from "~/utils/string";
   import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
+  import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Colors)
 
   definePageMeta({
@@ -16,9 +17,13 @@
   const isLoading = ref(true)
 
   const toast = useToast()
+  const overlay = useOverlay()
+
   const route = useRoute()
   const itemId = decodeUrlUuid(route.params.id.toString());
 
+
+  const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
   const inventoryItemModalOpen = ref(false)
 
   const inventoryItem: Ref<InventoryItem | undefined> = ref(undefined)
@@ -36,7 +41,7 @@
   loadItem().then(value => {
     if (!value) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "Produit non trouvé",
       })
 
@@ -103,14 +108,14 @@
     }
   }
 
-  async function deleteItem(close: Function) {
+  async function deleteItem() {
     if (!inventoryItem.value) return
 
     const { error } = await itemQuery.delete(inventoryItem.value)
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       })
@@ -119,10 +124,9 @@
     }
 
     toast.add({
-      color: "green",
+      color: "success",
       title: "Produit supprimé",
     })
-    close()
     navigateTo('/admin/inventories')
   }
 </script>
@@ -145,7 +149,7 @@
         <UButton v-if="inventoryItem?.category"
            :to="'/admin/inventories?category=' + convertUuidToUrlUuid(inventoryItem.category.uuid)"
            variant="soft"
-           :ui="{ rounded: 'rounded-full' }">
+        >
           {{ inventoryItem.category.name }}
         </UButton>
       </div>
@@ -153,32 +157,23 @@
       <UTooltip text="Modifier">
         <UButton
           icon="i-heroicons-pencil-square"
-          color="yellow"
+          color="warning"
           @click="inventoryItemModalOpen = true"
         />
       </UTooltip>
 
       <UTooltip text="Supprimer">
-        <UPopover>
-          <UButton
-            icon="i-heroicons-trash"
-            color="red"
-          />
-
-          <template #panel="{ close }">
-            <div class="p-4 w-56 flex flex-col gap-4">
-              <div class="text-center text-lg font-bold">Êtes-vous certain ?</div>
-
-              <UButton
-                @click="deleteItem(close);"
-                color="red"
-                class="mx-auto"
-              >
-                Supprimer
-              </UButton>
-            </div>
-          </template>
-        </UPopover>
+        <UButton
+          icon="i-heroicons-trash"
+          color="error"
+          @click="
+            overlayDeleteConfirmation.open({
+              async onDelete() {
+                await deleteItem()
+                overlayDeleteConfirmation.close(true)
+              }
+            })"
+        />
       </UTooltip>
     </div>
 
@@ -198,13 +193,13 @@
       <GenericStatCard
         title="En stock"
         :value="inventoryItem?.quantity ?? '∞' "
-        :value-class="inventoryItem?.quantityAlert && inventoryItem?.quantity && inventoryItem?.quantity <= inventoryItem?.quantityAlert ? 'text-red-600' : ''"
+        :value-class="inventoryItem?.quantityAlert && (inventoryItem?.quantity || inventoryItem?.quantity === 0) && inventoryItem?.quantity <= inventoryItem?.quantityAlert ? 'text-error-600' : ''"
         :loading="isLoading">
       </GenericStatCard>
 
       <GenericStatCard
         :title="inventoryItem?.canBeSold ? 'Vente activée' : 'Vente désactivée' "
-        :value-class="inventoryItem?.canBeSold ? 'text-green-600' : 'text-red-600'"
+        :value-class="inventoryItem?.canBeSold ? 'text-success-600' : 'text-error-600'"
         :loading="isLoading">
         <template #value>
           <UIcon
@@ -223,17 +218,19 @@
   </div>
 
   <UModal
-    v-model="inventoryItemModalOpen">
-    <UCard>
-      <InventoryItemForm
-        :item="inventoryItem ? {...inventoryItem} : undefined"
-        @updated="(value) => {inventoryItemModalOpen = false; loadItem() }"
-      />
-    </UCard>
+    v-model:open="inventoryItemModalOpen">
+    <template #content>
+      <UCard>
+        <InventoryItemForm
+          :item="inventoryItem ? {...inventoryItem} : undefined"
+          @updated="(value) => {inventoryItemModalOpen = false; loadItem() }"
+        />
+      </UCard>
+    </template>
   </UModal>
 
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

@@ -9,16 +9,16 @@ const props = defineProps(
   }
 )
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'close'])
 
 </script>
 
 <template>
-  <ModalWithActions :title="props.title">
+  <ModalWithActions :title="props.title" @close="(state: boolean) => emit('close', state)">
 
     <UAlert
       class="my-4"
-      color="orange"
+      color="error"
       variant="soft"
       title="La suppression d'une activité, supprimera aussi toutes les activités des membres liées."
       description="Il conseillé de faire un migration à la place."
@@ -26,8 +26,8 @@ const emit = defineEmits(['delete'])
 
     <template #actions>
       <UButton
-        @click="emit('delete')"
-        color="red"
+        @click="emit('delete'); emit('close', true)"
+        color="error"
       >
         Valider la suppression
       </UButton>
@@ -35,6 +35,6 @@ const emit = defineEmits(['delete'])
   </ModalWithActions>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

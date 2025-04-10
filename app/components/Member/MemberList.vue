@@ -5,6 +5,7 @@ import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {usePaginationValues} from "~/composables/api/list";
 import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
 import {ClubRole, getAvailableClubRoles} from "../../types/api/item/club";
+import type {TableRow} from "#ui/types";
 
 const toast = useToast();
 const isLoading = ref(true);
@@ -32,29 +33,29 @@ getMembers();
 
 const columns = [
   {
-    key: 'licence',
-    label: 'Licence'
+    accessorKey: 'licence',
+    header: 'Licence'
   },
   {
-    key: 'lastname',
-    label: 'Nom',
+    accessorKey: 'lastname',
+    header: 'Nom',
     sortable: true
   },
   {
-    key: 'firstname',
-    label: 'Prénom'
+    accessorKey: 'firstname',
+    header: 'Prénom'
   },
   {
-    key: 'status',
-    label: 'Statut'
+    accessorKey: 'status',
+    header: 'Statut'
   },
   {
-    key: 'actions',
-    label: 'Actions'
+    accessorKey: 'actions',
+    header: 'Actions'
   }
 ]
 
-function getMembers() {
+async function getMembers() {
   isLoading.value = true;
 
   const urlParams = new URLSearchParams({
@@ -85,24 +86,22 @@ function getMembers() {
     urlParams.append('exists[licence]', 'true');
   }
 
-  memberQuery.getAll(urlParams).then(value => {
-    isLoading.value = false;
+  const { error, items, totalItems } = await memberQuery.getAll(urlParams);
+  isLoading.value = false;
 
-    if (value.error) {
-      toast.add({
-        color: "red",
-        title: "Une erreur s'est produite",
-        description: value.error.message || value.error.toString()
-      })
-    }
+  if (error) {
+    toast.add({
+      color: "error",
+      title: "Une erreur s'est produite",
+      description: error.message || error.toString()
+    })
+    return
+  }
 
-    if (value.items) {
-      members.value = value.items
-      if (value.totalItems) {
-        totalMembers.value = value.totalItems
-      }
-    }
-  });
+  members.value = items
+  if (totalItems) {
+    totalMembers.value = totalItems
+  }
 }
 
 let inputTimer: NodeJS.Timeout;
@@ -158,42 +157,50 @@ function displayMemberPage(member: Member) {
         sort-mode="manual"
         @update:sort="getMembers()"
         :columns="columns"
-        :rows="members"
-        @select="displayMemberPage">
-        <template #empty-state>
+        :data="members"
+        @select="displayMemberPage"
+        :ui="{
+          tr: 'cursor-pointer'
+        }"
+      >
+        <template #empty>
           <div class="flex flex-col items-center justify-center py-6 gap-3">
             <span class="italic text-sm">Aucun membres trouvés.</span>
           </div>
         </template>
 
-        <template #status-data="{ row }">
-          <i v-if="!row.currentSeason">Saison non renouvelée</i>
-          <p v-if="row.role && row.role !== ClubRole.Member">{{ getAvailableClubRoles().find((role) => role.value === row.role)?.text }}</p>
+        <template #status-cell="{ row }">
+          <i v-if="!row.original.currentSeason">Saison non renouvelée</i>
+          <p v-if="row.original.role && row.original.role !== ClubRole.Member">{{ getAvailableClubRoles().find((role) => role.value === row.original.role)?.text }}</p>
         </template>
 
-        <template #actions-data="{ row }">
-          <UButton :to="`/admin/members/${convertUuidToUrlUuid(row.uuid)}`">Détail</UButton>
+        <template #actions-cell="{ row }">
+          <UButton :to="`/admin/members/${convertUuidToUrlUuid(row.original.uuid)}`">Détail</UButton>
         </template>
 
       </UTable>
 
-      <div class="flex justify-end gap-4 px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-        <USelect v-model="itemsPerPage" :options="usePaginationValues" @update:model-value="getMembers()" />
-        <UPagination v-model="page" @update:model-value="getMembers()" :page-count="parseInt(itemsPerPage.toString())" :total="totalMembers" />
-      </div>
+      <GenericTablePagination
+        v-model:page="page"
+        v-model:items-per-page="itemsPerPage"
+        :total-items="totalMembers"
+        @paginate="(object: TablePaginateInterface) => { getMembers() }"
+      />
     </UCard>
   </div>
 
   <UModal
-    v-model="createMemberModal">
-    <UCard>
-      <MemberForm
-        @updated="(value) => {createMemberModal = false; displayMemberPage(value) }"
-      />
-    </UCard>
+    v-model:open="createMemberModal">
+    <template #content>
+      <UCard>
+        <MemberForm
+          @updated="(value) => {createMemberModal = false; displayMemberPage(value) }"
+        />
+      </UCard>
+    </template>
   </UModal>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>

@@ -58,7 +58,7 @@
           class="mb-4"
           title="L'import ne doit être fait qu'une fois l'import des membres effectué."
           description="Dans le cas contraire, les présences seront enregistrées comme externe."
-          color="red"
+          color="error"
       />
 
       <p>L'import ce fait grâce au xls généré par cerbère.</p>

@@ -23,7 +23,10 @@ definePageMeta({
   const isAdmin = selfStore.isAdmin()
 
   const toast = useToast()
-  const modal = useModal()
+
+  const overlay = useOverlay()
+  const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+
   const route = useRoute()
   const itemId = decodeUrlUuid(route.params.id.toString());
 
@@ -35,23 +38,27 @@ definePageMeta({
 
   const columns = [
     {
-      key: 'itemCategory',
-      label: 'Catégorie',
+      accessorKey: 'itemCategory',
+      header: 'Catégorie',
       sortable: true
     },
     {
-      key: 'itemName',
-      label: 'Nom',
-      class: 'w-full',
+      accessorKey: 'itemName',
+      header: 'Nom',
+      meta: {
+        class: {
+          th: 'w-full',
+        }
+      },
       sortable: true
     },
     {
-      key: 'itemPrice',
-      label: 'Prix unitaire'
+      accessorKey: 'itemPrice',
+      header: 'Prix unitaire'
     },
     {
-      key: 'total',
-      label: 'Total'
+      accessorKey: 'total',
+      header: 'Total'
     }
   ]
 
@@ -62,7 +69,7 @@ definePageMeta({
 
     if (!retrieved || error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "Vente non trouvé",
       })
 
@@ -82,7 +89,7 @@ definePageMeta({
 
     if (error) {
       toast.add({
-        color: "red",
+        color: "error",
         title: "La suppression a échouée",
         description: error.message
       })
@@ -98,8 +105,8 @@ definePageMeta({
   loadSale()
   if (isAdmin) {
     columns.push({
-      key: 'item',
-      label: 'Article'
+      accessorKey: 'item',
+      header: 'Article'
     })
   }
 </script>
@@ -123,23 +130,23 @@ definePageMeta({
       >
         <UButton v-if="sale"
           icon="i-heroicons-pencil"
-          color="yellow"
+          color="warning"
           size="xs"
           label="Modifier"
-          @click="modal.open(SaleModalEdit, {
+          @click="overlay.create(SaleModalEdit).open({
             sale: sale
           })"
         />
 
         <UButton
           icon="i-heroicons-trash"
-          color="red"
+          color="error"
           size="xs"
           label="Supprimer"
-          @click="modal.open(ModalDeleteConfirmation, {
-            onDelete() {
-              modal.close()
-              deleteSale()
+          @click="overlayDeleteConfirmation.open({
+            async onDelete() {
+              await deleteSale()
+              overlayDeleteConfirmation.close(true)
             }
           })"
         />
@@ -190,18 +197,18 @@ definePageMeta({
           column: 'itemCategory',
           direction: 'asc'
         }"
-        :rows="sale?.salePurchasedItems">
-        <template #empty-state>
+        :data="sale?.salePurchasedItems">
+        <template #empty>
           <div class="flex flex-col items-center justify-center py-6 gap-3">
             <span class="italic text-sm">Aucun articles.</span>
           </div>
         </template>
 
-        <template #itemCategory-data="{ row }">
-          <UButton v-if="row.itemCategory"
+        <template #itemCategory-cell="{ row }">
+          <UButton v-if="row.original.itemCategory"
                    variant="soft"
-                   :ui="{ rounded: 'rounded-full' }">
-            {{ row.itemCategory }}
+          >
+            {{ row.original.itemCategory }}
           </UButton>
 
           <i v-else>
@@ -210,19 +217,19 @@ definePageMeta({
 
         </template>
 
-        <template #itemPrice-data="{ row }">
-          {{ row.quantity }} x {{ formatMonetary(row.itemPrice) }}
+        <template #itemPrice-cell="{ row }">
+          {{ row.original.quantity }} x {{ formatMonetary(row.original.itemPrice) }}
         </template>
 
-        <template #total-data="{ row }">
-          {{ formatMonetary(Number(Number(row.itemPrice) * Number(row.quantity)).toFixed(2)) }}
+        <template #total-cell="{ row }">
+          {{ formatMonetary(Number(Number(row.original.itemPrice) * Number(row.original.quantity)).toFixed(2)) }}
         </template>
 
-        <template #item-data="{ row }">
-          <UButton v-if="row.item"
-             :to="'/admin/inventories/items/' + convertUuidToUrlUuid(row.item.uuid)"
+        <template #item-cell="{ row }">
+          <UButton v-if="row.original.item"
+             :to="'/admin/inventories/items/' + convertUuidToUrlUuid(row.original.item.uuid)"
              variant="soft"
-             :ui="{ rounded: 'rounded-full' }">
+          >
             Voir l'article
           </UButton>
           <i v-else>
@@ -235,6 +242,6 @@ definePageMeta({
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 
 </style>
