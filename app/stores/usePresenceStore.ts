@@ -2,10 +2,11 @@ import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/prese
 import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
 import dayjs from "dayjs";
 import {defineStore} from "pinia";
+import type {DateRange} from "~/types/date";
 
 export const usePresenceStore = defineStore('presence', () => {
 	const selectedDate: Ref<Date|null> = ref(null)
-	const selectedRange: Ref<{start: Date, end: Date}|null> = ref({ start: dayjs().subtract(30, 'day').toDate(), end: new Date() })
+	const selectedRange: Ref<DateRange|undefined> = ref({ start: dayjs().subtract(30, 'day').toDate(), end: new Date() })
 	const searchQuery: Ref<string> = ref('')
 
 	const totalExternal: Ref<number> = ref(0)

@@ -32,7 +32,7 @@
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="formatDateRangeReadable(presenceStore.selectedRange) || 'Choisir une date'" />
 
           <template #content>
-            <GenericDateRangePicker v-model="presenceStore.selectedRange" @close="popoverOpen = false" />
+            <GenericDateRangePicker v-model="presenceStore.selectedRange" @range-updated="popoverOpen = false" />
           </template>
         </UPopover>
 
