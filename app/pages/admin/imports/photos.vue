@@ -52,7 +52,6 @@
           type="file"
           accept="application/zip"
           icon="i-heroicons-archive-box"
-          v-model="state.file"
           @change="getFileObject"
       />
 

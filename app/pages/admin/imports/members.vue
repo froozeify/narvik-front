@@ -134,7 +134,6 @@
             type="file"
             accept="text/csv"
             icon="i-heroicons-document-text"
-            v-model="state.file"
             @change="importFromItac"
           />
         </div>
@@ -146,7 +145,7 @@
           <UAlert v-if="selfStore.selectedProfile?.club.settings.itacSecondaryImportDate"
                   variant="soft"
                   :title="'Dernier import effectué le ' + formatDateReadable(selfStore.selectedProfile.club.settings.itacSecondaryImportDate.toString())"
-                  :color="dayjs(selfStore.selectedProfile.club.settings.itacSecondaryImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'red' : 'success' "
+                  :color="dayjs(selfStore.selectedProfile.club.settings.itacSecondaryImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'error' : 'success' "
           />
           <UAlert v-else
                   title="Aucun import effectué"
@@ -159,7 +158,6 @@
             type="file"
             accept="text/csv"
             icon="i-heroicons-document-text"
-            v-model="state.file"
             @change="importFromItacSecondary"
           />
         </div>
@@ -186,15 +184,15 @@
         type="file"
         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         icon="i-heroicons-document-text"
-        v-model="state.file"
         @change="importFromEden"
       />
 
       <p class="my-2">Exemple</p>
 
-      <pre class=" w-full thin-scrollbar text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
-N° licence | Date d'expiration
-01234578   | 11.11.2024</pre>
+      <GenericCode>
+        N° licence | Date d'expiration <br />
+        01234578 | 11.11.2024
+      </GenericCode>
 
       <div class="flex gap-2 mt-4">
         <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-eden.html#import-des-certificats-medicaux">Documentation</UButton>

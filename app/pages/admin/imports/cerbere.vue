@@ -71,7 +71,6 @@
           type="file"
           accept="application/vnd.ms-excel"
           icon="i-heroicons-document-text"
-          v-model="state.file"
           @change="getFileObject"
       />
 

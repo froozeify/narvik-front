@@ -84,18 +84,18 @@
             type="file"
             accept="text/csv"
             icon="i-heroicons-document-text"
-            v-model="state.file"
             @change="importInventoriesFromCsv"
           />
 
           <p class="">Exemple</p>
-
-          <pre class=" w-full thin-scrollbar text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
-name,description,purchasePrice,canBeSold,sellingPrice,sellingQuantity,category.name
-Carabine 10M,sed laboriosam molestiae aliquid quia et,2.89,0,13.41,2,Cibles
-Cible C50,,1.47,1,14.31,1,Cibles
-</pre>
+          <GenericCode>
+            name,description,purchasePrice,canBeSold,sellingPrice,sellingQuantity,category.name <br />
+            Carabine 10M,sed laboriosam molestiae aliquid quia et,2.89,0,13.41,2,Cibles <br />
+            Cible C50,,1.47,1,14.31,1,Cibles
+          </GenericCode>
         </div>
+
+
 
         <USeparator class="col-span-1" orientation="vertical" />
 
@@ -108,20 +108,20 @@ Cible C50,,1.47,1,14.31,1,Cibles
             type="file"
             accept="text/csv"
             icon="i-heroicons-document-text"
-            v-model="state.file"
             @change="importSalesFromCsv"
           />
 
           <p class="">Exemple</p>
 
-          <pre class=" w-full thin-scrollbar text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">
-seller.licence,paymentMode.name,price,comment,item.0.name,item.0.category,item.0.price,item.0.quantity,uuid,createdAt
-31394762,Espèces,14.31,test,"Cible C50",Cibles,14.31,1,01950394-b472-7135-beb6-f138d91d624c,2025-02-14T08:30:32+00:00</pre>
+          <GenericCode>
+            seller.licence,paymentMode.name,price,comment,item.0.name,item.0.category,item.0.price,item.0.quantity,uuid,createdAt <br />
+            31394762,Espèces,14.31,test,"Cible C50",Cibles,14.31,1,01950394-b472-7135-beb6-f138d91d624c,2025-02-14T08:30:32+00:00
+          </GenericCode>
         </div>
       </div>
 
 
-      <pre v-if="apiUploadResponse" class="mb-4 w-full thin-scrollbar text-xs inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 overflow-x-auto whitespace-pre">{{apiUploadResponse}}</pre>
+      <GenericCode v-if="apiUploadResponse" class="mb-4">{{apiUploadResponse}}</GenericCode>
 
       <div class="flex gap-2">
         <UButton class="mt-4" target="_blank" to="https://docs.narvik.app/frontend/docs/import/narvik-pos.html">Documentation</UButton>
