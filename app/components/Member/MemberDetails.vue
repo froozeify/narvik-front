@@ -570,9 +570,6 @@ async function deleteMember() {
                 size="3xl"
                 :src="memberProfileImage?.base64"
                 :alt="member.fullName"
-                :ui="{
-                  rounded: 'object-contain bg-gray-100 dark:bg-gray-800'
-                }"
               />
             </div>
 
