@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {FormError} from '#ui/types'
+import type {FormError, TabsItem} from '#ui/types'
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {isMobile, isTablet, watchBreakpoint} from "~/utils/browser";
@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="mb-2">
-      <UButton size="2xs" variant="link" to="/login" label="Se connecter" icon="i-heroicons-arrow-uturn-left" />
+      <UButton size="xs" variant="link" to="/login" label="Se connecter" icon="i-heroicons-arrow-uturn-left" />
     </div>
 
     <UCard>
