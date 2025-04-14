@@ -190,7 +190,7 @@ function sortClicked() {
 
           <div v-if="row.original.member.medicalCertificateExpiration && row.original.member.medicalCertificateStatus !== 'valid'" class="basis-full">
             <UButton
-              :color="row.original.member.medicalCertificateStatus === 'expired' ? 'error' : 'yellow'"
+              :color="row.original.member.medicalCertificateStatus === 'expired' ? 'error' : 'warning'"
             >
               Certificat médical : {{ formatDateReadable(row.original.member.medicalCertificateExpiration.toString()) }}
             </UButton>

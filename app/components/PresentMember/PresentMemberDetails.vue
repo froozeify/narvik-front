@@ -240,7 +240,7 @@ async function copyLicence() {
 
             <div v-if="member.medicalCertificateExpiration && member.medicalCertificateStatus !== 'valid'" class="basis-full text-center">
               <UButton
-                :color="member.medicalCertificateStatus === 'expired' ? 'error' : 'yellow'">
+                :color="member.medicalCertificateStatus === 'expired' ? 'error' : 'warning'">
                 Certificat médical : {{ formatDateReadable(member.medicalCertificateExpiration.toString()) }}
               </UButton>
             </div>
