@@ -4,6 +4,8 @@ DOCKER_COMP = docker compose
 # Docker containers
 NODE_CONT = $(DOCKER_COMP) exec front
 
+# Container repo
+BUILD_REPO = benoitvignal/narvik-front
 
 # Misc
 .DEFAULT_GOAL = help
@@ -15,17 +17,17 @@ help: ## Outputs this help screen
 ## —— Docker 🐳 ————————————————————————————————————————————————————————————————
 
 build-prod:
-	@docker build --pull --no-cache -t benoitvignal/narvik-front:latest -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o` -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o` -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o` --target run .
+	@docker build --pull --no-cache -t $(BUILD_REPO):latest -t $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o` -t $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o` -t $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o` --target run .
 
 build-cloud-prod:
-	@docker buildx build . --builder cloud-benoitvignal-narvik-cloud --pull --no-cache -t benoitvignal/narvik-front:latest -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o` -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o` -t benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o` --target run
+	@docker buildx build . --builder cloud-benoitvignal-narvik-cloud --pull --no-cache -t $(BUILD_REPO):latest -t $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o` -t $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o` -t $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o` --target run
 
 
 push-build-prod:
-	@docker image push benoitvignal/narvik-front:latest
-	@docker image push benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o`
-	@docker image push benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o`
-	@docker image push benoitvignal/narvik-front:`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o`
+	@docker image push $(BUILD_REPO):latest
+	@docker image push $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o`
+	@docker image push $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o`
+	@docker image push $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o`
 
 sh: ## Connect to the Node container
 	@$(NODE_CONT) sh
