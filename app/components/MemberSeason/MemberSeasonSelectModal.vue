@@ -5,13 +5,23 @@ import type {Season} from "~/types/api/item/season";
 import type {AgeCategory} from "~/types/api/item/ageCategory";
 import AgeCategoryQuery from "~/composables/api/query/AgeCategoryQuery";
 import type {SelectApiItem} from "~/types/select";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+
+const selfStore = useSelfUserStore();
+const { selectedProfile } = storeToRefs(selfStore)
 
 const seasonQuery = new SeasonQuery()
 const ageCategoryQuery = new AgeCategoryQuery()
 
 const seasons: Ref<Season[]> = ref([])
 const ageCategories: Ref<AgeCategory[]> = ref([])
-const selectedSeason: Ref<string | undefined> = ref(undefined)
+const selectedSeason: Ref<string | undefined> = computed( () => {
+  if (selectedProfile.value?.club.settings.currentSeason["@id"]) {
+    // By default we select the current season
+    return selectedProfile.value?.club.settings.currentSeason["@id"]
+  }
+  return undefined
+})
 const isSecondary: Ref<boolean> = ref(false)
 const selectedAgeCategory: Ref<string | undefined> = ref(undefined)
 
@@ -52,6 +62,11 @@ ageCategoryQuery.getAll().then((value) => {
 
 <template>
   <ModalWithActions title="Sélection d'une saison" @close="(state: boolean) => emit('close', state)">
+    <UAlert v-if="selectedProfile?.club.settings.currentSeason" icon="i-heroicons-information-circle">
+      <template #description>
+        Saison actuelle : <b>{{ selectedProfile.club.settings.currentSeason.name }}</b>
+      </template>
+    </UAlert>
 
     <UFormField label="Saison">
       <USelect v-model="selectedSeason" :items="seasonsSelect" value-attribute="@id" />
