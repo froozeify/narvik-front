@@ -9,6 +9,8 @@ import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting"
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
 import ClubModalGenerateBadger from "~/components/Club/ClubModalGenerateBadger.vue";
 import type {SelectApiItem} from "~/types/select";
+import type {Club} from "~/types/api/item/club";
+import type {Season} from "~/types/api/item/season";
 
 definePageMeta({
   layout: "admin"
@@ -31,9 +33,11 @@ const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.b
 
 const configState = reactive({
   selectedControlShootingActivity: selectedProfile.value?.club.settings.controlShootingActivity?.uuid,
-  excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays?.map((a: Activity) => a.uuid)
+  excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays?.map((a: Activity) => a.uuid),
+  selectedMonth: selectedProfile.value?.club.settings.seasonEnd.split('-')[0].toString(),
+  selectedDay: selectedProfile.value?.club.settings.seasonEnd.split('-')[1].toString(),
 })
-const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
+// const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
 
 const activities: Ref<Activity[] | undefined> = ref(undefined);
 activityQuery.getAll().then(value => {
@@ -55,6 +59,82 @@ const logoUploading = ref(false)
 const state = reactive({
   file: undefined
 })
+
+const monthsSelect: SelectApiItem<Season>[] = [
+  {
+    value: '01',
+    label: 'Janvier'
+  },
+  {
+    value: '02',
+    label: 'Février'
+  },
+  {
+    value: '03',
+    label: 'Mars'
+  },
+  {
+    value: '04',
+    label: 'Avril'
+  },
+  {
+    value: '05',
+    label: 'Mai'
+  },
+  {
+    value: '06',
+    label: 'Juin'
+  },
+  {
+    value: '07',
+    label: 'Juillet'
+  },
+  {
+    value: '08',
+    label: 'Août'
+  },
+  {
+    value: '09',
+    label: 'Septembre'
+  },
+  {
+    value: '10',
+    label: 'Octobre'
+  },
+  {
+    value: '11',
+    label: 'Novembre'
+  }
+  ,{
+    value: '12',
+    label: 'Décembre'
+  }
+]
+
+const daysSelect = computed( () => {
+  const items: SelectApiItem<Season>[] = []
+
+  let maxDays = 31
+  if (configState.selectedMonth.value) {
+    if (['04', '06', '09', '11'].includes(configState.selectedMonth.value.toString())) {
+      maxDays = 30
+    }
+
+    if (configState.selectedMonth.value.toString() === '02') {
+      maxDays = 28
+    }
+  }
+
+  for (let i = maxDays; i > 0; i--) {
+    items.push({
+      label: i.toString(),
+      value: i < 10 ? '0' + i.toString() : i.toString()
+    })
+  }
+
+  return items;
+})
+
 
 function getBadgerLoginPath(): string|undefined {
   if (!badgerSetting.value || !selectedProfile.value) {
@@ -188,12 +268,40 @@ async function deleteLogo() {
   displayFileSuccessToast('Logo supprimé')
 }
 
+async function seasonEndUpdated() {
+  if (!selectedProfile.value?.club.settings ||
+      !configState.selectedDay ||
+      !configState.selectedMonth
+  ) return;
+
+  const payload: WriteClubSetting = {
+    seasonEnd: `${configState.selectedMonth}-${configState.selectedDay}`
+  }
+
+  let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
+
+  if (error) {
+    toast.add({
+      color: "error",
+      title: "L'enregistrement a échoué",
+      description: error.message
+    });
+    return;
+  }
+
+  selfStore.refreshSelectedClub().then()
+
+  toast.add({
+    color: "success",
+    title: "Paramètre enregistré"
+  });
+}
 
 </script>
 
 <template>
-  <div class="grid gap-4 md:grid-cols-4">
-    <GenericCard class="md:col-span-4" title="Lien de connexion badger">
+  <div class="grid gap-4 md:grid-cols-2">
+    <GenericCard class="md:col-span-2" title="Lien de connexion badger">
       <p>A mettre en favoris sur l'ordinateur accessible publiquement.</p>
       <p>Ce lien permet d'être automatiquement connecté en tant que badgeuse (accès seulement à la liste de présence).</p>
       <p>Le lien peut être déposé directement dans la barre personnelle pour le marquer en favoris.</p>
@@ -232,38 +340,54 @@ async function deleteLogo() {
       </div>
     </GenericCard>
 
-    <div class="md:col-span-2">
-      <GenericCard class="h-fit" title="Activités exclus du compte des jours ouverts">
-        <div>
-          <USelectMenu
-            v-model="configState.excludedActivitiesFromOpeningDays"
-            @change="ignoredActivitiesDaysUpdated"
-            :items="activitiesSelect"
-            value-key="value"
-            multiple
-          >
-            <template #default>
-              <span v-if="configState.excludedActivitiesFromOpeningDays && activities && configState.excludedActivitiesFromOpeningDays.length" class="truncate">
-                {{ activities.filter(a => (a.uuid && configState.excludedActivitiesFromOpeningDays?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
-              </span>
-              <span v-else>Aucune activités exclus</span>
-            </template>
-          </USelectMenu>
-        </div>
-      </GenericCard>
+    <GenericCard title="Activités exclus du compte des jours ouverts">
+      <div>
+        <USelectMenu
+          v-model="configState.excludedActivitiesFromOpeningDays"
+          @change="ignoredActivitiesDaysUpdated"
+          :items="activitiesSelect"
+          value-key="value"
+          multiple
+        >
+          <template #default>
+            <span v-if="configState.excludedActivitiesFromOpeningDays && activities && configState.excludedActivitiesFromOpeningDays.length" class="truncate">
+              {{ activities.filter(a => (a.uuid && configState.excludedActivitiesFromOpeningDays?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
+            </span>
+            <span v-else>Aucune activités exclus</span>
+          </template>
+        </USelectMenu>
+      </div>
+    </GenericCard>
 
-      <GenericCard class="h-fit mt-4" title="Activité correspondante au contrôle">
-        <div>
-          <USelect
-            v-model="configState.selectedControlShootingActivity"
-            @change="controlShootingUpdated"
-            :items="activitiesSelect"
-            placeholder="Aucun contrôle défini" />
-        </div>
-      </GenericCard>
-    </div>
+    <GenericCard title="Activité correspondante au contrôle">
+      <div>
+        <USelect
+          v-model="configState.selectedControlShootingActivity"
+          @change="controlShootingUpdated"
+          :items="activitiesSelect"
+          placeholder="Aucun contrôle défini" />
+      </div>
+    </GenericCard>
 
-    <GenericCard class="md:col-span-2" title="Logo">
+    <GenericCard title="Date de fin saison">
+      <div>
+        <p class="mb-4">Pour les activités sportives, une saison se termine souvent la 31 août afin de débuter en même temps que la rentrée des classes en septembre.</p>
+        <div class="grid grid-cols-2 gap-2">
+          <UFormField label="Mois">
+            <USelect v-model="configState.selectedMonth" :items="monthsSelect" placeholder="Non défini" />
+          </UFormField>
+
+          <UFormField label="Jour">
+            <USelect v-model="configState.selectedDay" :items="daysSelect" placeholder="Non défini" />
+          </UFormField>
+        </div>
+
+        <UButton class="mt-4" label="Sauvegarder" @click="seasonEndUpdated" />
+
+      </div>
+    </GenericCard>
+
+    <GenericCard title="Logo">
       <div v-if="selectedProfile?.club?.settings?.logoBase64" class="mt-4 flex justify-center">
         <NuxtImg :src="selectedProfile.club.settings.logoBase64" class="w-48" />
       </div>
