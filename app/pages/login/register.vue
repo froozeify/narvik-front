@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {FormError, TabsItem} from '#ui/types'
+import type {FormError, SelectItem, TabsItem} from '#ui/types'
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {isMobile, isTablet, watchBreakpoint} from "~/utils/browser";
@@ -39,11 +39,27 @@ const items = ref<TabsItem[]>([
     label: 'Demande de création',
     icon: 'i-heroicons-lock-closed',
   }, {
-    slot: 'reset' as const,
+    slot: 'create' as const,
     label: 'Validation et création',
     icon: 'i-heroicons-envelope-open',
   }
 ])
+
+const accountTypes = ref([
+  {
+    label: 'Personnel',
+    value: 'personal',
+    icon: 'i-heroicons-user'
+  },
+  {
+    label: 'Association',
+    value: 'club',
+    icon: 'i-heroicons-building-storefront'
+  }
+] satisfies SelectItem[])
+const accountType = ref(accountTypes.value[0]?.value)
+const accountTypeIcon = computed(() => accountTypes.value.find(item => item.value === accountType.value)?.icon)
+const alreadyAnAccount = ref(false)
 
 const validate = (state: any): FormError[] => {
   const errors = []
@@ -69,7 +85,7 @@ async function register() {
     toast.add({
       color: "error",
       title: "Impossible d'effectuer la création du compte.",
-      description: error.data?.detail ?? error.message
+      description: error.message
     });
     return;
   }
@@ -150,7 +166,7 @@ onBeforeUnmount(() => {
             </UForm>
         </template>
 
-        <template #reset>
+        <template #create>
           <UAlert
             icon="i-heroicons-megaphone"
             color="warning"
@@ -163,24 +179,45 @@ onBeforeUnmount(() => {
               <UInput v-model.trim="state.securityCode" />
             </UFormField>
 
+            <UFormField label="Type de compte" name="accountType">
+              <USelect v-model="accountType" :items="accountTypes" value-key="value" :icon="accountTypeIcon" />
+            </UFormField>
+
+            <template v-if="accountType === 'club'">
+              <USeparator  label="Informations personnel" />
+
+              <UFormField label="J'ai déjà un compte">
+                <USwitch v-model="alreadyAnAccount"/>
+              </UFormField>
+            </template>
+
             <UFormField label="Email" name="email">
               <UInput v-model.trim="state.email" type="email" />
             </UFormField>
 
-            <UFormField label="Mot de passe" name="password">
+            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Mot de passe" name="password">
               <UInput v-model="state.password" type="password" />
             </UFormField>
 
-            <UFormField label="Prénom" name="firstname">
-              <UInput v-model="state.firstname" />
-            </UFormField>
-
-            <UFormField label="Nom" name="lastname">
+            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Nom" name="lastname">
               <UInput v-model="state.lastname" />
             </UFormField>
 
+            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Prénom" name="firstname">
+              <UInput v-model="state.firstname" />
+            </UFormField>
+
+            <template v-if="accountType === 'club'">
+              <USeparator label="Informations sur l'association" />
+              Test
+            </template>
+
             <UFormField required name="legals">
-              <UCheckbox required v-model="state.legals"  label="J'accepte les Conditions Générales d'Utilisation, les Conditions Générales de Vente et la Politique de confidentialité " />
+              <UCheckbox required v-model="state.legals">
+                <template #label>
+                  J'accepte les <ContentLink target="_blank" to="https://about.narvik.app/documents-legaux/cgu">Conditions Générales d’Utilisation</ContentLink>, les <ContentLink target="_blank" to="https://about.narvik.app/documents-legaux/cgv">Conditions Générales de Vente</ContentLink> et la <ContentLink target="_blank" to="https://about.narvik.app/documents-legaux/rgpd">Politique de confidentialité</ContentLink>
+                </template>
+              </UCheckbox>
             </UFormField>
 
             <div class="flex justify-between">

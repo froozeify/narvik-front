@@ -52,7 +52,7 @@ const selfStore = useSelfUserStore()
       </div>
     </UCard>
 
-    <GenericCard v-if="selfStore.selectedProfile?.club" class="sm:col-span-2" title="Facturation">
+    <GenericCard v-if="selfStore.selectedProfile?.club" class="sm:col-span-2 h-fit" title="Facturation">
       <div class="mb-4">
         <p v-if="selfStore.selectedProfile.club.contactName">
           <b>Nom</b> : {{ selfStore.selectedProfile.club.contactName }}
