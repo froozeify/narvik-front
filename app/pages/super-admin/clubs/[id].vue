@@ -281,7 +281,24 @@ loadClubUsers()
       >
         <ClubSubscriptionList :item="club" />
       </UCard>
+
+      <GenericCard title="Facturation">
+        <div>
+          <p>{{ club.name }}</p>
+          <p>{{ club.address }}</p>
+          <p>{{ club.zipCode }} {{ club.city }}</p>
+          <p v-if="club.siret">Siret : {{ club.siret }}</p>
+          <p v-if="club.vat">TVA : {{ club.vat }}</p>
+        </div>
+      </GenericCard>
+
+      <GenericCard v-if="club.comment" title="Commentaire">
+        <div class="whitespace-pre-line">
+          {{ club.comment }}
+        </div>
+      </GenericCard>
     </div>
+
     <div>
       <GenericCard title="Utilisateurs">
         <p>Compte avec un mail de connexion liée.</p>

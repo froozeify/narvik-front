@@ -66,6 +66,11 @@ async function submitItem() {
     renewDate: item.value.renewDate ?? null,
     salesEnabled: item.value.salesEnabled,
     isActivated: item.value.isActivated,
+    address: item.value.address,
+    zipCode: Number(item.value.zipCode) ?? null,
+    city: item.value.city,
+    siret: item.value.siret,
+    vat: item.value.vat,
     comment: item.value.comment,
     website: item.value.website,
     contactName: item.value.contactName,
@@ -143,6 +148,26 @@ async function submitItem() {
       </UFormField>
       <UFormField label="Téléphone" name="contactPhone">
         <UInput v-model="item.contactPhone" type="tel" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+      </UFormField>
+
+      <USeparator label="Facturation" />
+
+      <UFormField label="Adresse" name="address">
+        <UInput v-model="item.address" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+      </UFormField>
+      <div class="grid grid-cols-2 gap-2">
+        <UFormField label="Code postal" name="zipCode">
+          <UInput v-model="item.zipCode" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+        </UFormField>
+        <UFormField label="Ville" name="city">
+          <UInput v-model="item.city" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+        </UFormField>
+      </div>
+      <UFormField label="Siret" name="siret">
+        <UInput v-model="item.siret" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+      </UFormField>
+      <UFormField label="TVA" name="vat">
+        <UInput v-model="item.vat" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
       </UFormField>
 
       <GenericItemTimestampInfo :item="item" />
