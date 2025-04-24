@@ -1,6 +1,6 @@
 import type {UuidItem} from "~/types/api/uuidItem";
-import type {ClubSetting} from "~/types/api/item/clubDependent/ClubSetting";
 import type {TimestampItem} from "~/types/api/timestampItem";
+import type {ClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 
 export enum ClubRole {
   Badger = 'CLUB_BADGER',

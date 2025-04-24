@@ -9,13 +9,24 @@ const toast = useToast()
 const isLoading = ref(false)
 
 const state = reactive({
-  turnstileToken: undefined,
-  securityCode: undefined,
-  email: undefined,
-  password: undefined,
-  firstname: undefined,
-  lastname: undefined,
-  legals: undefined,
+  turnstileToken: undefined as string|undefined,
+  securityCode: undefined as string|undefined,
+
+  email: undefined as string|undefined,
+  password: undefined as string|undefined,
+  firstname: undefined as string|undefined,
+  lastname: undefined as string|undefined,
+
+  clubName: undefined as string|undefined,
+  clubEmail: undefined as string|undefined,
+  clubPhone: undefined as string|undefined,
+  clubAddress: undefined as string|undefined,
+  clubZipCode: undefined as number|undefined,
+  clubCity: undefined as string|undefined,
+  clubSiret: undefined as string|undefined,
+  clubVat: undefined as string|undefined,
+
+  legals: false,
 })
 
 const turnstile = ref<InstanceType<typeof NuxtTurnstile>>()
@@ -73,12 +84,29 @@ const validate = (state: any): FormError[] => {
 }
 
 async function register() {
-  if (!state.securityCode || !state.email || !state.password || !state.firstname || !state.lastname) {
+  if (!state.securityCode || !state.email || !state.password || !state.firstname || !state.lastname || !accountType.value) {
     return
   }
 
   isLoading.value = true
-  const { error } = await userQuery.register(state.securityCode, state.email, state.password, state.firstname, state.lastname)
+  const { error } = await userQuery.register({
+    accountType: accountType.value,
+    securityCode: state.securityCode,
+
+    email: state.email,
+    password: state.password,
+    firstname: state.firstname,
+    lastname: state.lastname,
+
+    clubName: state.clubName,
+    clubEmail: state.clubEmail,
+    clubPhone: state.clubPhone,
+    clubAddress: state.clubAddress,
+    clubZipCode: state.clubZipCode,
+    clubCity: state.clubCity,
+    clubSiret: state.clubSiret,
+    clubVat: state.clubVat,
+  })
   isLoading.value = false
 
   if (error) {
@@ -175,7 +203,7 @@ onBeforeUnmount(() => {
             description="Seul le dernier code de sécurité reçu est valide."
           />
           <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="register">
-            <UFormField label="Code de sécurité" name="securityCode">
+            <UFormField label="Code de sécurité" name="securityCode" required>
               <UInput v-model.trim="state.securityCode" />
             </UFormField>
 
@@ -191,25 +219,52 @@ onBeforeUnmount(() => {
               </UFormField>
             </template>
 
-            <UFormField label="Email" name="email">
+            <UFormField label="Email" name="email" required>
               <UInput v-model.trim="state.email" type="email" />
             </UFormField>
 
-            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Mot de passe" name="password">
+            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Mot de passe" name="password" required>
               <UInput v-model="state.password" type="password" />
             </UFormField>
 
-            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Nom" name="lastname">
+            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Nom" name="lastname" required>
               <UInput v-model="state.lastname" />
             </UFormField>
 
-            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Prénom" name="firstname">
+            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Prénom" name="firstname" required>
               <UInput v-model="state.firstname" />
             </UFormField>
 
             <template v-if="accountType === 'club'">
               <USeparator label="Informations sur l'association" />
-              Test
+
+              <UFormField label="Nom" name="clubName" required>
+                <UInput v-model="state.clubName" />
+              </UFormField>
+              <UFormField label="Email" name="clubEmail" required>
+                <UInput v-model.trim="state.clubEmail" type="email" />
+              </UFormField>
+              <UFormField label="Téléphone" name="clubPhone">
+                <UInput v-model="state.clubPhone" />
+              </UFormField>
+              <UFormField label="Adresse" name="address" required>
+                <UInput v-model="state.clubAddress" />
+              </UFormField>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <UFormField label="Code postal" name="zipCode" required>
+                  <UInput v-model="state.clubZipCode" />
+                </UFormField>
+                <UFormField label="Ville" name="city" required>
+                  <UInput v-model="state.clubCity" />
+                </UFormField>
+              </div>
+              <UFormField label="Siret" name="siret">
+                <UInput v-model="state.clubSiret" />
+              </UFormField>
+              <UFormField label="TVA" name="vat">
+                <UInput v-model="state.clubVat" />
+              </UFormField>
+
             </template>
 
             <UFormField required name="legals">

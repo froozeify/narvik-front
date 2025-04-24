@@ -66,20 +66,20 @@ const selfStore = useSelfUserStore()
       </div>
 
       <div>
-        <p v-if="selfStore.selectedProfile.club.address">
+        <p>
           <b>Adresse</b> : {{ selfStore.selectedProfile.club.address }}
         </p>
-        <p v-if="selfStore.selectedProfile.club.zipCode">
+        <p>
           <b>Code postal</b> : {{ selfStore.selectedProfile.club.zipCode }}
         </p>
-        <p v-if="selfStore.selectedProfile.club.city">
+        <p>
           <b>Ville</b> : {{ selfStore.selectedProfile.club.city }}
         </p>
-        <p v-if="selfStore.selectedProfile.club.siret">
-          <b>Siret</b> : {{ selfStore.selectedProfile.club.siret }}
+        <p>
+          <b>Siret</b> : {{ selfStore.selectedProfile.club.siret ?? 'Non défini' }}
         </p>
-        <p v-if="selfStore.selectedProfile.club.vat">
-          <b>TVA</b> : {{ selfStore.selectedProfile.club.vat }}
+        <p>
+          <b>TVA</b> : {{ selfStore.selectedProfile.club.vat ?? 'Non défini' }}
         </p>
       </div>
     </GenericCard>
