@@ -40,6 +40,7 @@ export const useAppConfigStore = defineStore('appConfig', () => {
   }
 
   async function refresh(requireLogin?: boolean) {
+    console.log('call')
     const selfStore = useSelfUserStore()
 
     if (requireLogin == undefined) requireLogin = selfStore.isLogged()
@@ -58,20 +59,11 @@ export const useAppConfigStore = defineStore('appConfig', () => {
     return logoNk
   }
 
-  function getModuleConfig(name: string): Ref<ConfigValue|null> {
-    if (!config.value || !config.value.modules || !config.value.modules[name]) {
-      return ref(null)
-    }
-
-    return ref(config.value.modules[name])
-  }
-
 	return {
 		config,
 
 		refresh,
 		getLogo,
 		getLogoNk,
-    getModuleConfig,
 	}
 })

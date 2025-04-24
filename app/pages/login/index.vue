@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type {FormError, FormSubmitEvent} from '#ui/types'
 import {useLoginUser} from "~/composables/api/api";
-import type {Image} from "~/types/api/item/image";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import ModalLegalsAcceptance from "~/components/Modal/ModalLegalsAcceptance.vue";
@@ -19,7 +18,6 @@ const appConfigStore = useAppConfigStore();
 
 const selfStore = useSelfUserStore();
 const siteLogo: Ref<string> = appConfigStore.getLogo()
-const notificationsModule = appConfigStore.getModuleConfig('notifications')
 
 const validate = (state: any): FormError[] => {
   const errors = []
@@ -81,7 +79,7 @@ function redirectSuccessLogin() {
         </UFormField>
 
         <div class="flex justify-end !-mt-0 ">
-          <UButton class="text-xs" v-if="notificationsModule && notificationsModule['enabled']" variant="link" @click="navigateTo('login/password-reset')">
+          <UButton class="text-xs" variant="link" @click="navigateTo('login/password-reset')">
             Mot de passe oublié
           </UButton>
         </div>
