@@ -6,9 +6,9 @@ export interface UserRegister {
   accountType: string,
   securityCode: string,
   email: string,
-  password: string,
-  firstname: string,
-  lastname: string,
+  password?: string,
+  firstname?: string,
+  lastname?: string,
 
   clubName?: string,
   clubEmail?: string,
@@ -23,8 +23,9 @@ export interface UserRegister {
 export default class UserQuery extends AbstractQuery<User, User> {
   rootPath = "users";
 
-  async registerInitialise(email: string, turnstileToken: string|undefined = undefined) {
+  async registerInitialise(accountType: string, email: string, turnstileToken: string|undefined = undefined) {
     return usePostRawJson(`${this.rootPath}/-/initiate-register`, {
+      accountType: accountType,
       email: email,
       token: turnstileToken
     });

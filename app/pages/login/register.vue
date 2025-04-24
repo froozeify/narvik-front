@@ -4,6 +4,7 @@ import {useAppConfigStore} from "~/stores/useAppConfig";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {isMobile, isTablet, watchBreakpoint} from "~/utils/browser";
 import type {NuxtTurnstile} from "#components";
+import {useLoginUser} from "~/composables/api/api";
 
 const toast = useToast()
 const isLoading = ref(false)
@@ -76,15 +77,19 @@ const validate = (state: any): FormError[] => {
   const errors = []
   if (!state.securityCode) errors.push({ name: 'securityCode', message: 'Champ requis' })
   if (!state.email) errors.push({ name: 'email', message: 'Champ requis' })
-  if (!state.password || state.password.length < 8) errors.push({ name: 'password', message: 'Champ requis (8 caractères minimum)' })
-  if (!state.firstname) errors.push({ name: 'firstname', message: 'Champ requis' })
-  if (!state.lastname) errors.push({ name: 'lastname', message: 'Champ requis' })
+
+  if (accountType.value !== 'club' || !alreadyAnAccount.value) {
+    if (!state.password || state.password.length < 8) errors.push({ name: 'password', message: 'Champ requis (8 caractères minimum)' })
+    if (!state.firstname) errors.push({ name: 'firstname', message: 'Champ requis' })
+    if (!state.lastname) errors.push({ name: 'lastname', message: 'Champ requis' })
+  }
+
   if (!state.legals) errors.push({ name: 'legals', message: 'Vous devez accepter les conditions légales' })
   return errors
 }
 
 async function register() {
-  if (!state.securityCode || !state.email || !state.password || !state.firstname || !state.lastname || !accountType.value) {
+  if (!state.securityCode || !state.email || ( (accountType.value !== 'club' || !alreadyAnAccount.value) && (!state.password || !state.firstname || !state.lastname)) || !accountType.value) {
     return
   }
 
@@ -119,15 +124,27 @@ async function register() {
   }
 
   toast.add({
-    color: "success",
     title: "Le compte a été créé",
   });
+
+  // We log the user directly
+  if (state.password) {
+    const { error } = await useLoginUser(state.email, state.password);
+    if (!error) {
+      if (accountType.value === 'club') {
+        navigateTo('/admin')
+      } else {
+        navigateTo('/')
+      }
+      return
+    }
+  }
 
   navigateTo('/login');
 }
 
 async function initiateRegister() {
-  if (!state.email) {
+  if (!state.email || !accountType.value) {
     return
   }
 
@@ -137,7 +154,7 @@ async function initiateRegister() {
   }
 
   isLoading.value = true
-  const { error } = await userQuery.registerInitialise(state.email, state.turnstileToken)
+  const { error } = await userQuery.registerInitialise(accountType.value, state.email, state.turnstileToken)
   isLoading.value = false
   turnstile.value?.reset()
 
@@ -182,6 +199,10 @@ onBeforeUnmount(() => {
       <UTabs v-model="selected" :items="items">
         <template #initial>
             <UForm :state="state" class="space-y-4" @submit="initiateRegister">
+              <UFormField label="Type de compte" name="accountType">
+                <USelect v-model="accountType" :items="accountTypes" value-key="value" :icon="accountTypeIcon" />
+              </UFormField>
+
               <UFormField label="Email" name="email">
                 <UInput v-model="state.email" type="email" />
               </UFormField>
