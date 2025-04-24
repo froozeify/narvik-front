@@ -9,11 +9,13 @@ import {useLoginUser} from "~/composables/api/api";
 const toast = useToast()
 const isLoading = ref(false)
 
+const queryParams = useRoute().query
+
 const state = reactive({
   turnstileToken: undefined as string|undefined,
-  securityCode: undefined as string|undefined,
+  securityCode: queryParams.security_code ?? undefined as string|undefined,
 
-  email: undefined as string|undefined,
+  email: queryParams.email ? decodeURI(queryParams.email.toString()) : undefined as string|undefined,
   password: undefined as string|undefined,
   firstname: undefined as string|undefined,
   lastname: undefined as string|undefined,
@@ -44,7 +46,8 @@ watchEffect(() => {
   isHorizontal.value = !isMobileDisplay.value
 })
 
-const selected = ref('0')
+
+const selected = ref(queryParams.security_code ? '1' : '0')
 const items = ref<TabsItem[]>([
   {
     slot: 'initial' as const,
@@ -69,7 +72,7 @@ const accountTypes = ref([
     icon: 'i-heroicons-building-storefront'
   }
 ] satisfies SelectItem[])
-const accountType = ref(accountTypes.value[0]?.value)
+const accountType = ref(queryParams.account_type ?? accountTypes.value[0]?.value)
 const accountTypeIcon = computed(() => accountTypes.value.find(item => item.value === accountType.value)?.icon)
 const alreadyAnAccount = ref(false)
 
@@ -218,7 +221,7 @@ onBeforeUnmount(() => {
         <template #create>
           <UAlert
             icon="i-heroicons-megaphone"
-            color="warning"
+            color="error"
             variant="soft"
             title="En cas de code invalide, un nouveau sera envoyé."
             description="Seul le dernier code de sécurité reçu est valide."
