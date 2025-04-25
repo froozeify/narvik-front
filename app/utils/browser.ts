@@ -11,18 +11,40 @@ export function verifyCameraIsPresent(): Ref<boolean> {
   return isCameraPresent
 }
 
+export function extractDataFromBase64Encoded(base64: string) {
+  const split = base64.split(',')
+  return split[1] ?? split[0]
+}
+
+export function base64ToBlob(base64: string, type = "application/octet-stream" ) {
+  const data = extractDataFromBase64Encoded(base64)
+
+  const binStr = atob( data );
+  const len = binStr.length;
+  const arr = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    arr[ i ] = binStr.charCodeAt( i );
+  }
+  return new Blob( [ arr ], { type: type } );
+}
+
+function createBrowserDownload(filename: string, blob: Blob) {
+  const elem = window.document.createElement('a')
+  elem.href = window.URL.createObjectURL(blob)
+  elem.download = filename
+  document.body.appendChild(elem)
+  elem.click()
+  document.body.removeChild(elem)
+}
+
 export function createBrowserCsvDownload(filename: string, data: any) {
   const blob = new Blob([data], {type: 'text/csv'})
-  if(window.navigator.msSaveOrOpenBlob) {
-    window.navigator.msSaveBlob(blob, filename)
-  } else {
-    const elem = window.document.createElement('a')
-    elem.href = window.URL.createObjectURL(blob)
-    elem.download = filename
-    document.body.appendChild(elem)
-    elem.click()
-    document.body.removeChild(elem)
-  }
+  createBrowserDownload(filename, blob)
+}
+
+export function createBrowserPdfDownload(filename: string, base64: string) {
+  const blob = base64ToBlob(base64, 'application/pdf')
+  createBrowserDownload(filename, blob)
 }
 
 /**
