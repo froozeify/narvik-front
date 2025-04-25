@@ -23,6 +23,11 @@
       label: 'Email',
       icon: 'i-heroicons-envelope',
       to: '/super-admin/config/email'
+    },
+    {
+      label: 'Documents légaux',
+      icon: 'i-heroicons-scale',
+      to: '/super-admin/config/legals'
     }
   ]
 
