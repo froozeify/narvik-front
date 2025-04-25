@@ -2,8 +2,8 @@
 import type {PropType} from "vue";
 import {type Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
-import type {Image} from "~/types/api/item/image";
-import ImageQuery from "~/composables/api/query/ImageQuery";
+import type {ExposedFile} from "~/types/api/item/exposedFile";
+import FileQuery from "~/composables/api/query/FileQuery";
 import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
 import {formatDate, formatDateReadable} from "~/utils/date"
@@ -61,7 +61,7 @@ const selectedPresence: Ref<MemberPresence | undefined> = ref(undefined)
 const memberPresenceModal: Ref<boolean> = ref(false);
 
 const member: Ref<Member | undefined> = ref(undefined)
-const memberProfileImage: Ref<Image | undefined> = ref(undefined)
+const memberProfileImage: Ref<ExposedFile | undefined> = ref(undefined)
 const memberPresences: Ref<MemberPresence[]> = ref([])
 const totalMemberPresences = computed(() => memberPresences.value.length)
 
@@ -103,7 +103,7 @@ const memberQuery = new MemberQuery();
 let memberSeasonQuery: MemberSeasonQuery|null = null
 
 const memberPresenceQuery = new MemberPresenceQuery();
-const imageQuery = new ImageQuery();
+const fileQuery = new FileQuery();
 
 const activityQuery = new ActivityQuery()
 const filteredActivities: Ref<SelectApiItem<Activity>[]> = ref([])
@@ -146,7 +146,8 @@ watch(member, (newValue, oldValue) => {
       memberSeasonQuery = new MemberSeasonQuery(member.value)
 
       if (member.value.profileImage?.privateUrl) {
-        imageQuery.getFromUrl(member.value.profileImage.privateUrl).then(imageResponse => {
+        console.log(member.value.profileImage.privateUrl)
+        fileQuery.getFromUrl(member.value.profileImage.privateUrl).then(imageResponse => {
           memberProfileImage.value = imageResponse.retrieved
         })
       }

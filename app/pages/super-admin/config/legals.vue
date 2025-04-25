@@ -19,18 +19,61 @@ const isUploading = ref(false)
 const popoverLegalsOpen = ref(false)
 
 const legalsLastUpdate: Ref<Date|undefined> = ref(undefined)
+const legalsCguLink: Ref<string|undefined> = ref(undefined)
+const legalsCgvLink: Ref<string|undefined> = ref(undefined)
+const legalsPrivacyLink: Ref<string|undefined> = ref(undefined)
 
 const globalSettingQuery = new GlobalSettingQuery();
 
-async function getLasLegalsDate() {
+async function loadLegalsLastUpdate() {
   const { retrieved, error } = await globalSettingQuery.getPublic(GlobalSettingPublicEnum.LEGALS_LAST_UPDATE)
   if (error) {
     console.error(error)
   }
-
   if (retrieved) {
     legalsLastUpdate.value = retrieved.value ? dayjs(retrieved.value).toDate() : undefined
   }
+}
+
+async function loadLegalsCgu() {
+  const { retrieved, error } = await globalSettingQuery.getPublic(GlobalSettingPublicEnum.LEGALS_CGU)
+  if (error) {
+    console.error(error)
+  }
+  if (retrieved) {
+    legalsCguLink.value = retrieved.value
+  }
+}
+
+async function loadLegalsCgv() {
+  const { retrieved, error } = await globalSettingQuery.getPublic(GlobalSettingPublicEnum.LEGALS_CGV)
+  if (error) {
+    console.error(error)
+  }
+  if (retrieved) {
+    legalsCgvLink.value = retrieved.value
+  }
+}
+
+async function loadLegalsPrivacy() {
+  const { retrieved, error } = await globalSettingQuery.getPublic(GlobalSettingPublicEnum.LEGALS_PRIVACY_POLICY)
+  if (error) {
+    console.error(error)
+  }
+  if (retrieved) {
+    legalsPrivacyLink.value = retrieved.value
+  }
+}
+
+async function loadLegals() {
+  await Promise.all([
+    loadLegalsLastUpdate(),
+    loadLegalsCgu(),
+    loadLegalsCgv(),
+    loadLegalsPrivacy()
+  ])
+
+  await loadLegalsLastUpdate()
 }
 
 async function updateLegalsDate() {
@@ -45,7 +88,7 @@ async function updateLegalsDate() {
 }
 
 // Code run at page load
-getLasLegalsDate()
+loadLegals()
 
 </script>
 
@@ -72,13 +115,15 @@ getLasLegalsDate()
         @change="console.log('file')"
       />
 
+      {{ legalsCgvLink }}
+
       <UButton class="mt-2">Afficher le pdf</UButton>
     </GenericCard>
     <GenericCard title="Condition d'Utilisation">
-
+      {{ legalsCguLink }}
     </GenericCard>
     <GenericCard title="Politique de confidentialité">
-
+      {{ legalsPrivacyLink }}
     </GenericCard>
   </div>
 </template>

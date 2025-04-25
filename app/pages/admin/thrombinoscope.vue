@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type {Member} from "~/types/api/item/clubDependent/member";
   import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
-  import ImageQuery from "~/composables/api/query/ImageQuery";
+  import FileQuery from "~/composables/api/query/FileQuery";
   import {convertUuidToUrlUuid} from "~/utils/resource";
 
   definePageMeta({
@@ -25,7 +25,7 @@
   const members: Ref<Member[]> = ref([]);
 
   const memberQuery = new MemberQuery();
-  const imageQuery = new ImageQuery();
+  const fileQuery = new FileQuery();
 
   getMembers();
 
@@ -71,7 +71,7 @@
   async function loadMemberProfileImage(member: Member) {
     if (!member.profileImage?.privateUrl) return null;
 
-    const { retrieved } = await imageQuery.getFromUrl(member.profileImage.privateUrl);
+    const { retrieved } = await fileQuery.getFromUrl(member.profileImage.privateUrl);
     if (!retrieved || !retrieved.base64) return null
 
     return retrieved.base64

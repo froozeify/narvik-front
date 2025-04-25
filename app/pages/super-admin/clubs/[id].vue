@@ -4,7 +4,7 @@ import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.
 import type {Club, WriteClub} from "~/types/api/item/club";
 import ClubQuery from "~/composables/api/query/ClubQuery";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
-import ImageQuery from "~/composables/api/query/ImageQuery";
+import FileQuery from "~/composables/api/query/FileQuery";
 import {formatDateReadable} from "~/utils/date";
 import dayjs from "dayjs";
 import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRenewDate.vue";
@@ -108,8 +108,8 @@ async function loadClubSettings() {
 
 async function loadClubLogo() {
   if (!club.value?.settings.logo?.publicUrl) return null;
-  const imageQuery = new ImageQuery();
-  const { retrieved } = await imageQuery.getFromUrl(club.value.settings.logo.publicUrl);
+  const fileQuery = new FileQuery();
+  const { retrieved } = await fileQuery.getFromUrl(club.value.settings.logo.publicUrl);
 
   if (!retrieved || !retrieved.base64) return null
 

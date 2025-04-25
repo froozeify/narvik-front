@@ -1,9 +1,9 @@
 import type {Ref} from "vue";
 import type {Config} from "~/types/api/item/config";
-import ImageQuery from "~/composables/api/query/ImageQuery";
+import FileQuery from "~/composables/api/query/FileQuery";
 import ConfigQuery from "~/composables/api/query/ConfigQuery";
 import {useSelfUserStore} from "~/stores/useSelfUser";
-import type {Image} from "~/types/api/item/image";
+import type {ExposedFile} from "~/types/api/item/exposedFile";
 import type {ConfigValue} from "~/types/api/configValue";
 import {defineStore} from "pinia";
 import {isDarkMode} from "~/utils/browser";
@@ -40,7 +40,6 @@ export const useAppConfigStore = defineStore('appConfig', () => {
   }
 
   async function refresh(requireLogin?: boolean) {
-    console.log('call')
     const selfStore = useSelfUserStore()
 
     if (requireLogin == undefined) requireLogin = selfStore.isLogged()

@@ -3,8 +3,8 @@ import type {PropType} from "vue";
 import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import clipboard from "clipboardy";
 import RegisterMemberPresence from "~/components/PresentMember/RegisterMemberPresence.vue";
-import type {Image} from "~/types/api/item/image";
-import ImageQuery from "~/composables/api/query/ImageQuery";
+import type {ExposedFile} from "~/types/api/item/exposedFile";
+import FileQuery from "~/composables/api/query/FileQuery";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import type {Member} from "~/types/api/item/clubDependent/member";
 import {formatDateReadable} from "~/utils/date";
@@ -40,7 +40,7 @@ const emit = defineEmits([
   'close'
 ])
 
-const imageQuery = new ImageQuery()
+const fileQuery = new FileQuery()
 const memberQuery = new MemberQuery()
 const memberPresenceQuery = new MemberPresenceQuery()
 
@@ -49,7 +49,7 @@ const popoverOpen = ref(false)
 const memberPresence: Ref<MemberPresence> = ref(props.item)
 const member: Ref<Member | undefined> = ref(undefined)
 
-const memberProfileImage: Ref<Image|undefined> = ref(undefined)
+const memberProfileImage: Ref<ExposedFile|undefined> = ref(undefined)
 
 const isLoadingPresences = ref(false)
 const memberPresences: Ref<MemberPresence[]> = ref([])
@@ -71,7 +71,7 @@ if (memberPresence.value && memberPresence.value.member?.uuid) {
 
       // We load the profile image
       if (memberResponse.retrieved.profileImage?.privateUrl) {
-        imageQuery.getFromUrl(memberResponse.retrieved.profileImage.privateUrl).then(profileImage => {
+        fileQuery.getFromUrl(memberResponse.retrieved.profileImage.privateUrl).then(profileImage => {
           if (profileImage.retrieved) {
             memberProfileImage.value = profileImage.retrieved
           }
