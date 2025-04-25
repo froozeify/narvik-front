@@ -13,7 +13,7 @@ export function verifyCameraIsPresent(): Ref<boolean> {
 
 export function extractDataFromBase64Encoded(base64: string) {
   const split = base64.split(',')
-  return split[1] ?? split[0]
+  return split[1] ?? split[0] ?? ''
 }
 
 export function base64ToBlob(base64: string, type = "application/octet-stream" ) {
