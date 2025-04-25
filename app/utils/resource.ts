@@ -1,4 +1,5 @@
 import UuidEncoder from "uuid-encoder";
+import type {NuxtError} from "#app";
 
 export const getIdFromIri = (iri?: string): string => {
   if (!iri) return "";
@@ -69,7 +70,13 @@ export function formatErrorFromApiResponse(response: any): object {
       message: `Unknown exception`
     }
   }
-
-
   return response
+}
+
+export function displayApiError(error: NuxtError, title: string|undefined = undefined) {
+  useToast().add({
+    color: "error",
+    title: title ?? "Une erreur est survenue",
+    description: error.message
+  })
 }
