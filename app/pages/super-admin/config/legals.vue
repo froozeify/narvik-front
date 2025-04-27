@@ -137,7 +137,7 @@ loadLegals()
         </template>
       </UPopover>
     </GenericCard>
-    <GenericCard title="Condition Générales de vente">
+    <GenericCard title="Conditions Générales de vente">
       <UInput
         :loading="isUploading"
         type="file"
@@ -153,7 +153,7 @@ loadLegals()
         Afficher le pdf
       </UButton>
     </GenericCard>
-    <GenericCard title="Condition Générales d'Utilisation">
+    <GenericCard title="Conditions Générales d'Utilisation">
       <UInput
         :loading="isUploading"
         type="file"
