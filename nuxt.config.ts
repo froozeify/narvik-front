@@ -35,7 +35,6 @@ export default defineNuxtConfig({
 
   site: {
     name: 'Narvik',
-    indexable: false
   },
 
   app: {
