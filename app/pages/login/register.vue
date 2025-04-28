@@ -262,10 +262,10 @@ onBeforeUnmount(() => {
             <template v-if="accountType === 'club'">
               <USeparator label="Informations sur l'association" />
 
-              <UFormField label="Nom" name="clubName" required>
+              <UFormField label="Nom de l'association" name="clubName" required>
                 <UInput v-model="state.clubName" />
               </UFormField>
-              <UFormField label="Email" name="clubEmail" required>
+              <UFormField label="Email" description="Utilisé principalement pour la facturation." name="clubEmail" required>
                 <UInput v-model.trim="state.clubEmail" type="email" />
               </UFormField>
               <UFormField label="Téléphone" name="clubPhone">
