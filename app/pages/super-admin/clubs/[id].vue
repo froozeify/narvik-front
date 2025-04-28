@@ -247,7 +247,7 @@ loadClubUsers()
             <div class="flex flex-col justify-center">
               <div v-if="club.website" class="flex justify-center items-center">
                 <UIcon class="mr-2" name="i-heroicons-link" />
-                <UButton variant="link">{{ club.website }}</UButton>
+                <UButton variant="link" :to="club.website" target="_blank">{{ club.website }}</UButton>
               </div>
 
               <div v-if="club.contactName" class="flex justify-center items-center">
