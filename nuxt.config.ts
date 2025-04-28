@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     'pinia-plugin-persistedstate/nuxt',
     'nuxt-api-party',
     '@nuxtjs/turnstile',
+    '@nuxtjs/seo',
   ],
 
   css: ['~/assets/css/main.css'],
@@ -30,6 +31,11 @@ export default defineNuxtConfig({
   piniaPluginPersistedstate: {
     storage: 'localStorage',
     key: 'narvik_%id',
+  },
+
+  site: {
+    name: 'Narvik',
+    indexable: false
   },
 
   app: {
@@ -66,4 +72,14 @@ export default defineNuxtConfig({
     siteKey: '',
     addValidateEndpoint: false
   },
+
+  // Require ssr, so we disable it
+  ogImage: {
+    enabled: false
+  },
+
+  robots: {
+    disallow: ['*'],
+    allow: ['/login', '/login/**'],
+  }
 })
