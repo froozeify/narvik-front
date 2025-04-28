@@ -13,8 +13,8 @@ const selfStore = useSelfUserStore()
 </script>
 
 <template>
-  <div>
-    <UCard>
+  <div class="grid grid-cols-1 sm:grid-cols-6 gap-4">
+    <UCard class="sm:col-span-4">
       <div class="flex gap-2 flex-row flex-wrap">
         <div class="text-xl font-bold">Information sur l'abonnement</div>
         <div class="flex-1"></div>
@@ -31,7 +31,7 @@ const selfStore = useSelfUserStore()
         <div v-if="!selfStore.selectedProfile?.club">
           <UAlert
             color="error"
-            title="Impossible d'obtenir les informations sur le club."
+            title="Impossible d'obtenir les informations sur l'association."
             description="Veuillez rafraichir la page ou vous reconnecter si cela ne corrige pas le problème."
           />
         </div>
@@ -39,18 +39,11 @@ const selfStore = useSelfUserStore()
           <p>
             <b>Statut</b> : <span :class="selfStore.selectedProfile.club.isActivated ? '' : 'text-error-500'">{{ selfStore.selectedProfile.club.isActivated ? 'Actif' : 'Non actif' }}</span>
           </p>
+
           <p v-if="selfStore.selectedProfile.club.renewDate">
             <b>Date de renouvellement</b> : {{ formatDateReadable(selfStore.selectedProfile.club.renewDate.toString()) }}
           </p>
-          <p v-if="selfStore.selectedProfile.club.contactName">
-            <b>Nom du contact</b> : {{ selfStore.selectedProfile.club.contactName }}
-          </p>
-          <p v-if="selfStore.selectedProfile.club.contactEmail">
-            <b>Email de contact</b> : {{ selfStore.selectedProfile.club.contactEmail }}
-          </p>
-          <p v-if="selfStore.selectedProfile.club.contactPhone">
-            <b>Téléphone</b> : {{ selfStore.selectedProfile.club.contactPhone }}
-          </p>
+
 
           <UCard class="mt-4">
             <ClubSubscriptionList :item="selfStore.selectedProfile.club" />
@@ -58,5 +51,37 @@ const selfStore = useSelfUserStore()
         </div>
       </div>
     </UCard>
+
+    <GenericCard v-if="selfStore.selectedProfile?.club" class="sm:col-span-2 h-fit" title="Facturation">
+      <div class="mb-4">
+        <p v-if="selfStore.selectedProfile.club.contactName">
+          <b>Nom</b> : {{ selfStore.selectedProfile.club.contactName }}
+        </p>
+        <p v-if="selfStore.selectedProfile.club.contactEmail">
+          <b>Email</b> : {{ selfStore.selectedProfile.club.contactEmail }}
+        </p>
+        <p v-if="selfStore.selectedProfile.club.contactPhone">
+          <b>Téléphone</b> : {{ selfStore.selectedProfile.club.contactPhone }}
+        </p>
+      </div>
+
+      <div>
+        <p>
+          <b>Adresse</b> : {{ selfStore.selectedProfile.club.address }}
+        </p>
+        <p>
+          <b>Code postal</b> : {{ selfStore.selectedProfile.club.zipCode }}
+        </p>
+        <p>
+          <b>Ville</b> : {{ selfStore.selectedProfile.club.city }}
+        </p>
+        <p>
+          <b>Siret</b> : {{ selfStore.selectedProfile.club.siret ?? 'Non défini' }}
+        </p>
+        <p>
+          <b>TVA</b> : {{ selfStore.selectedProfile.club.vat ?? 'Non défini' }}
+        </p>
+      </div>
+    </GenericCard>
   </div>
 </template>

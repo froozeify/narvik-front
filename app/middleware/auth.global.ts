@@ -4,7 +4,7 @@ import {useAppConfigStore} from "~/stores/useAppConfig";
 
 const publicPaths = [
   "^/login$",
-  "^/login/password-reset$",
+  "^/login/password-reset",
   "^/login/register",
   "^/login/bdg/.*",
 ]

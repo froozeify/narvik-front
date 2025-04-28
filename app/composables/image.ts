@@ -1,4 +1,4 @@
-import type {Image} from "~/types/api/item/image";
+import type {ExposedFile} from "~/types/api/item/exposedFile";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 

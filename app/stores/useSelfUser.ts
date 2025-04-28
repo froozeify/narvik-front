@@ -3,7 +3,7 @@ import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {MIME_TYPE_JSON, usePostRawJson} from "~/composables/api/api";
 import {JwtToken} from "~/types/jwtTokens";
 import type {Ref} from "vue";
-import ImageQuery from "~/composables/api/query/ImageQuery";
+import FileQuery from "~/composables/api/query/FileQuery";
 import {defineStore} from "pinia";
 import dayjs from "dayjs";
 import UserQuery from "~/composables/api/query/UserQuery";
@@ -261,8 +261,8 @@ export const useSelfUserStore = defineStore('selfUser', () => {
   async function loadProfileImage() {
     if (!member.value || !member.value.profileImage?.privateUrl) return null;
 
-    const imageQuery = new ImageQuery();
-    const { retrieved } = await imageQuery.getFromUrl(member.value.profileImage.privateUrl);
+    const fileQuery = new FileQuery();
+    const { retrieved } = await fileQuery.getFromUrl(member.value.profileImage.privateUrl);
 
     if (!retrieved || !retrieved.base64) return null
 
@@ -271,8 +271,8 @@ export const useSelfUserStore = defineStore('selfUser', () => {
 
   async function loadClubLogo() {
     if (!selectedProfile.value?.club.settings.logo?.publicUrl) return null;
-    const imageQuery = new ImageQuery();
-    const { retrieved } = await imageQuery.getFromUrl(selectedProfile.value.club.settings.logo.publicUrl);
+    const fileQuery = new FileQuery();
+    const { retrieved } = await fileQuery.getFromUrl(selectedProfile.value.club.settings.logo.publicUrl);
 
     if (!retrieved || !retrieved.base64) return null
 

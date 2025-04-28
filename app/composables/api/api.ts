@@ -72,7 +72,11 @@ async function useApi<T>(path: string, options: UseApiDataOptions<T> = {}, requi
   }
 
   if (!overloadedOptions?.headers?.Authorization) {
-    overloadedOptions.headers.Authorization = getBasicAuthorization()
+    overloadedOptions = mergician({
+      headers: {
+        Authorization: getBasicAuthorization()
+      }
+    }, options);
   }
 
   return await $localApi<T>(path, overloadedOptions);

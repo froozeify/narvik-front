@@ -1,21 +1,35 @@
 <script setup lang="ts">
-import type {FormError, TabsItem} from '#ui/types'
+import type {FormError, SelectItem, TabsItem} from '#ui/types'
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {isMobile, isTablet, watchBreakpoint} from "~/utils/browser";
 import type {NuxtTurnstile} from "#components";
+import {useLoginUser} from "~/composables/api/api";
 
 const toast = useToast()
 const isLoading = ref(false)
 
+const queryParams = useRoute().query
+
 const state = reactive({
-  turnstileToken: undefined,
-  securityCode: undefined,
-  email: undefined,
-  password: undefined,
-  firstname: undefined,
-  lastname: undefined,
-  legals: undefined,
+  turnstileToken: undefined as string|undefined,
+  securityCode: queryParams.security_code ?? undefined as string|undefined,
+
+  email: queryParams.email ? decodeURI(queryParams.email.toString()) : undefined as string|undefined,
+  password: undefined as string|undefined,
+  firstname: undefined as string|undefined,
+  lastname: undefined as string|undefined,
+
+  clubName: undefined as string|undefined,
+  clubEmail: undefined as string|undefined,
+  clubPhone: undefined as string|undefined,
+  clubAddress: undefined as string|undefined,
+  clubZipCode: undefined as number|undefined,
+  clubCity: undefined as string|undefined,
+  clubSiret: undefined as string|undefined,
+  clubVat: undefined as string|undefined,
+
+  legals: false,
 })
 
 const turnstile = ref<InstanceType<typeof NuxtTurnstile>>()
@@ -32,58 +46,108 @@ watchEffect(() => {
   isHorizontal.value = !isMobileDisplay.value
 })
 
-const selected = ref('0')
+
+const selected = ref(queryParams.security_code ? '1' : '0')
 const items = ref<TabsItem[]>([
   {
     slot: 'initial' as const,
     label: 'Demande de création',
     icon: 'i-heroicons-lock-closed',
   }, {
-    slot: 'reset' as const,
+    slot: 'create' as const,
     label: 'Validation et création',
     icon: 'i-heroicons-envelope-open',
   }
 ])
 
+const accountTypes = ref([
+  {
+    label: 'Personnel',
+    value: 'personal',
+    icon: 'i-heroicons-user'
+  },
+  {
+    label: 'Association',
+    value: 'club',
+    icon: 'i-heroicons-building-storefront'
+  }
+] satisfies SelectItem[])
+const accountType = ref(queryParams.account_type ?? accountTypes.value[0]?.value)
+const accountTypeIcon = computed(() => accountTypes.value.find(item => item.value === accountType.value)?.icon)
+const alreadyAnAccount = ref(false)
+
 const validate = (state: any): FormError[] => {
   const errors = []
   if (!state.securityCode) errors.push({ name: 'securityCode', message: 'Champ requis' })
   if (!state.email) errors.push({ name: 'email', message: 'Champ requis' })
-  if (!state.password || state.password.length < 8) errors.push({ name: 'password', message: 'Champ requis (8 caractères minimum)' })
-  if (!state.firstname) errors.push({ name: 'firstname', message: 'Champ requis' })
-  if (!state.lastname) errors.push({ name: 'lastname', message: 'Champ requis' })
+
+  if (accountType.value !== 'club' || !alreadyAnAccount.value) {
+    if (!state.password || state.password.length < 8) errors.push({ name: 'password', message: 'Champ requis (8 caractères minimum)' })
+    if (!state.firstname) errors.push({ name: 'firstname', message: 'Champ requis' })
+    if (!state.lastname) errors.push({ name: 'lastname', message: 'Champ requis' })
+  }
+
   if (!state.legals) errors.push({ name: 'legals', message: 'Vous devez accepter les conditions légales' })
   return errors
 }
 
 async function register() {
-  if (!state.securityCode || !state.email || !state.password || !state.firstname || !state.lastname) {
+  if (!state.securityCode || !state.email || ( (accountType.value !== 'club' || !alreadyAnAccount.value) && (!state.password || !state.firstname || !state.lastname)) || !accountType.value) {
     return
   }
 
   isLoading.value = true
-  const { error } = await userQuery.register(state.securityCode, state.email, state.password, state.firstname, state.lastname)
+  const { error } = await userQuery.register({
+    accountType: accountType.value,
+    securityCode: state.securityCode,
+
+    email: state.email,
+    password: state.password,
+    firstname: state.firstname,
+    lastname: state.lastname,
+
+    clubName: state.clubName,
+    clubEmail: state.clubEmail,
+    clubPhone: state.clubPhone,
+    clubAddress: state.clubAddress,
+    clubZipCode: state.clubZipCode,
+    clubCity: state.clubCity,
+    clubSiret: state.clubSiret,
+    clubVat: state.clubVat,
+  })
   isLoading.value = false
 
   if (error) {
     toast.add({
       color: "error",
       title: "Impossible d'effectuer la création du compte.",
-      description: error.data?.detail ?? error.message
+      description: error.message
     });
     return;
   }
 
   toast.add({
-    color: "success",
     title: "Le compte a été créé",
   });
+
+  // We log the user directly
+  if (state.password) {
+    const { error } = await useLoginUser(state.email, state.password);
+    if (!error) {
+      if (accountType.value === 'club') {
+        navigateTo('/admin')
+      } else {
+        navigateTo('/')
+      }
+      return
+    }
+  }
 
   navigateTo('/login');
 }
 
 async function initiateRegister() {
-  if (!state.email) {
+  if (!state.email || !accountType.value) {
     return
   }
 
@@ -93,7 +157,7 @@ async function initiateRegister() {
   }
 
   isLoading.value = true
-  const { error } = await userQuery.registerInitialise(state.email, state.turnstileToken)
+  const { error } = await userQuery.registerInitialise(accountType.value, state.email, state.turnstileToken)
   isLoading.value = false
   turnstile.value?.reset()
 
@@ -138,6 +202,10 @@ onBeforeUnmount(() => {
       <UTabs v-model="selected" :items="items">
         <template #initial>
             <UForm :state="state" class="space-y-4" @submit="initiateRegister">
+              <UFormField label="Type de compte" name="accountType">
+                <USelect v-model="accountType" :items="accountTypes" value-key="value" :icon="accountTypeIcon" />
+              </UFormField>
+
               <UFormField label="Email" name="email">
                 <UInput v-model="state.email" type="email" />
               </UFormField>
@@ -150,37 +218,85 @@ onBeforeUnmount(() => {
             </UForm>
         </template>
 
-        <template #reset>
+        <template #create>
           <UAlert
             icon="i-heroicons-megaphone"
-            color="warning"
+            color="error"
             variant="soft"
             title="En cas de code invalide, un nouveau sera envoyé."
             description="Seul le dernier code de sécurité reçu est valide."
           />
           <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="register">
-            <UFormField label="Code de sécurité" name="securityCode">
+            <UFormField label="Code de sécurité" name="securityCode" required>
               <UInput v-model.trim="state.securityCode" />
             </UFormField>
 
-            <UFormField label="Email" name="email">
+            <UFormField label="Type de compte" name="accountType">
+              <USelect v-model="accountType" :items="accountTypes" value-key="value" :icon="accountTypeIcon" />
+            </UFormField>
+
+            <template v-if="accountType === 'club'">
+              <USeparator  label="Informations personnel" />
+
+              <UFormField label="J'ai déjà un compte">
+                <USwitch v-model="alreadyAnAccount"/>
+              </UFormField>
+            </template>
+
+            <UFormField label="Email" name="email" required>
               <UInput v-model.trim="state.email" type="email" />
             </UFormField>
 
-            <UFormField label="Mot de passe" name="password">
+            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Mot de passe" name="password" required>
               <UInput v-model="state.password" type="password" />
             </UFormField>
 
-            <UFormField label="Prénom" name="firstname">
-              <UInput v-model="state.firstname" />
-            </UFormField>
-
-            <UFormField label="Nom" name="lastname">
+            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Nom" name="lastname" required>
               <UInput v-model="state.lastname" />
             </UFormField>
 
+            <UFormField v-if="accountType !== 'club' || !alreadyAnAccount" label="Prénom" name="firstname" required>
+              <UInput v-model="state.firstname" />
+            </UFormField>
+
+            <template v-if="accountType === 'club'">
+              <USeparator label="Informations sur l'association" />
+
+              <UFormField label="Nom de l'association" name="clubName" required>
+                <UInput v-model="state.clubName" />
+              </UFormField>
+              <UFormField label="Email" description="Utilisé principalement pour la facturation." name="clubEmail" required>
+                <UInput v-model.trim="state.clubEmail" type="email" />
+              </UFormField>
+              <UFormField label="Téléphone" name="clubPhone">
+                <UInput v-model="state.clubPhone" />
+              </UFormField>
+              <UFormField label="Adresse" name="address" required>
+                <UInput v-model="state.clubAddress" />
+              </UFormField>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <UFormField label="Code postal" name="zipCode" required>
+                  <UInput v-model="state.clubZipCode" />
+                </UFormField>
+                <UFormField label="Ville" name="city" required>
+                  <UInput v-model="state.clubCity" />
+                </UFormField>
+              </div>
+              <UFormField label="Siret" name="siret">
+                <UInput v-model="state.clubSiret" />
+              </UFormField>
+              <UFormField label="TVA" name="vat">
+                <UInput v-model="state.clubVat" />
+              </UFormField>
+
+            </template>
+
             <UFormField required name="legals">
-              <UCheckbox required v-model="state.legals"  label="J'accepte les Conditions Générales d'Utilisation, les Conditions Générales de Vente et la Politique de confidentialité " />
+              <UCheckbox required v-model="state.legals">
+                <template #label>
+                  J'accepte les <ContentLink target="_blank" to="https://about.narvik.app/documents-legaux/cgu">Conditions Générales d’Utilisation</ContentLink>, les <ContentLink target="_blank" to="https://about.narvik.app/documents-legaux/cgv">Conditions Générales de Vente</ContentLink> et la <ContentLink target="_blank" to="https://about.narvik.app/documents-legaux/rgpd">Politique de confidentialité</ContentLink>
+                </template>
+              </UCheckbox>
             </UFormField>
 
             <div class="flex justify-between">

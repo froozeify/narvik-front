@@ -8,11 +8,14 @@ import type {NuxtTurnstile} from "#components";
 const toast = useToast()
 const isLoading = ref(false)
 
+const queryParams = useRoute().query
+
 const state = reactive({
   turnstileToken: undefined,
-  email: undefined,
-  password: undefined,
-  securityCode: undefined,
+  securityCode: queryParams.security_code ?? undefined as string|undefined,
+
+  email: queryParams.email ? decodeURI(queryParams.email.toString()) : undefined as string|undefined,
+  password: undefined as string|undefined,
 })
 
 const turnstile = ref<InstanceType<typeof NuxtTurnstile>>()
@@ -29,7 +32,7 @@ watchEffect(() => {
   isHorizontal.value = !isMobileDisplay.value
 })
 
-const selected = ref('0')
+const selected = ref(queryParams.security_code ? '1' : '0')
 const items = ref<TabsItem[]>([{
   slot: 'initial' as const,
   label: 'Demande de réinitialisation',
@@ -145,22 +148,22 @@ onBeforeUnmount(() => {
         <template #reset>
           <UAlert
             icon="i-heroicons-megaphone"
-            color="warning"
+            color="error"
             variant="soft"
             title="En cas d'erreur un nouveau code de sécurité sera envoyé."
             description="Seul le dernier code de sécurité reçu est valide."
           />
           <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="resetPassword">
+            <UFormField label="Code de sécurité" name="securityCode">
+              <UInput v-model.trim="state.securityCode" />
+            </UFormField>
+
             <UFormField label="Email" name="email">
               <UInput v-model.trim="state.email" type="email" />
             </UFormField>
 
             <UFormField label="Nouveau mot de passe" name="password">
               <UInput v-model="state.password" type="password" />
-            </UFormField>
-
-            <UFormField label="Code de sécurité" name="securityCode">
-              <UInput v-model.trim="state.securityCode" />
             </UFormField>
 
             <div class="flex justify-between">

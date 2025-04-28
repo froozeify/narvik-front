@@ -1,35 +1,54 @@
-import type {Member} from "~/types/api/item/clubDependent/member";
-import {
-  useDelete,
-  useDeleteItem,
-  useFetchItem,
-  useFetchList,
-  useGetCsv, usePatch,
-  usePost,
-  usePostRawJson,
-  usePut,
-  useUploadFile
-} from "~/composables/api/api";
+import {useDelete, useFetchItem, usePatch, usePostRawJson, usePut} from "~/composables/api/api";
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {User} from "~/types/api/item/user";
+
+export interface UserRegister {
+  accountType: string,
+  securityCode: string,
+  email: string,
+  password?: string,
+  firstname?: string,
+  lastname?: string,
+
+  clubName?: string,
+  clubEmail?: string,
+  clubPhone?: string,
+  clubAddress?: string,
+  clubZipCode?: number,
+  clubCity?: string,
+  clubSiret?: string,
+  clubVat?: string
+}
 
 export default class UserQuery extends AbstractQuery<User, User> {
   rootPath = "users";
 
-  async registerInitialise(email: string, turnstileToken: string|undefined = undefined) {
+  async registerInitialise(accountType: string, email: string, turnstileToken: string|undefined = undefined) {
     return usePostRawJson(`${this.rootPath}/-/initiate-register`, {
+      accountType: accountType,
       email: email,
       token: turnstileToken
     });
   }
 
-  async register(securityCode: string, email: string, password: string, firstname: string, lastname: string) {
+  async register(userRegister: UserRegister) {
     return usePostRawJson(`${this.rootPath}/-/register`, {
-      securityCode: securityCode.trim().toUpperCase(),
-      email: email,
-      password: password,
-      firstname: firstname,
-      lastname: lastname
+      securityCode: userRegister.securityCode.trim().toUpperCase(),
+      accountType: userRegister.accountType,
+
+      email: userRegister.email,
+      password: userRegister.password,
+      firstname: userRegister.firstname,
+      lastname: userRegister.lastname,
+
+      clubName: userRegister.clubName,
+      clubEmail: userRegister.clubEmail,
+      clubPhone: userRegister.clubPhone,
+      clubAddress: userRegister.clubAddress,
+      clubZipCode: userRegister.clubZipCode,
+      clubCity: userRegister.clubCity,
+      clubSiret: userRegister.clubSiret,
+      clubVat: userRegister.clubVat,
     });
   }
 

@@ -1,6 +1,6 @@
 import type { Item } from "../item";
 
-export interface Image extends Item {
+export interface ExposedFile extends Item {
   id: string;
   name: string;
   base64: string;

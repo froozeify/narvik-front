@@ -1,26 +1,34 @@
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
-import type {GlobalSetting} from "~/types/api/item/globalSetting";
+import {type GlobalSetting, GlobalSettingPublicEnum} from "~/types/api/item/globalSetting";
 import {useFetchItem, usePost, useUploadFile} from "~/composables/api/api";
-import type {FetchItemData} from "~/types/api/api";
 import type {SmtpConfig} from "~/types/api/smtp";
+import dayjs from "dayjs";
+import type {ClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 
 export default class GlobalSettingQuery extends AbstractQuery<GlobalSetting, GlobalSetting> {
-    rootPath = "global-settings";
+  rootPath = "global-settings";
 
-    async importLogo(formData: FormData) {
-        return useUploadFile(this.rootPath + "/-/logo", formData)
-    }
+  async importLogo(formData: FormData) {
+    return useUploadFile(this.rootPath + "/-/logo", formData)
+  }
 
-    async getPublic(id: number|string, useCache: boolean = false) {
-        return useFetchItem<GlobalSetting>(`public/${this.rootPath}/${id}`, useCache, false);
-    }
+  async getPublic(id: GlobalSettingPublicEnum, useCache: boolean = false) {
+    return useFetchItem<GlobalSetting>(`public/${this.rootPath}/${id}`, useCache, false);
+  }
 
-    async updateSmtpConfig(config: SmtpConfig) {
-      return usePost(this.rootPath + "/-/smtp", config)
+  async updateLegals(date: Date) {
+    return usePost(this.rootPath + "/-/legals", { date: dayjs(date).format('YYYY-MM-DD') })
+  }
 
-    }
+  async updateLegalsFile(formData: FormData) {
+    return useUploadFile(this.rootPath + "/-/legals-file", formData)
+  }
 
-    async testSmtp(email: string) {
-      return usePost(this.rootPath + "/-/test-email", {to: email})
-    }
+  async updateSmtpConfig(config: SmtpConfig) {
+    return usePost(this.rootPath + "/-/smtp", config)
+  }
+
+  async testSmtp(email: string) {
+    return usePost(this.rootPath + "/-/test-email", {to: email})
+  }
 }
