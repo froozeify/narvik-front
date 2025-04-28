@@ -7,9 +7,7 @@ import {useSelfUserStore} from "~/stores/useSelfUser";
 import {convertUuidToUrlUuid} from "~/utils/resource";
 import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
-import ClubModalGenerateBadger from "~/components/Club/ClubModalGenerateBadger.vue";
 import type {SelectApiItem} from "~/types/select";
-import type {Club} from "~/types/api/item/club";
 import type {Season} from "~/types/api/item/season";
 
 definePageMeta({
@@ -21,7 +19,6 @@ useHead({
 })
 
 const toast = useToast()
-const overlay = useOverlay()
 
 const selfStore = useSelfUserStore();
 const { selectedProfile } = storeToRefs(selfStore)
@@ -29,15 +26,13 @@ const { selectedProfile } = storeToRefs(selfStore)
 const clubSettingQuery = new ClubSettingQuery();
 const activityQuery = new ActivityQuery();
 
-const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.badgerToken);
-
 const configState = reactive({
   selectedControlShootingActivity: selectedProfile.value?.club.settings.controlShootingActivity?.uuid,
   excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays?.map((a: Activity) => a.uuid),
   selectedMonth: selectedProfile.value?.club.settings.seasonEnd.split('-')[0].toString(),
   selectedDay: selectedProfile.value?.club.settings.seasonEnd.split('-')[1].toString(),
 })
-// const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
+const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
 
 const activities: Ref<Activity[] | undefined> = ref(undefined);
 activityQuery.getAll().then(value => {
@@ -115,12 +110,12 @@ const daysSelect = computed( () => {
   const items: SelectApiItem<Season>[] = []
 
   let maxDays = 31
-  if (configState.selectedMonth.value) {
-    if (['04', '06', '09', '11'].includes(configState.selectedMonth.value.toString())) {
+  if (configState.selectedMonth) {
+    if (['04', '06', '09', '11'].includes(configState.selectedMonth)) {
       maxDays = 30
     }
 
-    if (configState.selectedMonth.value.toString() === '02') {
+    if (configState.selectedMonth === '02') {
       maxDays = 28
     }
   }
@@ -135,36 +130,17 @@ const daysSelect = computed( () => {
   return items;
 })
 
-
-function getBadgerLoginPath(): string|undefined {
-  if (!badgerSetting.value || !selectedProfile.value) {
-    return undefined
-  }
-
-  return `/login/bdg/${convertUuidToUrlUuid(selectedProfile.value.club.uuid)}/${badgerSetting.value}`
-}
-
-function copyBadgerLink() {
-  if (!getBadgerLoginPath()) return;
-
-  clipboard.write(window.location.origin + getBadgerLoginPath())
-  toast.add({
-    title: 'URL Copiée',
-    color: "success"
-  })
-}
-
 async function controlShootingUpdated() {
   if (!selectedProfile.value?.club.settings) return;
 
   if (configState.selectedControlShootingActivity) {
     selectedControlShootingActivity.value = await getActivity(configState.selectedControlShootingActivity)
+  } else {
+    selectedControlShootingActivity.value = undefined
   }
 
-  if (!selectedControlShootingActivity.value) return;
-
   const payload: WriteClubSetting = {
-    controlShootingActivity: selectedControlShootingActivity.value["@id"]
+    controlShootingActivity: selectedControlShootingActivity.value? selectedControlShootingActivity.value["@id"] : null
   }
 
   let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
@@ -224,7 +200,7 @@ async function getActivity(id: string) {
   return response.retrieved;
 }
 
-async function uploadLogo(event) {
+async function uploadLogo(event: Event) {
   if (!selectedProfile.value?.club.settings) return;
 
   const formData = getFileFormDataFromUInputChangeEvent(event);
@@ -301,45 +277,6 @@ async function seasonEndUpdated() {
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <GenericCard class="md:col-span-2" title="Lien de connexion badger">
-      <p>A mettre en favoris sur l'ordinateur accessible publiquement.</p>
-      <p>Ce lien permet d'être automatiquement connecté en tant que badgeuse (accès seulement à la liste de présence).</p>
-      <p>Le lien peut être déposé directement dans la barre personnelle pour le marquer en favoris.</p>
-
-      <UButton
-        class="my-4"
-        @click="
-          overlay.create(ClubModalGenerateBadger).open({
-            onGenerated(newClub: Club) {
-              badgerSetting = newClub.badgerToken
-              selfStore.refreshSelectedClub()
-              useToast().add({title: 'Lien de connexion généré'})
-            }
-          })"
-      >
-        Générer un nouveau lien
-      </UButton>
-
-      <div v-if="!badgerSetting">
-        <UAlert
-          icon="i-heroicons-exclamation-triangle"
-          color="warning"
-          title="Lien de connexion non généré."
-        />
-      </div>
-      <div v-else
-         class="break-words cursor-pointer"
-         @click.prevent="copyBadgerLink"
-        >
-
-        <a :href="getBadgerLoginPath()"
-           class="focus:outline-none disabled:cursor-not-allowed disabled:opacity-75 flex-shrink-0 font-medium rounded-md text-sm gap-x-1.5 px-2.5 py-1.5 shadow-sm text-white dark:text-gray-900 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-500 dark:bg-yellow-400 dark:hover:bg-yellow-500 dark:disabled:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500 dark:focus-visible:outline-yellow-400 flex justify-center"
-        >
-          Gestion de présence
-        </a>
-      </div>
-    </GenericCard>
-
     <GenericCard title="Activités exclus du compte des jours ouverts">
       <div>
         <USelectMenu
@@ -360,18 +297,33 @@ async function seasonEndUpdated() {
     </GenericCard>
 
     <GenericCard title="Activité correspondante au contrôle">
-      <div>
+      <div class="flex flex-col gap-2">
+        <div class="text-xs">
+          <p>Certaines activités sportives peuvent avoir un contrôle annuel obligatoire.</p>
+          <p>En créant une activité dédié pour, cela permettra d'alerter le membre lorsque ce contrôle doit de nouveau être effectué.</p>
+        </div>
+
         <USelect
           v-model="configState.selectedControlShootingActivity"
           @change="controlShootingUpdated"
           :items="activitiesSelect"
           placeholder="Aucun contrôle défini" />
+
+        <UButton v-if="configState.selectedControlShootingActivity"
+                 class="w-fit"
+                 @click="
+                  configState.selectedControlShootingActivity = undefined;
+                  controlShootingUpdated()
+                 "
+        >
+          Désactiver l'activité de contrôle
+        </UButton>
       </div>
     </GenericCard>
 
     <GenericCard title="Date de fin saison">
-      <div>
-        <p class="mb-4">Pour les activités sportives, une saison se termine souvent la 31 août afin de débuter en même temps que la rentrée des classes en septembre.</p>
+      <div class="flex flex-col gap-4">
+        <p class="text-xs">Pour les activités sportives, une saison se termine souvent la 31 août afin de débuter en même temps que la rentrée des classes en septembre.</p>
         <div class="grid grid-cols-2 gap-2">
           <UFormField label="Mois">
             <USelect v-model="configState.selectedMonth" :items="monthsSelect" placeholder="Non défini" />
@@ -382,7 +334,7 @@ async function seasonEndUpdated() {
           </UFormField>
         </div>
 
-        <UButton class="mt-4" label="Sauvegarder" @click="seasonEndUpdated" />
+        <UButton class="w-fit" label="Sauvegarder" @click="seasonEndUpdated" />
 
       </div>
     </GenericCard>

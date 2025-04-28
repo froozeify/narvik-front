@@ -26,6 +26,6 @@ export interface ClubSetting extends _ClubSetting {
 
 
 export interface WriteClubSetting extends _ClubSetting {
-  controlShootingActivity?: Activity|string
+  controlShootingActivity?: Activity|string|null
   excludedActivitiesFromOpeningDays?: Activity[]|string[]
 }

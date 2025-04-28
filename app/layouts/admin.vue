@@ -40,6 +40,11 @@
       label: 'Activités',
       icon: 'i-heroicons-rocket-launch',
       to: '/admin/config/activities'
+    },
+    {
+      label: 'Présences',
+      icon: 'i-heroicons-calendar-days',
+      to: '/admin/config/presences'
     }
   ]
 
