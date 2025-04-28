@@ -206,7 +206,7 @@ onBeforeUnmount(() => {
                 <USelect v-model="accountType" :items="accountTypes" value-key="value" :icon="accountTypeIcon" />
               </UFormField>
 
-              <UFormField label="Email" name="email">
+              <UFormField label="Email" name="email" :description="accountType === 'club' ? 'Email de votre compte de connexion personnel.' : ''">
                 <UInput v-model="state.email" type="email" />
               </UFormField>
 
