@@ -7,9 +7,7 @@ import {useSelfUserStore} from "~/stores/useSelfUser";
 import {convertUuidToUrlUuid} from "~/utils/resource";
 import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
-import ClubModalGenerateBadger from "~/components/Club/ClubModalGenerateBadger.vue";
 import type {SelectApiItem} from "~/types/select";
-import type {Club} from "~/types/api/item/club";
 import type {Season} from "~/types/api/item/season";
 
 definePageMeta({
@@ -21,15 +19,12 @@ useHead({
 })
 
 const toast = useToast()
-const overlay = useOverlay()
 
 const selfStore = useSelfUserStore();
 const { selectedProfile } = storeToRefs(selfStore)
 
 const clubSettingQuery = new ClubSettingQuery();
 const activityQuery = new ActivityQuery();
-
-const badgerSetting: Ref<string | undefined> = ref(selectedProfile.value?.club.badgerToken);
 
 const configState = reactive({
   selectedControlShootingActivity: selectedProfile.value?.club.settings.controlShootingActivity?.uuid,
@@ -135,25 +130,6 @@ const daysSelect = computed( () => {
   return items;
 })
 
-
-function getBadgerLoginPath(): string|undefined {
-  if (!badgerSetting.value || !selectedProfile.value) {
-    return undefined
-  }
-
-  return `/login/bdg/${convertUuidToUrlUuid(selectedProfile.value.club.uuid)}/${badgerSetting.value}`
-}
-
-function copyBadgerLink() {
-  if (!getBadgerLoginPath()) return;
-
-  clipboard.write(window.location.origin + getBadgerLoginPath())
-  toast.add({
-    title: 'URL Copiée',
-    color: "success"
-  })
-}
-
 async function controlShootingUpdated() {
   if (!selectedProfile.value?.club.settings) return;
 
@@ -224,7 +200,7 @@ async function getActivity(id: string) {
   return response.retrieved;
 }
 
-async function uploadLogo(event) {
+async function uploadLogo(event: Event) {
   if (!selectedProfile.value?.club.settings) return;
 
   const formData = getFileFormDataFromUInputChangeEvent(event);
