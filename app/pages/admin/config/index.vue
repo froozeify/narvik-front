@@ -135,12 +135,12 @@ async function controlShootingUpdated() {
 
   if (configState.selectedControlShootingActivity) {
     selectedControlShootingActivity.value = await getActivity(configState.selectedControlShootingActivity)
+  } else {
+    selectedControlShootingActivity.value = undefined
   }
 
-  if (!selectedControlShootingActivity.value) return;
-
   const payload: WriteClubSetting = {
-    controlShootingActivity: selectedControlShootingActivity.value["@id"]
+    controlShootingActivity: selectedControlShootingActivity.value? selectedControlShootingActivity.value["@id"] : null
   }
 
   let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
@@ -297,18 +297,33 @@ async function seasonEndUpdated() {
     </GenericCard>
 
     <GenericCard title="Activité correspondante au contrôle">
-      <div>
+      <div class="flex flex-col gap-2">
+        <div class="text-xs">
+          <p>Certaines activités sportives peuvent avoir un contrôle annuel obligatoire.</p>
+          <p>En créant une activité dédié pour, cela permettra d'alerter le membre lorsque ce contrôle doit de nouveau être effectué.</p>
+        </div>
+
         <USelect
           v-model="configState.selectedControlShootingActivity"
           @change="controlShootingUpdated"
           :items="activitiesSelect"
           placeholder="Aucun contrôle défini" />
+
+        <UButton v-if="configState.selectedControlShootingActivity"
+                 class="w-fit"
+                 @click="
+                  configState.selectedControlShootingActivity = undefined;
+                  controlShootingUpdated()
+                 "
+        >
+          Désactiver l'activité de contrôle
+        </UButton>
       </div>
     </GenericCard>
 
     <GenericCard title="Date de fin saison">
-      <div>
-        <p class="mb-4">Pour les activités sportives, une saison se termine souvent la 31 août afin de débuter en même temps que la rentrée des classes en septembre.</p>
+      <div class="flex flex-col gap-4">
+        <p class="text-xs">Pour les activités sportives, une saison se termine souvent la 31 août afin de débuter en même temps que la rentrée des classes en septembre.</p>
         <div class="grid grid-cols-2 gap-2">
           <UFormField label="Mois">
             <USelect v-model="configState.selectedMonth" :items="monthsSelect" placeholder="Non défini" />
@@ -319,7 +334,7 @@ async function seasonEndUpdated() {
           </UFormField>
         </div>
 
-        <UButton class="mt-4" label="Sauvegarder" @click="seasonEndUpdated" />
+        <UButton class="w-fit" label="Sauvegarder" @click="seasonEndUpdated" />
 
       </div>
     </GenericCard>
