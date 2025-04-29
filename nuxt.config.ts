@@ -24,9 +24,6 @@ export default defineNuxtConfig({
   ],
 
   css: ['~/assets/css/main.css'],
-  ui: {
-    global: true,
-  },
 
   piniaPluginPersistedstate: {
     storage: 'localStorage',
@@ -56,6 +53,10 @@ export default defineNuxtConfig({
       badgerClientSecret: '', // can be overridden by NUXT_PUBLIC_BADGER_CLIENT_SECRET environment variable
 
       clientTurnstile: false,
+
+      umamiEnabled: false,// can be overridden by NUXT_PUBLIC_UMAMI_ENABLED environment variable
+      umamiScript: '',// can be overridden by NUXT_PUBLIC_UMAMI_SCRIPT environment variable
+      umamiWebsiteId: '',// can be overridden by NUXT_PUBLIC_UMAMI_WEBSITE_ID environment variable
     },
 
     apiParty: {
