@@ -173,7 +173,7 @@
 
 
     <UCard class="my-4">
-      <p class="font-bold">Certificat médicaux</p>
+      <p class="font-bold">Certificats médicaux</p>
       <p>Pour le moment itac n'exporte pas la date de validité du certificat médical.</p>
       <p>Pour ce faire vous devais télécharger le fichier excel fourni par eden.</p>
 
