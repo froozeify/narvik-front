@@ -11,6 +11,7 @@
   import {formatDate} from "~/utils/date";
   import dayjs from "dayjs";
   import {convertUuidToUrlUuid} from "~/utils/resource";
+  import {print} from "~/utils/browser";
   import type {SelectApiItem} from "~/types/select";
   import type {Member} from "~/types/api/item/clubDependent/member";
 
@@ -220,7 +221,6 @@
             @update:model-value="searchQueryUpdated()"
             :loading="isLoading"
             placeholder="Rechercher..."
-            :ui="{ icon: { trailing: { pointer: '' } } }"
           >
             <template #trailing v-if="cameraIsPresent || searchQueryInput">
               <UIcon
@@ -239,7 +239,11 @@
             </template>
           </UInput>
 
-          <UButton @click="cartCustomItemModalOpen = true;" icon="i-heroicons-plus" />
+          <UButton @click="cartCustomItemModalOpen = true;" icon="i-heroicons-plus">
+            <span class="hidden sm:block">Article personnalisé</span>
+          </UButton>
+
+          <UButton :disabled="isLoading" icon="i-heroicons-printer" @click="print()" />
         </div>
         <UProgress v-if="isLoading" animation="swing" class="mb-2" />
 
@@ -286,7 +290,7 @@
                 <UInput v-model="customItemForm.name"/>
               </UFormField>
 
-              <UFormField label="Prix de vente" name="sellingPrice">
+              <UFormField label="Prix de vente" name="sellingPrice" description="Le prix peut être négatif afin de faire une réduction.">
                 <UInput v-model="customItemForm.sellingPrice">
                   <template #trailing>
                     <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>

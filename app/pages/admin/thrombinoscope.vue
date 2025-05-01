@@ -3,6 +3,7 @@
   import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
   import FileQuery from "~/composables/api/query/FileQuery";
   import {convertUuidToUrlUuid} from "~/utils/resource";
+  import {print} from "~/utils/browser";
 
   definePageMeta({
     layout: "admin"
@@ -80,17 +81,21 @@
 
 <template>
   <div>
-    <GenericCard class="print:ring-0 print:shadow-none print:!bg-transparent" :title="`Trombinoscope pour la saison actuelle (${totalMembers} membres)`">
+    <GenericCardWithActions class="print:ring-0 print:shadow-none print:!bg-transparent" :title="`Trombinoscope pour la saison actuelle (${totalMembers} membres)`">
+      <template #actions>
+        <UButton :disabled="isLoading" icon="i-heroicons-printer" @click="print()" />
+      </template>
+
       <UProgress
         v-if="isLoading"
         class="mb-4"
-        :value="members.length"
+        v-model="members.length"
         :max="totalMembers"
-        indicator
+        status
       >
-        <template #indicator="{percent}">
-          <div class="text-right" :style="{ width: `${percent}%` }">
-            <span class="text-xs">Liste chargée à {{ Math.round(percent) || 0 }} %</span>
+        <template #status="{percent}">
+          <div class="text-right">
+            <span class="text-xs">Liste chargée à {{ Math.round(percent ?? 0) || 0 }} %</span>
           </div>
         </template>
       </UProgress>
@@ -152,7 +157,7 @@
         </template>
       </div>
 
-    </GenericCard>
+    </GenericCardWithActions>
   </div>
 </template>
 
