@@ -127,9 +127,7 @@ async function downloadCsv() {
   isDownloadingCsv.value = true
 
   const urlParams = getUrlParams()
-
   const { data } = await memberQuery.getAllCsv(urlParams)
-  // We parse all the pages
 
   isDownloadingCsv.value = false
   // We download in the browser
