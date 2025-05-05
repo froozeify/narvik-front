@@ -264,7 +264,7 @@ export async function useUpdateItem<T>(item: Item, payload: Item) {
 }
 
 export async function useGetCsv(path: string) {
-  let data = null;
+  let data : string | null = null;
   let error: NuxtError | undefined = undefined;
 
   try {

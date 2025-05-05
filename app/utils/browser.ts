@@ -111,3 +111,11 @@ export function isDarkMode() {
     }
   });
 }
+
+/**
+ * We create a function that call window.print...
+ * Otherwise directly in the vue file we got a _ctxt error (window not exist)
+ */
+export function print() {
+  window.print()
+}

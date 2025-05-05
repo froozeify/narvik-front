@@ -2,13 +2,13 @@
 
 import type {Member} from "~/types/api/item/clubDependent/member";
 import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
-import {usePaginationValues} from "~/composables/api/list";
-import {convertUuidToUrlUuid, decodeUrlUuid} from "~/utils/resource";
-import {ClubRole, getAvailableClubRoles} from "../../types/api/item/club";
-import type {TableRow} from "#ui/types";
+import {convertUuidToUrlUuid} from "~/utils/resource";
+import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
+import {createBrowserCsvDownload} from "~/utils/browser";
 
 const toast = useToast();
 const isLoading = ref(true);
+const isDownloadingCsv = ref(false)
 
 const page = ref(1);
 const itemsPerPage = ref(30);
@@ -55,13 +55,10 @@ const columns = [
   }
 ]
 
-async function getMembers() {
-  isLoading.value = true;
-
-  const urlParams = new URLSearchParams({
-    page: page.value.toString(),
-    itemsPerPage: itemsPerPage.value.toString(),
-  });
+function getUrlParams(): URLSearchParams {
+  const urlParams = new URLSearchParams();
+  urlParams.append('page', page.value.toString())
+  urlParams.append('itemsPerPage', itemsPerPage.value.toString())
 
   urlParams.append(`order[${sort.value.column}]`, sort.value.direction);
   urlParams.append(`order[firstname]`, 'asc');
@@ -86,6 +83,13 @@ async function getMembers() {
     urlParams.append('exists[licence]', 'true');
   }
 
+  return urlParams
+}
+
+async function getMembers() {
+  isLoading.value = true;
+
+  const urlParams = getUrlParams()
   const { error, items, totalItems } = await memberQuery.getAll(urlParams);
   isLoading.value = false;
 
@@ -101,6 +105,8 @@ async function getMembers() {
   members.value = items
   if (totalItems) {
     totalMembers.value = totalItems
+  } else {
+    totalMembers.value = 0
   }
 }
 
@@ -115,6 +121,17 @@ function queryUpdated() {
 
 function displayMemberPage(member: Member) {
   navigateTo(`/admin/members/${convertUuidToUrlUuid(member.uuid)}`)
+}
+
+async function downloadCsv() {
+  isDownloadingCsv.value = true
+
+  const urlParams = getUrlParams()
+  const { data } = await memberQuery.getAllCsv(urlParams)
+
+  isDownloadingCsv.value = false
+  // We download in the browser
+  createBrowserCsvDownload('members.csv', data)
 }
 
 </script>
@@ -138,7 +155,14 @@ function displayMemberPage(member: Member) {
           <UCheckbox label="Saison précédente" v-model="onlyPreviousSeason" @change="onlyCurrentSeason = false; page = 1; getMembers()" />
           <UCheckbox label="Licence" v-model="onlyWithLicence" @change="page = 1; getMembers()" />
         </div>
+
+        <div class="text-right">
+          <UButton  @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv">
+            CSV
+          </UButton>
+        </div>
       </div>
+
     </UCard>
 
     <UCard>
