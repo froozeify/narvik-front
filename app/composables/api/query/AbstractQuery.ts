@@ -2,6 +2,7 @@ import {useCreateItem, useDeleteItem, useFetchItem, useFetchList, useGetCsv, use
 import type {FetchAllData, FetchItemData} from "~/types/api/api";
 import type {Item} from "~/types/api/item";
 import {useSelfUserStore} from "~/stores/useSelfUser";
+import type {NuxtError} from "#app";
 
 export abstract class AbstractQuery<R, W> {
 	protected abstract rootPath: string;
@@ -39,19 +40,49 @@ export abstract class AbstractQuery<R, W> {
 		return useFetchList<R>(url);
 	}
 
-  async getAllCsv(urlParams?: URLSearchParams) {
+  async getAllCsv(urlParams?: URLSearchParams, itemsPerPage = 100) {
     let url = `${this.getRootUrl()}.csv`;
 
     if (!urlParams) {
       urlParams = new URLSearchParams()
     }
-    if (!urlParams.has('pagination')) {
-      urlParams.append('pagination', 'false')
-    }
 
     url += '?' + urlParams.toString()
+    if (urlParams.has('pagination')) {
+      return useGetCsv(url)
+    }
 
-    return useGetCsv(url)
+    let data = '';
+    let error: NuxtError | undefined = undefined;
+    let response = {
+      data,
+      error
+    }
+
+    // No disabled pagination, we are guessing the number of pages to request
+    urlParams.set('page', '1')
+    urlParams.set('itemsPerPage', '1') // We just want the total items so we can do the pagination
+    const { totalItems, view } = await this.getAll(urlParams)
+    if (!totalItems) {
+      return response
+    }
+
+    urlParams.set('itemsPerPage', itemsPerPage.toString())
+
+    const numberOfPages = Math.ceil(totalItems / itemsPerPage)
+    for (let i = 0; i < numberOfPages; i++) {
+      urlParams.set('page', (i+1).toString())
+      urlParams.set('pagination', '1') // We set the pagination so the recursive call won't execute again this code
+      let { data } = await this.getAllCsv(urlParams, itemsPerPage)
+      if (data) {
+        // We remove the header if already set
+        if (response.data.length > 0) {
+          data = data.substring(data.indexOf("\n") + 1)
+        }
+        response.data += data
+      }
+    }
+    return response
   }
 
 	async post(payload: Item) {

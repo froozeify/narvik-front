@@ -23,6 +23,7 @@ import MemberEditLinkedEmailModal from "~/components/Member/MemberEditLinkedEmai
 import clipboard from "clipboardy";
 import type {TablePaginateInterface} from "~/types/table";
 import type {SelectApiItem} from "~/types/select";
+import {createBrowserCsvDownload} from "~/utils/browser";
 
 ChartJS.register(Title, Tooltip, Legend, DoughnutController, ArcElement, CategoryScale, LinearScale, Colors)
 
@@ -356,17 +357,7 @@ async function downloadCsv() {
   isDownloadingCsv.value = false
   // We download in the browser
   const filename = `${member.value.licence}-presences.csv`
-  const blob = new Blob([data], {type: 'text/csv'})
-  if(window.navigator.msSaveOrOpenBlob) {
-    window.navigator.msSaveBlob(blob, filename)
-  } else {
-    const elem = window.document.createElement('a')
-    elem.href = window.URL.createObjectURL(blob)
-    elem.download = filename
-    document.body.appendChild(elem)
-    elem.click()
-    document.body.removeChild(elem)
-  }
+  createBrowserCsvDownload(filename, data)
 }
 
 async function addMemberSeason(seasonIri: string, isSecondary: boolean = false, ageCategory: string|undefined = undefined) {
