@@ -16,7 +16,7 @@ help: ## Outputs this help screen
 
 ## —— Docker 🐳 ————————————————————————————————————————————————————————————————
 
-build-push-cloud-latest-only: ## Build using cloud and push it under latest tag (use for preprod testing)
+build-cloud-latest-only: ## Build using cloud and push it under latest tag (use for preprod testing)
 	@docker buildx build . --builder cloud-benoitvignal-narvik-cloud --pull --no-cache -t $(BUILD_REPO):latest --target run
 	@docker image push $(BUILD_REPO):latest
 
