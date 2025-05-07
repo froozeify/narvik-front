@@ -10,6 +10,7 @@ export interface UserRegister {
   firstname?: string,
   lastname?: string,
 
+  clubActivity?: string,
   clubName?: string,
   clubEmail?: string,
   clubPhone?: string,
@@ -41,6 +42,7 @@ export default class UserQuery extends AbstractQuery<User, User> {
       firstname: userRegister.firstname,
       lastname: userRegister.lastname,
 
+      clubActivity: userRegister.clubActivity,
       clubName: userRegister.clubName,
       clubEmail: userRegister.clubEmail,
       clubPhone: userRegister.clubPhone,

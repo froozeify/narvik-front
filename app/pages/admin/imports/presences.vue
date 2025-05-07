@@ -1,64 +1,64 @@
 <script lang="ts" setup>
-  import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
-  import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
-  import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
+import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
+import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
+import ExternalPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/ExternalPresenceQuery";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import {ClubActivity} from "~/types/api/item/club";
 
-  definePageMeta({
-    layout: "admin"
-  });
+definePageMeta({
+  layout: "admin"
+});
 
-  useHead({
-    title: "Import présences"
-  })
+useHead({
+  title: "Import présences"
+})
 
-  const toast = useToast()
+const selfStore = useSelfUserStore();
+const { selectedProfile } = storeToRefs(selfStore)
 
-  const apiUploadResponse: Ref<Object|undefined> = ref(undefined);
-  const fileUploading = ref(false)
-  const state = reactive({
-    file: undefined
-  })
+const apiUploadResponse: Ref<Object|undefined> = ref(undefined);
+const fileUploading = ref(false)
 
-  const memberPresenceQuery = new MemberPresenceQuery()
-  const externalPresenceQuery = new ExternalPresenceQuery()
+const memberPresenceQuery = new MemberPresenceQuery()
+const externalPresenceQuery = new ExternalPresenceQuery()
 
-  async function importMemberPresences(event: any) {
-    const formData = getFileFormDataFromUInputChangeEvent(event);
+async function importMemberPresences(event: any) {
+  const formData = getFileFormDataFromUInputChangeEvent(event);
 
-    if (!formData) {
-      return;
-    }
-
-    fileUploading.value = true
-    const {created, error} = await memberPresenceQuery.importFromCsv(formData)
-    fileUploading.value = false
-
-    if (error) {
-      return displayFileErrorToast(error.message)
-    }
-
-    apiUploadResponse.value = created
-    displayFileSuccessToast()
+  if (!formData) {
+    return;
   }
 
-  async function importExternalPresences(event: any) {
-    const formData = getFileFormDataFromUInputChangeEvent(event);
+  fileUploading.value = true
+  const {created, error} = await memberPresenceQuery.importFromCsv(formData)
+  fileUploading.value = false
 
-    if (!formData) {
-      return;
-    }
-
-    fileUploading.value = true
-    const {created, error} = await externalPresenceQuery.importFromCsv(formData)
-    fileUploading.value = false
-
-    if (error) {
-      return displayFileErrorToast(error.message)
-    }
-
-    apiUploadResponse.value = created
-    displayFileSuccessToast()
+  if (error) {
+    return displayFileErrorToast(error.message)
   }
+
+  apiUploadResponse.value = created
+  displayFileSuccessToast()
+}
+
+async function importExternalPresences(event: any) {
+  const formData = getFileFormDataFromUInputChangeEvent(event);
+
+  if (!formData) {
+    return;
+  }
+
+  fileUploading.value = true
+  const {created, error} = await externalPresenceQuery.importFromCsv(formData)
+  fileUploading.value = false
+
+  if (error) {
+    return displayFileErrorToast(error.message)
+  }
+
+  apiUploadResponse.value = created
+  displayFileSuccessToast()
+}
 
 </script>
 
@@ -133,7 +133,7 @@
       <div class="flex gap-2">
         <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/narvik-presences.html">Documentation</UButton>
         <div class="flex-1"></div>
-        <UButton variant="ghost" to="/admin/imports/cerbere">Import depuis cerbère</UButton>
+        <UButton v-if="selectedProfile?.club.settings.activity === ClubActivity.FFTIR" variant="ghost" to="/admin/imports/cerbere">Import depuis cerbère</UButton>
       </div>
 
     </UCard>

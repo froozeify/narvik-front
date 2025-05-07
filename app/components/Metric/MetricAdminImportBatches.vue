@@ -32,9 +32,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
+  <div v-if="(itacImportRemaining??0) > 0 || (itacSecondaryImportRemaining??0) > 0 || (cerbereImportRemaining??0) > 0">
 
-    <UAlert v-if="(itacImportRemaining??0) > 0 || (itacSecondaryImportRemaining??0) > 0 || (cerbereImportRemaining??0) > 0"
+    <UAlert
             class="mb-4"
             variant="subtle"
             icon="i-heroicons-exclamation-triangle"

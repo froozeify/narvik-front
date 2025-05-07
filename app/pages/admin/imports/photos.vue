@@ -1,49 +1,49 @@
 <script lang="ts" setup>
-  import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
-  import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
+import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import {ClubActivity} from "~/types/api/item/club";
 
-  definePageMeta({
-    layout: "admin"
-  });
+definePageMeta({
+  layout: "admin"
+});
 
-  useHead({
-    title: "Import des photos"
-  })
+useHead({
+  title: "Import des photos"
+})
 
-  const toast = useToast()
-  const memberQuery = new MemberQuery()
+const selfStore = useSelfUserStore();
+const { selectedProfile } = storeToRefs(selfStore)
 
-  const fileUploading = ref(false)
-  const state = reactive({
-    file: undefined
-  })
+const memberQuery = new MemberQuery()
 
-  async function getFileObject(event: any) {
-    const formData = getFileFormDataFromUInputChangeEvent(event);
+const fileUploading = ref(false)
 
-    if (!formData) {
-      return;
-    }
+async function getFileObject(event: any) {
+  const formData = getFileFormDataFromUInputChangeEvent(event);
 
-    fileUploading.value = true
-    const {created, error} = await memberQuery.importPhotosFromItac(formData)
-    fileUploading.value = false
-
-    if (error) {
-      return displayFileErrorToast(error.message)
-    }
-
-    displayFileSuccessToast()
+  if (!formData) {
+    return;
   }
+
+  fileUploading.value = true
+  const {created, error} = await memberQuery.importPhotosFromItac(formData)
+  fileUploading.value = false
+
+  if (error) {
+    return displayFileErrorToast(error.message)
+  }
+
+  displayFileSuccessToast()
+}
 
 </script>
 
 <template>
   <div>
     <UCard>
-      <p>L'import ce fait grâce au zip généré par itac.</p>
-      <p>Celui-ci doit obligatoirement être au format zip.</p>
-      <p>Chaque image doit être nommé avec le numéro de licence de la personne.</p>
+      <p>L'archive importée doit obligatoirement être au format zip.</p>
+      <p>Chaque photo doit être nommée avec le numéro de licence de la personne.</p>
 
       <UInput
           :loading="fileUploading"
@@ -55,7 +55,7 @@
           @change="getFileObject"
       />
 
-      <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-itac.html#import-des-photos">Documentation</UButton>
+      <UButton v-if="selectedProfile?.club.settings.activity === ClubActivity.FFTIR" target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-itac.html#import-des-photos">Documentation</UButton>
 
     </UCard>
   </div>

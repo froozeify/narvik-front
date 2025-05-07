@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type {FormError, SelectItem, TabsItem} from '#ui/types'
+import type {FormError, SelectItem, SelectMenuItem, TabsItem} from '#ui/types'
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import UserQuery from "~/composables/api/query/UserQuery";
 import {isMobile, isTablet, watchBreakpoint} from "~/utils/browser";
 import type {NuxtTurnstile} from "#components";
 import {useLoginUser} from "~/composables/api/api";
+import {ClubActivity, getSelectMenuClubActivity} from "~/types/api/item/club";
 
 const toast = useToast()
 const isLoading = ref(false)
@@ -20,6 +21,7 @@ const state = reactive({
   firstname: undefined as string|undefined,
   lastname: undefined as string|undefined,
 
+  clubActivity: getSelectMenuClubActivity().find((item) => item?.value === ClubActivity.Generic) as SelectMenuItem|undefined,
   clubName: undefined as string|undefined,
   clubEmail: undefined as string|undefined,
   clubPhone: undefined as string|undefined,
@@ -98,14 +100,15 @@ async function register() {
 
   isLoading.value = true
   const { error } = await userQuery.register({
-    accountType: accountType.value,
-    securityCode: state.securityCode,
+    accountType: accountType.value.toString(),
+    securityCode: state.securityCode.toString(),
 
     email: state.email,
     password: state.password,
     firstname: state.firstname,
     lastname: state.lastname,
 
+    clubActivity: state.clubActivity?.value.toString() ?? ClubActivity.Generic,
     clubName: state.clubName,
     clubEmail: state.clubEmail,
     clubPhone: state.clubPhone,
@@ -261,6 +264,18 @@ onBeforeUnmount(() => {
 
             <template v-if="accountType === 'club'">
               <USeparator label="Informations sur l'association" />
+
+              <UFormField label="Activité principal">
+                <template #description>
+                  <p>Si votre activité n'est pas listée, veuillez sélectionner "Global".</p>
+                </template>
+
+                <USelectMenu v-model="state.clubActivity" :items="getSelectMenuClubActivity()" />
+
+                <template #help>
+                  <p v-if="state.clubActivity?.value === ClubActivity.Generic">Votre activité n'est pas listée ? N'hésitez pas à <ContentLink to="https://about.narvik.app/contact" target="_blank">nous contacter</ContentLink> pour que nous l'ajoutions.</p>
+                </template>
+              </UFormField>
 
               <UFormField label="Nom de l'association" name="clubName" required>
                 <UInput v-model="state.clubName" />
