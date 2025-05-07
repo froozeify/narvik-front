@@ -265,7 +265,7 @@ onBeforeUnmount(() => {
             <template v-if="accountType === 'club'">
               <USeparator label="Informations sur l'association" />
 
-              <UFormField label="Activité principal">
+              <UFormField label="Activité principale">
                 <template #description>
                   <p>Si votre activité n'est pas listée, veuillez sélectionner "Global".</p>
                 </template>
