@@ -1,204 +1,209 @@
 <script lang="ts" setup>
-  import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
-  import MetricQuery from "~/composables/api/query/MetricQuery";
-  import type {Metric} from "~/types/api/item/metric";
-  import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
-  import { formatDateReadable } from "~/utils/date";
-  import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
-  import {useSelfUserStore} from "~/stores/useSelfUser";
-  import dayjs from "dayjs";
-  import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
+import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
+import MetricQuery from "~/composables/api/query/MetricQuery";
+import type {Metric} from "~/types/api/item/metric";
+import GlobalSettingQuery from "~/composables/api/query/GlobalSettingQuery";
+import { formatDateReadable } from "~/utils/date";
+import {displayFileErrorToast, displayFileSuccessToast, getFileFormDataFromUInputChangeEvent} from "~/utils/file";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+import dayjs from "dayjs";
+import MemberPresenceQuery from "~/composables/api/query/clubDependent/plugin/presence/MemberPresenceQuery";
+import {ClubActivity} from "~/types/api/item/club";
 
-  definePageMeta({
-    layout: "admin"
-  });
+definePageMeta({
+  layout: "admin"
+});
 
-  useHead({
-    title: "Import membres"
-  })
+useHead({
+  title: "Import membres"
+})
 
-  const selfStore = useSelfUserStore()
+const selfStore = useSelfUserStore()
+const { selectedProfile } = storeToRefs(selfStore)
 
-  const toast = useToast()
+const toast = useToast()
 
-  const fileUploading = ref(false)
-  const state = reactive({
-    file: undefined
-  })
+const fileUploading = ref(false)
 
-  const memberQuery = new MemberQuery()
-  const memberPresenceQuery = new MemberPresenceQuery()
+const memberQuery = new MemberQuery()
+const memberPresenceQuery = new MemberPresenceQuery()
 
-  async function importFromItac(event: any) {
-    const formData = getFileFormDataFromUInputChangeEvent(event);
+async function importFromItac(event: any) {
+  const formData = getFileFormDataFromUInputChangeEvent(event);
 
-    if (!formData) {
-      return;
-    }
-
-    fileUploading.value = true
-    const {created, error} = await memberQuery.importFromItac(formData)
-    fileUploading.value = false
-
-    if (error) {
-      return displayFileErrorToast(error.message)
-    }
-
-    displayFileSuccessToast()
-    selfStore.refreshSelectedClubSettings()
+  if (!formData) {
+    return;
   }
 
-  async function importFromItacSecondary(event: any) {
-    const formData = getFileFormDataFromUInputChangeEvent(event);
+  fileUploading.value = true
+  const {created, error} = await memberQuery.importFromItac(formData)
+  fileUploading.value = false
 
-    if (!formData) {
-      return;
-    }
-
-    fileUploading.value = true
-    const {created, error} = await memberQuery.importFromItacSecondary(formData)
-    fileUploading.value = false
-
-    if (error) {
-      return displayFileErrorToast(error.message)
-    }
-
-    selfStore.refreshSelectedClubSettings()
-    displayFileSuccessToast();
+  if (error) {
+    return displayFileErrorToast(error.message)
   }
 
-  async function migrateExternal() {
-    const { error } = await memberPresenceQuery.importFromExternalPresences()
+  displayFileSuccessToast()
+  selfStore.refreshSelectedClubSettings()
+}
 
-    if (error) {
-      toast.add({
-        title: "Erreur lors de la migration",
-        description: error.message,
-        color: "error"
-      })
-      return
-    }
+async function importFromItacSecondary(event: any) {
+  const formData = getFileFormDataFromUInputChangeEvent(event);
 
-    selfStore.refreshSelectedClubSettings()
+  if (!formData) {
+    return;
+  }
 
+  fileUploading.value = true
+  const {created, error} = await memberQuery.importFromItacSecondary(formData)
+  fileUploading.value = false
+
+  if (error) {
+    return displayFileErrorToast(error.message)
+  }
+
+  selfStore.refreshSelectedClubSettings()
+  displayFileSuccessToast();
+}
+
+async function migrateExternal() {
+  const { error } = await memberPresenceQuery.importFromExternalPresences()
+
+  if (error) {
     toast.add({
-      title: "Présences migrées",
-      color: "success"
+      title: "Erreur lors de la migration",
+      description: error.message,
+      color: "error"
     })
+    return
   }
 
-  async function importFromEden(event: any) {
-    const formData = getFileFormDataFromUInputChangeEvent(event);
+  selfStore.refreshSelectedClubSettings()
 
-    if (!formData) {
-      return;
-    }
+  toast.add({
+    title: "Présences migrées",
+    color: "success"
+  })
+}
 
-    fileUploading.value = true
-    const {created, error} = await memberQuery.importFromEden(formData)
-    fileUploading.value = false
+async function importFromEden(event: any) {
+  const formData = getFileFormDataFromUInputChangeEvent(event);
 
-    if (error) {
-      return displayFileErrorToast(error.message)
-    }
-
-    displayFileSuccessToast();
+  if (!formData) {
+    return;
   }
+
+  fileUploading.value = true
+  const {created, error} = await memberQuery.importFromEden(formData)
+  fileUploading.value = false
+
+  if (error) {
+    return displayFileErrorToast(error.message)
+  }
+
+  displayFileSuccessToast();
+}
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col gap-4">
 
     <MetricAdminImportBatches />
 
-    <UCard>
-      <p>L'import ce fait grâce au fichier généré par itac.</p>
-      <p>Celui-ci doit obligatoirement être au format csv.</p>
+    <template v-if="selectedProfile?.club.settings.activity === ClubActivity.FFTIR">
+      <UCard>
+        <p>L'import doit être structuré au format itac.</p>
+        <p>Celui-ci doit obligatoirement être au format csv.</p>
 
-      <div class="grid grid-cols-11 my-4">
-        <div class="col-span-5 space-y-4">
-          <p class="font-bold">Club principal</p>
-          <UAlert v-if="selfStore.selectedProfile?.club.settings.itacImportDate"
-                  variant="soft"
-                  :title="'Dernier import effectué le ' + formatDateReadable(selfStore.selectedProfile.club.settings.itacImportDate.toString())"
-                  :color="dayjs(selfStore.selectedProfile.club.settings.itacImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'error' : 'success' "
-          />
-          <UAlert v-else
-                  title="Aucun import effectué"
-                  color="error"
-          />
+        <div class="grid grid-cols-11 my-4">
+          <div class="col-span-5 space-y-4">
+            <p class="font-bold">Club principal</p>
+            <UAlert v-if="selfStore.selectedProfile?.club.settings.itacImportDate"
+                    variant="soft"
+                    :title="'Dernier import effectué le ' + formatDateReadable(selfStore.selectedProfile.club.settings.itacImportDate.toString())"
+                    :color="dayjs(selfStore.selectedProfile.club.settings.itacImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'error' : 'success' "
+            />
+            <UAlert v-else
+                    title="Aucun import effectué"
+                    color="error"
+            />
 
-          <UInput
-            :loading="fileUploading"
-            :disabled="fileUploading"
-            type="file"
-            accept="text/csv"
-            icon="i-heroicons-document-text"
-            @change="importFromItac"
-          />
+            <UInput
+              :loading="fileUploading"
+              :disabled="fileUploading"
+              type="file"
+              accept="text/csv"
+              icon="i-heroicons-document-text"
+              @change="importFromItac"
+            />
+          </div>
+
+          <USeparator class="col-span-1" orientation="vertical" />
+
+          <div class="col-span-5 space-y-4">
+            <p class="font-bold">Club secondaire</p>
+            <UAlert v-if="selfStore.selectedProfile?.club.settings.itacSecondaryImportDate"
+                    variant="soft"
+                    :title="'Dernier import effectué le ' + formatDateReadable(selfStore.selectedProfile.club.settings.itacSecondaryImportDate.toString())"
+                    :color="dayjs(selfStore.selectedProfile.club.settings.itacSecondaryImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'error' : 'success' "
+            />
+            <UAlert v-else
+                    title="Aucun import effectué"
+                    color="error"
+            />
+
+            <UInput
+              :loading="fileUploading"
+              :disabled="fileUploading"
+              type="file"
+              accept="text/csv"
+              icon="i-heroicons-document-text"
+              @change="importFromItacSecondary"
+            />
+          </div>
         </div>
 
-        <USeparator class="col-span-1" orientation="vertical" />
-
-        <div class="col-span-5 space-y-4">
-          <p class="font-bold">Club secondaire</p>
-          <UAlert v-if="selfStore.selectedProfile?.club.settings.itacSecondaryImportDate"
-                  variant="soft"
-                  :title="'Dernier import effectué le ' + formatDateReadable(selfStore.selectedProfile.club.settings.itacSecondaryImportDate.toString())"
-                  :color="dayjs(selfStore.selectedProfile.club.settings.itacSecondaryImportDate).isBefore(dayjs().subtract(1, 'months')) ? 'error' : 'success' "
-          />
-          <UAlert v-else
-                  title="Aucun import effectué"
-                  color="error"
-          />
-
-          <UInput
-            :loading="fileUploading"
-            :disabled="fileUploading"
-            type="file"
-            accept="text/csv"
-            icon="i-heroicons-document-text"
-            @change="importFromItacSecondary"
-          />
+        <div class="flex gap-2">
+          <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-itac.html#import-des-membres">Documentation</UButton>
+          <div class="flex-1"></div>
+          <UButton @click="migrateExternal()" variant="ghost" color="success" :disabled="((selfStore.selectedProfile?.club.settings.itacSecondaryImportRemaining && selfStore.selectedProfile.club.settings.itacSecondaryImportRemaining) ?? 0) > 0">Migration présence externe vers présence membres</UButton>
         </div>
-      </div>
 
-      <div class="flex gap-2">
-        <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-itac.html#import-des-membres">Documentation</UButton>
-        <div class="flex-1"></div>
-        <UButton @click="migrateExternal()" variant="ghost" color="success" :disabled="((selfStore.selectedProfile?.club.settings.itacSecondaryImportRemaining && selfStore.selectedProfile.club.settings.itacSecondaryImportRemaining) ?? 0) > 0">Migration présence externe vers présence membres</UButton>
-      </div>
+      </UCard>
 
-    </UCard>
+      <GenericCard title="Certificats médicaux">
+        <p>Pour le moment itac n'exporte pas la date de validité du certificat médical.</p>
+        <p>Pour ce faire vous devais télécharger le fichier excel fourni par eden.</p>
 
+        <UInput
+          class="my-2"
+          :loading="fileUploading"
+          :disabled="fileUploading"
+          type="file"
+          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          icon="i-heroicons-document-text"
+          @change="importFromEden"
+        />
 
-    <UCard class="my-4">
-      <p class="font-bold">Certificats médicaux</p>
-      <p>Pour le moment itac n'exporte pas la date de validité du certificat médical.</p>
-      <p>Pour ce faire vous devais télécharger le fichier excel fourni par eden.</p>
+        <p class="my-2">Exemple</p>
 
-      <UInput
-        class="my-2"
-        :loading="fileUploading"
-        :disabled="fileUploading"
-        type="file"
-        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        icon="i-heroicons-document-text"
-        @change="importFromEden"
-      />
+        <GenericCode>
+          N° licence | Date d'expiration <br />
+          01234578 | 11.11.2024
+        </GenericCode>
 
-      <p class="my-2">Exemple</p>
+        <div class="flex gap-2 mt-4">
+          <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-eden.html#import-des-certificats-medicaux">Documentation</UButton>
+          <div class="flex-1"></div>
+        </div>
+      </GenericCard>
+    </template>
 
-      <GenericCode>
-        N° licence | Date d'expiration <br />
-        01234578 | 11.11.2024
-      </GenericCode>
-
-      <div class="flex gap-2 mt-4">
-        <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-eden.html#import-des-certificats-medicaux">Documentation</UButton>
-        <div class="flex-1"></div>
-      </div>
-    </UCard>
+    <template v-else>
+      <UCard>
+        <div class="text-center font-bold text-lg">Fonctionnalité à venir</div>
+      </UCard>
+    </template>
 
   </div>
 </template>

@@ -1,6 +1,43 @@
 import type {UuidItem} from "~/types/api/uuidItem";
 import type {TimestampItem} from "~/types/api/timestampItem";
 import type {ClubSetting} from "~/types/api/item/clubDependent/clubSetting";
+import type {SelectMenuItem} from "#ui/types";
+
+export enum ClubActivity {
+  Generic = 'GENERIC',
+
+  FFTIR = 'FFTIR',
+}
+
+export function getSelectMenuClubActivity(): SelectMenuItem[] {
+  return [
+    {
+      type: 'label',
+      label: 'Non sportive'
+    },
+    {
+      label: 'Global',
+      value: ClubActivity.Generic
+    },
+
+    {
+      type: 'separator'
+    },
+    {
+      type: 'label',
+      label: 'Sportive'
+    },
+
+    {
+      label: 'FFTIR - Tir sportif',
+      value: ClubActivity.FFTIR
+    }
+  ]
+}
+export function clubHasControlActivity(activity: ClubActivity|undefined): boolean {
+  if (!activity) return false
+  return [ClubActivity.Generic, ClubActivity.FFTIR].includes(activity)
+}
 
 export enum ClubRole {
   Badger = 'CLUB_BADGER',

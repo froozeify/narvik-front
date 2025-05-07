@@ -1,14 +1,15 @@
 <script setup lang="ts">
 
-import clipboard from "clipboardy";
 import ActivityQuery from "~/composables/api/query/clubDependent/plugin/presence/ActivityQuery";
 import type {Activity} from "~/types/api/item/clubDependent/plugin/presence/activity";
 import {useSelfUserStore} from "~/stores/useSelfUser";
-import {convertUuidToUrlUuid} from "~/utils/resource";
 import type {WriteClubSetting} from "~/types/api/item/clubDependent/clubSetting";
 import ClubSettingQuery from "~/composables/api/query/clubDependent/ClubSettingQuery";
 import type {SelectApiItem} from "~/types/select";
 import type {Season} from "~/types/api/item/season";
+import {clubHasControlActivity, getSelectMenuClubActivity} from "~/types/api/item/club";
+import {displayApiError} from "~/utils/resource";
+import type {SelectMenuItem} from "#ui/types";
 
 definePageMeta({
   layout: "admin"
@@ -31,6 +32,7 @@ const configState = reactive({
   excludedActivitiesFromOpeningDays: selectedProfile.value?.club.settings.excludedActivitiesFromOpeningDays?.map((a: Activity) => a.uuid),
   selectedMonth: selectedProfile.value?.club.settings.seasonEnd.split('-')[0].toString(),
   selectedDay: selectedProfile.value?.club.settings.seasonEnd.split('-')[1].toString(),
+  activity: getSelectMenuClubActivity().find((item) => item.value === selectedProfile.value?.club.settings.activity)
 })
 const selectedControlShootingActivity: Ref<Activity | undefined> = ref(undefined);
 
@@ -146,11 +148,7 @@ async function controlShootingUpdated() {
   let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
 
   if (error) {
-    toast.add({
-      color: "error",
-      title: "L'enregistrement a échoué",
-      description: error.message
-    });
+    displayApiError(error)
     return;
   }
 
@@ -179,11 +177,7 @@ async function ignoredActivitiesDaysUpdated() {
   let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
 
   if (error) {
-    toast.add({
-      color: "error",
-      title: "L'enregistrement a échoué",
-      description: error.message
-    });
+    displayApiError(error)
     return;
   }
 
@@ -232,11 +226,7 @@ async function deleteLogo() {
   logoUploading.value = false
 
   if (error) {
-    toast.add({
-      title: "Erreur lors de la suppression du logo",
-      description: error.message,
-      color: "error"
-    })
+    displayApiError(error, "Erreur lors de la suppression du logo")
     return
   }
 
@@ -257,11 +247,31 @@ async function seasonEndUpdated() {
   let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
 
   if (error) {
-    toast.add({
-      color: "error",
-      title: "L'enregistrement a échoué",
-      description: error.message
-    });
+    displayApiError(error)
+    return;
+  }
+
+  selfStore.refreshSelectedClub().then()
+
+  toast.add({
+    color: "success",
+    title: "Paramètre enregistré"
+  });
+}
+
+async function clubActivityUpdated() {
+  if (!selectedProfile.value?.club.settings ||
+    !configState.activity?.value
+  ) return;
+
+  const payload: WriteClubSetting = {
+    activity: configState.activity.value
+  }
+
+  let { updated, error } = await clubSettingQuery.patch(selectedProfile.value.club.settings, payload);
+
+  if (error) {
+    displayApiError(error)
     return;
   }
 
@@ -277,47 +287,20 @@ async function seasonEndUpdated() {
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <GenericCard title="Activités exclus du compte des jours ouverts">
-      <div>
-        <USelectMenu
-          v-model="configState.excludedActivitiesFromOpeningDays"
-          @change="ignoredActivitiesDaysUpdated"
-          :items="activitiesSelect"
-          value-key="value"
-          multiple
-        >
-          <template #default>
-            <span v-if="configState.excludedActivitiesFromOpeningDays && activities && configState.excludedActivitiesFromOpeningDays.length" class="truncate">
-              {{ activities.filter(a => (a.uuid && configState.excludedActivitiesFromOpeningDays?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
-            </span>
-            <span v-else>Aucune activités exclus</span>
-          </template>
-        </USelectMenu>
-      </div>
-    </GenericCard>
+    <GenericCard title="Type d'activité">
+      <div class="flex flex-col gap-4">
+        <p class="text-xs">En définissant votre type d'activité, certaines options supplémentaires seront disponible (imports spécifiques par exemple). </p>
 
-    <GenericCard title="Activité correspondante au contrôle">
-      <div class="flex flex-col gap-2">
-        <div class="text-xs">
-          <p>Certaines activités sportives peuvent avoir un contrôle annuel obligatoire.</p>
-          <p>En créant une activité dédié pour, cela permettra d'alerter le membre lorsque ce contrôle doit de nouveau être effectué.</p>
-        </div>
+        <UFormField label="Type">
+          <USelectMenu v-model="configState.activity" :items="getSelectMenuClubActivity()" placeholder="Non défini - Global" />
+        </UFormField>
 
-        <USelect
-          v-model="configState.selectedControlShootingActivity"
-          @change="controlShootingUpdated"
-          :items="activitiesSelect"
-          placeholder="Aucun contrôle défini" />
+        <UButton class="w-fit" label="Sauvegarder" @click="clubActivityUpdated" />
 
-        <UButton v-if="configState.selectedControlShootingActivity"
-                 class="w-fit"
-                 @click="
-                  configState.selectedControlShootingActivity = undefined;
-                  controlShootingUpdated()
-                 "
-        >
-          Désactiver l'activité de contrôle
-        </UButton>
+        <p class="text-xs">
+          Votre activité n'est pas listée, n'hésitez pas à <ContentLink to="https://about.narvik.app/contact" target="_blank">nous contacter</ContentLink> pour que nous l'ajoutions.
+        </p>
+
       </div>
     </GenericCard>
 
@@ -338,6 +321,52 @@ async function seasonEndUpdated() {
 
       </div>
     </GenericCard>
+
+    <div class="flex flex-col gap-4">
+      <GenericCard title="Activités exclus du décompte des jours ouverts">
+        <div>
+          <USelectMenu
+            v-model="configState.excludedActivitiesFromOpeningDays"
+            @change="ignoredActivitiesDaysUpdated"
+            :items="activitiesSelect"
+            value-key="value"
+            multiple
+          >
+            <template #default>
+            <span v-if="configState.excludedActivitiesFromOpeningDays && activities && configState.excludedActivitiesFromOpeningDays.length" class="truncate">
+              {{ activities.filter(a => (a.uuid && configState.excludedActivitiesFromOpeningDays?.includes(a.uuid)) ).map(a => a.name).join(', ') }}
+            </span>
+              <span v-else>Aucune activités exclus</span>
+            </template>
+          </USelectMenu>
+        </div>
+      </GenericCard>
+
+      <GenericCard v-if="clubHasControlActivity(selectedProfile?.club.settings.activity)" title="Activité correspondante au contrôle">
+        <div class="flex flex-col gap-2">
+          <div class="text-xs">
+            <p>Certaines activités sportives peuvent avoir un contrôle annuel obligatoire.</p>
+            <p>En créant une activité dédié pour, cela permettra d'alerter le membre lorsque ce contrôle doit de nouveau être effectué.</p>
+          </div>
+
+          <USelect
+            v-model="configState.selectedControlShootingActivity"
+            @change="controlShootingUpdated"
+            :items="activitiesSelect"
+            placeholder="Aucun contrôle défini" />
+
+          <UButton v-if="configState.selectedControlShootingActivity"
+                   class="w-fit"
+                   @click="
+                  configState.selectedControlShootingActivity = undefined;
+                  controlShootingUpdated()
+                 "
+          >
+            Désactiver l'activité de contrôle
+          </UButton>
+        </div>
+      </GenericCard>
+    </div>
 
     <GenericCard title="Logo">
       <div v-if="selectedProfile?.club?.settings?.logoBase64" class="mt-4 flex justify-center">
