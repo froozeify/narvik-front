@@ -16,6 +16,10 @@ help: ## Outputs this help screen
 
 ## —— Docker 🐳 ————————————————————————————————————————————————————————————————
 
+build-push-cloud-latest-only: ## Build using cloud and push it under latest tag (use for preprod testing)
+	@docker buildx build . --builder cloud-benoitvignal-narvik-cloud --pull --no-cache -t $(BUILD_REPO):latest --target run
+	@docker image push $(BUILD_REPO):latest
+
 build-prod:
 	@docker build --pull --no-cache -t $(BUILD_REPO):latest -t $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\+' -o` -t $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o` -t $(BUILD_REPO):`cat package.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o` --target run .
 
