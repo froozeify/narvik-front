@@ -50,11 +50,11 @@ export enum ClubRole {
 export function getAvailableClubRoles() {
   return [
     {
-      text:  'Administateur',
+      text:  'Administrateur',
       value: ClubRole.Admin
     },
     {
-      text:  'Superviseur/Permanent',
+      text:  'Bénévole / Superviseur',
       value: ClubRole.Supervisor
     },
     {

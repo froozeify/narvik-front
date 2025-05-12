@@ -28,14 +28,14 @@
       icon: 'i-heroicons-credit-card',
       to: '/admin/subscription'
     })
+    globalSection.push({
+      label: 'Configuration',
+      icon: 'i-heroicons-wrench-screwdriver',
+      to: '/admin/config'
+    })
   }
 
   const configsSection = [
-    {
-      label: 'Globale',
-      icon: 'i-heroicons-wrench-screwdriver',
-      to: '/admin/config'
-    },
     {
       label: 'Activités',
       icon: 'i-heroicons-rocket-launch',
@@ -101,7 +101,7 @@
     })
 
     links.push({
-      title: 'Configurations',
+      title: 'Paramétrage',
       links: configsSection,
     })
   }
