@@ -74,6 +74,9 @@ async function submitItem() {
       </UFormField>
 
       <USeparator label="Facturation" />
+      <UFormField label="Nom" description="Veuillez contacter le support pour modifier le nom.">
+        <UInput :model-value="item.name" disabled />
+      </UFormField>
 
       <UFormField label="Adresse" name="address" required>
         <UInput v-model="item.address" required/>
