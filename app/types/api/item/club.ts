@@ -84,6 +84,7 @@ interface _Club extends UuidItem, TimestampItem {
   comment?: string
   settings?: ClubSetting
   renewDate?: Date|null
+  deletionDate?: Date|null
   address?: string
   zipCode?: number
   city?: string

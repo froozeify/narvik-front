@@ -13,7 +13,7 @@ const props = defineProps({
 
 const emit = defineEmits(['selected', 'close'])
 
-const selectedDate: Ref<Date|undefined> = ref(props.item.renewDate ? dayjs(props.item.renewDate).toDate() : undefined)
+const selectedDate: Ref<Date|undefined> = ref(props.item.deletionDate ? dayjs(props.item.deletionDate).toDate() : undefined)
 
 function applyProfile() {
   emit('selected', selectedDate.value)
@@ -23,14 +23,14 @@ function applyProfile() {
 </script>
 
 <template>
-  <ModalWithActions title="Choix de la date de renouvellement" @close="(state: boolean) => emit('close', state)">
+  <ModalWithActions title="Choix de la date de suppression" @close="(state: boolean) => emit('close', state)">
 
     <slot>
       <div class="flex flex-col justify-center gap-4">
         <div class="flex justify-center gap-4">
           <UButton @click="selectedDate = dayjs(selectedDate).add(1, 'months').toDate(); applyProfile()">+1 mois</UButton>
           <UButton @click="selectedDate = dayjs(selectedDate).add(1, 'years').toDate(); applyProfile()">+1 an</UButton>
-          <UButton color="error" variant="ghost" @click="selectedDate = undefined; applyProfile()">Pas de renouvellement</UButton>
+          <UButton color="error" variant="ghost" @click="selectedDate = undefined; applyProfile()">Annuler la suppression</UButton>
         </div>
         <div class="text-center">
           <GenericDatePicker v-model="selectedDate" mode="date" />
