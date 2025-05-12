@@ -5,6 +5,7 @@ import MemberQuery from "~/composables/api/query/clubDependent/MemberQuery";
 import {convertUuidToUrlUuid} from "~/utils/resource";
 import {ClubRole, getAvailableClubRoles} from "~/types/api/item/club";
 import {createBrowserCsvDownload} from "~/utils/browser";
+import type {TablePaginateInterface} from "~/types/table";
 
 const toast = useToast();
 const isLoading = ref(true);
@@ -157,7 +158,7 @@ async function downloadCsv() {
         </div>
 
         <div class="text-right">
-          <UButton  @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv">
+          <UButton @click="downloadCsv()" icon="i-heroicons-arrow-down-tray" color="success" :loading="isDownloadingCsv">
             CSV
           </UButton>
         </div>
@@ -182,7 +183,7 @@ async function downloadCsv() {
         @update:sort="getMembers()"
         :columns="columns"
         :data="members"
-        @select="displayMemberPage"
+        @select="(evt) => displayMemberPage(evt.original)"
         :ui="{
           tr: 'cursor-pointer'
         }"

@@ -11,7 +11,7 @@ import {
 import type {MemberPresence} from "~/types/api/item/clubDependent/plugin/presence/memberPresence";
 import type {MemberSeason} from "~/types/api/item/clubDependent/memberSeason";
 import {AbstractClubDependentQuery} from "~/composables/api/query/AbstractClubDependentQuery";
-import type {Club, ClubRole, WriteClub} from "~/types/api/item/club";
+import type {Club, ClubRole, SelfWriteClub, WriteClub} from "~/types/api/item/club";
 import type {ExternalPresence} from "~/types/api/item/clubDependent/plugin/presence/externalPresence";
 import {AbstractQuery} from "~/composables/api/query/AbstractQuery";
 import type {FetchItemData} from "~/types/api/api";
@@ -26,5 +26,9 @@ export default class ClubQuery extends AbstractQuery<Club, WriteClub> {
 
   async generateBadger() {
     return usePatch<Club>(`${this.getCurrentClubPath()}/generate-badger`, {})
+  }
+
+  async programDeletion() {
+    return usePatch<Club>(`${this.getCurrentClubPath()}/delete`, {})
   }
 }

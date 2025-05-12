@@ -121,6 +121,9 @@ async function submitItem() {
       <UFormField label="Date de renouvellement" name="renewDate">
         {{ formatDateReadable(item.renewDate?.toString()) || 'Non défini' }}
       </UFormField>
+      <UFormField v-if="item.deletionDate" label="Date de suppression" name="deletionDate">
+        {{ formatDateReadable(item.deletionDate.toString()) }}
+      </UFormField>
       <UFormField label="Activé" name="isActivated">
         <USwitch v-model="item.isActivated" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'" />
       </UFormField>

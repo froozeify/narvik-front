@@ -11,6 +11,7 @@ import ModalClubSelectRenewDate from "~/components/Modal/Club/ModalClubSelectRen
 import {convertUuidToUrlUuid} from "~/utils/resource";
 import UserQuery from "~/composables/api/query/UserQuery";
 import type {User} from "~/types/api/item/user";
+import ModalClubSelectDeletionDate from "~/components/Modal/Club/ModalClubSelectDeletionDate.vue";
 
 definePageMeta({
   layout: "super-admin"
@@ -238,6 +239,25 @@ loadClubUsers()
                             return
                           }
                           await clubQuery.patch(club, { renewDate: date ?? null })
+                          await loadItem()
+                        }
+                      })"
+              />
+            </div>
+
+            <div class="text-center text-lg flex flex-row justify-center align-middle gap-2">
+              <p>Suppression programmée le</p>
+              <UButton icon="i-heroicons-calendar-days-20-solid"
+                       size="xs"
+                       :color="club.deletionDate ? 'error' : 'primary'"
+                       :label="formatDateReadable(club.deletionDate?.toString()) || 'Choisir une date'"
+                       @click="overlay.create(ModalClubSelectDeletionDate).open({
+                        item: club,
+                        async onSelected(date: Date|undefined) {
+                          if (!club) {
+                            return
+                          }
+                          await clubQuery.patch(club, { deletionDate: date ?? null })
                           await loadItem()
                         }
                       })"
