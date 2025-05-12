@@ -7,8 +7,12 @@ import ClubQuery from "~/composables/api/query/ClubQuery";
 import SelfClubForm from "~/components/Club/SelfClubForm.vue";
 
 definePageMeta({
-  layout: "admin"
+  layout: "admin",
 });
+
+useHead({
+  title: 'Abonnement'
+})
 
 const selfStore = useSelfUserStore()
 

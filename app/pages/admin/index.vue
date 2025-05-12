@@ -7,6 +7,10 @@ definePageMeta({
   layout: "admin"
 });
 
+useHead({
+  title: ''
+})
+
 const selfStore = useSelfUserStore();
 const { selectedProfile } = storeToRefs(selfStore)
 
