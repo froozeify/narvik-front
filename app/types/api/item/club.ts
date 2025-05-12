@@ -77,9 +77,9 @@ export function hasClubSupervisorRole(role: ClubRole|undefined): boolean {
 }
 
 interface _Club extends UuidItem, TimestampItem {
-  name: string;
-  isActivated: boolean
-  salesEnabled: boolean
+  name?: string;
+  isActivated?: boolean
+  salesEnabled?: boolean
   badgerToken?: string
   comment?: string
   settings?: ClubSetting
@@ -97,9 +97,19 @@ interface _Club extends UuidItem, TimestampItem {
 }
 
 export interface Club extends _Club {
+  name: string;
+  isActivated: boolean
+  salesEnabled: boolean
+
   settings: ClubSetting
 }
 
 export interface WriteClub extends _Club {
+  name: string;
+  isActivated: boolean
+  salesEnabled: boolean
+}
+
+export interface SelfWriteClub extends _Club {
 
 }

@@ -4,6 +4,7 @@ import {useSelfUserStore} from "~/stores/useSelfUser";
 import {formatDateReadable} from "~/utils/date";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import ClubQuery from "~/composables/api/query/ClubQuery";
+import SelfClubForm from "~/components/Club/SelfClubForm.vue";
 
 definePageMeta({
   layout: "admin"
@@ -13,6 +14,7 @@ const selfStore = useSelfUserStore()
 
 const overlay = useOverlay()
 const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
+const selfClubModalOpen = ref(false)
 
 async function deleteClub() {
   const club = selfStore.selectedProfile?.club
@@ -86,18 +88,21 @@ async function deleteClub() {
 
     <GenericCardWithActions v-if="selfStore.selectedProfile?.club" class="lg:col-span-2 h-fit" title="Facturation">
       <template #actions>
-        <UButton>Modifier -> Notif mail info modifié (avec copie sales team)</UButton>
+        <UButton @click="selfClubModalOpen = true">Modifier</UButton>
       </template>
 
       <div class="mb-4">
         <p v-if="selfStore.selectedProfile.club.contactName">
           <b>Nom</b> : {{ selfStore.selectedProfile.club.contactName }}
         </p>
+        <p v-if="selfStore.selectedProfile.club.contactPhone">
+          <b>Téléphone</b> : {{ selfStore.selectedProfile.club.contactPhone }}
+        </p>
         <p v-if="selfStore.selectedProfile.club.contactEmail">
           <b>Email</b> : {{ selfStore.selectedProfile.club.contactEmail }}
         </p>
-        <p v-if="selfStore.selectedProfile.club.contactPhone">
-          <b>Téléphone</b> : {{ selfStore.selectedProfile.club.contactPhone }}
+        <p v-if="selfStore.selectedProfile.club.website">
+          <b>Site</b> : {{ selfStore.selectedProfile.club.website }}
         </p>
       </div>
 
@@ -119,5 +124,17 @@ async function deleteClub() {
         </p>
       </div>
     </GenericCardWithActions>
+
+    <UModal
+      v-model:open="selfClubModalOpen">
+      <template #content>
+        <UCard>
+          <SelfClubForm v-if="selfStore.selectedProfile"
+            :item="{...selfStore.selectedProfile.club}"
+            @updated="(value) => {selfClubModalOpen = false; selfStore.refreshSelectedClub() }"
+          />
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
