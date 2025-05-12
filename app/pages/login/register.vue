@@ -9,6 +9,7 @@ import {ClubActivity, getSelectMenuClubActivity} from "~/types/api/item/club";
 
 const toast = useToast()
 const isLoading = ref(false)
+const securityEmailSent = ref(false)
 
 const queryParams = useRoute().query
 
@@ -175,10 +176,11 @@ async function initiateRegister() {
 
   toast.add({
     color: "success",
-    title: "Un code vérification à été envoyé par email",
+    title: "Un code de vérification a été envoyé par mail",
   });
 
   selected.value = '1'
+  securityEmailSent.value = true
 }
 
 onMounted(() => {
@@ -222,15 +224,15 @@ onBeforeUnmount(() => {
         </template>
 
         <template #create>
-          <UAlert
+          <UAlert v-if="securityEmailSent"
             icon="i-heroicons-megaphone"
-            color="error"
+            color="success"
             variant="soft"
-            title="En cas de code invalide, un nouveau sera envoyé."
-            description="Seul le dernier code de sécurité reçu est valide."
+            title="Un email contenant le code de sécurité vous a été envoyé."
+            description="Celui-ci peut se trouver dans votre dossier SPAM."
           />
           <UForm :state="state" class="space-y-4 mt-4" :validate="validate" @submit="register">
-            <UFormField label="Code de sécurité" name="securityCode" required>
+            <UFormField label="Code de sécurité" name="securityCode" help="En cas de code invalide, un nouveau sera envoyé. Seul le dernier code de sécurité reçu est valide." required>
               <UInput v-model.trim="state.securityCode" />
             </UFormField>
 

@@ -193,7 +193,7 @@ async function importFromEden(event: any) {
         </GenericCode>
 
         <div class="flex gap-2 mt-4">
-          <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-eden.html#import-des-certificats-medicaux">Documentation</UButton>
+          <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-itac.html#import-des-certificats-medicaux">Documentation</UButton>
           <div class="flex-1"></div>
         </div>
       </GenericCard>
