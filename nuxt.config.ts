@@ -80,6 +80,6 @@ export default defineNuxtConfig({
 
   robots: {
     disallow: ['*'],
-    allow: ['/login', '/login/**'],
+    allow: ['/', '/login', '/login/**'],
   }
 })
