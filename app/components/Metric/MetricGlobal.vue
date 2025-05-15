@@ -195,7 +195,7 @@ function parseGetActivities(value: FetchItemData<Metric>) {
           :loading="memberStats.loading">
         </GenericStatCard>
 
-        <template v-if="selectedProfile?.club.presencesEnabled">
+        <template v-if="props.superAdmin || selectedProfile?.club.presencesEnabled">
           <GenericStatCard
             title="Jours ouverts"
             tooltip="Cette année"
