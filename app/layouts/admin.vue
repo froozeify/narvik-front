@@ -41,23 +41,25 @@
       icon: 'i-heroicons-rocket-launch',
       to: '/admin/config/activities'
     },
-    {
+  ]
+  if (selfStore.selectedProfile?.club.presencesEnabled) {
+    configsSection.push({
       label: 'Présences',
       icon: 'i-heroicons-calendar-days',
       to: '/admin/config/presences'
-    }
-  ]
+    })
+  }
 
   const entitiesSection = [
-    {
-      label: 'Présences',
-      icon: 'i-heroicons-calendar-days',
-      to: '/admin/presences'
-    },
     {
       label: 'Membres',
       icon: 'i-heroicons-user-group',
       to: '/admin/members'
+    },
+    {
+      label: 'Présences',
+      icon: 'i-heroicons-calendar-days',
+      to: '/admin/presences'
     },
     {
       label: 'Trombinoscope',
@@ -77,12 +79,14 @@
       icon: 'i-heroicons-photo',
       to: '/admin/imports/photos'
     },
-    {
+  ]
+  if (selfStore.selectedProfile?.club.presencesEnabled) {
+    importSection.push({
       label: 'Présences',
       icon: 'i-heroicons-calendar-days',
       to: '/admin/imports/presences'
-    },
-  ]
+    })
+  }
 
   let links: GroupedNavigationLinks[] = [
     {

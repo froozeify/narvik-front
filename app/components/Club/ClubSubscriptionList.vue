@@ -14,8 +14,8 @@ const props = defineProps({
 
 <template>
   <div class="flex justify-between flex-wrap">
-    <span class="font-bold">Fonctionalités</span>
-    <NuxtLink class="text-xs underline" to="https://about.narvik.app/" target="_blank">En savoir plus sur les fonctionalités disponibles</NuxtLink>
+    <span class="font-bold">Fonctionnalités</span>
+    <NuxtLink class="text-xs underline" to="https://about.narvik.app/" target="_blank">En savoir plus sur les fonctionnalités disponibles</NuxtLink>
   </div>
   <UTable
     :columns="[
@@ -40,7 +40,7 @@ const props = defineProps({
       },
       {
         name: 'Enregistrement des présences',
-        enabled: true
+        enabled: props.item.presencesEnabled
       },
       {
         name: 'Ventes et gestion des stocks',

@@ -63,7 +63,8 @@ async function importExternalPresences(event: any) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <ErrorModuleNotEnabled v-if="!selfStore.selectedProfile?.club.presencesEnabled" />
+  <div v-else class="flex flex-col gap-4">
     <MetricAdminImportBatches />
 
     <UAlert

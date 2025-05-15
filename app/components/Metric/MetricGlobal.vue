@@ -5,6 +5,8 @@ import type {Metric} from "~/types/api/item/metric";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarController, BarElement, CategoryScale, LinearScale, Colors } from 'chart.js'
 import { Bar } from 'vue-chartjs'
 import type {FetchItemData} from "~/types/api/api";
+import {useSelfUserStore} from "~/stores/useSelfUser";
+
 ChartJS.register(Title, Tooltip, Legend, BarController, BarElement, CategoryScale, LinearScale, Colors)
 
 const props = defineProps({
@@ -14,6 +16,9 @@ const props = defineProps({
     default: false
   },
 });
+
+const selfStore = useSelfUserStore();
+const { selectedProfile } = storeToRefs(selfStore)
 
 const chartData: Ref<object|undefined> = ref(undefined)
 const chartOptions = ref({
@@ -120,20 +125,24 @@ function getMetrics() {
     return
   }
 
-  // We get metric for a club
+  // We get metrics for a club
+
   metricsQuery.get("members").then(value => {
     memberMetrics.value = value.retrieved
   });
 
-  metricsQuery.get("presences").then(value => {
-    presenceMetrics.value = value.retrieved
-  });
-  metricsQuery.get("external-presences").then(value => {
-    externalPresenceMetrics.value = value.retrieved
-  });
-  metricsQuery.get('activities').then(value => {
-    parseGetActivities(value)
-  });
+  // We get presences stats
+  if (selectedProfile.value?.club.presencesEnabled) {
+    metricsQuery.get("presences").then(value => {
+      presenceMetrics.value = value.retrieved
+    });
+    metricsQuery.get("external-presences").then(value => {
+      externalPresenceMetrics.value = value.retrieved
+    });
+    metricsQuery.get('activities').then(value => {
+      parseGetActivities(value)
+    });
+  }
 
 }
 
@@ -186,92 +195,94 @@ function parseGetActivities(value: FetchItemData<Metric>) {
           :loading="memberStats.loading">
         </GenericStatCard>
 
-        <GenericStatCard
-          title="Jours ouverts"
-          tooltip="Cette année"
-          :value="presenceStats.currentYearOpenedDays"
-          :is-increasing="presenceStats.currentYearOpenedDays >= presenceStats.previousYearOpenedDays"
-          :top-right="{
+        <template v-if="props.superAdmin || selectedProfile?.club.presencesEnabled">
+          <GenericStatCard
+            title="Jours ouverts"
+            tooltip="Cette année"
+            :value="presenceStats.currentYearOpenedDays"
+            :is-increasing="presenceStats.currentYearOpenedDays >= presenceStats.previousYearOpenedDays"
+            :top-right="{
               value: presenceStats.previousYearOpenedDays,
               tooltip: 'Année précédente (même date)'
             }"
-          :loading="presenceStats.loading">
-        </GenericStatCard>
+            :loading="presenceStats.loading">
+          </GenericStatCard>
 
-        <GenericStatCard
-          title="Présences (membres + externes)"
-          tooltip="Cette année"
-          :value="presenceStats.currentYear + externalPresenceStats.currentYear"
-          :is-increasing="(presenceStats.currentYear + externalPresenceStats.currentYear) >= (presenceStats.previousYear + externalPresenceStats.previousYear)"
-          :top-right="{
+          <GenericStatCard
+            title="Présences (membres + externes)"
+            tooltip="Cette année"
+            :value="presenceStats.currentYear + externalPresenceStats.currentYear"
+            :is-increasing="(presenceStats.currentYear + externalPresenceStats.currentYear) >= (presenceStats.previousYear + externalPresenceStats.previousYear)"
+            :top-right="{
               value: (presenceStats.previousYear + externalPresenceStats.previousYear),
               tooltip: 'Année précédente (même date)'
             }"
-          :loading="presenceStats.loading && externalPresenceStats.loading">
-        </GenericStatCard>
+            :loading="presenceStats.loading && externalPresenceStats.loading">
+          </GenericStatCard>
 
-        <GenericStatCard
-          title="Présences/ouvertures (membres + externes)"
-          tooltip="Cette année"
-          :value="'≃ ' + (presenceStats.ratioPresenceOpenCurrentYear + externalPresenceStats.ratioPresenceOpenCurrentYear)"
-          :is-increasing="(presenceStats.ratioPresenceOpenCurrentYear + externalPresenceStats.ratioPresenceOpenCurrentYear) >= (presenceStats.ratioPresenceOpenPreviousYear + externalPresenceStats.ratioPresenceOpenPreviousYear)"
-          :top-right="{
+          <GenericStatCard
+            title="Présences/ouvertures (membres + externes)"
+            tooltip="Cette année"
+            :value="'≃ ' + (presenceStats.ratioPresenceOpenCurrentYear + externalPresenceStats.ratioPresenceOpenCurrentYear)"
+            :is-increasing="(presenceStats.ratioPresenceOpenCurrentYear + externalPresenceStats.ratioPresenceOpenCurrentYear) >= (presenceStats.ratioPresenceOpenPreviousYear + externalPresenceStats.ratioPresenceOpenPreviousYear)"
+            :top-right="{
               value: (presenceStats.ratioPresenceOpenPreviousYear + externalPresenceStats.ratioPresenceOpenPreviousYear),
               tooltip: 'Année précédente (même date)'
             }"
-          :loading="presenceStats.loading">
-        </GenericStatCard>
+            :loading="presenceStats.loading">
+          </GenericStatCard>
 
-        <GenericStatCard
-          title="Présences"
-          tooltip="Cette année"
-          :value="presenceStats.currentYear"
-          :is-increasing="presenceStats.currentYear >= presenceStats.previousYear"
-          :top-right="{
+          <GenericStatCard
+            title="Présences"
+            tooltip="Cette année"
+            :value="presenceStats.currentYear"
+            :is-increasing="presenceStats.currentYear >= presenceStats.previousYear"
+            :top-right="{
               value: presenceStats.previousYear,
               tooltip: 'Année précédente (même date)'
             }"
-          :loading="presenceStats.loading">
-        </GenericStatCard>
+            :loading="presenceStats.loading">
+          </GenericStatCard>
 
-        <GenericStatCard
-          title="Présences/ouvertures"
-          tooltip="Cette année"
-          :value="'≃ ' + presenceStats.ratioPresenceOpenCurrentYear"
-          :is-increasing="presenceStats.ratioPresenceOpenCurrentYear >= presenceStats.ratioPresenceOpenPreviousYear"
-          :top-right="{
+          <GenericStatCard
+            title="Présences/ouvertures"
+            tooltip="Cette année"
+            :value="'≃ ' + presenceStats.ratioPresenceOpenCurrentYear"
+            :is-increasing="presenceStats.ratioPresenceOpenCurrentYear >= presenceStats.ratioPresenceOpenPreviousYear"
+            :top-right="{
               value: presenceStats.ratioPresenceOpenPreviousYear,
               tooltip: 'Année précédente (même date)'
             }"
-          :loading="presenceStats.loading">
-        </GenericStatCard>
+            :loading="presenceStats.loading">
+          </GenericStatCard>
 
-        <GenericStatCard
-          title="Présences externes"
-          tooltip="Cette année"
-          :value="externalPresenceStats.currentYear"
-          :is-increasing="externalPresenceStats.currentYear >= externalPresenceStats.previousYear"
-          :top-right="{
+          <GenericStatCard
+            title="Présences externes"
+            tooltip="Cette année"
+            :value="externalPresenceStats.currentYear"
+            :is-increasing="externalPresenceStats.currentYear >= externalPresenceStats.previousYear"
+            :top-right="{
               value: externalPresenceStats.previousYear,
               tooltip: 'Année précédente (même date)'
             }"
-          :loading="externalPresenceStats.loading">
-        </GenericStatCard>
+            :loading="externalPresenceStats.loading">
+          </GenericStatCard>
 
-        <GenericStatCard
-          title="Présences externes/ouvertures"
-          tooltip="Cette année"
-          :value="'≃ ' + externalPresenceStats.ratioPresenceOpenCurrentYear"
-          :is-increasing="externalPresenceStats.ratioPresenceOpenCurrentYear >= externalPresenceStats.ratioPresenceOpenPreviousYear"
-          :top-right="{
+          <GenericStatCard
+            title="Présences externes/ouvertures"
+            tooltip="Cette année"
+            :value="'≃ ' + externalPresenceStats.ratioPresenceOpenCurrentYear"
+            :is-increasing="externalPresenceStats.ratioPresenceOpenCurrentYear >= externalPresenceStats.ratioPresenceOpenPreviousYear"
+            :top-right="{
               value: externalPresenceStats.ratioPresenceOpenPreviousYear,
               tooltip: 'Année précédente (même date)'
             }"
-          :loading="externalPresenceStats.loading">
-        </GenericStatCard>
+            :loading="externalPresenceStats.loading">
+          </GenericStatCard>
+        </template>
       </div>
 
-      <GenericCard v-if="chartData" class="mt-4" title="Statistiques d'activités réalisées (membres)">
+      <GenericCard v-if="chartData && selectedProfile?.club.presencesEnabled" class="mt-4" title="Statistiques d'activités réalisées (membres)">
         <div class="mb-4 text-sm">Les données sont basées sur la même période (en partant du 1er janvier au jour actuel)</div>
         <Bar
           :data="chartData"
