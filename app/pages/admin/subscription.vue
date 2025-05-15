@@ -4,7 +4,6 @@ import {useSelfUserStore} from "~/stores/useSelfUser";
 import {formatDateReadable} from "~/utils/date";
 import ModalDeleteConfirmation from "~/components/Modal/ModalDeleteConfirmation.vue";
 import ClubQuery from "~/composables/api/query/ClubQuery";
-import SelfClubForm from "~/components/Club/SelfClubForm.vue";
 
 definePageMeta({
   layout: "admin",
@@ -136,7 +135,8 @@ async function deleteClub() {
       v-model:open="selfClubModalOpen">
       <template #content>
         <UCard>
-          <SelfClubForm v-if="selfStore.selectedProfile"
+          <ClubForm v-if="selfStore.selectedProfile"
+            :is-self-edit="true"
             :item="{...selfStore.selectedProfile.club}"
             @updated="(value) => {selfClubModalOpen = false; selfStore.refreshSelectedClub() }"
           />
