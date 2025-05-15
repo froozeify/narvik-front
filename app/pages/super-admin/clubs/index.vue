@@ -107,7 +107,8 @@ async function createItem() {
   let item: WriteClub = {
     name: '',
     isActivated: true,
-    salesEnabled: true
+    presencesEnabled: true,
+    salesEnabled: true,
   }
   selectedItem.value = item
   isSideVisible.value = true

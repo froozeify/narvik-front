@@ -9,7 +9,6 @@ import type {SelectApiItem} from "~/types/select";
 import type {Season} from "~/types/api/item/season";
 import {clubHasControlActivity, getSelectMenuClubActivity} from "~/types/api/item/club";
 import {displayApiError} from "~/utils/resource";
-import type {SelectMenuItem} from "#ui/types";
 
 definePageMeta({
   layout: "admin"
@@ -322,7 +321,7 @@ async function clubActivityUpdated() {
       </div>
     </GenericCard>
 
-    <div class="flex flex-col gap-4">
+    <div v-if="selectedProfile?.club.presencesEnabled" class="flex flex-col gap-4">
       <GenericCard title="Activités exclus du décompte des jours ouverts">
         <div>
           <USelectMenu

@@ -48,7 +48,8 @@ function copyBadgerLink() {
 </script>
 
 <template>
-  <div class="grid gap-4 md:grid-cols-2">
+  <ErrorModuleNotEnabled v-if="!selectedProfile?.club.presencesEnabled" />
+  <div v-else class="grid gap-4 md:grid-cols-2">
     <GenericCardWithActions class="md:col-span-2" title="Connexion en mode badgeuse/pointeuse">
       <template #actions>
         <UButton

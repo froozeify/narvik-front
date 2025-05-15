@@ -37,7 +37,8 @@ function getDefaultItem() {
     uuid: undefined,
     name: '',
     isActivated: true,
-    salesEnabled: false
+    presencesEnabled: false,
+    salesEnabled: false,
   }
   return item
 }
@@ -64,6 +65,7 @@ async function submitItem() {
   let payload: WriteClub = {
     name: item.value.name,
     renewDate: item.value.renewDate ?? null,
+    presencesEnabled: item.value.presencesEnabled,
     salesEnabled: item.value.salesEnabled,
     isActivated: item.value.isActivated,
     address: item.value.address,
@@ -130,21 +132,28 @@ async function submitItem() {
       <UFormField label="Nom" name="name" required>
         <UInput v-model="item.name" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
       </UFormField>
-      <UFormField label="Vente" name="salesEnabled">
-        <USwitch v-model="item.salesEnabled" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormField>
       <UFormField label="Commentaire" :error="item.comment ? (item.comment.length > 249 && 'Longueur maximum atteinte (250)') : ''">
         <UTextarea v-model="item.comment" :rows="2" autoresize :maxrows="3" placeholder="Commentaire" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
       </UFormField>
 
-      <UFormField label="Site" name="website">
-        <UInput v-model="item.website" type="url" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormField>
+      <USeparator label="Modules" />
+
+      <div class="grid grid-cols-1 md:grid-cols-2">
+        <UFormField label="Présences" name="presencesEnabled">
+          <USwitch v-model="item.presencesEnabled" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+        </UFormField>
+        <UFormField label="Vente" name="salesEnabled">
+          <USwitch v-model="item.salesEnabled" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+        </UFormField>
+      </div>
 
       <USeparator label="Contact" />
 
       <UFormField label="Nom" name="contactName">
         <UInput v-model="item.contactName" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+      </UFormField>
+      <UFormField label="Site" name="website">
+        <UInput v-model="item.website" type="url" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
       </UFormField>
       <UFormField label="Email" name="contactEmail">
         <UInput v-model="item.contactEmail" type="email" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
