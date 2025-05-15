@@ -57,10 +57,6 @@ async function submitItem() {
 <template>
   <UForm :state="item" @submit="submitItem">
     <div class="flex gap-2 flex-col relative">
-      <UFormField label="Site" name="website">
-        <UInput v-model="item.website" type="url" />
-      </UFormField>
-
       <USeparator label="Contact" />
 
       <UFormField label="Nom" name="contactName">
@@ -71,6 +67,9 @@ async function submitItem() {
       </UFormField>
       <UFormField label="Téléphone" name="contactPhone">
         <UInput v-model="item.contactPhone" type="tel"/>
+      </UFormField>
+      <UFormField label="Site" name="website">
+        <UInput v-model="item.website" type="url" />
       </UFormField>
 
       <USeparator label="Facturation" />

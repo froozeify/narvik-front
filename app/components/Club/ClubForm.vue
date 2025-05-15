@@ -152,14 +152,14 @@ async function submitItem() {
       <UFormField label="Nom" name="contactName">
         <UInput v-model="item.contactName" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
       </UFormField>
-      <UFormField label="Site" name="website">
-        <UInput v-model="item.website" type="url" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
-      </UFormField>
       <UFormField label="Email" name="contactEmail">
         <UInput v-model="item.contactEmail" type="email" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
       </UFormField>
       <UFormField label="Téléphone" name="contactPhone">
         <UInput v-model="item.contactPhone" type="tel" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
+      </UFormField>
+      <UFormField label="Site" name="website">
+        <UInput v-model="item.website" type="url" :class="props.isList && item.uuid ? 'pointer-events-none' : ''" :tabindex="props.isList && item.uuid ? '-1' : '0'"/>
       </UFormField>
 
       <USeparator label="Facturation" />

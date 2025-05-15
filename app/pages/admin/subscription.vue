@@ -112,6 +112,9 @@ async function deleteClub() {
 
       <div>
         <p>
+          <b>Nom</b> : {{ selfStore.selectedProfile.club.name }}
+        </p>
+        <p>
           <b>Adresse</b> : {{ selfStore.selectedProfile.club.address }}
         </p>
         <p>
