@@ -275,7 +275,7 @@ onBeforeUnmount(() => {
                 <USelectMenu v-model="state.clubActivity" :items="getSelectMenuClubActivity()" />
 
                 <template #help>
-                  <p v-if="state.clubActivity?.value === ClubActivity.Generic">Votre activité n'est pas listée ? N'hésitez pas à <ContentLink to="https://about.narvik.app/contact" target="_blank">nous contacter</ContentLink> pour que nous l'ajoutions.</p>
+                  <p v-if="state.clubActivity?.value === ClubActivity.Generic">Vous ne trouvez pas votre activité ? Aucun souci : <ContentLink to="https://about.narvik.app/contact" target="_blank">écrivez-nous</ContentLink> et nous l’intégrerons rapidement.</p>
                 </template>
               </UFormField>
 
