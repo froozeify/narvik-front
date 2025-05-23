@@ -85,5 +85,8 @@ export default defineNuxtConfig({
   robots: {
     disallow: ['*'],
     allow: ['/', '/login', '/login/**'],
+  },
+  sitemap: {
+    include: ['/', '/login', '/login/**']
   }
 })
