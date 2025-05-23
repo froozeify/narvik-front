@@ -1,0 +1,123 @@
+{
+  "name": "Narvik - Gestionnaire d'association",
+  "short_name": "Narvik",
+  "description": "Narvik est une plateforme en ligne permettant de simplifier la gestion d'une association",
+  "theme_color": "#1c398e",
+  "background_color": "#ffffff",
+  "display": "minimal-ui",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "purpose": "maskable",
+      "sizes": "1024x1024",
+      "src": "manifest/maskable_icon.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "48x48",
+      "src": "manifest/maskable_icon_x48.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "72x72",
+      "src": "manifest/maskable_icon_x72.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "96x96",
+      "src": "manifest/maskable_icon_x96.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "128x128",
+      "src": "manifest/maskable_icon_x128.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "192x192",
+      "src": "manifest/maskable_icon_x192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "384x384",
+      "src": "manifest/maskable_icon_x384.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any maskable",
+      "sizes": "512x512",
+      "src": "manifest/maskable_icon_x512.png",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "manifest/desktop/members.webp",
+      "sizes": "1920x1080",
+      "type": "image/webp",
+      "form_factor": "wide"
+    },
+    {
+      "src": "manifest/desktop/stats.webp",
+      "sizes": "1920x1080",
+      "type": "image/webp",
+      "form_factor": "wide"
+    },
+    {
+      "src": "manifest/desktop/members.webp",
+      "sizes": "1920x1080",
+      "type": "image/webp",
+      "form_factor": "wide"
+    },
+    {
+      "src": "manifest/desktop/sales-new.webp",
+      "sizes": "1920x1080",
+      "type": "image/webp",
+      "form_factor": "wide"
+    },
+    {
+      "src": "manifest/desktop/sales.webp",
+      "sizes": "1920x1080",
+      "type": "image/webp",
+      "form_factor": "wide"
+    },
+
+    {
+      "src": "manifest/mobile/members.webp",
+      "sizes": "800x1731",
+      "type": "image/webp",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "manifest/mobile/stats.webp",
+      "sizes": "800x1731",
+      "type": "image/webp",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "manifest/mobile/members.webp",
+      "sizes": "800x1731",
+      "type": "image/webp",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "manifest/mobile/sales-new.webp",
+      "sizes": "800x1731",
+      "type": "image/webp",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "manifest/mobile/sales.webp",
+      "sizes": "800x1731",
+      "type": "image/webp",
+      "form_factor": "narrow"
+    }
+  ]
+}

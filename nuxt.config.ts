@@ -38,7 +38,8 @@ export default defineNuxtConfig({
     head: {
       titleTemplate: 'Narvik',
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'manifest', href: '/manifest.json' },
       ]
     }
   },
