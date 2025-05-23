@@ -81,6 +81,9 @@ export default defineNuxtConfig({
   ogImage: {
     enabled: false
   },
+  schemaOrg: {
+    enabled: false
+  },
 
   robots: {
     disallow: ['*'],

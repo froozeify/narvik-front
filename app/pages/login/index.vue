@@ -43,11 +43,12 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
 
   if (!selfStore.isLegalsAccepted()) {
     const modal = overlay.create(ModalLegalsAcceptance)
-    await modal.open({
+    const instance = modal.open({
       onAccepted() {
         redirectSuccessLogin()
       }
     })
+    await instance.result
     isLoading.value = false
   } else {
     redirectSuccessLogin()
