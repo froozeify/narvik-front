@@ -15,13 +15,7 @@ const ageCategoryQuery = new AgeCategoryQuery()
 
 const seasons: Ref<Season[]> = ref([])
 const ageCategories: Ref<AgeCategory[]> = ref([])
-const selectedSeason: Ref<string | undefined> = computed( () => {
-  if (selectedProfile.value?.club.settings.currentSeason["@id"]) {
-    // By default we select the current season
-    return selectedProfile.value?.club.settings.currentSeason["@id"]
-  }
-  return undefined
-})
+const selectedSeason: Ref<string | undefined> = ref(selectedProfile.value?.club.settings.currentSeason?.["@id"])
 const isSecondary: Ref<boolean> = ref(false)
 const selectedAgeCategory: Ref<string | undefined> = ref(undefined)
 
@@ -69,7 +63,7 @@ ageCategoryQuery.getAll().then((value) => {
     </UAlert>
 
     <UFormField label="Saison">
-      <USelect v-model="selectedSeason" :items="seasonsSelect" value-attribute="@id" />
+      <USelect v-model="selectedSeason" :items="seasonsSelect" />
     </UFormField>
 
     <UFormField label="Club secondaire">
