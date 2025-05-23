@@ -6,7 +6,8 @@ import type {SelectMenuItem} from "#ui/types";
 export enum ClubActivity {
   Generic = 'GENERIC',
 
-  FFTIR = 'FFTIR',
+  SPORT_OTHER = 'SPORT_OTHER',
+  SPORT_FFTIR = 'SPORT_FFTIR',
 }
 
 export function getSelectMenuClubActivity(): SelectMenuItem[] {
@@ -29,14 +30,18 @@ export function getSelectMenuClubActivity(): SelectMenuItem[] {
     },
 
     {
+      label: 'Autre sport',
+      value: ClubActivity.SPORT_OTHER
+    },
+    {
       label: 'FFTIR - Tir sportif',
-      value: ClubActivity.FFTIR
+      value: ClubActivity.SPORT_FFTIR
     }
   ]
 }
 export function clubHasControlActivity(activity: ClubActivity|undefined): boolean {
   if (!activity) return false
-  return [ClubActivity.Generic, ClubActivity.FFTIR].includes(activity)
+  return [ClubActivity.Generic, ClubActivity.SPORT_FFTIR].includes(activity)
 }
 
 export enum ClubRole {

@@ -134,7 +134,7 @@ async function importExternalPresences(event: any) {
       <div class="flex gap-2">
         <UButton target="_blank" to="https://docs.narvik.app/frontend/docs/import/narvik-presences.html">Documentation</UButton>
         <div class="flex-1"></div>
-        <UButton v-if="selectedProfile?.club.settings.activity === ClubActivity.FFTIR" variant="ghost" to="/admin/imports/cerbere">Import depuis cerbère</UButton>
+        <UButton v-if="selectedProfile?.club.settings.activity === ClubActivity.SPORT_FFTIR" variant="ghost" to="/admin/imports/cerbere">Import depuis cerbère</UButton>
       </div>
 
     </UCard>
