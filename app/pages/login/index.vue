@@ -4,6 +4,7 @@ import {useLoginUser} from "~/composables/api/api";
 import {useAppConfigStore} from "~/stores/useAppConfig";
 import {useSelfUserStore} from "~/stores/useSelfUser";
 import ModalLegalsAcceptance from "~/components/Modal/ModalLegalsAcceptance.vue";
+import {convertUuidToUrlUuid} from "~/utils/resource";
 
 const toast = useToast()
 const overlay = useOverlay()
@@ -56,6 +57,10 @@ async function onSubmit(event: FormSubmitEvent<{email: string, password: string}
 }
 
 function redirectSuccessLogin() {
+  const { proxy } = useScriptUmamiAnalytics()
+  if (selfStore.user?.uuid) {
+    proxy.identify(convertUuidToUrlUuid(selfStore.user.uuid))
+  }
   if (selfStore.isSuperAdmin()) {
     navigateTo('/super-admin');
   }
