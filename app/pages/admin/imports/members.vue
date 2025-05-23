@@ -110,7 +110,7 @@ async function importFromEden(event: any) {
 
     <MetricAdminImportBatches />
 
-    <template v-if="selectedProfile?.club.settings.activity === ClubActivity.FFTIR">
+    <template v-if="selectedProfile?.club.settings.activity === ClubActivity.SPORT_FFTIR">
       <UCard>
         <p>L'import doit être structuré au format itac.</p>
         <p>Celui-ci doit obligatoirement être au format csv.</p>

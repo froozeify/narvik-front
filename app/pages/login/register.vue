@@ -276,6 +276,7 @@ onBeforeUnmount(() => {
 
                 <template #help>
                   <p v-if="state.clubActivity?.value === ClubActivity.Generic">Vous ne trouvez pas votre activité ? Aucun souci : <ContentLink to="https://about.narvik.app/contact" target="_blank">écrivez-nous</ContentLink> et nous l’intégrerons rapidement.</p>
+                  <p v-if="state.clubActivity?.value === ClubActivity.SPORT_OTHER">Votre activité sportive n'est pas listée ? Aucun souci : <ContentLink to="https://about.narvik.app/contact" target="_blank">écrivez-nous</ContentLink> et nous l’intégrerons rapidement.</p>
                 </template>
               </UFormField>
 

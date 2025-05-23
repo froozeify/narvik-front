@@ -55,7 +55,7 @@ async function getFileObject(event: any) {
           @change="getFileObject"
       />
 
-      <UButton v-if="selectedProfile?.club.settings.activity === ClubActivity.FFTIR" target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-itac.html#import-des-photos">Documentation</UButton>
+      <UButton v-if="selectedProfile?.club.settings.activity === ClubActivity.SPORT_FFTIR" target="_blank" to="https://docs.narvik.app/frontend/docs/import/fftir-itac.html#import-des-photos">Documentation</UButton>
 
     </UCard>
   </div>
