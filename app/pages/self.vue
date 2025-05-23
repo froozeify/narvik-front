@@ -12,8 +12,9 @@ useHead({
   title: "Mes informations"
 })
 
-const overlay = useOverlay()
 const toast = useToast()
+const overlay = useOverlay()
+const overlayDeleteConfirmation = overlay.create(ModalDeleteConfirmation)
 
 const userQuery = new UserQuery();
 
@@ -120,13 +121,13 @@ async function deleteUser() {
           icon="i-heroicons-trash"
           color="error"
           @click="
-          overlay.create(ModalDeleteConfirmation).open({
+          overlayDeleteConfirmation.open({
             alertTitle: 'Seul le compte sera supprimé.',
             alertDescription: 'Pour supprimer les enregistrements liée au club (présences, fiche membre), veuillez faire une demande auprès du club.',
             alertColor: 'error',
             onDelete() {
               deleteUser()
-              // modal.close()
+              overlayDeleteConfirmation.close(true)
             }
           })"
         >
